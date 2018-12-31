@@ -21,6 +21,8 @@ eXonytes Realm & other sources
 
 Current project state:
 
+IRC7 uses .NET Core 2.2 SDK and has been compiled in VS 2017
+
 - Apologies as commenting is VERY scarce, I have literally been rushing this code and it is by no means quality at the moment
 - Bits will definitely need to be improved upon, re-written, etc
 - Some fundamental architecture decisions may need to be made going forward
