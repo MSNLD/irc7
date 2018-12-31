@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Core": {
+      "commandName": "Project",
+      "commandLineArgs": "-console -bindip localhost -deb -remoteip 127.0.0.1 -bindport 6778"
+    }
+  }
+}
