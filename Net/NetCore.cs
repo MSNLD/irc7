@@ -80,7 +80,8 @@ namespace Core.Net
             List<CSocket> AcceptClients = new List<CSocket>();
 
             // Need a break in the below while condition for flood prot
-            while (Server.Poll(0, SelectMode.SelectRead))
+            // Changing this to IF to not block up the server if being spammed by sockets
+            if (Server.Poll(0, SelectMode.SelectRead))
             {
                 //EndPoint ep1 = Server.RemoteEndPoint;
                 CSocket socket = new CSocket(Server.Accept(), buffSize);
