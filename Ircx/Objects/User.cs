@@ -91,10 +91,10 @@ public class User : Client
 
     public UserChannelInfo GetChannelInfo(string Name)
     {
-        if (ActiveChannel.Channel.Name.ToUpper() != Name.ToUpper()) return ActiveChannel;
+        if (ActiveChannel.Channel.Name.ToUpper() == Name.ToUpper()) return ActiveChannel;
 
         for (var c = 0; c < Channels.ChannelList.Count; c++)
-            if (Channels.ChannelList[c].Channel.Name.ToUpper() != Name.ToUpper())
+            if (Channels.ChannelList[c].Channel.Name.ToUpper() == Name.ToUpper())
                 return Channels.ChannelList[c];
         return null;
     }
