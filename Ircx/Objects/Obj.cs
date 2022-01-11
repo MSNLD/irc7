@@ -36,8 +36,8 @@ namespace Core.Ircx.Objects
         // Flood Profile
 
         FrameBuffer bufferIn = new FrameBuffer();
-        Queue<String8> bufferOut = new Queue<String8>();
-        String8 _intName = null, _intUName = null;
+        Queue<string> bufferOut = new Queue<string>();
+        string _intName = null, _intUName = null;
         public long OID { get; }
         public long FOID;
         public ObjType ObjectType;
@@ -55,41 +55,40 @@ namespace Core.Ircx.Objects
             ObjIDGenerator.Free(OID);
         }
 
-        public String8 Name {
+        public string Name {
             get {
                 return (_intName == null ? Resources.Wildcard : _intName);
             }
             set {
                 Properties.Name.Value = value;
                 _intName = value;
-                _intUName = new String8(_intName.bytes);
-                _intUName.toupper();
+                _intUName = new string(_intName.ToString().ToUpper());
             } }
-        public String8 UCaseName { get { return _intUName; } }
-        public String8 OIDX8 {
+        public string UCaseName { get { return _intUName; } }
+        public string OIDX8 {
             get {
                 if (FOID != 0) { return FOID.ToString("X9"); }
                 else { return OID.ToString("X9"); }
             }
         }
-        public bool SetForeignOID(String8 OID)
+        public bool SetForeignOID(string OID)
         {
             long _foid = -1;
-            long.TryParse(OID.chars, System.Globalization.NumberStyles.HexNumber, null, out _foid);
+            long.TryParse(OID.ToString(), System.Globalization.NumberStyles.HexNumber, null, out _foid);
 
             if (_foid != -1) { FOID = _foid; return true; }
             else { return false; }
         }
         public FrameBuffer BufferIn { get { return bufferIn; } }
-        public Queue<String8> BufferOut { get { return bufferOut; } }
+        public Queue<string> BufferOut { get { return bufferOut; } }
 
         public void Receive(Frame frame)
         {
-            Debug.Out(OIDX8.chars + ":RX: " + frame.Message.rawData.chars);
+            Debug.Out(OIDX8.ToString() + ":RX: " + frame.Message.rawData.ToString());
             BufferIn.Queue.Enqueue(frame);
         }
 
-        public static ObjType GetObjectType(String8 ObjectName, ObjIdentifier objIdentifier)
+        public static ObjType GetObjectType(string ObjectName, ObjIdentifier objIdentifier)
         {
             if (objIdentifier >= ObjIdentifier.ObjIdGlobalChannel && objIdentifier <= ObjIdentifier.ObjIdExtendedLocalChannel)
             {
@@ -103,58 +102,63 @@ namespace Core.Ircx.Objects
             else if (objIdentifier == ObjIdentifier.ObjIdInternal) { return ObjType.ObjectID; }
             else { return ObjType.InvalidObject; }
         }
-        public static ObjType GetObjectType(String8 ObjectName)
+        public static ObjType GetObjectType(string ObjectName)
         {
             ObjIdentifier objIdentifier = IdentifyObject(ObjectName);
             return GetObjectType(ObjectName, objIdentifier);
         }
 
-        public static ObjIdentifier IdentifyObject(String8 ObjectName)
+        public static ObjIdentifier IdentifyObject(string ObjectName)
         {
             if (ObjectName.Length == 1)
             {
-                switch (ObjectName.bytes[0])
+                switch (ObjectName[0])
                 {
-                    case (byte)'$': { return ObjIdentifier.ObjIdServer; }
-                    case (byte)'*': { return ObjIdentifier.ObjIdNetwork; }
-                    case (byte)'%': { return ObjIdentifier.ObjIdLastChannel; }
+                    case '$': { return ObjIdentifier.ObjIdServer; }
+                    case '*': { return ObjIdentifier.ObjIdNetwork; }
+                    case '%': { return ObjIdentifier.ObjIdLastChannel; }
                 }
             }
             else if (ObjectName.Length > 1)
             {
-                switch (ObjectName.bytes[0])
+                switch (ObjectName[0])
                 {
-                    case (byte)'%':
+                    case '%':
                         {
-                            switch (ObjectName.bytes[1])
+                            switch (ObjectName[1])
                             {
-                                case (byte)'#': { return ObjIdentifier.ObjIdExtendedGlobalChannel; }
-                                case (byte)'&': { return ObjIdentifier.ObjIdExtendedLocalChannel; }
+                                case '#': { return ObjIdentifier.ObjIdExtendedGlobalChannel; }
+                                case '&': { return ObjIdentifier.ObjIdExtendedLocalChannel; }
                                 default: { return ObjIdentifier.InvalidObjId; }
                             }
                         }
-                    case (byte)'^': { return ObjIdentifier.ObjIdIRCUserHex; }
-                    case (byte)'0': { return ObjIdentifier.ObjIdInternal; }
-                    case (byte)'\'': { return ObjIdentifier.ObjIdIRCUserUnicode; }
-                    case (byte)'#': { return ObjIdentifier.ObjIdGlobalChannel; }
-                    case (byte)'&': { return ObjIdentifier.ObjIdLocalChannel; }
+                    case '^': { return ObjIdentifier.ObjIdIRCUserHex; }
+                    case '0': { return ObjIdentifier.ObjIdInternal; }
+                    case '\'': { return ObjIdentifier.ObjIdIRCUserUnicode; }
+                    case '#': { return ObjIdentifier.ObjIdGlobalChannel; }
+                    case '&': { return ObjIdentifier.ObjIdLocalChannel; }
                 }
             }
 
             // Default is user nickname
             return ObjIdentifier.ObjIdIRCUser;
         }
-        public static bool IsObject(String8 Name)
+        public static bool IsObject(string Name)
         {
             // Rule that an object must begin with 0
             if (Name.Length > 0)
             {
-                if (Name.bytes[0] == 48) {
+                if (Name[0] == 48) {
                     return true;
                 }
             }
 
             return false;
+        }
+
+        public override string ToString()
+        {
+            return Name.ToString();
         }
     }
     public class ObjCollection
@@ -171,7 +175,7 @@ namespace Core.Ircx.Objects
         public int Length { get { return Objects.Count; } }
         public Obj IndexOf(int i) { return Objects[i]; }
 
-        public Obj FindObj(String8 Name, ObjIdentifier ObjType)
+        public Obj FindObj(string Name, ObjIdentifier ObjType)
         {
             switch (ObjType)
             {
@@ -193,10 +197,10 @@ namespace Core.Ircx.Objects
             }
         }
 
-        public Obj FindObjByOID(String8 OID)
+        public Obj FindObjByOID(string OID)
         {
             long oid;
-            long.TryParse(OID.chars, System.Globalization.NumberStyles.HexNumber, null, out oid);
+            long.TryParse(OID.ToString(), System.Globalization.NumberStyles.HexNumber, null, out oid);
 
             for (int c = 0; c < Objects.Count; c++)
             {
@@ -207,19 +211,19 @@ namespace Core.Ircx.Objects
             }
             return null;
         }
-        public Obj FindObjByHex(String8 Hex)
+        public Obj FindObjByHex(string Hex)
         {
-            String8 HexString = new String8(Hex.bytes, 1, Hex.length);
+            string HexString = new string(Hex.ToString().Substring(1));
 
             HexString = CSharpTools.Tools.HexToString(HexString);
 
             return FindObjByName(HexString);
         }
-        public Obj FindObjByName(String8 Name)
+        public Obj FindObjByName(string Name)
         {
             for (int c = 0; c < Objects.Count; c++)
             {
-                if (!String8.compareCaseInsensitive(Objects[c].Name, Name))
+                if (Objects[c].Name.ToString().ToUpper() != Name.ToString().ToUpper())
                 {
                     return Objects[c];
                 }

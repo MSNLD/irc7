@@ -56,7 +56,7 @@ namespace Core.Ircx.Commands
                                 }
                             }
 
-                            if (message.Data[1].bytes[0] == (byte)'*')
+                            if (message.Data[1][0] == (byte)'*')
                             {
                                 //list properties for current user level
                                 bool eligible = true;
@@ -67,20 +67,19 @@ namespace Core.Ircx.Commands
                                 {
                                     for (int i = 0; i < c.Properties.List.Count; i++)
                                     {
-                                        if (c.Properties.List[i].Value.length > 0)
+                                        if (c.Properties.List[i].Value.Length > 0)
                                         {
-                                            if ((c.Properties.List[i].ReadLevel <= UserLevel) && (!c.Properties.List[i].Hidden)) { /* display prop */ user.Send(Raws.Create(Server: server, Channel: c, Client: user, Raw: Raws.IRCX_RPL_PROPLIST_818, Data: new String8[] { c.Name, c.Properties.List[i].Name, c.Properties.List[i].Value })); }
+                                            if ((c.Properties.List[i].ReadLevel <= UserLevel) && (!c.Properties.List[i].Hidden)) { /* display prop */ user.Send(Raws.Create(Server: server, Channel: c, Client: user, Raw: Raws.IRCX_RPL_PROPLIST_818, Data: new string[] { c.Name, c.Properties.List[i].Name, c.Properties.List[i].Value })); }
                                         }
                                     }
                                 }
                                 //send end of properties
-                                user.Send(Raws.Create(Server: server, Channel: c, Client: user, Raw: Raws.IRCX_RPL_PROPEND_819, Data: new String8[] { c.Name }));
+                                user.Send(Raws.Create(Server: server, Channel: c, Client: user, Raw: Raws.IRCX_RPL_PROPEND_819, Data: new string[] { c.Name }));
                             }
                             else
                             {
                                 //resolve property
-                                String8 PropertyValue = new String8(message.Data[1].bytes, 0, message.Data[1].length);
-                                PropertyValue.toupper();
+                                string PropertyValue = new string(message.Data[1].ToString().ToUpper());
 
                                 Prop ChannelProperty = c.Properties.GetPropByName(PropertyValue);
                                 if (ChannelProperty != null)
@@ -91,7 +90,7 @@ namespace Core.Ircx.Commands
 
                                         if (!user.IsOnChannel(c))
                                         {
-                                            user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442, Data: new String8[] { message.Data[0] }));
+                                            user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442, Data: new string[] { message.Data[0] }));
                                             //not on channel
                                         }
                                         else if (ChannelProperty.WriteLevel <= UserLevel)
@@ -99,13 +98,13 @@ namespace Core.Ircx.Commands
                                             //change and send PROP to channel
                                             if (ChannelProperty.Limit > 0)
                                             {
-                                                if (message.Data[2].length <= ChannelProperty.Limit)
+                                                if (message.Data[2].Length <= ChannelProperty.Limit)
                                                 {
-                                                    String8 Value = message.Data[2];
+                                                    string Value = message.Data[2];
                                                     if (ChannelProperty == c.Properties.Memberkey)
                                                     {
 
-                                                        if (Value.length > 0) { c.Modes.Key.Value = 1; }
+                                                        if (Value.Length > 0) { c.Modes.Key.Value = 1; }
                                                         else { c.Modes.Key.Value = 0; }
 
                                                         c.Modes.UpdateModes(ChannelProperty);
@@ -116,31 +115,31 @@ namespace Core.Ircx.Commands
                                                     }
                                                     else if (ChannelProperty == c.Properties.ClientGuid)
                                                     {
-                                                        if (Value.length == 32)
+                                                        if (Value.Length == 32)
                                                         {
                                                             Guid guid;
-                                                            Guid.TryParseExact(Value.chars, "N", out guid);
+                                                            Guid.TryParseExact(Value.ToString(), "N", out guid);
                                                             if (guid == Guid.Empty)
                                                             {
                                                                 //bad value specified
-                                                                user.Send(Raws.Create(Server: server, Channel: c, Client: user, Raw: Raws.IRCX_ERR_BADVALUE_906, Data: new String8[] { message.Data[2] }));
+                                                                user.Send(Raws.Create(Server: server, Channel: c, Client: user, Raw: Raws.IRCX_ERR_BADVALUE_906, Data: new string[] { message.Data[2] }));
                                                                 return COM_RESULT.COM_SUCCESS;
 
                                                             }
                                                         }
                                                         else {
-                                                            user.Send(Raws.Create(Server: server, Channel: c, Client: user, Raw: Raws.IRCX_ERR_BADVALUE_906, Data: new String8[] { message.Data[2] }));
+                                                            user.Send(Raws.Create(Server: server, Channel: c, Client: user, Raw: Raws.IRCX_ERR_BADVALUE_906, Data: new string[] { message.Data[2] }));
                                                             return COM_RESULT.COM_SUCCESS;
                                                         }
                                                     }
 
                                                     ChannelProperty.Value = Value;
-                                                    c.SendLevel(Raws.Create(Server: server, Channel: c, Client: user, Raw: Raws.RPL_PROP_IRCX, Data: new String8[] { ChannelProperty.Name, ChannelProperty.Value }), ChannelProperty.ReadLevel);
+                                                    c.SendLevel(Raws.Create(Server: server, Channel: c, Client: user, Raw: Raws.RPL_PROP_IRCX, Data: new string[] { ChannelProperty.Name, ChannelProperty.Value }), ChannelProperty.ReadLevel);
                                                 }
                                                 else
                                                 {
                                                     //bad value specified
-                                                    user.Send(Raws.Create(Server: server, Channel: c, Client: user, Raw: Raws.IRCX_ERR_BADVALUE_906, Data: new String8[] { message.Data[2] }));
+                                                    user.Send(Raws.Create(Server: server, Channel: c, Client: user, Raw: Raws.IRCX_ERR_BADVALUE_906, Data: new string[] { message.Data[2] }));
                                                 }
                                             }
                                             else if (ChannelProperty.Limit == 0)
@@ -150,7 +149,7 @@ namespace Core.Ircx.Commands
                                                 //then rest of logic
                                                 //else
                                                 //bad command
-                                                if (message.Data[2].length <= 9)
+                                                if (message.Data[2].Length <= 9)
                                                 {
                                                     int number = CSharpTools.Tools.Str2Int(message.Data[2]);
                                                     if (number > -1)
@@ -159,25 +158,25 @@ namespace Core.Ircx.Commands
                                                         if ((number >= 0) && (number <= 2))
                                                         {
                                                             ChannelProperty.Value = message.Data[2];
-                                                            c.SendLevel(Raws.Create(Server: server, Channel: c, Client: user, Raw: Raws.RPL_PROP_IRCX, Data: new String8[] { ChannelProperty.Name, ChannelProperty.Value }), ChannelProperty.ReadLevel);
+                                                            c.SendLevel(Raws.Create(Server: server, Channel: c, Client: user, Raw: Raws.RPL_PROP_IRCX, Data: new string[] { ChannelProperty.Name, ChannelProperty.Value }), ChannelProperty.ReadLevel);
                                                             c.FloodProfile.FloodProtectionLevel.Delay = number;
                                                         }
                                                         else
                                                         {
                                                             //bad value specified
-                                                            user.Send(Raws.Create(Server: server, Channel: c, Client: user, Raw: Raws.IRCX_ERR_BADVALUE_906, Data: new String8[] { message.Data[2] }));
+                                                            user.Send(Raws.Create(Server: server, Channel: c, Client: user, Raw: Raws.IRCX_ERR_BADVALUE_906, Data: new string[] { message.Data[2] }));
                                                         }
                                                     }
                                                     else
                                                     {
                                                         //bad command
-                                                        user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new String8[] { Resources.CommandProp }));
+                                                        user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new string[] { Resources.CommandProp }));
                                                     }
                                                 }
                                                 else
                                                 {
                                                     //bad command
-                                                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new String8[] { Resources.CommandProp }));
+                                                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new string[] { Resources.CommandProp }));
                                                 }
                                             }
                                             else; //this is taken care of as if its -1 then you cannot write to it, and therefore no permissions
@@ -190,25 +189,25 @@ namespace Core.Ircx.Commands
                                     else
                                     {
                                         //user wants to read a property
-                                        if (ChannelProperty.Value.length > 0)
+                                        if (ChannelProperty.Value.Length > 0)
                                         {
-                                            if ((ChannelProperty.ReadLevel <= UserLevel) && (!ChannelProperty.Hidden)) { /* display prop */ user.Send(Raws.Create(Server: server, Channel: c, Client: user, Raw: Raws.IRCX_RPL_PROPLIST_818, Data: new String8[] { c.Name, ChannelProperty.Name, ChannelProperty.Value })); }
+                                            if ((ChannelProperty.ReadLevel <= UserLevel) && (!ChannelProperty.Hidden)) { /* display prop */ user.Send(Raws.Create(Server: server, Channel: c, Client: user, Raw: Raws.IRCX_RPL_PROPLIST_818, Data: new string[] { c.Name, ChannelProperty.Name, ChannelProperty.Value })); }
                                         }
                                         //send end of properties
-                                        user.Send(Raws.Create(Server: server, Channel: c, Client: user, Raw: Raws.IRCX_RPL_PROPEND_819, Data: new String8[] { c.Name }));
+                                        user.Send(Raws.Create(Server: server, Channel: c, Client: user, Raw: Raws.IRCX_RPL_PROPEND_819, Data: new string[] { c.Name }));
                                     }
                                 }
                                 else
                                 {
                                     //<- :Default-Chat-Community 905 Sky2k #test :Bad property specified (muel)
-                                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADPROPERTY_905, Data: new String8[] { message.Data[1] }));
+                                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADPROPERTY_905, Data: new string[] { message.Data[1] }));
                                 }
                             }
                         }
                         else
                         {
                             //<- :Default-Chat-Community 461 Sky2k PROP :Not enough parameters
-                            user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new String8[] { message.Command }));
+                            user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new string[] { message.Command }));
                         }
                     }
                     #endregion
@@ -220,10 +219,9 @@ namespace Core.Ircx.Commands
                         if (Flood.FloodCheck(base.DataType, Frame.User) == FLD_RESULT.S_WAIT) { return COM_RESULT.COM_WAIT; }
 
                         User TargetUser = null;
-                        String8 ObjectNickname = new String8(message.Data[0].bytes, 0, message.Data[0].length);
-                        ObjectNickname.toupper();
+                        string ObjectNickname = new string(message.Data[0].ToString().ToUpper());
 
-                        if ((ObjectNickname.length == 1) && (ObjectNickname.bytes[0] == (byte)'$')) { TargetUser = user; } //<$> The $ value is used to indicate the user that originated the request.
+                        if ((ObjectNickname.Length == 1) && (ObjectNickname[0] == (byte)'$')) { TargetUser = user; } //<$> The $ value is used to indicate the user that originated the request.
                         else if (user.Address.UNickname == ObjectNickname) { TargetUser = user; }
                         else { TargetUser = server.Users.GetUser(ObjectNickname); }
 
@@ -231,7 +229,7 @@ namespace Core.Ircx.Commands
                         {
 
                             //for PROP $ NICK, PROP $ MSNPROFILE etc
-                            if (message.Data[1].bytes[0] == (byte)'*')
+                            if (message.Data[1][0] == (byte)'*')
                             {
                                 //send end of properties
                                 user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_SECURITY_908));
@@ -239,8 +237,7 @@ namespace Core.Ircx.Commands
                             else
                             {
                                 //resolve property
-                                String8 PropertyValue = new String8(message.Data[1].bytes, 0, message.Data[1].length);
-                                PropertyValue.toupper();
+                                string PropertyValue = new string(message.Data[1].ToString().ToUpper());
 
                                 Prop UserProperty = TargetUser.Properties.GetPropByName(PropertyValue);
                                 if (UserProperty != null)
@@ -250,26 +247,26 @@ namespace Core.Ircx.Commands
                                         //user wants to change a property
                                         if (UserProperty.WriteLevel <= user.Level)
                                         {
-                                            String8 Value = message.Data[2];
+                                            string Value = message.Data[2];
                                             //change and send PROP to channel
                                             if (UserProperty.Limit > 0)
                                             {
-                                                if (message.Data[2].length <= UserProperty.Limit)
+                                                if (message.Data[2].Length <= UserProperty.Limit)
                                                 {
                                                     if ((!user.Guest) && (UserProperty.Name == Resources.UserPropMsnRegCookie))
                                                     {
-                                                        String8 RegCookie = message.Data[2];
-                                                        RegCookie r = Passport3.DecryptRegCookie(RegCookie);
+                                                        string RegCookie = message.Data[2];
+                                                        RegCookie r = Passport3.DecryptRegCookie(RegCookie.ToString());
                                                         if (r.version == 3)
                                                         {
-                                                            String8 Nickname = r.nickname;
+                                                            string Nickname = r.nickname;
                                                             
                                                             if (TargetUser.Registered)
                                                             {
                                                                 NICK.UpdateNickname(Frame.Server, Frame.User, Nickname);
                                                             }
                                                             server.UpdateUserNickname(TargetUser, Nickname);
-                                                            //TargetUser.Props.Puid.Value = new String8(Puid.bytes, 0, Puid.length);
+                                                            //TargetUser.Props.Puid.Value = new string(Puid.bytes, 0, Puid.Length);
                                                             //TargetUser.HasUser = true;
                                                             //Core.Ircx.Runtime.Register.QualifyUser(server, Frame.Connection);
                                                             UserProperty.SetPermissions(UserAccessLevel.NoAccess, UserAccessLevel.NoAccess, true, false);
@@ -277,13 +274,13 @@ namespace Core.Ircx.Commands
                                                     }
                                                     else
                                                     {
-                                                        user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADVALUE_906, Data: new String8[] { message.Data[3] }));
+                                                        user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADVALUE_906, Data: new string[] { message.Data[3] }));
                                                     }
                                                 }
                                                 else
                                                 {
                                                     //bad value specified
-                                                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADVALUE_906, Data: new String8[] { message.Data[2] }));
+                                                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADVALUE_906, Data: new string[] { message.Data[2] }));
                                                 }
                                             }
                                             else
@@ -295,7 +292,7 @@ namespace Core.Ircx.Commands
                                                     //then rest of logic
                                                     //else
                                                     //bad command
-                                                    if (message.Data[2].length <= 9)
+                                                    if (message.Data[2].Length <= 9)
                                                     {
                                                         int number = CSharpTools.Tools.Str2Int(message.Data[2]);
                                                         if (number > -1)
@@ -340,22 +337,22 @@ namespace Core.Ircx.Commands
                                                                         user.Profile.Picture = true;
                                                                         break;
                                                                     }
-                                                                default: { user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADVALUE_906, Data: new String8[] { message.Data[3] })); return COM_RESULT.COM_SUCCESS; }
+                                                                default: { user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADVALUE_906, Data: new string[] { message.Data[3] })); return COM_RESULT.COM_SUCCESS; }
                                                             }
 
                                                             UserProperty.Value = message.Data[2];
-                                                            user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_RPL_PROPLIST_818, Data: new String8[] { user.Address.Nickname, UserProperty.Name, UserProperty.Value }));
+                                                            user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_RPL_PROPLIST_818, Data: new string[] { user.Address.Nickname, UserProperty.Name, UserProperty.Value }));
                                                         }
                                                         else
                                                         {
                                                             //bad command
-                                                            user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new String8[] { Resources.CommandProp }));
+                                                            user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new string[] { Resources.CommandProp }));
                                                         }
                                                     }
                                                     else
                                                     {
                                                         //bad command
-                                                        user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new String8[] { Resources.CommandProp }));
+                                                        user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new string[] { Resources.CommandProp }));
                                                     }
                                                 }
                                                 else
@@ -372,39 +369,40 @@ namespace Core.Ircx.Commands
                                     else
                                     {
                                         //user wants to read a property
-                                        if (UserProperty.Value.length > 0)
+                                        if (UserProperty.Value.Length > 0)
                                         {
                                             if (UserProperty.ReadLevel <= user.Level)
                                             {
-                                                if (user.Auth.Signature == Authentication.Package.NTLM.SIGNATURE)
-                                                {
-                                                    if (!user.Registered)
-                                                    {
-                                                        TargetUser.Name = UserProperty.Value;
-                                                        Runtime.Register.QualifyUser(server, Frame.Connection);
-                                                        return COM_RESULT.COM_SUCCESS;
-                                                    }
-                                                }
+                                                // TODO: Fix NTLM
+                                                //if (user.Auth.Signature == Authentication.Package.NTLM.SIGNATURE)
+                                                //{
+                                                //    if (!user.Registered)
+                                                //    {
+                                                //        TargetUser.Name = UserProperty.Value;
+                                                //        Runtime.Register.QualifyUser(server, Frame.Connection);
+                                                //        return COM_RESULT.COM_SUCCESS;
+                                                //    }
+                                                //}
 
                                                 /* display prop */
-                                                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_RPL_PROPLIST_818, Data: new String8[] { TargetUser.Address.Nickname, UserProperty.Name, UserProperty.Value }));
+                                                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_RPL_PROPLIST_818, Data: new string[] { TargetUser.Address.Nickname, UserProperty.Name, UserProperty.Value }));
                                             }
                                         }
                                         //send end of properties
-                                        user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_RPL_PROPEND_819, Data: new String8[] { TargetUser.Address.Nickname }));
+                                        user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_RPL_PROPEND_819, Data: new string[] { TargetUser.Address.Nickname }));
                                     }
                                 }
                                 else
                                 {
                                     //<- :Default-Chat-Community 905 Sky2k #test :Bad property specified (muel)
-                                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADPROPERTY_905, Data: new String8[] { message.Data[1] }));
+                                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADPROPERTY_905, Data: new string[] { message.Data[1] }));
                                 }
                             }
                         }
                         else
                         {
                             //NO such object!
-                            user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NOSUCHOBJECT_924, Data: new String8[] { message.Data[0] }));
+                            user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NOSUCHOBJECT_924, Data: new string[] { message.Data[0] }));
                         }
                     }
                     #endregion
@@ -413,7 +411,7 @@ namespace Core.Ircx.Commands
                 else
                 {
                     //insufficient parameters
-                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new String8[] { message.Command }));
+                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new string[] { message.Command }));
                 }
             }
             return COM_RESULT.COM_SUCCESS;

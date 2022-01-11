@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Core.Ircx.Objects;
 using CSharpTools;
 using System.Reflection;
+using System.Text;
 
 namespace Core.Ircx.Commands
 {
@@ -31,41 +32,41 @@ namespace Core.Ircx.Commands
                 else
                 {
                     // you are not on that channel
-                    Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442, Data: new String8[] { Frame.Message.Data[0] }));
+                    Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442, Data: new string[] { Frame.Message.Data[0] }));
                 }
             }
             else
             {
                 //no such channel
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403, Data: new String8[] { Frame.Message.Data[0] }));
+                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403, Data: new string[] { Frame.Message.Data[0] }));
             }
             return COM_RESULT.COM_SUCCESS;
         }
         public static void ProcessNames(Server server, ChannelMember Member, Channel c)
         {
-            String8 Names = new String8(512);
-            String8 NameReply = Raws.Create(Server: server, Channel: c, Client: Member.User, Raw: Raws.IRCX_RPL_NAMEREPLY_353X, Newline: false);
+            StringBuilder Names = new StringBuilder(512);
+            string NameReply = Raws.Create(Server: server, Channel: c, Client: Member.User, Raw: Raws.IRCX_RPL_NAMEREPLY_353X, Newline: false);
 
-            Names.append(NameReply);
+            Names.Append(NameReply);
             for (int i = 0; i < c.MemberList.Count; i++)
             {
                 if (((c.Modes.Auditorium.Value == 1) && (c.MemberList[i].Level < UserAccessLevel.ChatHost) && (Member.Level <= UserAccessLevel.ChatMember)) && (Member != c.MemberList[i])) ;
                 else
                 {
-                    String8 Nickname = c.MemberList[i].User.Address.Nickname,
+                    string Nickname = c.MemberList[i].User.Address.Nickname,
                     PassportProf = c.MemberList[i].User.Profile.GetProfile(Member.User.Profile.Ircvers);
-                    int expectedLength = Nickname.length + PassportProf.length + (Member.User.Profile.Ircvers > 3 ? 1 : 0) + (Member.ChannelMode.UserMode != ChanUserMode.Normal ? 1 : 0);
+                    int expectedLength = Nickname.Length + PassportProf.Length + (Member.User.Profile.Ircvers > 3 ? 1 : 0) + (Member.ChannelMode.UserMode != ChanUserMode.Normal ? 1 : 0);
 
-                    if (Names.length + expectedLength < 510)
+                    if (Names.Length + expectedLength < 510)
                     {
                         if (Member.User.Profile.Ircvers > 3)
                         {
-                            Names.append(PassportProf);
-                            Names.append(44);
+                            Names.Append(PassportProf);
+                            Names.Append((char)44);
                         }
                         if ((c.MemberList[i].ChannelMode.IsHost()) || (c.MemberList[i].ChannelMode.IsOwner()))
                         {
-                            Names.append((byte)c.MemberList[i].ChannelMode.modeChar);
+                            Names.Append((char)c.MemberList[i].ChannelMode.modeChar);
 
                             // If the member is host or owner, the + voice flag is suffixed after the . or @
                             if (c.MemberList[i].ChannelMode.UserMode > ChanUserMode.Voice)
@@ -75,34 +76,34 @@ namespace Core.Ircx.Commands
                                     // however only under non-ircvers, irc0 and irc9
                                     switch (Member.User.Profile.Ircvers)
                                     {
-                                        case -1: case 0: case 9: { Names.append(Resources.FlagVoice); break; }
+                                        case -1: case 0: case 9: { Names.Append(Resources.FlagVoice); break; }
                                     }
                                 }
                             }
                         }
                         else if (c.MemberList[i].ChannelMode.IsVoice())
                         {
-                            Names.append((byte)c.MemberList[i].ChannelMode.modeChar);
+                            Names.Append((char)c.MemberList[i].ChannelMode.modeChar);
                         }
 
-                        Names.append(c.MemberList[i].User.Address.Nickname);
-                        Names.append(' ');
+                        Names.Append(c.MemberList[i].User.Address.Nickname);
+                        Names.Append(' ');
                     }
                     else
                     {
-                        Names.length--; //to get rid of tailing space
-                        Names.append(Resources.CRLF);
-                        Member.User.Send(new String8(Names.bytes, 0, Names.length));
-                        Names.length = 0;
-                        Names.append(NameReply);
+                        Names.Length--; //to get rid of tailing space
+                        Names.Append(Resources.CRLF);
+                        Member.User.Send(new string(Names.ToString()));
+                        Names.Length = 0;
+                        Names.Append(NameReply);
                         i--;
                     }
                 }
             }
-            Names.length--; //to get rid of tailing space
-            Names.append(Resources.CRLF);
-            Member.User.Send(new String8(Names.bytes, 0, Names.length));
-            Member.User.Send(Raws.Create(Server: server, Client: Member.User, Raw: Raws.IRCX_RPL_ENDOFNAMES_366, Data: new String8[] { c.Name }));
+            Names.Length--; //to get rid of tailing space
+            Names.Append(Resources.CRLF);
+            Member.User.Send(new string(Names.ToString()));
+            Member.User.Send(Raws.Create(Server: server, Client: Member.User, Raw: Raws.IRCX_RPL_ENDOFNAMES_366, Data: new string[] { c.Name }));
         }
     }
 }

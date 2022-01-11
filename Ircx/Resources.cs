@@ -8,168 +8,168 @@ namespace Core
     static class Resources
     {
         public static long epoch = 621355968000000000;
-        public static String8 CommandAccess = "ACCESS";
-        public static String8 CommandAdmin = "ADMIN";
-        public static String8 CommandAway = "AWAY";
-        public static String8 CommandAuth = "AUTH";
-        public static String8 CommandEvent = "EVENT";
-        public static String8 CommandGoto = "GOTO";
-        public static String8 CommandInfo = "INFO";
-        public static String8 CommandInvite = "INVITE";
-        public static String8 CommandIrcvers = "IRCVERS";
-        public static String8 CommandIsIrcx = "ISIRCX";
-        public static String8 CommandIrcx = "IRCX";
-        public static String8 CommandJoin = "JOIN";
-        public static String8 CommandKick = "KICK";
-        public static String8 CommandKill = "KILL";
-        public static String8 CommandListx = "LISTX";
-        public static String8 CommandMode = "MODE";
-        public static String8 CommandNick = "NICK";
-        public static String8 CommandNames = "NAMES";
-        public static String8 CommandNotice = "NOTICE";
-        public static String8 CommandPart = "PART";
-        public static String8 CommandPing = "PING";
-        public static String8 CommandPong = "PONG";
-        public static String8 CommandProp = "PROP";
-        public static String8 CommandPrivmsg = "PRIVMSG";
-        public static String8 CommandQuit = "QUIT";
-        public static String8 CommandTime = "TIME";
-        public static String8 CommandTopic = "TOPIC";
-        public static String8 CommandUser = "USER";
-        public static String8 CommandUserhost = "USERHOST";
-        public static String8 CommandVersion = "VERSION";
-        public static String8 CommandWho = "WHO";
-        public static String8 CommandWhois = "WHOIS";
-        public static String8 CommandWhisper = "WHISPER";
+        public static string CommandAccess = "ACCESS";
+        public static string CommandAdmin = "ADMIN";
+        public static string CommandAway = "AWAY";
+        public static string CommandAuth = "AUTH";
+        public static string CommandEvent = "EVENT";
+        public static string CommandGoto = "GOTO";
+        public static string CommandInfo = "INFO";
+        public static string CommandInvite = "INVITE";
+        public static string CommandIrcvers = "IRCVERS";
+        public static string CommandIsIrcx = "ISIRCX";
+        public static string CommandIrcx = "IRCX";
+        public static string CommandJoin = "JOIN";
+        public static string CommandKick = "KICK";
+        public static string CommandKill = "KILL";
+        public static string CommandListx = "LISTX";
+        public static string CommandMode = "MODE";
+        public static string CommandNick = "NICK";
+        public static string CommandNames = "NAMES";
+        public static string CommandNotice = "NOTICE";
+        public static string CommandPart = "PART";
+        public static string CommandPing = "PING";
+        public static string CommandPong = "PONG";
+        public static string CommandProp = "PROP";
+        public static string CommandPrivmsg = "PRIVMSG";
+        public static string CommandQuit = "QUIT";
+        public static string CommandTime = "TIME";
+        public static string CommandTopic = "TOPIC";
+        public static string CommandUser = "USER";
+        public static string CommandUserhost = "USERHOST";
+        public static string CommandVersion = "VERSION";
+        public static string CommandWho = "WHO";
+        public static string CommandWhois = "WHOIS";
+        public static string CommandWhisper = "WHISPER";
 
-        public static String8 CRLF = "\r\n";
-        public static String8 PROP_NAME = "NAME";
-        public static String8 PROP_TOPIC = "TOPIC";
-        public static String8 PROP_LAG = "LAG";
-        public static String8 S_OK = "OK";
-        public static String8 IRC = "IRC";
-        public static String8 Null = "";
-        public static String8 Wildcard = "*";
-        public static String8 Self = "$";
-        public static String8 Home = "H";
-        public static String8 Gone = "G";
-        public static String8 Admin = "a";
-        public static String8 ISIRCX = "ISIRCX";
-        public static String8 PRIVMSG = "PRIVMSG";
-        public static String8 NOTICE = "NOTICE";
-        public static String8 CONNRESETBYPEER = "Connection reset by peer";
-        public static String8 INPUTFLOODING = "Input flooding";
-        public static String8 OUTPUTSATURATION = "Output Saturation";
-        public static String8 PINGTIMEOUT = "Ping Timeout";
-        public static String8 TimeRegionServerTime = "ST";
-        public static String8 TimeRegionGMT = "GT";
-        public static String8 TimeRegionEST = "ET";
-        public static String8 Zero = "0";
-        public static String8 One = "1";
-        public static String8 DefaultUserLimit = "100";
-        public static String8 DefaultCreateUserLimit = "50";
-        public static String8 DefaultChannelModes = "ntl";
-        public static String8 Raw471 = "471";
-        public static String8 Raw473 = "473";
-        public static String8 Raw474 = "474";
-        public static String8 Raw475 = "475";
-        public static String8 Raw556 = "556";
-        public static String8 Raw557 = "557";
-        public static String8 Raw812 = "812";
-        public static String8 Raw817 = "817";
-        public static String8 FlagOwner = ".";
-        public static String8 FlagHost = "@";
-        public static String8 FlagVoice = "+";
-        public static String8 UserhostParticle = "=+";
-        public static String8 enUS = "EN-US";
-        public static String8 Service = "SERVICE";
-        public static String8 Delete = "DELETE";
-        public static String8 IRCXOptions = "*";
+        public static string CRLF = "\r\n";
+        public static string PROP_NAME = "NAME";
+        public static string PROP_TOPIC = "TOPIC";
+        public static string PROP_LAG = "LAG";
+        public static string S_OK = "OK";
+        public static string IRC = "IRC";
+        public static string Null = "";
+        public static string Wildcard = "*";
+        public static string Self = "$";
+        public static string Home = "H";
+        public static string Gone = "G";
+        public static string Admin = "a";
+        public static string ISIRCX = "ISIRCX";
+        public static string PRIVMSG = "PRIVMSG";
+        public static string NOTICE = "NOTICE";
+        public static string CONNRESETBYPEER = "Connection reset by peer";
+        public static string INPUTFLOODING = "Input flooding";
+        public static string OUTPUTSATURATION = "Output Saturation";
+        public static string PINGTIMEOUT = "Ping Timeout";
+        public static string TimeRegionServerTime = "ST";
+        public static string TimeRegionGMT = "GT";
+        public static string TimeRegionEST = "ET";
+        public static string Zero = "0";
+        public static string One = "1";
+        public static string DefaultUserLimit = "100";
+        public static string DefaultCreateUserLimit = "50";
+        public static string DefaultChannelModes = "ntl";
+        public static string Raw471 = "471";
+        public static string Raw473 = "473";
+        public static string Raw474 = "474";
+        public static string Raw475 = "475";
+        public static string Raw556 = "556";
+        public static string Raw557 = "557";
+        public static string Raw812 = "812";
+        public static string Raw817 = "817";
+        public static string FlagOwner = ".";
+        public static string FlagHost = "@";
+        public static string FlagVoice = "+";
+        public static string UserhostParticle = "=+";
+        public static string enUS = "EN-US";
+        public static string Service = "SERVICE";
+        public static string Delete = "DELETE";
+        public static string IRCXOptions = "*";
 
 
-        public static String8 UserAccessGroupService = "Service Accounts";
-        public static String8 UserAccessGroupAdministrators = "Chat Administrators";
-        public static String8 UserAccessGroupSysopManagers = "Chat Sysop Managers";
-        public static String8 UserAccessGroupSysops = "Chat Sysops";
-        public static String8 UserAccessGroupGuides = "Chat Guides";
+        public static string UserAccessGroupService = "Service Accounts";
+        public static string UserAccessGroupAdministrators = "Chat Administrators";
+        public static string UserAccessGroupSysopManagers = "Chat Sysop Managers";
+        public static string UserAccessGroupSysops = "Chat Sysops";
+        public static string UserAccessGroupGuides = "Chat Guides";
 
         #region Channel Categories
-        public static String8 ChannelCategoryTeens = "TN";
-        public static String8 ChannelCategoryComputing = "CP";
-        public static String8 ChannelCategoryEvents = "EV";
-        public static String8 ChannelCategoryGeneral = "GN";
-        public static String8 ChannelCategoryHealth = "HE";
-        public static String8 ChannelCategoryCityChats = "GE";
-        public static String8 ChannelCategoryEntertainment = "EA";
-        public static String8 ChannelCategoryInterests = "II";
-        public static String8 ChannelCategoryLifestyles = "LF";
-        public static String8 ChannelCategoryMusic = "MU";
-        public static String8 ChannelCategoryPeers = "PR";
-        public static String8 ChannelCategoryNews = "NW";
-        public static String8 ChannelCategoryReligion = "RL";
-        public static String8 ChannelCategoryRomance = "RM";
-        public static String8 ChannelCategorySports = "SP";
-        public static String8 ChannelCategoryUnlisted = "UL";
+        public static string ChannelCategoryTeens = "TN";
+        public static string ChannelCategoryComputing = "CP";
+        public static string ChannelCategoryEvents = "EV";
+        public static string ChannelCategoryGeneral = "GN";
+        public static string ChannelCategoryHealth = "HE";
+        public static string ChannelCategoryCityChats = "GE";
+        public static string ChannelCategoryEntertainment = "EA";
+        public static string ChannelCategoryInterests = "II";
+        public static string ChannelCategoryLifestyles = "LF";
+        public static string ChannelCategoryMusic = "MU";
+        public static string ChannelCategoryPeers = "PR";
+        public static string ChannelCategoryNews = "NW";
+        public static string ChannelCategoryReligion = "RL";
+        public static string ChannelCategoryRomance = "RM";
+        public static string ChannelCategorySports = "SP";
+        public static string ChannelCategoryUnlisted = "UL";
         
         #endregion
 
         #region Channel Country & Language
-        public static String8 ChannelCountryLanguageENUS = "EN-US";
-        public static String8 ChannelCountryLanguageENCA = "EN-CA";
-        public static String8 ChannelCountryLanguageENGB = "EN-GB";
-        public static String8 ChannelCountryLanguageENUK = "EN-UK";
-        public static String8 ChannelCountryLanguageFRCA = "FR-CA";
-        public static String8 ChannelCountryLanguageENAU = "EN-AU";
+        public static string ChannelCountryLanguageENUS = "EN-US";
+        public static string ChannelCountryLanguageENCA = "EN-CA";
+        public static string ChannelCountryLanguageENGB = "EN-GB";
+        public static string ChannelCountryLanguageENUK = "EN-UK";
+        public static string ChannelCountryLanguageFRCA = "FR-CA";
+        public static string ChannelCountryLanguageENAU = "EN-AU";
         #endregion
 
         #region User Properties
-        public static String8 UserPropName = "NAME";
-        public static String8 UserPropRole = "ROLE";
-        public static String8 UserPropMsnProfile = "MSNPROFILE"; //
-        public static String8 UserPropMsnRegCookie = "MSNREGCOOKIE";
-        public static String8 UserPropNickname = "NICK";
-        public static String8 UserPropPuid = "PUID";
-        public static String8 UserPropIrcvers = "IRCVERS";
-        public static String8 UserPropClient = "CLIENT";
+        public static string UserPropName = "NAME";
+        public static string UserPropRole = "ROLE";
+        public static string UserPropMsnProfile = "MSNPROFILE"; //
+        public static string UserPropMsnRegCookie = "MSNREGCOOKIE";
+        public static string UserPropNickname = "NICK";
+        public static string UserPropPuid = "PUID";
+        public static string UserPropIrcvers = "IRCVERS";
+        public static string UserPropClient = "CLIENT";
         #endregion
 
         #region Channel Properties
-        public static String8 ChannelPropName = "NAME";
-        public static String8 ChannelPropTopic = "TOPIC";
-        public static String8 ChannelPropLag = "LAG";
-        public static String8 ChannelPropLanguage = "LANGUAGE";
-        public static String8 ChannelPropSubject = "SUBJECT";
-        public static String8 ChannelPropMemberkey = "MEMBERKEY";
-        public static String8 ChannelPropOwnerkey = "OWNERKEY";
-        public static String8 ChannelPropHostkey = "HOSTKEY";
-        public static String8 ChannelPropCreation = "CREATION";
-        public static String8 ChannelPropOID = "OID";
-        public static String8 ChannelPropPICS = "PICS";
-        public static String8 ChannelPropOnJoin = "ONJOIN";
-        public static String8 ChannelPropOnPart = "ONPART";
-        public static String8 ChannelPropClientGuid = "CLIENTGUID";
+        public static string ChannelPropName = "NAME";
+        public static string ChannelPropTopic = "TOPIC";
+        public static string ChannelPropLag = "LAG";
+        public static string ChannelPropLanguage = "LANGUAGE";
+        public static string ChannelPropSubject = "SUBJECT";
+        public static string ChannelPropMemberkey = "MEMBERKEY";
+        public static string ChannelPropOwnerkey = "OWNERKEY";
+        public static string ChannelPropHostkey = "HOSTKEY";
+        public static string ChannelPropCreation = "CREATION";
+        public static string ChannelPropOID = "OID";
+        public static string ChannelPropPICS = "PICS";
+        public static string ChannelPropOnJoin = "ONJOIN";
+        public static string ChannelPropOnPart = "ONPART";
+        public static string ChannelPropClientGuid = "CLIENTGUID";
         #endregion
 
         #region Server Events
-        public static String8 EventLevelUser = "USER";
-        public static String8 EventLevelChannel = "CHANNEL";
-        public static String8 EventLevelMember = "MEMBER";
-        public static String8 EventLevelServer = "SERVER";
-        public static String8 EventLevelConnect = "CONNECT";
-        public static String8 EventLevelSocket = "SOCKET";
+        public static string EventLevelUser = "USER";
+        public static string EventLevelChannel = "CHANNEL";
+        public static string EventLevelMember = "MEMBER";
+        public static string EventLevelServer = "SERVER";
+        public static string EventLevelConnect = "CONNECT";
+        public static string EventLevelSocket = "SOCKET";
         #endregion
 
         #region Channel Access
-        public static String8 AccessLevelOwner = "OWNER";
-        public static String8 AccessLevelHost = "HOST";
-        public static String8 AccessLevelVoice = "VOICE";
-        public static String8 AccessLevelDeny = "DENY";
-        public static String8 AccessLevelGrant = "GRANT";
+        public static string AccessLevelOwner = "OWNER";
+        public static string AccessLevelHost = "HOST";
+        public static string AccessLevelVoice = "VOICE";
+        public static string AccessLevelDeny = "DENY";
+        public static string AccessLevelGrant = "GRANT";
 
-        public static String8 AccessEntryOperatorAdd = "ADD";
-        public static String8 AccessEntryOperatorDelete = "DELETE";
-        public static String8 AccessEntryOperatorClear = "CLEAR";
-        public static String8 AccessEntryOperatorList = "LIST";
+        public static string AccessEntryOperatorAdd = "ADD";
+        public static string AccessEntryOperatorDelete = "DELETE";
+        public static string AccessEntryOperatorClear = "CLEAR";
+        public static string AccessEntryOperatorList = "LIST";
         #endregion
 
         #region Channel Resources
@@ -204,7 +204,7 @@ namespace Core
         public static byte ChannelUserFlagHost = (byte)'@';
         public static byte ChannelUserFlagVoice = (byte)'+';
 
-        public static String8 ChannelModeDefault = "ntl50";
+        public static string ChannelModeDefault = "ntl50";
         #endregion
 
         #region "User Modes"

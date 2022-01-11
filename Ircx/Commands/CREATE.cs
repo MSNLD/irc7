@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Core.Ircx.Objects;
 using CSharpTools;
 using System.Reflection;
+using System.Text;
 
 namespace Core.Ircx.Commands
 {
@@ -35,7 +36,7 @@ namespace Core.Ircx.Commands
             if (Frame.User.Level < UserAccessLevel.ChatUser)
             {
                 //guests cannot create
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_UNKNOWNCOMMAND_421, Data: new String8[] { Frame.Message.Command }));
+                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_UNKNOWNCOMMAND_421, Data: new string[] { Frame.Message.Command }));
                 return COM_RESULT.COM_SUCCESS;
             }
 
@@ -46,8 +47,7 @@ namespace Core.Ircx.Commands
          
             int currentIndex = 0;
 
-            String8 CatCode = new String8(message.Data[0].bytes, 0, message.Data[currentIndex++].length);
-            CatCode.toupper();
+            string CatCode = new string(message.Data[currentIndex++].ToString().ToUpper());
             Category Cat = ResolveCategoryByString(CatCode);
             if (Cat == Category.None)
             {
@@ -56,7 +56,7 @@ namespace Core.Ircx.Commands
                 return COM_RESULT.COM_SUCCESS;
             }
 
-            String8 ChannelName = message.Data[currentIndex++];
+            string ChannelName = message.Data[currentIndex++];
             if (!Channel.IsValidChannelFormat(ChannelName))
             {
                 //:server 706 [yournick] :Channel name is not valid
@@ -64,14 +64,14 @@ namespace Core.Ircx.Commands
                 return COM_RESULT.COM_SUCCESS;
             }
 
-            String8 Topic = message.Data[currentIndex++];
+            string Topic = message.Data[currentIndex++];
 
             //Validate Mode
             //If - then no Limit
             //Else Mode + Limit
-            String8 ModeString = message.Data[currentIndex++];
-            String8 Limit = Resources.DefaultCreateUserLimit;
-            if ((ModeString.length == 1) && (ModeString.bytes[0] == 45))
+            string ModeString = message.Data[currentIndex++];
+            string Limit = Resources.DefaultCreateUserLimit;
+            if ((ModeString.Length == 1) && (ModeString[0] == 45))
             {
                 ModeString = Resources.DefaultChannelModes;
             }
@@ -89,9 +89,8 @@ namespace Core.Ircx.Commands
                 }
             }
 
-            String8 Region = message.Data[currentIndex++];
+            string Region = message.Data[currentIndex++].ToString().ToUpper();
             CountryLanguageZone Zone = CountryLanguageZone.ENUS;
-            Region.toupper();
             Zone = ResolveCountry(Region);
             if (Zone == CountryLanguageZone.None)
             {
@@ -102,7 +101,7 @@ namespace Core.Ircx.Commands
             //check for en-us etc
 
             //Validate Locale (A language const from 1 - 24)
-            String8 Locale = message.Data[currentIndex++];
+            string Locale = message.Data[currentIndex++];
             int locale = CSharpTools.Tools.Str2Int(Locale);
             if ((locale < 1) || (locale > 24))
             {
@@ -112,14 +111,14 @@ namespace Core.Ircx.Commands
             }
 
             //Validate Ownerkey
-            String8 OwnerKey = Resources.Null;
+            string OwnerKey = Resources.Null;
 
             if (currentIndex < message.Data.Count)
             {
                 OwnerKey = message.Data[currentIndex++];
             }
 
-            if ((OwnerKey.length <= 0) || (OwnerKey.length > 31))
+            if ((OwnerKey.Length <= 0) || (OwnerKey.Length > 31))
             {
                 //:server 902 [yournick] :Badly formed parameters IRCX_ERR_BADLYFORMEDPARAMS_902
                 BadlyFormed(server, user);
@@ -160,9 +159,9 @@ namespace Core.Ircx.Commands
 
                 // Apply modes to channel
                 int limit = CSharpTools.Tools.Str2Int(Limit);
-                for (int i = 0; i < ModeString.length; i++)
+                for (int i = 0; i < ModeString.Length; i++)
                 {
-                    Mode m = c.Modes.ResolveMode(ModeString.bytes[i]);
+                    Mode m = c.Modes.ResolveMode((byte)ModeString[i]);
                     if (m.ModeChar == (byte)'l')
                     {
                         m.Value = limit; // Mode itself is limit
@@ -194,7 +193,7 @@ namespace Core.Ircx.Commands
             user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADLYFORMEDPARAMS_902));
         }
 
-        public bool IsModeValid(User user, String8 ModeString, String8 Limit)
+        public bool IsModeValid(User user, string ModeString, string Limit)
         {
             bool bModeAuthOnly = false, bModeHidden = false, bModeModerated = false, bModePrivate = false, bModeSecret = false,
             bModeTopicOp = false, bModeNoWhisper = false, bModeAuditorium = false, bModeNoGuestWhisper = false, bModeSpecialGuest = false,
@@ -203,71 +202,71 @@ namespace Core.Ircx.Commands
             int limit = CSharpTools.Tools.Str2Int(Limit);
             if (limit <= 0) { return false; }
 
-            for (int i = 0; i < ModeString.length; i++)
+            for (int i = 0; i < ModeString.Length; i++)
             {
-                switch (ModeString.bytes[i])
+                switch (ModeString[i])
                 {
-                    case (byte)'a':
+                    case 'a':
                         {
                             if (bModeAuthOnly) { return false; }
                             else { bModeAuthOnly = true; }
                             break;
                         }
-                    case (byte)'m':
+                    case 'm':
                         {
                             if (bModeModerated) { return false; }
                             else { bModeModerated = true; }
                             break;
                         }
-                    case (byte)'n':
+                    case 'n':
                         {
                             if (bModeNoExtern) { return false; }
                             else { bModeNoExtern = true; }
                             break;
                         }
-                    case (byte)'t':
+                    case 't':
                         {
                             if (bModeTopicOp) { return false; }
                             else { bModeTopicOp = true; }
                             break;
                         }
-                    case (byte)'l':
+                    case 'l':
                         {
                             if (bModeLimit) { return false; }
                             else { bModeLimit = true; }
                             break;
                         }
-                    case (byte)'w':
+                    case 'w':
                         {
                             if (bModeNoWhisper) { return false; }
                             else { bModeNoWhisper = true; }
                             break;
                         }
-                    case (byte)'W':
+                    case 'W':
                         {
                             if (bModeNoGuestWhisper) { return false; }
                             else { bModeNoGuestWhisper = true; }
                             break;
                         }
-                    case (byte)'h':
+                    case 'h':
                         {
                             if ((bModeHidden) || (bModeSecret) || (bModePrivate)) { return false; }
                             else { bModeHidden = true; }
                             break;
                         }
-                    case (byte)'p':
+                    case 'p':
                         {
                             if ((bModeHidden) || (bModeSecret) || (bModePrivate)) { return false; }
                             else { bModePrivate = true; }
                             break;
                         }
-                    case (byte)'s':
+                    case 's':
                         {
                             if ((bModeHidden) || (bModeSecret) || (bModePrivate)) { return false; }
                             else { bModeSecret = true; }
                             break;
                         }
-                    case (byte)'g':
+                    case 'g':
                         {
                             if (bModeSpecialGuest) { return false; }
                             else { bModeSpecialGuest = true; }
@@ -281,7 +280,7 @@ namespace Core.Ircx.Commands
             else { return true; } //limit has to exist as well
         }
 
-        public static String8 ResolveCategory(Category Cat)
+        public static string ResolveCategory(Category Cat)
         {
             switch (Cat)
             {
@@ -304,7 +303,7 @@ namespace Core.Ircx.Commands
             }
             return Resources.Null;
         }
-        public static Category ResolveCategoryByString(String8 Cat)
+        public static Category ResolveCategoryByString(string Cat)
         {
             if (Cat == Resources.ChannelCategoryTeens) { return Category.Teens; }
             else if (Cat == Resources.ChannelCategoryComputing) { return Category.Computing; }
@@ -324,7 +323,7 @@ namespace Core.Ircx.Commands
             else if (Cat == Resources.ChannelCategoryUnlisted) { return Category.Unlisted; }
             else { return Category.None; }
         }
-        public static String8 ResolveTimeZone(TimeZone Zone)
+        public static string ResolveTimeZone(TimeZone Zone)
         {
             switch (Zone)
             {
@@ -334,7 +333,7 @@ namespace Core.Ircx.Commands
             }
             return Resources.Null;
         }
-        public static String8 ResolveCountry(CountryLanguageZone Country)
+        public static string ResolveCountry(CountryLanguageZone Country)
         {
             switch (Country)
             {
@@ -346,7 +345,7 @@ namespace Core.Ircx.Commands
             }
             return Resources.Null;
         }
-        public static CountryLanguageZone ResolveCountry(String8 Country)
+        public static CountryLanguageZone ResolveCountry(string Country)
         {
             if (Country == Resources.ChannelCountryLanguageENUS) { return CountryLanguageZone.ENUS; }
             else if (Country == Resources.ChannelCountryLanguageENCA) { return CountryLanguageZone.ENCA; }
@@ -358,22 +357,21 @@ namespace Core.Ircx.Commands
             return CountryLanguageZone.None;
         }
 
-        public static String8 CreateSubject(TimeZone Zone, CountryLanguageZone Country, Category Cat, bool DST)
+        public static string CreateSubject(TimeZone Zone, CountryLanguageZone Country, Category Cat, bool DST)
         {
             //1:+ST!EN-US!AV
             //1:+ST!EN-GB!AV
             //1:-ST!EN-US!TN
-            String8 Value = new String8(14);
-            Value = new String8(14);
-            Value.append((byte)'1');
-            Value.append(58);
-            Value.append(DST ? (byte)'+' : (byte)'-');
-            Value.append(ResolveTimeZone(Zone));
-            Value.append((byte)'!');
-            Value.append(ResolveCountry(Country));
-            Value.append((byte)'!');
-            Value.append(ResolveCategory(Cat));
-            return Value;
+            StringBuilder Value = new StringBuilder(14);
+            Value.Append('1');
+            Value.Append(':');
+            Value.Append(DST ? '+' : '-');
+            Value.Append(ResolveTimeZone(Zone));
+            Value.Append('!');
+            Value.Append(ResolveCountry(Country));
+            Value.Append('!');
+            Value.Append(ResolveCategory(Cat));
+            return Value.ToString();
         }
 
         public enum TimeZone { ServerTime, GMT, EST };

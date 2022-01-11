@@ -23,15 +23,15 @@ namespace Core.Ircx.Commands
         {
             if (Frame.Message.Data != null)
             {
-                String8 AwayReason;
+                string AwayReason;
                 AwayReason = Frame.Message.Data[0];
-                if (AwayReason.Length >= 64) { AwayReason = new String8(AwayReason.bytes, 0, 63); }
+                if (AwayReason.Length >= 64) { AwayReason = new string(AwayReason.ToString().Substring(64)); }
 
-                Frame.User.Profile.AwayReason = AwayReason;
+                Frame.User.Profile.AwayReason = AwayReason.ToString();
 
                 Frame.User.Profile.Away = true;
                 Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_NOWAWAY_306));
-                Frame.User.BroadcastToChannels(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_USERNOWAWAY_822, Data: new String8[] { AwayReason } ), true);
+                Frame.User.BroadcastToChannels(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_USERNOWAWAY_822, Data: new string[] { AwayReason } ), true);
             }
             else
             {

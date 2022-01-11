@@ -18,7 +18,7 @@ namespace Core.Ircx.Objects
 
         public Command Command;
         public Message Message;
-        public String8 Reply;
+        public string Reply;
 
         public Frame(Server Server, Connection Connection, Message Message)
         {

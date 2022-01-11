@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using CSharpTools;
 
 namespace Core.Ircx.Objects
@@ -39,17 +40,19 @@ namespace Core.Ircx.Objects
         ProfileUserMode usermode;
         ProfileUserType usertype;
         bool haspic, isreg, isaway;
-        String8 ProfileData = new String8(7);
-        public String8 AwayReason;
+
+        StringBuilder _profileData = new StringBuilder(new string('\0', 7));
+        string ProfileData => _profileData.ToString();
+        public string AwayReason;
 
         public Profile()
         {
             ircvers = -1;
 
             Away = false;
-            ProfileData.bytes[1] = 44;
+            _profileData[1] = ',';
             UserMode = ProfileUserMode.User;
-            ProfileData.bytes[3] = 44;
+            _profileData[3] = ',';
             UserType = ProfileUserType.Guest;
             Picture = false;
             Registered = false;
@@ -65,7 +68,7 @@ namespace Core.Ircx.Objects
             set
             {
                 isaway = value;
-                ProfileData.bytes[0] = (!isaway ? (byte)'H' : (byte)'G');
+                _profileData[0] = (!isaway ? 'H' : 'G');
             }
         }
         public bool Picture
@@ -74,7 +77,7 @@ namespace Core.Ircx.Objects
             set
             {
                 haspic = value;
-                ProfileData.bytes[5] = haspic ? (byte)'Y' : (byte)'X';
+                _profileData[5] = haspic ? 'Y' : 'X';
             }
         }
         public bool Registered
@@ -83,7 +86,7 @@ namespace Core.Ircx.Objects
             set
             {
                 isreg = value;
-                ProfileData.bytes[6] = isreg ? (byte)'B' : (byte)'O';
+                _profileData[6] = isreg ? 'B' : 'O';
             }
         }
         public ProfileUserMode UserMode
@@ -100,7 +103,7 @@ namespace Core.Ircx.Objects
                     case ProfileUserMode.Sysop: { c = 'S'; break; }
                     case ProfileUserMode.Admin: { c = 'A'; break; }
                 }
-                ProfileData.bytes[2] = (byte)c;
+                _profileData[2] = c;
             }
         }
         public ProfileUserType UserType
@@ -118,15 +121,14 @@ namespace Core.Ircx.Objects
                     case ProfileUserType.Male: { c = 'M'; break; }
                     case ProfileUserType.Female: { c = 'F'; break; }
                 }
-                ProfileData.bytes[4] = (byte)c;
+                _profileData[4] = c;
             }
         }
-        public String8 GetProfile(int version)
+        public string GetProfile(int version)
         {
             if (version <= 3)
             {
-                return Resources.Null;
-                //return null;
+                return string.Empty;
             }
             else
             {
@@ -139,30 +141,30 @@ namespace Core.Ircx.Objects
                     if (UserMode != ProfileUserMode.User)
                     {
                         //Admin handling
-                        ProfileData.bytes[5] = (byte)'O';
-                        if (version < 8) { ProfileData.length = 5; }
-                        else { ProfileData.length = 6; }
+                        _profileData[5] = 'O';
+                        if (version < 8) { _profileData.Length = 5; }
+                        else { _profileData.Length = 6; }
                     }
                     else
                     {
 
-                        if (version <= 6) { ProfileData.bytes[4] = (UserType != ProfileUserType.Guest ? (byte)'R' : (byte)'G'); ProfileData.length = 5; } //e.g. H,U,R
+                        if (version <= 6) { _profileData[4] = (UserType != ProfileUserType.Guest ? 'R' : 'G'); _profileData.Length = 5; } //e.g. H,U,R
                         else
                         {
                             if (UserType == ProfileUserType.Guest)
                             {
-                                ProfileData.bytes[5] = (byte)'O';
-                                ProfileData.length = (version == 7 ? 5 : 6); // 7 is H,U,G not H,U,GO
+                                _profileData[5] = 'O';
+                                _profileData.Length = (version == 7 ? 5 : 6); // 7 is H,U,G not H,U,GO
                             }
                             else
                             {
                                 UserType = usertype;
-                                if (version < 8) { ProfileData.length = 6; }
-                                else { ProfileData.bytes[6] = (Registered ? (byte)'B' : (byte)'O'); ProfileData.length = 7; }
+                                if (version < 8) { _profileData.Length = 6; }
+                                else { _profileData[6] = (Registered ? 'B' : 'O'); _profileData.Length = 7; }
                             }
                         } //resets to default
                     }
-                    return ProfileData;
+                    return _profileData.ToString();
                 }
             }
         }

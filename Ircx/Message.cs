@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.CSharpTools;
 using CSharpTools;
 
 namespace Core.Ircx
@@ -10,17 +11,17 @@ namespace Core.Ircx
     {
         public static short whiteSpace = 0x20;
 
-        public String8 rawData, Prefix, Command;
-        public List<String8> Data;
+        public string rawData, Prefix, Command;
+        public List<string> Data;
         // Temp stuff
         public int ParamOffset;
-        public String8 GetNextParam()
+        public string GetNextParam()
         {
             if (ParamOffset < Data.Count) { return Data[ParamOffset++]; }
             else { return null; }
         }
         // Temp stuff
-        public Message(String8 incomingData)
+        public Message(string incomingData)
         {
             rawData = incomingData;
             Parse();
@@ -33,12 +34,14 @@ namespace Core.Ircx
 
             int offset = 0;
 
-            for (; ((offset < rawData.Length) && (rawData.bytes[offset] == whiteSpace)); offset++) ; //trimming
+            for (; ((offset < rawData.Length) && (rawData.ToByteArray()[offset] == whiteSpace)); offset++) ; //trimming
 
-            if (rawData.bytes[offset] == ':') {
+            if (rawData.ToByteArray()[offset] == ':')
+            {
                 Prefix = GetWord(++offset);
                 //if (Prefix == null) return;
-                if (Prefix != null) { 
+                if (Prefix != null)
+                {
                     offset += Prefix.Length + 1;
                 }
             }
@@ -46,47 +49,48 @@ namespace Core.Ircx
             while ((Command == null) && (offset < rawData.Length)) { Command = GetWord(offset); offset++; }
 
             if (Command == null) return;
-            Command.toupper();
-            
+            Command = Command.ToString().ToUpper();
+
 
             offset += Command.Length;
 
             Data = GetParams(offset);
         }
 
-        private String8 GetWord(int offset)
+        private string GetWord(int offset)
         {
             int c;
             for (c = offset; c < rawData.Length; c++)
             {
-                if (rawData.bytes[c] == whiteSpace)
+                if (rawData.ToByteArray()[c] == whiteSpace)
                 {
                     if ((c - offset) <= 1) { return null; }
-                    else { return new String8(rawData.bytes, offset, c); }
+                    else { return StringBuilderExtensions.FromBytes(rawData.ToByteArray(), offset, c).ToString(); }
                 }
             }
 
-            if (c == rawData.Length) { return new String8(rawData.bytes, offset, c); }
+            if (c == rawData.Length) { return StringBuilderExtensions.FromBytes(rawData.ToByteArray(), offset, c).ToString(); }
             else { return null; }
         }
-        private List<String8> GetParams(int offset)
+        private List<string> GetParams(int offset)
         {
-            if ((rawData.bytes.Length - offset) <= 0) return null;
+            if ((rawData.ToByteArray().Length - offset) <= 0) return null;
 
-            List<String8> Data = new List<String8>();
+            List<string> Data = new List<string>();
 
-            if ((rawData.bytes[offset] == 58) && (offset + 1 < rawData.bytes.Length)) { Data.Add(new String8(rawData.bytes, offset + 1, rawData.bytes.Length)); return Data; }
-            else if ((rawData.bytes[offset] == 58) && (offset + 1 == rawData.bytes.Length)) { Data.Add(Resources.Null); }
-            else { 
-                for (int i = offset; i < rawData.bytes.Length; i++)
+            if ((rawData.ToByteArray()[offset] == 58) && (offset + 1 < rawData.ToByteArray().Length)) { Data.Add(StringBuilderExtensions.FromBytes(rawData.ToByteArray(), offset + 1, rawData.ToByteArray().Length).ToString()); return Data; }
+            else if ((rawData.ToByteArray()[offset] == 58) && (offset + 1 == rawData.ToByteArray().Length)) { Data.Add(string.Empty); }
+            else
+            {
+                for (int i = offset; i < rawData.ToByteArray().Length; i++)
                 {
-                    if (rawData.bytes[i] == whiteSpace)
+                    if (rawData.ToByteArray()[i] == whiteSpace)
                     {
-                        if ((i - offset) > 0) { Data.Add(new String8(rawData.bytes, offset, i)); } //add current parameter
+                        if ((i - offset) > 0) { Data.Add(StringBuilderExtensions.FromBytes(rawData.ToByteArray(), offset, i).ToString()); } //add current parameter
 
-                        if ((i + 1) < rawData.bytes.Length)
+                        if ((i + 1) < rawData.ToByteArray().Length)
                         {
-                            if (rawData.bytes[i + 1] == 0x3A) //check if next parameter has a :
+                            if (rawData.ToByteArray()[i + 1] == 0x3A) //check if next parameter has a :
                             {
                                 //if (i + 2 == rawData.bytes.Length) { Data.Add(Resources.Null); } // Fix for blank messages
 
@@ -98,7 +102,7 @@ namespace Core.Ircx
                         offset = i + 1;
                     }
                 }
-                Data.Add(new String8(rawData.bytes, offset, rawData.bytes.Length));
+                Data.Add(StringBuilderExtensions.FromBytes(rawData.ToByteArray(), offset, rawData.ToByteArray().Length).ToString());
             }
             return Data;
         }

@@ -28,8 +28,7 @@ namespace Core.Ircx.Commands
             {
                 Access AccessObject = null;
                 UserAccessLevel requiredLevel = UserAccessLevel.NoAccess;
-                String8 AccessObjectName = new String8(message.Data[0].bytes, 0, message.Data[0].length);
-                AccessObjectName.toupper();
+                string AccessObjectName = new string(message.Data[0].ToString().ToUpper());
 
                 Obj obj = server.GetObject(AccessObjectName);
 
@@ -128,7 +127,7 @@ namespace Core.Ircx.Commands
                                     else
                                     {
                                         //<- :Default-Chat-Community 461 Sky ACCESS :Not enough parameters
-                                        user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new String8[] { message.Command }));
+                                        user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new string[] { message.Command }));
                                     }
                                 }
                                 else if (Operator == EnumAccessOperator.DELETE)
@@ -141,14 +140,14 @@ namespace Core.Ircx.Commands
                                     else
                                     {
                                         //<- :Default-Chat-Community 461 Sky ACCESS :Not enough parameters
-                                        user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new String8[] { message.Command }));
+                                        user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new string[] { message.Command }));
                                     }
                                 }
                             }
                             else
                             {
                                 //<- :Default-Chat-Community 900 Sky moo :Bad command
-                                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new String8[] { message.Data[1] }));
+                                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new string[] { message.Data[1] }));
                             }
 
 
@@ -157,20 +156,20 @@ namespace Core.Ircx.Commands
                     else
                     {
                         //<- :Default-Chat-Community 913 Sky2k #x :No access
-                        user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NOACCESS_913, Data: new String8[] { message.Data[0] }));
+                        user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NOACCESS_913, Data: new string[] { message.Data[0] }));
                     }
                 }
                 else
                 {
                     //<- :Default-Chat-Community 924 Sky test :No such object found
-                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NOSUCHOBJECT_924, Data: new String8[] { message.Data[0] }));
+                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NOSUCHOBJECT_924, Data: new string[] { message.Data[0] }));
                 }
 
             }
             else
             {
                 //insufficient parameters
-                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new String8[] { message.Command }));
+                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new string[] { message.Command }));
             }
             //
             return COM_RESULT.COM_SUCCESS;
@@ -186,11 +185,11 @@ namespace Core.Ircx.Commands
                  <- :Default-Chat-Community 804 Sky #x OWNER *!*@*$* 0 ~no@127.0.0.1 :
                  <- :Default-Chat-Community 805 Sky #x :End of access entries
                  */
-                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_RPL_ACCESSSTART_803, Data: new String8[] { Access.ObjectName }));
+                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_RPL_ACCESSSTART_803, Data: new string[] { Access.ObjectName }));
 
                 for (int i = 0; i < Access.Entries.Entries.Count; i++)
                 {
-                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_RPL_ACCESSLIST_804, Data: new String8[] { Access.ObjectName,
+                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_RPL_ACCESSLIST_804, Data: new string[] { Access.ObjectName,
                                                                                                              Access.Entries.Entries[i].Level.LevelText,
                                                                                                              Access.Entries.Entries[i].Mask._address[3],
                                                                                                              Access.Entries.Entries[i].EntryAddress,
@@ -198,11 +197,11 @@ namespace Core.Ircx.Commands
                                                                                              IData: new int[] { Access.Entries.Entries[i].DurationInSeconds }));
                 }
 
-                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_RPL_ACCESSEND_805, Data: new String8[] { Access.ObjectName }));
+                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_RPL_ACCESSEND_805, Data: new string[] { Access.ObjectName }));
             }
             else
             {
-                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_TOOMANYARGUMENTS_901, Data: new String8[] { message.Data[3] }));
+                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_TOOMANYARGUMENTS_901, Data: new string[] { message.Data[3] }));
                 //<- :Default-Chat-Community 901 Sky e :Too many arguments
             }
         }
@@ -233,7 +232,7 @@ namespace Core.Ircx.Commands
             {
                 //success
                 //<- :Default-Chat-Community 820 Sky #x * :Clear
-                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_RPL_ACCESSCLEAR_820, Data: new String8[] { Access.ObjectName, (level.Level == EnumAccessLevel.All ? Resources.Wildcard : level.LevelText) }));
+                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_RPL_ACCESSCLEAR_820, Data: new string[] { Access.ObjectName, (level.Level == EnumAccessLevel.All ? Resources.Wildcard : level.LevelText) }));
             }
             else
             {
@@ -247,7 +246,7 @@ namespace Core.Ircx.Commands
             if ((UserAccessLevel == UserAccessLevel.ChatHost) && (level.Level == EnumAccessLevel.OWNER))
             {
                 //<- :Default-Chat-Community 903 Sky2k OWNER :Bad level
-                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADLEVEL_903, Data: new String8[] { message.Data[2] }));
+                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADLEVEL_903, Data: new string[] { message.Data[2] }));
                 return;
             }
 
@@ -272,14 +271,14 @@ namespace Core.Ircx.Commands
 
                         if ((duration == -1) || (duration > 999999))
                         {
-                            user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new String8[] { message.Data[4] }));
+                            user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new string[] { message.Data[4] }));
                             //<- :organisa-e679d0 900 Sky a :Bad command
                             return;
                         }
 
-                        String8 Reason = Resources.Null;
+                        string Reason = Resources.Null;
                         if (message.Data.Count >= 6) { Reason = message.Data[5]; }
-                        //Would be good to check the length of the reason with a given limit... Exchange 5.5 flat out does not care
+                        //Would be good to check the Length of the reason with a given limit... Exchange 5.5 flat out does not care
 
                         AccessEntry ae = new AccessEntry();
 
@@ -301,7 +300,7 @@ namespace Core.Ircx.Commands
 
                         Access.Entries.Add(ae);
                         //<- :Default-Chat-Community 801 Sky #x OWNER B!*@*$* 0 ~no@127.0.0.1 :
-                        user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_RPL_ACCESSADD_801, Data: new String8[] { Access.ObjectName, ae.Level.LevelText, ae.Mask._address[3], ae.EntryAddress, ae.Reason }, IData: new int[] { ae.DurationInSeconds }));
+                        user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_RPL_ACCESSADD_801, Data: new string[] { Access.ObjectName, ae.Level.LevelText, ae.Mask._address[3], ae.EntryAddress, ae.Reason }, IData: new int[] { ae.DurationInSeconds }));
                     }
                     else
                     {
@@ -312,14 +311,14 @@ namespace Core.Ircx.Commands
                 else
                 {
                     //<- :Default-Chat-Community 461 Sky ACCESS :Not enough parameters
-                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new String8[] { message.Data[0] }));
+                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new string[] { message.Data[0] }));
 
                 }
             }
             else
             {
                 //<- :organisa-e679d0 903 Sky #Test :Bad level
-                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADLEVEL_903, Data: new String8[] { message.Data[1] }));
+                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADLEVEL_903, Data: new string[] { message.Data[1] }));
             }
 
         }
@@ -328,7 +327,7 @@ namespace Core.Ircx.Commands
             if ((UserAccessLevel == UserAccessLevel.ChatHost) && (level.Level == EnumAccessLevel.OWNER))
             {
                 //<- :Default-Chat-Community 903 Sky2k OWNER :Bad level
-                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADLEVEL_903, Data: new String8[] { message.Data[3] }));
+                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADLEVEL_903, Data: new string[] { message.Data[3] }));
                 return;
             }
 
@@ -345,7 +344,7 @@ namespace Core.Ircx.Commands
                         {
                             Access.Entries.Remove(ae);
                             //<- :Default-Chat-Community 801 Sky #x OWNER B!*@*$* 0 ~no@127.0.0.1 :
-                            user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_RPL_ACCESSDELETE_802, Data: new String8[] { Access.ObjectName, ae.Level.LevelText, ae.Mask._address[3], ae.EntryAddress, ae.Reason }, IData: new int[] { ae.DurationInSeconds }));
+                            user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_RPL_ACCESSDELETE_802, Data: new string[] { Access.ObjectName, ae.Level.LevelText, ae.Mask._address[3], ae.EntryAddress, ae.Reason }, IData: new int[] { ae.DurationInSeconds }));
                         }
                     }
                     else
@@ -357,14 +356,14 @@ namespace Core.Ircx.Commands
                 else
                 {
                     //<- :Default-Chat-Community 461 Sky ACCESS :Not enough parameters
-                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new String8[] { message.Command }));
+                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new string[] { message.Command }));
 
                 }
             }
             else
             {
                 //<- :organisa-e679d0 903 Sky #Test :Bad level
-                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADLEVEL_903, Data: new String8[] { message.Data[0] }));
+                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADLEVEL_903, Data: new string[] { message.Data[0] }));
             }
         }
     }

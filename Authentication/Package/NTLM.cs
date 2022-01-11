@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using CSharpTools;
 using System.Runtime.InteropServices;
+using Core.CSharpTools;
 
 namespace Core.Authentication.Package
 {
@@ -309,7 +310,7 @@ namespace Core.Authentication.Package
                 Marshal.StructureToPtr(Message1, ipMessage1, false);
                 for (int i = 0; i < ptrMessageSize; i++)
                 {
-                    bytMessage.bytes[i] = Marshal.ReadByte(ipMessage1, i);
+                    bytMessage.bytes[i] = (char)Marshal.ReadByte(ipMessage1, i);
                 }
             }
             finally
@@ -317,8 +318,8 @@ namespace Core.Authentication.Package
                 Marshal.FreeHGlobal(ipMessage1);
             }
             bytMessage.length = 40;
-            bytMessage.append(UnicodeDomain.bytes);
-            bytMessage.append(UnicodeWorkstation.bytes);
+            bytMessage.append(UnicodeDomain.bytes.GetBytes());
+            bytMessage.append(UnicodeWorkstation.bytes.GetBytes());
 
             return bytMessage;
         }
@@ -326,7 +327,7 @@ namespace Core.Authentication.Package
         public override state InitializeSecurityContext(String8 data, String8 ip)
         {
             int NTLMSSPMessageType1Size = Marshal.SizeOf<NTLMSSPMessageType1>();
-            data = String8.ToLiteral(data);
+            data = StringExtensions.ToLiteral(data);
 
             if (data.length < NTLMSSPMessageType1Size) { return state.SSP_FAILED; }
 
@@ -463,7 +464,7 @@ namespace Core.Authentication.Package
 
         public state AcceptType2Message(String8 data)
         {
-            data = String8.ToLiteral(data);
+            data = StringExtensions.ToLiteral(data);
             IntPtr pBuf = Marshal.AllocHGlobal(Marshal.SizeOf(Message2));
             try
             {
@@ -550,7 +551,7 @@ namespace Core.Authentication.Package
         public override state AcceptSecurityContext(String8 data, String8 ip)
         {
             int NTLMSSPMessageType3Size = Marshal.SizeOf<NTLMSSPMessageType3>();
-            data = String8.ToLiteral(data);
+            data = StringExtensions.ToLiteral(data);
 
             if (data.length < NTLMSSPMessageType3Size) { return state.SSP_FAILED; }
 
@@ -642,7 +643,7 @@ namespace Core.Authentication.Package
             //Process LM Hash
             String8 LMpassword = new String8(14);
             LMpassword.append(password);
-            LMpassword.toupper();
+            LMpassword.ToUpper();
 
             String8 key1 = new String8(LMpassword.bytes, 0, 7);
             String8 key2 = new String8(LMpassword.bytes, 7, 14);

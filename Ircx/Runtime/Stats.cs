@@ -72,16 +72,16 @@ namespace Core.Ircx.Runtime
             for (int i = 0; i < Server.Channels.Length; i++)
             {
                 //"1:-ST!EN-US!GN"
-                string ChannelCategory = (Server.Channels[i].Properties.Subject.Value.chars).Split(new char[] { '!' }, StringSplitOptions.None)[2];
+                string ChannelCategory = (Server.Channels[i].Properties.Subject.Value.ToString()).Split(new char[] { '!' }, StringSplitOptions.None)[2];
 
                 if (ChannelCategory == Category) { 
                     channel c = new channel();
-                    c.name = Server.Channels[i].Name.chars;
-                    c.topic = System.Net.WebUtility.UrlEncode(Server.Channels[i].Properties.Topic.Value.chars);
-                    c.modes = (new String8(Server.Channels[i].Modes.ChannelModeShortString.bytes, 0, Server.Channels[i].Modes.ChannelModeShortString.Length)).chars;
+                    c.name = Server.Channels[i].Name.ToString();
+                    c.topic = System.Net.WebUtility.UrlEncode(Server.Channels[i].Properties.Topic.Value.ToString());
+                    c.modes = (new string(Server.Channels[i].Modes.ChannelModeShortString.ToString().Substring(Server.Channels[i].Modes.ChannelModeShortString.Length))).ToString();
                     c.managed = (Server.Channels[i].Modes.Registered.Value.ToString());
-                    c.locale = (Server.Channels[i].Properties.Subject.Value.chars).Split(new char[] { '!' }, StringSplitOptions.None)[1];
-                    c.language = (Server.Channels[i].Properties.Subject.Value.chars).Split(new char[] { ':' }, StringSplitOptions.None)[0];
+                    c.locale = (Server.Channels[i].Properties.Subject.Value.ToString()).Split(new char[] { '!' }, StringSplitOptions.None)[1];
+                    c.language = (Server.Channels[i].Properties.Subject.Value.ToString()).Split(new char[] { ':' }, StringSplitOptions.None)[0];
                     c.currentusers = Server.Channels[i].Members.MemberList.Count.ToString();
                     c.maxusers = Server.Channels[i].Modes.UserLimit.Value.ToString();
                     cat.channels.Add(c);
@@ -96,37 +96,38 @@ namespace Core.Ircx.Runtime
         }
         public static void ExportUserList(Server Server)
         {
-            sitemembers members = new sitemembers();
-            members.name = "Members";
-            XmlSerializer serializer = new XmlSerializer(typeof(sitemembers));
-            XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
-            ns.Add("", "");
-            for (int i = 0; i < Server.Users.Length; i++)
-            {
-                sitemember sm = new sitemember();
-                sm.nick = Server.Users[i].Name.chars;
-                if (Server.Users[i].Address != null) { 
-                    if (Server.Users[i].Address._address != null) { 
-                        if (Server.Users[i].Address._address.Length == 5)
-                        {
-                            sm.address = Server.Users[i].Address._address[1].chars;
-                        }
-                    }
-                }
+            // TODO: Fix this
+            //sitemembers members = new sitemembers();
+            //members.name = "Members";
+            //XmlSerializer serializer = new XmlSerializer(typeof(sitemembers));
+            //XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+            //ns.Add("", "");
+            //for (int i = 0; i < Server.Users.Length; i++)
+            //{
+            //    sitemember sm = new sitemember();
+            //    sm.nick = Server.Users[i].Name.chars;
+            //    if (Server.Users[i].Address != null) { 
+            //        if (Server.Users[i].Address._address != null) { 
+            //            if (Server.Users[i].Address._address.Length == 5)
+            //            {
+            //                sm.address = Server.Users[i].Address._address[1].chars;
+            //            }
+            //        }
+            //    }
 
-                for (int x = 0; x < Server.Users[i].ChannelList.Count; x++)
-                {
-                    sm.channels.Add(Server.Users[i].ChannelList[x].Channel.Name.chars);
-                }
+            //    for (int x = 0; x < Server.Users[i].ChannelList.Count; x++)
+            //    {
+            //        sm.channels.Add(Server.Users[i].ChannelList[x].Channel.Name.chars);
+            //    }
 
-                members.members.Add(sm);
-            }
+            //    members.members.Add(sm);
+            //}
 
-            if (!Directory.Exists("en-us/Users/")) { Directory.CreateDirectory("en-us/Users/"); }
-            using (TextWriter tw = new StreamWriter(File.Create("en-us/Users/" + "/roomlist.xml")))
-            {
-                serializer.Serialize(tw, members, ns);
-            }
+            //if (!Directory.Exists("en-us/Users/")) { Directory.CreateDirectory("en-us/Users/"); }
+            //using (TextWriter tw = new StreamWriter(File.Create("en-us/Users/" + "/roomlist.xml")))
+            //{
+            //    serializer.Serialize(tw, members, ns);
+            //}
         }
     }
 }

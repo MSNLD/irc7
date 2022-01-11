@@ -30,7 +30,7 @@ namespace Core.Ircx.Commands
                     // Supports KILL OID1,OID2,OID3 Reason
                     // Can mix user / chan
 
-                    String8 Reason = Resources.Null;
+                    string Reason = Resources.Null;
                     if (Frame.Message.Data.Count > 1)
                     {
                         Reason = Frame.Message.Data[1];
@@ -61,12 +61,12 @@ namespace Core.Ircx.Commands
             return COM_RESULT.COM_SUCCESS;
         }
 
-        public bool ProcessKill(Frame Frame, User TargetUser, String8 Reason)
+        public bool ProcessKill(Frame Frame, User TargetUser, string Reason)
         {
-            if (Frame.User.Level >= TargetUser.Level) { 
+            if ((Frame.User.Level >= UserAccessLevel.ChatGuide) && (Frame.User.Level >= TargetUser.Level)) { 
                 List<UserChannelInfo> channels = TargetUser.ChannelList;
 
-                String8 KillRaw = Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.RPL_KILL_IRC, Data: new String8[] { TargetUser.Address.Nickname, Reason });
+                string KillRaw = Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.RPL_KILL_IRC, Data: new string[] { TargetUser.Address.Nickname, Reason });
 
                 while (channels.Count > 0)
                 {
@@ -91,7 +91,7 @@ namespace Core.Ircx.Commands
                 return false;
             }
         }
-        public void ProcessChannelKill(Frame Frame, String8 Reason) {
+        public void ProcessChannelKill(Frame Frame, string Reason) {
             if (Frame.User.Level >= UserAccessLevel.ChatGuide)
             {
                 List<ChannelMember> Members = Frame.Channel.MemberList;
@@ -123,14 +123,14 @@ namespace Core.Ircx.Commands
                     if ((Members.Count == 0) && (Frame.Channel.Modes.Registered.Value != 0x1))
                     {
                         // Remove Channel
-                        String8 KillRaw = Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.RPL_KILL_IRC, Data: new String8[] { Frame.Channel.Name, Reason });
+                        string KillRaw = Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.RPL_KILL_IRC, Data: new string[] { Frame.Channel.Name, Reason });
                         Frame.Server.RemoveObject(Frame.Channel);
                         Frame.User.Send(KillRaw);
                     }
                 }
                 else
                 {
-                    Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401, Data: new String8[] { Resources.Null }));
+                    Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401, Data: new string[] { Resources.Null }));
                 }
 
             }

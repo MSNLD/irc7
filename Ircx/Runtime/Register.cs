@@ -1,7 +1,8 @@
 ﻿    using System;
 using System.Collections.Generic;
 using System.Text;
-using Core.Ircx.Objects;
+    using Core.CSharpTools;
+    using Core.Ircx.Objects;
 using CSharpTools;
 
 namespace Core.Ircx.Runtime
@@ -11,7 +12,7 @@ namespace Core.Ircx.Runtime
         public static void QualifyUser(Server server, Connection Connection)
         {
             Client Client = (Client)Connection.Client;
-            User User = (User)Client;
+            User user = (User)Client;
 
             if (Client.Auth != null)
             {
@@ -29,19 +30,19 @@ namespace Core.Ircx.Runtime
                                 {
                                     // TO FIX
 
-                                    User.Level = Program.Credentials[c].Level;
-                                    server.UpdateUserNickname(User, Program.Credentials[c].Nickname);
+                                    user.Level = Program.Credentials[c].Level;
+                                    server.UpdateUserNickname(user, Program.Credentials[c].Nickname);
                                     Client.Address.Userhost = Program.Credentials[c].Username;
                                     Client.Address.Hostname = "cg";
 
-                                    switch (User.Level)
+                                    switch (user.Level)
                                     {
-                                        case UserAccessLevel.ChatAdministrator: { User.Profile.UserMode = ProfileUserMode.Admin; break; }
-                                        case UserAccessLevel.ChatSysopManager: case UserAccessLevel.ChatSysop: { User.Profile.UserMode = ProfileUserMode.Sysop; break; }
-                                        case UserAccessLevel.ChatGuide: { User.Profile.UserMode = ProfileUserMode.Guide; break; }
+                                        case UserAccessLevel.ChatAdministrator: { user.Profile.UserMode = ProfileUserMode.Admin; break; }
+                                        case UserAccessLevel.ChatSysopManager: case UserAccessLevel.ChatSysop: { user.Profile.UserMode = ProfileUserMode.Sysop; break; }
+                                        case UserAccessLevel.ChatGuide: { user.Profile.UserMode = ProfileUserMode.Guide; break; }
                                     }
 
-                                    User.Profile.UserMode = ProfileUserMode.Admin;
+                                    user.Profile.UserMode = ProfileUserMode.Admin;
                                 }
                             }
                         }
@@ -57,20 +58,20 @@ namespace Core.Ircx.Runtime
                 if (Client.Auth == null)
                 {
                     Client.Auth = new Authentication.ANON();
-                    if (Client.Address.Nickname.bytes[0] != '>')
+                    if (Client.Address.Nickname[0] != '>')
                     {
                         int nLen = (Client.Address.Nickname.Length > 62 ? 63 : Client.Address.Nickname.Length);
-                        String8 ChangeNick = new String8(nLen + 1);
-                        ChangeNick.append('>');
-                        ChangeNick.append(Client.Address.Nickname.bytes, 0, nLen);
-                        server.UpdateUserNickname(User, ChangeNick);
+                        StringBuilder ChangeNick = new StringBuilder(nLen + 1);
+                        ChangeNick.Append('>');
+                        ChangeNick.Append(Client.Address.Nickname.ToString().Substring(nLen));
+                        server.UpdateUserNickname(user, ChangeNick.ToString());
                         
                     }
                 }
 
-                Commands.NICK.ValidateNicknameResult vNicknameRes = Commands.NICK.ValidateNickname(User, Client.Name);
+                Commands.NICK.ValidateNicknameResult vNicknameRes = Commands.NICK.ValidateNickname(user, Client.Name);
 
-                if ((vNicknameRes != Commands.NICK.ValidateNicknameResult.INVALID) || (User.Level >= UserAccessLevel.ChatGuide))
+                if ((vNicknameRes != Commands.NICK.ValidateNicknameResult.INVALID) || (user.Level >= UserAccessLevel.ChatGuide))
                 {
                     Client.Address.UpdateAddressMask(Address.AddressMaskType.NUHS);
 
@@ -81,23 +82,23 @@ namespace Core.Ircx.Runtime
                     {
                         if (result.Entry.Level.Level == EnumAccessLevel.DENY)
                         {
-                            Client.Send(Raws.Create(Server: server, Client: Client, Raw: Raws.IRCX_CLOSINGLINK, Data: new String8[] { Client.Address.RemoteIP, result.Entry.Reason }));
+                            Client.Send(Raws.Create(Server: server, Client: Client, Raw: Raws.IRCX_CLOSINGLINK, Data: new string[] { Client.Address.RemoteIP, result.Entry.Reason }));
                             Client.Terminate();
                             return;
                             // Deny user from network
                         }
                     }
 
-                    if (User.ObjectType == ObjType.UserObject) { 
-                        server.RegisterUser(User);
+                    if (user.ObjectType == ObjType.UserObject) { 
+                        server.RegisterUser(user);
                         // welcome raws
 
-                        String8 ServerName = Program.Config.ServerFullName;
-
-                        Client.Send(Raws.Create(Server: server, Client: Client, Raw: Raws.IRCX_RPL_WELCOME_001, Data: new String8[] { ServerName }));
-                        Client.Send(Raws.Create(Server: server, Client: Client, Raw: Raws.IRCX_RPL_WELCOME_002, IData: new int[] { Program.Config.major, Program.Config.minor, Program.Config.build }));
-                        Client.Send(Raws.Create(Server: server, Client: Client, Raw: Raws.IRCX_RPL_WELCOME_003, Data: new String8[] { server.CreationDate }));
-                        Client.Send(Raws.Create(Server: server, Client: Client, Raw: Raws.IRCX_RPL_WELCOME_004, IData: new int[] { Program.Config.major, Program.Config.minor, Program.Config.build }));
+                        string ServerName = Program.Config.ServerFullName;
+                        
+                        Client.Send(Raw.IRCX_RPL_WELCOME_001(server, user));
+                        Client.Send(Raw.IRCX_RPL_WELCOME_002(server, user, new Version(Program.Config.major, Program.Config.minor, Program.Config.build)));
+                        Client.Send(Raw.IRCX_RPL_WELCOME_003(server, user));
+                        Client.Send(Raw.IRCX_RPL_WELCOME_004(server, user, new Version(Program.Config.major, Program.Config.minor, Program.Config.build)));
 
                         // Below is not required anymore due to mIRC obeying IRCX with version >= 5.5
                         //switch (user.Profile.Ircvers)
@@ -105,15 +106,15 @@ namespace Core.Ircx.Runtime
                         //    case -1: case 0: case 9: { user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_RPL_WELCOME_005)); break; }
                         //}
 
-                        Commands.LUSERS.SendLusers(server, User);
+                        Commands.LUSERS.SendLusers(server, user);
                         Client.Send(Raws.Create(Server: server, Client: Client, Raw: Raws.IRCX_ERR_NOMOTD_422));
 
-                        if (User.Level >= UserAccessLevel.ChatGuide)
+                        if (user.Level >= UserAccessLevel.ChatGuide)
                         {
-                            String8 RPLStaffRaw = Resources.Null;
+                            string RPLStaffRaw = Resources.Null;
                             byte StaffChar = 0x0;
 
-                            switch (User.Level)
+                            switch (user.Level)
                             {
                                 case UserAccessLevel.ChatGuide: { RPLStaffRaw = Raws.IRCX_RPL_YOUREGUIDE_629; StaffChar = Resources.UserModeCharOper; break; }
                                 case UserAccessLevel.ChatSysop: { RPLStaffRaw = Raws.IRCX_RPL_YOUREOPER_381; StaffChar = Resources.UserModeCharOper; break; }
@@ -122,34 +123,34 @@ namespace Core.Ircx.Runtime
                                 case UserAccessLevel.ChatService: { RPLStaffRaw = Raws.IRCX_RPL_YOUREADMIN_386; StaffChar = Resources.UserModeCharAdmin; break; }
                             }
 
-                            Core.Ircx.Commands.UserModeInvisibleFunction.ToggleInvisible(server, User, 1);
-                            User.Modes.Admin.Value = 0x1;
-                            User.Modes.UpdateModes();
+                            Core.Ircx.Commands.UserModeInvisibleFunction.ToggleInvisible(server, user, 1);
+                            user.Modes.Admin.Value = 0x1;
+                            user.Modes.UpdateModes();
 
                             AuditModeReport AdminMode = new AuditModeReport();
-                            AdminMode.UserModes.Add(new AuditUserMode(User, Client.Address.Nickname, StaffChar, true));
-                            AdminMode.UserModes.Add(new AuditUserMode(User, Client.Address.Nickname, Resources.UserModeCharInvisible, true));
-                            Commands.MODE.ProcessUserReport(server, User, User, AdminMode);
+                            AdminMode.UserModes.Add(new AuditUserMode(user, Client.Address.Nickname, StaffChar, true));
+                            AdminMode.UserModes.Add(new AuditUserMode(user, Client.Address.Nickname, Resources.UserModeCharInvisible, true));
+                            Commands.MODE.ProcessUserReport(server, user, user, AdminMode);
                             Client.Send(Raws.Create(Server: server, Client: Client, Raw: RPLStaffRaw));
                         }
                     }
-                    else if (User.ObjectType == ObjType.ServerObject)
+                    else if (user.ObjectType == ObjType.ServerObject)
                     {
                         // Attempt at inter-server communication
-                        Server serv = (Server)server.AddObject(User.Name, ObjType.ServerObject, User.Name);
-                        server.RemoveObject(User);
-                        User = null;
+                        Server serv = (Server)server.AddObject(user.Name, ObjType.ServerObject, user.Name);
+                        server.RemoveObject(user);
+                        user = null;
                         Client = null;
                         Connection.Client = serv;
                         serv.Register();
-                        serv.Send(Raws.Create(Server: serv, Raw: Raws.RPL_SERVICE_DATA, Data: new String8[] { "LOGON", serv.OIDX8 }));
+                        serv.Send(Raws.Create(Server: serv, Raw: Raws.RPL_SERVICE_DATA, Data: new string[] { "LOGON", serv.OIDX8 }));
                     }
                 }
                 else if (vNicknameRes == Commands.NICK.ValidateNicknameResult.IDENTICAL) ;
                 else
                 {
                     //user.Address.Nickname = Resources.Wildcard;
-                    Client.Send(Raws.Create(Server: server, Client: Client, Raw: Raws.IRCX_ERR_ERRONEOUSNICK_432, Data: new String8[] { Client.Name }));
+                    Client.Send(Raws.Create(Server: server, Client: Client, Raw: Raws.IRCX_ERR_ERRONEOUSNICK_432, Data: new string[] { Client.Name }));
                     Client.Address.Nickname = Resources.Wildcard;
                 }
             }

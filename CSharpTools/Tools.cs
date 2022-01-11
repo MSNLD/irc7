@@ -7,27 +7,27 @@ namespace Core.CSharpTools
 {
     static class Tools
     {
-        public static int Str2Int(String8 Data) //all negative mean failure
+        public static int Str2Int(string Data) //all negative mean failure
         {
             int result = 0;
-            for (int i = 0; i < Data.length; i++)
+            for (int i = 0; i < Data.Length; i++)
             {
-                if ((Data.bytes[i] >= 48) && (Data.bytes[i] <= 57))
+                if ((Data[i] >= 48) && (Data[i] <= 57))
                 {
-                    result += ((Data.bytes[i] - 48) * ((int)System.Math.Pow(10, (Data.length - i - 1))));
+                    result += ((Data[i] - 48) * ((int)System.Math.Pow(10, (Data.Length - i - 1))));
                 }
                 else { return -1; }
             }
             return result;
         }
-        public static int Str2Int(String8 Data, int iStartPos)
+        public static int Str2Int(string Data, int iStartPos)
         {
-            if (iStartPos >= Data.length) { return -1; }
+            if (iStartPos >= Data.Length) { return -1; }
 
-            String8 nString = new String8(Data.bytes, iStartPos, Data.length);
+            string nString = new string(Data.ToString().Substring(iStartPos, Data.Length));
             return Str2Int(nString);
         }
-        public static bool StringArrayContains(List<String8> StringArray, String8 Data)
+        public static bool StringArrayContains(List<string> StringArray, string Data)
         {
             for (int i = 0; i < StringArray.Count; i++)
             {
@@ -35,50 +35,50 @@ namespace Core.CSharpTools
             }
             return false;
         }
-        public static List<String8> CSVToArray(String8 CSV, bool bIgnoreBlanks)
+        public static List<string> CSVToArray(string CSV, bool bIgnoreBlanks)
         {
-            List<String8> Values = new List<String8>();
-            String8 Value = new String8(Core.Ircx.Objects.Address.MaxFieldLen);
-            for (int i = 0; i < CSV.length; i++)
+            List<string> Values = new List<string>();
+            StringBuilder Value = new StringBuilder(Core.Ircx.Objects.Address.MaxFieldLen);
+            for (int i = 0; i < CSV.Length; i++)
             {
-                if (CSV.bytes[i] != 44) { Value.append(CSV.bytes[i]); }
+                if (CSV[i] != 44) { Value.Append(CSV[i]); }
                 else
                 {
-                    if (Value.length > 0)
+                    if (Value.Length > 0)
                     {
-                        String8 Field = new String8(Value.bytes, 0, Value.length);
+                        string Field = new string(Value.ToString());
                         if (!StringArrayContains(Values, Field))
                         {
                             Values.Add(Field);
-                            Value.length = 0;
+                            Value.Length = 0;
                         }
                     }
                     //else { return null; }
                 }
             }
 
-            if (Value.length > 0) { Values.Add(new String8(Value.bytes, 0, Value.length)); }
+            if (Value.Length > 0) { Values.Add(new string(Value.ToString())); }
             //else { if (!bIgnoreBlanks) { return null; } }
 
             return Values;
         }
-        public static List<String8> CSVToArray(String8 CSV)
+        public static List<string> CSVToArray(string CSV)
         {
             return CSVToArray(CSV, false);
         }
-        public static String8 HexToString(String8 Hex)
+        public static string HexToString(string Hex)
         {
             if (Hex.Length == 0) { return null; }
 
-            String8 OutputString = new String8(Hex.Length / 2);
-            string HexStr = Hex.chars;
+            StringBuilder OutputString = new StringBuilder(Hex.Length / 2);
+            string HexStr = Hex.ToString();
 
             for (int c = 0; c < OutputString.Length; c++)
             {
-                OutputString.bytes[c] = Convert.ToByte(HexStr.Substring(c * 2, 2));
+                OutputString[c] = (char)Convert.ToByte(HexStr.Substring(c * 2, 2));
             }
 
-            return OutputString;
+            return OutputString.ToString();
         }
     }
 }

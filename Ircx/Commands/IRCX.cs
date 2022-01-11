@@ -35,7 +35,7 @@ namespace Core.Ircx.Commands
 
         public static void ProcessIRCXReply(Frame Frame)
         {
-            Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_IRCX_800, Data: new String8[] { Core.Authentication.SSP.SupportedPackages, Resources.IRCXOptions }, IData: new int[] { Frame.User.Modes.Ircx.Value, Frame.Server.IrcxVersion, Program.Config.BufferSize }));
+            Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_IRCX_800, Data: new string[] { Core.Authentication.SSP.SupportedPackages, Resources.IRCXOptions }, IData: new int[] { Frame.User.Modes.Ircx.Value, Frame.Server.IrcxVersion, Program.Config.BufferSize }));
         }
 
         public new COM_RESULT Execute(Frame Frame)

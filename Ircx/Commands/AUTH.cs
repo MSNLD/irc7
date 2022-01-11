@@ -6,6 +6,7 @@ using Core.Ircx.Objects;
 using CSharpTools;
 using System.Reflection;
 using Core.Authentication;
+using Core.CSharpTools;
 
 namespace Core.Ircx.Commands
 {
@@ -28,7 +29,7 @@ namespace Core.Ircx.Commands
                     if (Frame.User.Registered)
                     {
                         // You are already authenticated
-                        Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_ALREADYAUTHENTICATED_909, Data: new String8[] { Frame.Message.Data[0] }));
+                        Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_ALREADYAUTHENTICATED_909, Data: new string[] { Frame.Message.Data[0] }));
                     }
                     else
                     {
@@ -36,20 +37,20 @@ namespace Core.Ircx.Commands
                         if (Frame.User.Auth == null)
                         {
                             // No such authentication package
-                            Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_UNKNOWNPACKAGE_912, Data: new String8[] { Frame.Message.Data[0] }));
+                            Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_UNKNOWNPACKAGE_912, Data: new string[] { Frame.Message.Data[0] }));
                         }
                         else
                         {
-                            if (Frame.User.Auth.InitializeSecurityContext(Frame.Message.Data[2], Program.Config.ExternalIP) == Authentication.SSP.state.SSP_OK)
+                            if (Frame.User.Auth.InitializeSecurityContext(Frame.Message.Data[2].ToString(), Program.Config.ExternalIP) == Authentication.SSP.state.SSP_OK)
                             {
-                                String8 data = String8.ToEscape(Frame.User.Auth.CreateSecurityChallenge(SSP.state.SSP_SEC));
-                                String8 reply = Raws.Create(Server: Frame.Server, Raw: Raws.RPL_AUTH_SEC_REPLY, Data: new String8[] { Frame.Message.Data[0], data });
+                                string data = StringExtensions.ToEscape(Frame.User.Auth.CreateSecurityChallenge(SSP.state.SSP_SEC));
+                                string reply = Raws.Create(Server: Frame.Server, Raw: Raws.RPL_AUTH_SEC_REPLY, Data: new string[] { Frame.Message.Data[0], data });
                                 Frame.User.Send(reply);
                             }
                             else
                             {
                                 // Authentication failed
-                                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_AUTHENTICATIONFAILED_910, Data: new String8[] { Frame.Message.Data[0] }));
+                                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_AUTHENTICATIONFAILED_910, Data: new string[] { Frame.Message.Data[0] }));
                             }
                         }
                     }
@@ -62,11 +63,11 @@ namespace Core.Ircx.Commands
                     if (Frame.User.Registered)
                     {
                         // You are already authenticated
-                        Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_ALREADYAUTHENTICATED_909, Data: new String8[] { Frame.Message.Data[0] }));
+                        Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_ALREADYAUTHENTICATED_909, Data: new string[] { Frame.Message.Data[0] }));
                     }
                     else
                     {
-                        SSP.state State = Frame.User.Auth.AcceptSecurityContext(Frame.Message.Data[2], Program.Config.ExternalIP);
+                        SSP.state State = Frame.User.Auth.AcceptSecurityContext(Frame.Message.Data[2].ToString(), Program.Config.ExternalIP);
                         if (State == Authentication.SSP.state.SSP_OK)
                         {
                             if (Frame.User.Auth.Signature == Core.Authentication.Package.GateKeeperPassport.SIGNATURE)
@@ -80,19 +81,19 @@ namespace Core.Ircx.Commands
                                 Frame.User.Level = UserAccessLevel.ChatUser;
                             }
 
-                            Frame.User.Address.Userhost = new String8(Frame.User.Auth.uuid);
+                            Frame.User.Address.Userhost = new string(StringExtensions.FromBytes(Frame.User.Auth.uuid).ToString());
                             Frame.User.Address.Hostname = Frame.User.Auth.GetDomain();
 
-                            String8 reply = Raws.Create(Server: Frame.Server, Raw: Raws.RPL_AUTH_SUCCESS, Data: new String8[] { Frame.Message.Data[0], Frame.User.Address._address[1] }, IData: new int[] { (int)Frame.User.OID });
+                            string reply = Raws.Create(Server: Frame.Server, Raw: Raws.RPL_AUTH_SUCCESS, Data: new string[] { Frame.Message.Data[0], Frame.User.Address._address[1] }, IData: new int[] { (int)Frame.User.OID });
                             Frame.User.Send(reply);
                         }
                         else if (State == Authentication.SSP.state.SSP_CREDENTIALS)
                         {
-                            Frame.User.Send(Raws.Create(Server: Frame.Server, Raw: Raws.RPL_AUTH_SEC_REPLY, Data: new String8[] { Frame.Message.Data[0], Resources.S_OK }));
+                            Frame.User.Send(Raws.Create(Server: Frame.Server, Raw: Raws.RPL_AUTH_SEC_REPLY, Data: new string[] { Frame.Message.Data[0], Resources.S_OK }));
                         }
                         else
                         {
-                            Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_AUTHENTICATIONFAILED_910, Data: new String8[] { Frame.Message.Data[0] }));
+                            Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_AUTHENTICATIONFAILED_910, Data: new string[] { Frame.Message.Data[0] }));
                         }
                     }
                 }

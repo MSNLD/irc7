@@ -29,7 +29,7 @@ namespace Core.Ircx.Commands
             else
             {
                 // you are not on that channel
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442, Data: new String8[] { c.Name }));
+                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442, Data: new string[] { c.Name }));
             }
         }
         public static void ProcessPartUserChannels(Frame Frame)
@@ -66,12 +66,12 @@ namespace Core.Ircx.Commands
 
                 // null
                 // No such channel
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403, Data: new String8[] { Frame.Message.Data[0] }));
+                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403, Data: new string[] { Frame.Message.Data[0] }));
             }
             else
             {
                 //insufficient parameters
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new String8[] { message.Data[0] }));
+                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new string[] { message.Data[0] }));
             }
             return COM_RESULT.COM_SUCCESS;
         }

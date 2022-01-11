@@ -25,15 +25,15 @@ namespace Core.Ircx.Commands
         {
             if (!Frame.User.Registered)
             {
-                if (Frame.Message.Data[0].length == 4)
+                if (Frame.Message.Data[0].Length == 4)
                 {
-                    if (!String8.compare(Frame.Message.Data[0], Resources.IRC, 3))
+                    if (Frame.Message.Data[0].ToString() == Resources.IRC.ToString())
                     {
-                        if ((Frame.Message.Data[0].bytes[3] >= 48) && (Frame.Message.Data[0].bytes[3] <= 57))
+                        if ((Frame.Message.Data[0][3] >= 48) && (Frame.Message.Data[0][3] <= 57))
                         {
                             Frame.User.Properties.Ircvers.Value = Frame.Message.Data[0];
                             Frame.User.Modes.Ircx.Value = 1;
-                            Frame.User.Profile.Ircvers = (byte)(Frame.Message.Data[0].bytes[3] - 48);
+                            Frame.User.Profile.Ircvers = (byte)(Frame.Message.Data[0][3] - 48);
                             Frame.User.Properties.Client.Value = Frame.Message.Data[1];
 
                             IRCX.ProcessIRCXReply(Frame);
@@ -41,7 +41,7 @@ namespace Core.Ircx.Commands
                             return COM_RESULT.COM_SUCCESS;
                         }
                     }
-                    Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_BADVALUE_906, Data: new String8[] { Frame.Message.Data[0] }));
+                    Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_BADVALUE_906, Data: new string[] { Frame.Message.Data[0] }));
                 }
             }
             else

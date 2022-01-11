@@ -23,16 +23,16 @@ namespace Core.Ircx.Objects
         public ServerCollection Servers = new ServerCollection();
         public CommandCollection Commands = new CommandCollection();
 
-        public String8 CreationDate, TimeZone;
+        public string CreationDate, TimeZone;
 
-        public Server(String8 Name): base(ObjType.ServerObject)
+        public Server(string Name): base(ObjType.ServerObject)
         {
             Properties = new ServerProperties(this);
             base.Name = Name;
             Access = new Access("$", false);
-            CreationDate = new String8(Resources.GetFullTimeString(Resources.GetTime()));
+            CreationDate = new string(Resources.GetFullTimeString(Resources.GetTime()));
             string TZ = DateTime.Now.GetDateTimeFormats('R')[0];
-            TimeZone = new String8(TZ.Substring(TZ.LastIndexOf(' ') + 1));
+            TimeZone = new string(TZ.Substring(TZ.LastIndexOf(' ') + 1));
         }
 
         // Statistics
@@ -46,9 +46,10 @@ namespace Core.Ircx.Objects
         public int UnknownConnections { get { return iUnknownConnections; } }
         public int OperatorCount { get { return iOperatorCount; } }
         public int IrcxVersion { get { return iIrcxVersion; } }
+        public string FullName { get; set; }
 
         // Operations
-        public Obj AddObject(String8 Name, ObjType objType, String8 ObjID)
+        public Obj AddObject(string Name, ObjType objType, string ObjID)
         {
             Obj obj = null;
             switch (objType)
@@ -151,7 +152,7 @@ namespace Core.Ircx.Objects
             else if ((!IsInvisible) && (user.Modes.Invisible.Value == 1)) { iInvisibleCount--; }
         }
 
-        public Channel AddChannel(String8 Name)
+        public Channel AddChannel(string Name)
         {
             Channel channel = new Channel(Name);
             Channels.Add(channel);
@@ -162,10 +163,10 @@ namespace Core.Ircx.Objects
             Channels.Remove(channel);
         }
 
-        public List<Obj> GetObjects(String8 Nicknames)
+        public List<Obj> GetObjects(string Nicknames)
         {
             List<Obj> objs = new List<Obj>();
-            List<String8> NicknameList = CSharpTools.Tools.CSVToArray(Nicknames);
+            List<string> NicknameList = CSharpTools.Tools.CSVToArray(Nicknames);
 
             for (int i = 0; i < NicknameList.Count; i++)
             {
@@ -175,7 +176,7 @@ namespace Core.Ircx.Objects
             return objs;
         }
 
-        public Obj GetObject(String8 Name)
+        public Obj GetObject(string Name)
         {
             Obj obj = null;
             ObjIdentifier objIdentifier = Client.IdentifyObject(Name);
@@ -219,7 +220,7 @@ namespace Core.Ircx.Objects
         }
        
 
-        public void UpdateUserNickname(User user, String8 Nickname)
+        public void UpdateUserNickname(User user, string Nickname)
         {
             // if OK
             user.Address.Nickname = Nickname;

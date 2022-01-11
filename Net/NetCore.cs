@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using Core.CSharpTools;
 using CSharpTools;
 
 namespace Core.Net
 {
-    public static class IPInfo {
+    public static class IPInfo
+    {
         public static IPAddress[] ips;
         public static async System.Threading.Tasks.Task<IPAddress[]> GetAddresses()
         {
@@ -28,13 +30,15 @@ namespace Core.Net
         }
     }
 
-    public class CSocketInfo {
+    public class CSocketInfo
+    {
         public GUID ipaddress;
         public int count;
     }
 
 
-    public class CSocketListener {
+    public class CSocketListener
+    {
         public Socket Server;
         public GuidMap ClientMap;
         public int buffSize;
@@ -49,7 +53,7 @@ namespace Core.Net
         public CSocketListener(bool ipv6)
         {
             Server = new Socket((ipv6 ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork), SocketType.Stream, ProtocolType.Tcp);
-        }   
+        }
         public void Listen(string bindip, int port, int backlog)
         {
             Listen(IPAddress.Parse(bindip), port, backlog);
@@ -61,12 +65,14 @@ namespace Core.Net
 
             ClientMap = new GuidMap();
 
-            try { 
+            try
+            {
                 Server.Bind(new IPEndPoint(bindip, port));
             }
             catch (SocketException se) { Debug.Out(se.Message); return se; }
 
-            try { 
+            try
+            {
                 Server.Listen(backlog);
             }
             catch (SocketException se) { Debug.Out(se.Message); return se; }
@@ -91,16 +97,16 @@ namespace Core.Net
                 {
                     // Check count
                     GuidNode node = ClientMap.AddGuid(socket.Address);
-                    
+
                     if (node.count <= maxClientsPerIP)
                     {
                         AcceptClients.Add(socket);
                         Debug.Out("[" + AcceptClients.Count.ToString() + "]connected " + socket.RemoteEndPoint);
-                        Debug.Out("[" + AcceptClients.Count.ToString() + "]socket " + new String8(node.guid.ToHex()).chars + " count = " + node.count.ToString());
+                        Debug.Out("[" + AcceptClients.Count.ToString() + "]socket " + StringBuilderExtensions.FromBytes(node.guid.ToHex()).ToString() + " count = " + node.count.ToString());
                     }
                     else
                     {
-                        Debug.Out("[" + AcceptClients.Count.ToString() + "]dumped socket " + new String8(node.guid.ToHex()).chars + " count = " + node.count.ToString());
+                        Debug.Out("[" + AcceptClients.Count.ToString() + "]dumped socket " + StringBuilderExtensions.FromBytes(node.guid.ToHex()).ToString() + " count = " + node.count.ToString());
                         socket.Shutdown(SocketShutdown.Both);
                         ClientMap.DecGuid(socket.Address);
                     }
@@ -120,7 +126,7 @@ namespace Core.Net
 
         public GUID Address { get { return guid; } }
         public bool IsConnected { get { return socket.Connected; } }
-        public String8 RemoteIP { get { return ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(); } }
+        public string RemoteIP { get { return ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(); } }
 
         public CSocket(Socket socket, int buffSize)
         {
@@ -128,9 +134,11 @@ namespace Core.Net
             this.socket.Blocking = false;
             this.socket.LingerState = new LingerOption(true, 1);
             buffer = new StringBuffer(buffSize);
+
             guid = new GUID();
-            if (socket.RemoteEndPoint.AddressFamily == AddressFamily.InterNetwork) { 
-                guid.Data1 = BitConverter.ToUInt32(((IPEndPoint)socket.RemoteEndPoint).Address.GetAddressBytes(), 0);   
+            if (socket.RemoteEndPoint.AddressFamily == AddressFamily.InterNetwork)
+            {
+                guid.Data1 = BitConverter.ToUInt32(((IPEndPoint)socket.RemoteEndPoint).Address.GetAddressBytes(), 0);
             }
             else
             {
@@ -141,15 +149,16 @@ namespace Core.Net
         public EndPoint RemoteEndPoint { get { return socket.RemoteEndPoint; } }
         public void Shutdown(SocketShutdown both)
         {
-            Debug.Out(socket.RemoteEndPoint.ToString() + " has been Shutdown (" + (new String8(guid.ToHex()).chars + ")"));
-            try { 
+            Debug.Out(socket.RemoteEndPoint.ToString() + " has been Shutdown (" + (StringBuilderExtensions.FromBytes(guid.ToHex()).ToString() + ")"));
+            try
+            {
                 socket.Shutdown(both);
             }
-            catch (SocketException se) {  }
+            catch (SocketException se) { }
 
         }
         public void Terminate() { bTerminateSocket = true; }
-        public List<String8> Process()
+        public List<string> Process()
         {
             int bytes = -1;
 
@@ -173,7 +182,8 @@ namespace Core.Net
                 {
                     if (buffer.bytesOut.Count > 0)
                     {
-                        try {
+                        try
+                        {
                             bytes = socket.Send(buffer.bytesOut);
                         }
                         catch (SocketException se) { }
@@ -189,9 +199,9 @@ namespace Core.Net
             }
             return null;
         }
-        public void Send(String8 data)
+        public void Send(string data)
         {
-            buffer.bytesOut.Add(new ArraySegment<byte>(data.bytes, 0, data.length));
+            buffer.bytesOut.Add(new ArraySegment<byte>(data.ToByteArray(), 0, data.Length));
         }
     }
 

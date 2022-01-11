@@ -45,9 +45,9 @@ namespace Core.Ircx.Objects
         }
         public Queue<Frame> InputQueue { get { return BufferIn.Queue; } }
 
-        public void Send(String8 data)
+        public void Send(string data)
         {
-            Debug.Out(base.OIDX8.chars + ":TX: " + data.chars);
+            Debug.Out(base.OIDX8.ToString() + ":TX: " + data.ToString());
             base.BufferOut.Enqueue(data);
         }
         public void Receive(Frame frame)
@@ -73,7 +73,7 @@ namespace Core.Ircx.Objects
             }
             else
             {
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_UNKNOWNCOMMAND_421, Data: new String8[] { Frame.Message.Command }));
+                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_UNKNOWNCOMMAND_421, Data: new string[] { Frame.Message.Command }));
                 // No such command
             }
             return COM_RESULT.COM_SUCCESS;

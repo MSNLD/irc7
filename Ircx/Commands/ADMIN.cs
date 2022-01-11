@@ -24,13 +24,13 @@ namespace Core.Ircx.Commands
             if (Frame.Message.Data == null)
             {
                 Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ADMINME_256));
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ADMINLOC1_257, Data: new String8[] { Program.Config.AdminLoc1 }));
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ADMINLOC1_258, Data: new String8[] { Program.Config.AdminLoc2 }));
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ADMINEMAIL_259, Data: new String8[] { Program.Config.AdminEmail }));
+                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ADMINLOC1_257, Data: new string[] { Program.Config.AdminLoc1 }));
+                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ADMINLOC1_258, Data: new string[] { Program.Config.AdminLoc2 }));
+                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ADMINEMAIL_259, Data: new string[] { Program.Config.AdminEmail }));
             }
             else
             {
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_OPTIONUNSUPPORTED_555, Data: new String8[] { Frame.Message.Data[0] }));
+                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_OPTIONUNSUPPORTED_555, Data: new string[] { Frame.Message.Data[0] }));
             }
             return COM_RESULT.COM_SUCCESS;
         }

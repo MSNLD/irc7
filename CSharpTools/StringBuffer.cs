@@ -4,24 +4,27 @@ using System.Text;
 
 namespace CSharpTools
 {
-    class StringBuffer : String8
+    class StringBuffer
     {
         //needs to be converted to a Queue later
-        public List<String8> DataIn;
-        public List<String8> DataOut;
+        public List<string> DataIn;
+        public List<string> DataOut;
         public List<ArraySegment<byte>> bytesOut;
         int buffSize, cursor;
+        private StringBuilder _buffer;
+        public int Capacity => _buffer.Capacity;
 
         //e.g.                  1024      512
 
         public StringBuffer(int size)
-            : base(size)
+
         {
+            _buffer = new StringBuilder(new string('\0', size));
             buffSize = size;
             cursor = 0;
 
-            DataIn = new List<String8>();
-            DataOut = new List<String8>();
+            DataIn = new List<string>();
+            DataOut = new List<string>();
             bytesOut = new List<ArraySegment<byte>>();
         }
         public void Digest(byte[] data, int bytes)
@@ -33,31 +36,31 @@ namespace CSharpTools
                 {
                     if ((data[dataPos] != '\r') && (data[dataPos] != '\n'))
                     {
-                        base.bytString[cursor++] = data[dataPos]; //copy in
+                        _buffer[cursor++] = (char)data[dataPos]; //copy in
                     }
                     else
                     {
                         if (cursor > 0) //to stop problems with joined crlf
                         {
-                            String8 message = new String8(base.bytString, 0, cursor);
+                            StringBuilder message = new StringBuilder(_buffer.ToString().Substring(0, cursor));
                             cursor = 0;
-                            DataIn.Add(message);
+                            DataIn.Add(message.ToString());
                         }
                     }
                 }
                 else
                 {
-                    String8 message = new String8(base.bytString, 0, cursor);
+                    StringBuilder message = new StringBuilder(_buffer.ToString().Substring(0, cursor));
                     cursor = 0;
-                    DataIn.Add(message);
+                    DataIn.Add(message.ToString());
                 }
             }
 
             if (cursor == buffSize)
             {
-                String8 message = new String8(base.bytString, 0, cursor);
+                StringBuilder message = new StringBuilder(_buffer.ToString().Substring(0, cursor));
                 cursor = 0;
-                DataIn.Add(message);
+                DataIn.Add(message.ToString());
             }
 
         }

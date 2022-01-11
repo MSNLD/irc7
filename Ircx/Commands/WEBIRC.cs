@@ -23,10 +23,10 @@ namespace Core.Ircx.Commands
             if (Frame.Message.Data != null) { 
                 if (Frame.Message.Data.Count >= 4)
                 {
-                    String8 Password = Frame.Message.Data[0];
-                    String8 Username = Frame.Message.Data[1];
-                    String8 Hostname = Frame.Message.Data[2];
-                    String8 IP = Frame.Message.Data[3];
+                    string Password = Frame.Message.Data[0];
+                    string Username = Frame.Message.Data[1];
+                    string Hostname = Frame.Message.Data[2];
+                    string IP = Frame.Message.Data[3];
 
                     if ((Username == Program.Config.WebIRCUsername) && (Password == Program.Config.WebIRCPassword)) {
                         Frame.User.Address.Hostname = Hostname;
@@ -35,7 +35,7 @@ namespace Core.Ircx.Commands
                 }
                 if (Frame.Message.Data.Count == 5)
                 {
-                    if (Frame.Message.Data[4].chars.Contains('s'))
+                    if (Frame.Message.Data[4].ToString().Contains('s'))
                     {
                         //Set secure mode
                         Frame.User.Modes.Secure.Value = 1;

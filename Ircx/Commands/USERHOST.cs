@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Core.Ircx.Objects;
 using CSharpTools;
 using System.Reflection;
+using System.Text;
 
 namespace Core.Ircx.Commands
 {
@@ -23,11 +24,11 @@ namespace Core.Ircx.Commands
         {
             if (Frame.User.Registered)
             {
-                String8 Userhost = new String8(Frame.User.Name.Length + 1 + Frame.User.Address._address[2].Length);
-                Userhost.append(Frame.User.Name);
-                Userhost.append((byte)'=');
-                Userhost.append(Frame.User.Address._address[2]);
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_USERHOST_302, Data: new String8[] { Userhost }) );
+                StringBuilder Userhost = new StringBuilder(Frame.User.Name.Length + 1 + Frame.User.Address._address[2].Length);
+                Userhost.Append(Frame.User.Name);
+                Userhost.Append('=');
+                Userhost.Append(Frame.User.Address._address[2]);
+                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_USERHOST_302, Data: new string[] { Userhost.ToString() }) );
             }
             return COM_RESULT.COM_SUCCESS;
         }

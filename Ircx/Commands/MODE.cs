@@ -21,7 +21,7 @@ namespace Core.Ircx.Commands
             //Mode %#Lobby <modes> <param1> <param2> ...
             if (message.Data.Count == 1)
             {
-                user.Send(Raws.Create(Server: server, Channel: channel, Client: user, Raw: Raws.IRCX_RPL_MODE_324, Data: new String8[] { channel.Modes.ChannelModeString }));
+                user.Send(Raws.Create(Server: server, Channel: channel, Client: user, Raw: Raws.IRCX_RPL_MODE_324, Data: new string[] { channel.Modes.ChannelModeString }));
                 //Display Modes to user
             }
             else if (message.Data.Count > 1)
@@ -31,7 +31,7 @@ namespace Core.Ircx.Commands
                 if (uci == null)
                 {
                     // you're not on that channel
-                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442, Data: new String8[] { message.Data[0] }));
+                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442, Data: new string[] { message.Data[0] }));
                 }
                 else if (uci.Member.ChannelMode.UserMode < ChanUserMode.Host)
                 {
@@ -51,15 +51,15 @@ namespace Core.Ircx.Commands
                     AuditModeReport Report = new AuditModeReport();
                     bool bModeFlag = true;
                     message.ParamOffset = 2;
-                    for (int i = 0; i < message.Data[1].length; i++)
+                    for (int i = 0; i < message.Data[1].Length; i++)
                     {
-                        switch (message.Data[1].bytes[i])
+                        switch (message.Data[1][i])
                         {
-                            case (byte)'-': { bModeFlag = false; break; }
-                            case (byte)'+': { bModeFlag = true; break; }
+                            case '-': { bModeFlag = false; break; }
+                            case '+': { bModeFlag = true; break; }
                             default:
                                 {
-                                    Mode m = channel.Modes.ResolveMode(message.Data[1].bytes[i]);
+                                    Mode m = channel.Modes.ResolveMode((byte)message.Data[1][i]);
                                     if (m != null)
                                     {
                                         //At this point its Host vs Owner vs Oper
@@ -82,7 +82,7 @@ namespace Core.Ircx.Commands
                                                     {
                                                         //if report contains no modes and we are at the end of the string then update modes
                                                         //update wont be invoked unless the mode change was announced
-                                                        if ((Report.Modes.Count == 0) && (i + 1 == message.Data[1].length))
+                                                        if ((Report.Modes.Count == 0) && (i + 1 == message.Data[1].Length))
                                                         {
                                                             channel.Modes.UpdateModes(channel.Properties.Memberkey);
                                                         }
@@ -105,7 +105,7 @@ namespace Core.Ircx.Commands
                                     else
                                     {
                                         // unknown mode char
-                                        user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_UNKNOWNMODE_472, IData: new int[] { message.Data[1].bytes[i] }));
+                                        user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_UNKNOWNMODE_472, IData: new int[] { message.Data[1][i] }));
                                     }
                                     break;
                                 }
@@ -120,8 +120,8 @@ namespace Core.Ircx.Commands
 
         public static void ProcessChanModeReport(Server server, User user, Channel channel, AuditModeReport Report)
         {
-            String8 addModes = new String8(Report.Modes.Count + 1);
-            String8 delModes = new String8(Report.Modes.Count + 1);
+            StringBuilder addModes = new StringBuilder(Report.Modes.Count + 1);
+            StringBuilder delModes = new StringBuilder(Report.Modes.Count + 1);
 
             for (int i = 0; i < Report.Modes.Count; i++)
             {
@@ -129,28 +129,28 @@ namespace Core.Ircx.Commands
                 {
                     case true:
                         {
-                            if (addModes.length == 0) { addModes.append('+'); }
-                            addModes.append(Report.Modes[i].modeChar); break;
+                            if (addModes.Length == 0) { addModes.Append('+'); }
+                            addModes.Append((char)Report.Modes[i].modeChar); break;
                         }
                     default:
                         {
-                            if (delModes.length == 0) { delModes.append('-'); }
-                            delModes.append(Report.Modes[i].modeChar); break;
+                            if (delModes.Length == 0) { delModes.Append('-'); }
+                            delModes.Append((char)Report.Modes[i].modeChar); break;
                         }
                 }
             }
 
-            if ((addModes.length > 0) || (delModes.length > 0))
+            if ((addModes.Length > 0) || (delModes.Length > 0))
             {
                 channel.Modes.UpdateModes(channel.Properties.Memberkey);
-                channel.Send(Raws.Create(Server: server, Channel: channel, Client: user, Raw: Raws.RPL_MODE_IRC, Data: new String8[] { channel.Name, addModes, delModes }), user);
+                channel.Send(Raws.Create(Server: server, Channel: channel, Client: user, Raw: Raws.RPL_MODE_IRC, Data: new string[] { channel.Name, addModes.ToString(), delModes.ToString() }), user);
             }
 
         }
         public static void ProcessUserReport(Server server, User user, User TargetUser, AuditModeReport Report)
         {
-            String8 addModes = new String8(Report.UserModes.Count + 1);
-            String8 delModes = new String8(Report.UserModes.Count + 1);
+            StringBuilder addModes = new StringBuilder(Report.UserModes.Count + 1);
+            StringBuilder delModes = new StringBuilder(Report.UserModes.Count + 1);
 
             for (int i = 0; i < Report.UserModes.Count; i++)
             {
@@ -158,21 +158,21 @@ namespace Core.Ircx.Commands
                 {
                     case true:
                         {
-                            if (addModes.length == 0) { addModes.append('+'); }
-                            addModes.append(Report.UserModes[i].modeChar); break;
+                            if (addModes.Length == 0) { addModes.Append('+'); }
+                            addModes.Append((char)Report.UserModes[i].modeChar); break;
                         }
                     default:
                         {
-                            if (delModes.length == 0) { delModes.append('-'); }
-                            delModes.append(Report.UserModes[i].modeChar); break;
+                            if (delModes.Length == 0) { delModes.Append('-'); }
+                            delModes.Append((char)Report.UserModes[i].modeChar); break;
                         }
                 }
             }
 
-            if ((addModes.length > 0) || (delModes.length > 0))
+            if ((addModes.Length > 0) || (delModes.Length > 0))
             {
                 TargetUser.Modes.UpdateModes();
-                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.RPL_MODE_IRC, Data: new String8[] { TargetUser.Address.Nickname, addModes, delModes }));
+                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.RPL_MODE_IRC, Data: new string[] { TargetUser.Address.Nickname, addModes.ToString(), delModes.ToString() }));
             }
         }
         public static void ProcessChanUserModeReport(Server server, User user, Channel channel, AuditModeReport Report)
@@ -182,7 +182,7 @@ namespace Core.Ircx.Commands
                 for (int i = 0; i < Report.UserModes.Count; i++)
                 {
                     User TargetUser = (Report.UserModes[i].TargetUser == null ? user : Report.UserModes[i].TargetUser);
-                    channel.Send(Raws.Create(Server: server, Channel: channel, Client: user, Raw: Raws.RPL_MODE_IRC, Data: new String8[] { channel.Name, Report.UserModes[i].modeData, Report.UserModes[i].user }), TargetUser);
+                    channel.Send(Raws.Create(Server: server, Channel: channel, Client: user, Raw: Raws.RPL_MODE_IRC, Data: new string[] { channel.Name, Report.UserModes[i].modeData, Report.UserModes[i].user }), TargetUser);
                 }
             }
         }
@@ -190,7 +190,7 @@ namespace Core.Ircx.Commands
 
         public static void ProcessChanUserMode(Server server, ChannelMember Member, Channel channel, Message message, AuditModeReport Report, Mode m, bool bModeFlag)
         {
-            String8 UserParam = message.GetNextParam();
+            string UserParam = message.GetNextParam();
             if (UserParam != null)
             {
                 ChannelMember TargetUser = channel.Members.GetMemberByName(UserParam);
@@ -265,14 +265,14 @@ namespace Core.Ircx.Commands
                 }
                 else
                 {
-                    Member.User.Send(Raws.Create(Server: server, Client: Member.User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401, Data: new String8[] { UserParam }));
+                    Member.User.Send(Raws.Create(Server: server, Client: Member.User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401, Data: new string[] { UserParam }));
                     //no such nick/channel
                 }
             }
             else
             {
                 //insufficient paramters
-                Member.User.Send(Raws.Create(Server: server, Client: Member.User, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new String8[] { Resources.CommandMode, AuditUserMode.CreateModeData(bModeFlag, m.ModeChar, true) }));
+                Member.User.Send(Raws.Create(Server: server, Client: Member.User, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new string[] { Resources.CommandMode, AuditUserMode.CreateModeData(bModeFlag, m.ModeChar, true) }));
             }
 
 
@@ -290,10 +290,10 @@ namespace Core.Ircx.Commands
             //Is Oper/Admin?
             //Else <- :SERVER 403 sky9 s :No such channel
 
-            String8 Object = message.Data[0];
+            string Object = message.Data[0];
             User TargetUser = null;
 
-            if (!String8.compareCaseInsensitive(Object, user.Name))
+            if (Object.ToString().ToUpper() != user.Name.ToString().ToUpper())
             {
                 TargetUser = user;
             }
@@ -303,7 +303,7 @@ namespace Core.Ircx.Commands
             else if (user.Level < UserAccessLevel.ChatGuide) //If user and not a self mode
             {
                 //Else <- :SERVER 403 sky9 s :No such channel
-                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403, Data: new String8[] { message.Data[0] }));
+                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403, Data: new string[] { message.Data[0] }));
                 return;
             }
             else if (user.Level >= UserAccessLevel.ChatGuide)
@@ -311,7 +311,7 @@ namespace Core.Ircx.Commands
                 if (TargetUser == null) //If there really is no such user then 403
                 {
                     //Else <- :SERVER 403 sky9 s :No such channel
-                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403, Data: new String8[] { message.Data[0] }));
+                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403, Data: new string[] { message.Data[0] }));
                     return;
                 }
             }
@@ -320,22 +320,22 @@ namespace Core.Ircx.Commands
 
             if (message.Data.Count == 1)
             {
-                user.Send(Raws.Create(Server: server, Client: TargetUser, Raw: Raws.IRCX_RPL_UMODEIS_221, Data: new String8[] { TargetUser.Modes.UserModeString }));
+                user.Send(Raws.Create(Server: server, Client: TargetUser, Raw: Raws.IRCX_RPL_UMODEIS_221, Data: new string[] { TargetUser.Modes.UserModeString }));
             }
             else if (message.Data.Count > 1)
             {
                 AuditModeReport Report = new AuditModeReport();
                 bool bModeFlag = true;
                 message.ParamOffset = 2;
-                for (int i = 0; i < message.Data[1].length; i++)
+                for (int i = 0; i < message.Data[1].Length; i++)
                 {
-                    switch (message.Data[1].bytes[i])
+                    switch (message.Data[1][i])
                     {
-                        case (byte)'-': { bModeFlag = false; break; }
-                        case (byte)'+': { bModeFlag = true; break; }
+                        case '-': { bModeFlag = false; break; }
+                        case '+': { bModeFlag = true; break; }
                         default:
                             {
-                                Mode m = TargetUser.Modes.ResolveMode(message.Data[1].bytes[i]);
+                                Mode m = TargetUser.Modes.ResolveMode((byte)message.Data[1][i]);
                                 if (m != null)
                                 {
                                     if (!Report.GetModeFlagProcessed(m.ModeChar))
@@ -357,7 +357,7 @@ namespace Core.Ircx.Commands
                                 else
                                 {
                                     // unknown mode char
-                                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_UNKNOWNMODE_472, IData: new int[] { message.Data[1].bytes[i] }));
+                                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_UNKNOWNMODE_472, IData: new int[] { message.Data[1][i] }));
                                 }
                                 break;
                             }
@@ -377,7 +377,7 @@ namespace Core.Ircx.Commands
             {
                 if (user.Registered)
                 {
-                    String8 ObjectName = message.Data[0];
+                    string ObjectName = message.Data[0];
                     Channel c = null;
                     if (Channel.IsChannel(ObjectName))
                     {
@@ -389,7 +389,7 @@ namespace Core.Ircx.Commands
                         }
                         else
                         {
-                            user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403, Data: new String8[] { message.Data[0] }));
+                            user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403, Data: new string[] { message.Data[0] }));
                             return COM_RESULT.COM_SUCCESS;
                         }
                     }
@@ -398,7 +398,7 @@ namespace Core.Ircx.Commands
                         c = server.Channels.GetChannel(ObjectName);
                         if (c != null)
                         {
-                            message.Data[0] = c.Name;
+                            message.Data[0] = c.Name.ToString();
                             // Process Channel Modes
                             return ProcessChannelModes(server, user, c, message);
                         }
@@ -424,7 +424,7 @@ namespace Core.Ircx.Commands
             {
                 if (user.Registered)
                 {
-                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new String8[] { message.Command }));
+                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new string[] { message.Command }));
                 }
                 else
                 {
@@ -567,7 +567,7 @@ namespace Core.Ircx.Commands
             else
             {
                 //not enough params
-                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new String8[] { message.Command }));
+                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new string[] { message.Command }));
             }
             return false;
         }
@@ -624,7 +624,7 @@ namespace Core.Ircx.Commands
     {
         public override bool Execute(Server server, Channel channel, User user, bool bModeFlag, ref AuditModeReport report, Message message)
         {
-            String8 KeyParam = message.GetNextParam();
+            string KeyParam = message.GetNextParam();
             if (KeyParam != null)
             {
                 if (bModeFlag)
@@ -644,11 +644,8 @@ namespace Core.Ircx.Commands
                 }
                 else
                 {
-                    String8 UKey = new String8(channel.Properties.Memberkey.Value.bytes, 0, channel.Properties.Memberkey.Value.length);
-                    String8 UKeyParam = new String8(KeyParam.bytes, 0, KeyParam.length);
-                    UKeyParam.toupper();
-                    UKey.toupper();
-
+                    string UKey = new string(channel.Properties.Memberkey.Value.ToString().ToUpper());
+                    string UKeyParam = new string(KeyParam.ToString().ToUpper());
                     if (UKey == UKeyParam)
                     {
                         //unset key
@@ -661,7 +658,7 @@ namespace Core.Ircx.Commands
             }
             else
             {
-                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new String8[] { Resources.CommandMode, AuditUserMode.CreateModeData(bModeFlag, Resources.ChannelModeCharKey, true) }));
+                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new string[] { Resources.CommandMode, AuditUserMode.CreateModeData(bModeFlag, Resources.ChannelModeCharKey, true) }));
                 //need more params
             }
             return false;
@@ -686,7 +683,7 @@ namespace Core.Ircx.Commands
             }
             else
             {
-                String8 LimitParam = message.GetNextParam();
+                string LimitParam = message.GetNextParam();
                 if (LimitParam != null)
                 {
 
@@ -696,11 +693,11 @@ namespace Core.Ircx.Commands
                     int MaxLimit = (user.Level < UserAccessLevel.ChatGuide ? 100 : Int32.MaxValue);
 
                     if ((limit > 0) && (limit <= MaxLimit)) { channel.Modes.UserLimit.Value = limit; report.UserModes.Add(new AuditUserMode(null, LimitParam, Resources.ChannelModeCharUserLimit, bModeFlag)); }
-                    else { user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new String8[] { Resources.CommandMode, AuditUserMode.CreateModeData(bModeFlag, Resources.ChannelModeCharUserLimit, true) })); }
+                    else { user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new string[] { Resources.CommandMode, AuditUserMode.CreateModeData(bModeFlag, Resources.ChannelModeCharUserLimit, true) })); }
                 }
                 else
                 {
-                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new String8[] { Resources.CommandMode, AuditUserMode.CreateModeData(bModeFlag, Resources.ChannelModeCharUserLimit, true) }));
+                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new string[] { Resources.CommandMode, AuditUserMode.CreateModeData(bModeFlag, Resources.ChannelModeCharUserLimit, true) }));
                     //need more params
                 }
             }
@@ -808,7 +805,7 @@ namespace Core.Ircx.Commands
                 {
                     if (channel.Access.Entries.Entries[i].Level.Level == EnumAccessLevel.DENY)
                     {
-                        user.Send(Raws.Create(Server: server, Channel: channel, Client: user, Raw: Raws.IRCX_RPL_BANLIST_367, Data: new String8[] { channel.Access.Entries.Entries[i].Mask._address[3] }));
+                        user.Send(Raws.Create(Server: server, Channel: channel, Client: user, Raw: Raws.IRCX_RPL_BANLIST_367, Data: new string[] { channel.Access.Entries.Entries[i].Mask._address[3] }));
                     }
                 }
                 user.Send(Raws.Create(Server: server, Channel: channel, Client: user, Raw: Raws.IRCX_RPL_ENDOFBANLIST_368));

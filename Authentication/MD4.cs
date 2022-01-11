@@ -132,7 +132,7 @@ namespace Core.Authentication
             int padLen = (int)((index < 56) ? (56 - index) : (120 - index));
             HashCore(Padding(padLen), 0, padLen);
 
-            /* Append length (before padding) */
+            /* Append Length (before padding) */
             HashCore(bits, 0, 8);
 
             /* Store state in digest */

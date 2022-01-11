@@ -9,7 +9,7 @@ namespace Core.Authentication
 
     public abstract class SSP
     {
-        public static String8 DOMAIN;
+        public static string DOMAIN;
         public const UInt64 SIGNATURE = 0x1;
         public enum state { SSP_UNSUPPORTED = -2, SSP_UNKNOWN = -1, SSP_FAILED = -3, SSP_OK = 0, SSP_INIT = 1, SSP_SEC = 2, SSP_EXT = 3, SSP_CREDENTIALS = 4, SSP_AUTHENTICATED = 5 };
         protected bool IsAuthenticated;
@@ -22,22 +22,22 @@ namespace Core.Authentication
         public uint server_sequence; //1 = Init, 2 = Server Reply, 3 = Client Response, 4 = Waiting for additional information
         public uint server_version; //1 = Not supported, 2 = 42, 3 = 45
         public bool guest;
-        public static String8 SupportedPackages;
+        public static string SupportedPackages;
 
-        public abstract String8 CreateSecurityChallenge(state stage);
-        public abstract state InitializeSecurityContext(String8 data, String8 ip);
-        public abstract state AcceptSecurityContext(String8 data, String8 ip);
+        public abstract string CreateSecurityChallenge(state stage);
+        public abstract state InitializeSecurityContext(string data, string ip);
+        public abstract state AcceptSecurityContext(string data, string ip);
         public abstract SSP Create();
-        public abstract String8 GetDomain();
+        public abstract string GetDomain();
         public abstract string GetNickMask();
         public virtual UInt64 Signature { get { return 0; } }
 
 
-        public static SSP GetPackage(String8 Name)
+        public static SSP GetPackage(string Name)
         {
             try
             {
-                Type type = Type.GetType("Core.Authentication.Package." + Name.chars);
+                Type type = Type.GetType("Core.Authentication.Package." + Name.ToString());
                 SSP ssp = (SSP)Activator.CreateInstance(type);
                 return ssp;
             }
@@ -48,10 +48,5 @@ namespace Core.Authentication
             // To do later as it seems hard to enumerate in .NET Core
             SupportedPackages = "NTLM,GateKeeper,ANON";
         }
-    }
-    public class SSPCredentials
-    {
-        public String8 Username, Password, Nickname, UserGroup, Modes;
-        public Core.Ircx.Objects.UserAccessLevel Level;
     }
 }

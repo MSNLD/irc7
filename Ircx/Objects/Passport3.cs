@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
 using CSharpTools;
+using Core.CSharpTools;
 
 namespace Core.Ircx.Objects
 {
@@ -56,7 +57,7 @@ namespace Core.Ircx.Objects
             if (iv == null) { iv = new byte[16]; }
 
             string json = JsonConvert.SerializeObject(o);
-            String8 jsonBytes = new String8(json);
+            StringBuilder jsonBytes = new StringBuilder(json);
 
             Aes aes = Aes.Create();
             aes.BlockSize = 128;
@@ -65,28 +66,28 @@ namespace Core.Ircx.Objects
             aes.Padding = PaddingMode.PKCS7;
 
             ICryptoTransform encryptor = aes.CreateEncryptor(Key, iv);
-            String8 final;
+            StringBuilder final;
 
             using (MemoryStream msEncrypt = new MemoryStream())
             {
                 using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
                 {
-                    csEncrypt.Write(jsonBytes.bytes, 0, jsonBytes.Length);
+                    csEncrypt.Write(jsonBytes.ToByteArray(), 0, jsonBytes.Length);
                     csEncrypt.FlushFinalBlock();
-                    final = new String8(msEncrypt.ToArray());
+                    final = StringBuilderExtensions.FromBytes(msEncrypt.ToArray());
                 }
             }
 
-            String8 b64 = Base64.Encode(final, BaseMap, 0);
-            return (IncludeVersion == true ? Version.ToString() : "") + b64.chars;
+            string b64 = Base64.Encode(final.ToString(), BaseMap, 0);
+            return (IncludeVersion == true ? Version.ToString() : "") + b64.ToString();
         }
 
-        public static PassportTicket Decrypt(String8 cookie)
+        public static PassportTicket Decrypt(StringBuilder cookie)
         {
 
             PassportTicket t;
 
-            String8 encrypted = Base64.Decode(cookie, Base64.B64MapType.MSPassport, true);
+            string encrypted = Base64.Decode(cookie.ToString(), Base64.B64MapType.MSPassport, true);
 
             Aes aes = Aes.Create();
             aes.BlockSize = 128;
@@ -98,7 +99,7 @@ namespace Core.Ircx.Objects
             ICryptoTransform decryptor = aes.CreateDecryptor(Key, new byte[16]);
             string s;
 
-            using (MemoryStream msDecrypt = new MemoryStream(encrypted.bytes))
+            using (MemoryStream msDecrypt = new MemoryStream(encrypted.ToByteArray()))
             {
                 using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
                 {
@@ -121,12 +122,12 @@ namespace Core.Ircx.Objects
 
 
         }
-        public static PassportProfile Decrypt(String8 cookie, byte[] IV)
+        public static PassportProfile Decrypt(StringBuilder cookie, byte[] IV)
         {
 
             PassportProfile p;
 
-            String8 encrypted = Base64.Decode(cookie, Base64.B64MapType.MSPassport, true);
+            string encrypted = Base64.Decode(cookie.ToString(), Base64.B64MapType.MSPassport, true);
 
             Aes aes = Aes.Create();
             aes.BlockSize = 128;
@@ -138,7 +139,7 @@ namespace Core.Ircx.Objects
             ICryptoTransform decryptor = aes.CreateDecryptor(Key, IV);
             string s;
 
-            using (MemoryStream msDecrypt = new MemoryStream(encrypted.bytes))
+            using (MemoryStream msDecrypt = new MemoryStream(encrypted.ToByteArray()))
             {
                 using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
                 {
@@ -162,12 +163,12 @@ namespace Core.Ircx.Objects
 
         }
 
-        public static RegCookie DecryptRegCookie(String8 cookie)
+        public static RegCookie DecryptRegCookie(string cookie)
         {
 
             RegCookie r;
 
-            String8 encrypted = Base64.Decode(cookie, Base64.B64MapType.MSRegCookie, false);
+            string encrypted = Base64.Decode(cookie.ToString(), Base64.B64MapType.MSRegCookie, false);
 
             Aes aes = Aes.Create();
             aes.BlockSize = 128;
@@ -179,7 +180,7 @@ namespace Core.Ircx.Objects
             ICryptoTransform decryptor = aes.CreateDecryptor(Key, new byte[16]);
             string s;
 
-            using (MemoryStream msDecrypt = new MemoryStream(encrypted.bytes))
+            using (MemoryStream msDecrypt = new MemoryStream(encrypted.ToByteArray()))
             {
                 using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
                 {

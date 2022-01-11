@@ -18,7 +18,7 @@ namespace Core.Ircx.Objects
         public ChannelProperties Properties { get { return ((ChannelProperties)base.Properties); }  set { base.Properties = value; }  }
 
         public List<ChannelMember> MemberList { get { return Members.MemberList; } }
-        public Channel(String8 Name): base(ObjType.ChannelObject)
+        public Channel(string Name): base(ObjType.ChannelObject)
         {
             Properties = new ChannelProperties(this);
             Access = new Access(Name, true);
@@ -38,7 +38,7 @@ namespace Core.Ircx.Objects
             return Members.IsMember(User);
         }
 
-        private void SetName(String8 Name)
+        private void SetName(string Name)
         {
             base.Name = Name;
         }
@@ -73,7 +73,7 @@ namespace Core.Ircx.Objects
             return MemberCollection;
         }
 
-        public void Send(String8 Data, User u, bool ExcludeSender)
+        public void Send(string Data, User u, bool ExcludeSender)
         {
             for (int i = 0; i < Members.MemberList.Count; i++)
             {
@@ -85,12 +85,12 @@ namespace Core.Ircx.Objects
                 }
             }
         }
-        public void Send(String8 Data, User u)
+        public void Send(string Data, User u)
         {
             Send(Data, u, false);
         }
 
-        public void SendLevel(String8 Data, UserAccessLevel level)
+        public void SendLevel(string Data, UserAccessLevel level)
         {
             for (int i = 0; i < Members.MemberList.Count; i++)
             {
@@ -101,18 +101,18 @@ namespace Core.Ircx.Objects
             }
         }
 
-        public static bool IsChannel(String8 ChannelName)
+        public static bool IsChannel(string ChannelName)
         {
-            if ((ChannelName.bytes[0] == '%') || (ChannelName.bytes[0] == '#')) { return true; }
+            if ((ChannelName[0] == '%') || (ChannelName[0] == '#')) { return true; }
             else { return false; }
         }
-        public static bool IsValidChannelFormat(String8 ChannelName)
+        public static bool IsValidChannelFormat(string ChannelName)
         {
-            return String8RegEx.Evalute(Resources.ChannelRegEx, ChannelName, true);
+            return StringBuilderRegEx.Evalute(Resources.ChannelRegEx, ChannelName.ToString(), true);
         }
 
 
-        public Access.AccessResultEnum AllowsUser(User user, String8 Param, bool IsGoto)
+        public Access.AccessResultEnum AllowsUser(User user, string Param, bool IsGoto)
         {
             // I am sure there is a better way to do this implementation, through HashSet or something
 
@@ -121,7 +121,7 @@ namespace Core.Ircx.Objects
             }
 
             bool bFoundUser = false;
-            if (IsGoto) { Param.toupper(); }
+            if (IsGoto) { Param = new string(Param.ToString().ToUpper()); }
 
             for (int i = 0; i < Members.MemberList.Count; i++)
             {
@@ -156,12 +156,13 @@ namespace Core.Ircx.Objects
                                 if (user.Auth.memberIdLow == Members.MemberList[i].User.Auth.memberIdLow) { return Access.AccessResultEnum.ERR_ALREADYINCHANNEL; }
                                 break;
                             }
-                        case Authentication.Package.NTLM.SIGNATURE:
-                            {
-                                //NTLM Expensive comparison :(
-                                if (user.Address._address[1] == Members.MemberList[i].User.Address._address[1]) { return Access.AccessResultEnum.ERR_ALREADYINCHANNEL; }
-                                break;
-                            }
+                        // TODO: Fix NTLM
+                            //case Authentication.Package.NTLM.SIGNATURE:
+                            //    {
+                            //        //NTLM Expensive comparison :(
+                            //        if (user.Address._address[1] == Members.MemberList[i].User.Address._address[1]) { return Access.AccessResultEnum.ERR_ALREADYINCHANNEL; }
+                            //        break;
+                            //    }
                     }
                 }
             }
@@ -196,8 +197,8 @@ namespace Core.Ircx.Objects
 
             //Try pass if possible
 
-            if (Properties.Ownerkey.Value.length > 0) { if (Param == Properties.Ownerkey.Value) { return Access.AccessResultEnum.SUCCESS_OWNER; } }
-            if (Properties.Hostkey.Value.length > 0) { if (Param == Properties.Hostkey.Value) { return Access.AccessResultEnum.SUCCESS_HOST; } }
+            if (Properties.Ownerkey.Value.Length > 0) { if (Param == Properties.Ownerkey.Value) { return Access.AccessResultEnum.SUCCESS_OWNER; } }
+            if (Properties.Hostkey.Value.Length > 0) { if (Param == Properties.Hostkey.Value) { return Access.AccessResultEnum.SUCCESS_HOST; } }
 
             if (user.Level >= UserAccessLevel.ChatGuide) { return Access.AccessResultEnum.SUCCESS_OWNER; }
 
@@ -235,7 +236,7 @@ namespace Core.Ircx.Objects
 
         public ChannelProperties(Obj obj): base(obj)
         {
-            Creation.Value = new String8(CreationDate.ToString());
+            Creation.Value = new string(CreationDate.ToString());
             Language.Value = "1";
             base.Properties.Add(Creation);
             base.Properties.Add(Language);
@@ -307,7 +308,7 @@ namespace Core.Ircx.Objects
         {
             Members.Clear();
         }
-        public ChannelMember GetMember(String8 TargetUser)
+        public ChannelMember GetMember(string TargetUser)
         {
             if (!Client.IsObject(TargetUser))
             {
@@ -320,10 +321,10 @@ namespace Core.Ircx.Objects
                 return GetMemberByOID(TargetUser);
             }
         }
-        public ChannelMember GetMemberByOID(String8 OID)
+        public ChannelMember GetMemberByOID(string OID)
         {
             long oid;
-            long.TryParse(OID.chars, System.Globalization.NumberStyles.HexNumber, null, out oid);
+            long.TryParse(OID.ToString(), System.Globalization.NumberStyles.HexNumber, null, out oid);
 
             for (int c = 0; c < Members.Count; c++)
             {
@@ -334,11 +335,11 @@ namespace Core.Ircx.Objects
             }
             return null;
         }
-        public ChannelMember GetMemberByName(String8 UserName)
+        public ChannelMember GetMemberByName(string UserName)
         {
             for (int c = 0; c < Members.Count; c++)
             {
-                if (!String8.compareCaseInsensitive(Members[c].User.Name,UserName))
+                if (Members[c].User.Name.ToString().ToUpper() != UserName.ToString().ToUpper())
                 {
                     return Members[c];
                 }
@@ -346,9 +347,9 @@ namespace Core.Ircx.Objects
             return null;
         }
 
-        public List<ChannelMember> GetMembers(Server Server, Channel Channel, User User, String8 MemberNames, bool ReportMissing)
+        public List<ChannelMember> GetMembers(Server Server, Channel Channel, User User, string MemberNames, bool ReportMissing)
         {
-            List<String8> MemberList = CSharpTools.Tools.CSVToArray(MemberNames);
+            List<string> MemberList = CSharpTools.Tools.CSVToArray(MemberNames);
             if (MemberList == null) { return null; }
 
             List<ChannelMember> Members = new List<ChannelMember>();
@@ -373,7 +374,7 @@ namespace Core.Ircx.Objects
             {
                 for (int x = 0; x < MemberList.Count; x++)
                 {
-                    if (ReportMissing) { User.Send(Raws.Create(Server, Client: User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401, Data: new String8[] { MemberList[x] })); }
+                    if (ReportMissing) { User.Send(Raws.Create(Server, Client: User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401, Data: new string[] { MemberList[x] })); }
                 }
             }
 
@@ -401,7 +402,7 @@ namespace Core.Ircx.Objects
         {
             get { return ((Channel)base.IndexOf(c)); }
         }
-        public Channel GetChannel(String8 TargetChannel)
+        public Channel GetChannel(string TargetChannel)
         {
             ObjIdentifier objIdentifier = Client.IdentifyObject(TargetChannel);
             return ((Channel)base.FindObj(TargetChannel, objIdentifier));
@@ -419,16 +420,16 @@ namespace Core.Ircx.Objects
             }
         }
 
-        public List<Channel> GetChannels(Server Server, User User, String8 ChannelNames, bool ReportMissing)
+        public List<Channel> GetChannels(Server Server, User User, string ChannelNames, bool ReportMissing)
         {
-            List<String8> ChannelList = CSharpTools.Tools.CSVToArray(ChannelNames);
+            List<string> ChannelList = CSharpTools.Tools.CSVToArray(ChannelNames);
             if (ChannelList == null) { return null; }
 
             // Clear out garbage first
             for (int x = 0; x < ChannelList.Count; x++)
             {
                 if (!Channel.IsChannel(ChannelList[x])) {
-                    if (ReportMissing) { User.Send(Raws.Create(Server, Client: User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401, Data: new String8[] { ChannelList[x] })); }
+                    if (ReportMissing) { User.Send(Raws.Create(Server, Client: User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401, Data: new string[] { ChannelList[x] })); }
                     ChannelList.RemoveAt(x);
                     x--;
                 }
@@ -440,7 +441,7 @@ namespace Core.Ircx.Objects
             {
                 for (int x = 0; x < ChannelList.Count; x++)
                 {
-                    if (!String8.compareCaseInsensitive(Server.Channels[c].Name, ChannelList[x]))
+                    if (Server.Channels[c].Name.ToString().ToUpper() != ChannelList[x].ToString().ToUpper())
                     {
                         Channels.Add(Server.Channels[c]);
                         // Once found narrow the search further to save cycles
@@ -455,7 +456,7 @@ namespace Core.Ircx.Objects
             {
                 for (int x = 0; x < ChannelList.Count; x++)
                 {
-                    if (ReportMissing) { User.Send(Raws.Create(Server, Client: User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401, Data: new String8[] { ChannelList[x] })); }
+                    if (ReportMissing) { User.Send(Raws.Create(Server, Client: User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401, Data: new string[] { ChannelList[x] })); }
                 }
             }
 

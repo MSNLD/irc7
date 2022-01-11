@@ -40,7 +40,7 @@ namespace Core.Ircx.Objects
 
 
 
-        public void BroadcastToChannels(String8 data, bool ExcludeUser)
+        public void BroadcastToChannels(string data, bool ExcludeUser)
         {
             for (int c = 0; c < ChannelList.Count; c++)
             {
@@ -53,7 +53,7 @@ namespace Core.Ircx.Objects
 
         //public void Enqueue(Frame Frame)
         //{
-        //    base.FloodProfile.currentInputBytes += (uint)Frame.Message.rawData.length;
+        //    base.FloodProfile.currentInputBytes += (uint)Frame.Message.rawData.Length;
         //    base.BufferIn.Queue.Enqueue(Frame);
         //}
 
@@ -86,13 +86,13 @@ namespace Core.Ircx.Objects
             }
             return null;
         }
-        public UserChannelInfo GetChannelInfo(String8 Name)
+        public UserChannelInfo GetChannelInfo(string Name)
         {
-            if (!String8.compareCaseInsensitive(ActiveChannel.Channel.Name,Name)) { return ActiveChannel; }
+            if (ActiveChannel.Channel.Name.ToString().ToUpper() != Name.ToString().ToUpper()) { return ActiveChannel; }
 
             for (int c = 0; c < Channels.ChannelList.Count; c++)
             {
-                if (!String8.compareCaseInsensitive(Channels.ChannelList[c].Channel.Name,Name)) { return Channels.ChannelList[c]; }
+                if (Channels.ChannelList[c].Channel.Name.ToString().ToUpper() != Name.ToString().ToUpper()) { return Channels.ChannelList[c]; }
             }
             return null;
         }
@@ -161,7 +161,7 @@ namespace Core.Ircx.Objects
         {
             get { return ((User)base.IndexOf(c)); }
         }
-        public User GetUser(String8 TargetUser)
+        public User GetUser(string TargetUser)
         {
             ObjIdentifier objIdentifier = Client.IdentifyObject(TargetUser);
             return ((User)base.FindObj(TargetUser, objIdentifier));

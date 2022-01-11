@@ -18,11 +18,11 @@ namespace Core.Ircx.Commands
             base.DataType = CommandDataType.Standard;
         }
 
-        public static void ProcessWhisper(Frame Frame, Channel Channel, String8 TargetNicknames, String8 Message)
+        public static void ProcessWhisper(Frame Frame, Channel Channel, string TargetNicknames, string Message)
         {
             if (Frame.User.Modes.Gag.Value == 1) { return; }
 
-            List<String8> Nicknames = CSharpTools.Tools.CSVToArray(TargetNicknames);
+            List<string> Nicknames = CSharpTools.Tools.CSVToArray(TargetNicknames);
             if (Nicknames != null)
             {
                 for (int c = 0; c < Nicknames.Count; c++)
@@ -43,19 +43,19 @@ namespace Core.Ircx.Commands
                         else
                         {
                             // Send Whisper
-                            member.User.Send(Raws.Create(Server: Frame.Server, Channel: Channel, Client: Frame.User, Raw: Raws.RPL_CHAN_WHISPER, Data: new String8[] { member.User.Name, Message }));
+                            member.User.Send(Raws.Create(Server: Frame.Server, Channel: Channel, Client: Frame.User, Raw: Raws.RPL_CHAN_WHISPER, Data: new string[] { member.User.Name, Message }));
                         }
                     }
                     else
                     {
                         // Member not on channel
-                        Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401_N, Data: new String8[] { Nicknames[c] }));
+                        Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401_N, Data: new string[] { Nicknames[c] }));
                     }
                 }
             }
             else
             {
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401_N, Data: new String8[] { Resources.Null }));
+                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401_N, Data: new string[] { Resources.Null }));
             }
         }
 
@@ -64,12 +64,12 @@ namespace Core.Ircx.Commands
             if (Frame.Message.Data.Count == 1)
             {
                 // No recipient given
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRC_ERR_NORECIPIENT_411, Data: new String8[] { Resources.CommandWhisper }));
+                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRC_ERR_NORECIPIENT_411, Data: new string[] { Resources.CommandWhisper }));
             }
             else if (Frame.Message.Data.Count == 2)
             {
                 // No text to send
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRC_ERR_NOTEXT_412, Data: new String8[] { Resources.CommandWhisper }));
+                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRC_ERR_NOTEXT_412, Data: new string[] { Resources.CommandWhisper }));
             }
             else if (Frame.Message.Data.Count == 3)
             {
@@ -96,12 +96,12 @@ namespace Core.Ircx.Commands
                         if (c != null)
                         {
                             // You are not on that channel
-                            Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442, Data: new String8[] { Frame.Message.Data[0] }));
+                            Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442, Data: new string[] { Frame.Message.Data[0] }));
                         }
                         else
                         {
                             // No such channel
-                            Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403, Data: new String8[] { Frame.Message.Data[0] }));
+                            Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403, Data: new string[] { Frame.Message.Data[0] }));
                         }
                     }
 
@@ -110,14 +110,14 @@ namespace Core.Ircx.Commands
                 else
                 {
                     // No such channel
-                    Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403, Data: new String8[] { Frame.Message.Data[0] }));
+                    Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403, Data: new string[] { Frame.Message.Data[0] }));
                 }
 
             }
             else
             {
                 // Too many arguments
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_TOOMANYARGUMENTS_901, Data: new String8[] { Frame.Message.Data[2] }));
+                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_TOOMANYARGUMENTS_901, Data: new string[] { Frame.Message.Data[2] }));
             }
             return COM_RESULT.COM_SUCCESS;
         }

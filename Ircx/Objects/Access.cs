@@ -15,10 +15,10 @@ namespace Core.Ircx.Objects
     public class AccessLevel
     {
         public EnumAccessLevel Level;
-        public String8 LevelText;
+        public string LevelText;
         public static AccessLevel None = new AccessLevel(EnumAccessLevel.NONE, Resources.Null);
 
-        public AccessLevel(EnumAccessLevel Level, String8 LevelText)
+        public AccessLevel(EnumAccessLevel Level, string LevelText)
         {
             this.Level = Level;
             this.LevelText = LevelText;
@@ -27,8 +27,8 @@ namespace Core.Ircx.Objects
     public class AccessOperator
     {
         public EnumAccessOperator Operator;
-        public String8 OperatorText;
-        public AccessOperator(EnumAccessOperator Operator, String8 OperatorText)
+        public string OperatorText;
+        public AccessOperator(EnumAccessOperator Operator, string OperatorText)
         {
             this.Operator = Operator;
             this.OperatorText = OperatorText;
@@ -68,10 +68,10 @@ namespace Core.Ircx.Objects
     {
         public AccessLevel Level;
         public Address Mask;
-        public String8 EntryAddress;
+        public string EntryAddress;
         public UserAccessLevel EntryLevel;
         public int Duration;
-        public String8 Reason;
+        public string Reason;
         public bool Fixed;
 
         public int DurationInSeconds
@@ -102,13 +102,13 @@ namespace Core.Ircx.Objects
     };
     public class Access
     {
-        public String8 ObjectName;
+        public string ObjectName;
         public AccessCollection Entries;
         AccessLevelCollection LevelCollection;
         AccessOperatorCollection OperatorCollection;
 
 
-        public Access(String8 ObjectName, bool IsChannel)
+        public Access(string ObjectName, bool IsChannel)
         {
             this.ObjectName = ObjectName;
             Entries = new AccessCollection();
@@ -116,10 +116,9 @@ namespace Core.Ircx.Objects
             OperatorCollection = new AccessOperatorCollection();
         }
 
-        public AccessLevel ResolveAccessLevel(String8 Data)
+        public AccessLevel ResolveAccessLevel(string Data)
         {
-            String8 Level = new String8(Data.bytes, 0, Data.length);
-            Level.toupper();
+            string Level = new string(Data.ToString().ToUpper());
 
             for (int i = 0; i < LevelCollection.Levels.Count; i++)
             {
@@ -128,10 +127,9 @@ namespace Core.Ircx.Objects
 
             return AccessLevel.None;
         }
-        public EnumAccessOperator ResolveAccessOperator(String8 Data)
+        public EnumAccessOperator ResolveAccessOperator(string Data)
         {
-            String8 Operator = new String8(Data.bytes, 0, Data.length);
-            Operator.toupper();
+            string Operator = new string(Data.ToString().ToUpper());
 
             for (int i = 0; i < OperatorCollection.Operators.Count; i++)
             {
@@ -163,8 +161,8 @@ namespace Core.Ircx.Objects
             {
                 if (Entries.Entries[i].Level.Level == EnumAccessLevel.GRANT) { GrantExists = true; }
                 Address Entry = Entries.Entries[i].Mask;
-                String8 TestAddress = (Entry.UsesIP ? Mask._address[4] : Mask._address[3]);
-                if (String8RegEx.EvaluateString8(Entry._address[3], TestAddress, true))
+                string TestAddress = (Entry.UsesIP ? Mask._address[4] : Mask._address[3]);
+                if (StringBuilderRegEx.EvaluateString(Entry._address[3].ToString(), TestAddress.ToString(), true))
                 {
                     AccessResultEnum EntryResult = AccessResultEnum.ERR_AUTHONLYCHAN;
                     switch (Entries.Entries[i].Level.Level)

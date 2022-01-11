@@ -4,37 +4,39 @@ using System.Text;
 using System.Security.Cryptography;
 using CSharpTools;
 using System.Runtime.InteropServices;
-
+using System.Linq;
+using Core.CSharpTools;
 
 namespace Core.Authentication.Package
 {
-    class GateKeeper : SSP { 
-        public static new String8 DOMAIN = new String8("GateKeeper");
-        public static String8 _gksspSig = new String8("GKSSP\0");
+    class GateKeeper : SSP
+    {
+        public static new string DOMAIN = "GateKeeper";
+        public static string _gksspSig = "GKSSP\0";
         public const UInt64 SIGNATURE = 0x0000005053534b47; //S2 0x0000005053534b47 ulong
         public new string NicknameMask = @"^>(?!(Sysop)|(Admin)|(Guide))[\x41-\xFF\-0-9]+$";
         public override UInt64 Signature { get { return SIGNATURE; } }
 
         protected GKSSPToken ServerToken, ClientToken;
         protected GUID ClientGUID;
-        private String8 challenge;
+        private string challenge;
 
         // Credit to JD for discovering the below key through XOR'ing (Discovered 2017/05/04)
-        static String8 key = "SRFMKSJANDRESKKC";
+        static string key = "SRFMKSJANDRESKKC";
         public GateKeeper()
         {
             guest = true;
             server_sequence = (int)state.SSP_INIT;
         }
 
-        public override state InitializeSecurityContext(String8 data, String8 ip)
+        public override state InitializeSecurityContext(string data, string ip)
         {
-            String8 lit = String8.ToLiteral(data);
-            if (lit.length >= 0x10)
+            StringBuilder lit = StringBuilderExtensions.ToLiteral(data);
+            if (lit.Length >= 0x10)
             {
-                if (String8.compare(lit, _gksspSig, 0x10))
+                if (lit.ToString().StartsWith(_gksspSig))
                 {
-                    ClientToken = GKSSPTokenHelper.InitializeFromBytes(lit.bytes);
+                    ClientToken = GKSSPTokenHelper.InitializeFromBytes(lit.ToByteArray());
                     if ((ClientToken.Sequence == server_sequence) && ((ClientToken.Version >= 2) && (ClientToken.Version <= 3)))
                     {
                         server_sequence = (int)state.SSP_EXT; //expecting a SSP_EXT reply after challenge is sent
@@ -45,37 +47,39 @@ namespace Core.Authentication.Package
             }
             return state.SSP_FAILED;
         }
-        public override state AcceptSecurityContext(String8 data, String8 ip)
+        public override state AcceptSecurityContext(string data, string ip)
         {
-            String8 lit = String8.ToLiteral(data);
-            if (lit.length >= 0x20)
+            StringBuilder lit = StringBuilderExtensions.ToLiteral(data);
+            if (lit.Length >= 0x20)
             {
-                if (String8.compare(lit, _gksspSig, 0x10))
+                if (lit.ToString().StartsWith(_gksspSig))
                 {
-                    ClientToken = GKSSPTokenHelper.InitializeFromBytes(lit.bytes);
+                    ClientToken = GKSSPTokenHelper.InitializeFromBytes(lit.ToByteArray());
                     uint _clientVersion = ClientToken.Version, _clientStage = (uint)ClientToken.Sequence;
                     if ((_clientStage == server_sequence) && ((_clientVersion >= 2) && (_clientVersion <= 3)))
                     {
-                        String8 context = new String8(lit.bytes, 16, 32);
-                        if (VerifySecurityContext(challenge, context.bytes, ip, server_version))
+                        string context = StringBuilderExtensions.FromBytes(lit.ToByteArray(), 16, 32).ToString();
+                        if (VerifySecurityContext(challenge, context.ToByteArray(), ip, server_version))
                         {
                             //Note that I need to improve the below code. Guid needs a ToByteArray() function
-                            String8 GuidBinary = null;
+                            StringBuilder GuidBinary = null;
 
-                            if (lit.length >= 0x30) {
-                                GuidBinary = new String8(lit.bytes, 32, 48);
-                                ClientGUID = new GUID(GuidBinary.bytes);
+                            if (lit.Length >= 0x30)
+                            {
+                                GuidBinary = StringBuilderExtensions.FromBytes(lit.ToByteArray(), 32, 48);
+                                ClientGUID = new GUID(GuidBinary.ToByteArray());
                             }
-                            else {
-                                GuidBinary = new String8(Guid.NewGuid().ToByteArray(), 0, 16);
-                                ClientGUID = new GUID(GuidBinary.bytes);
+                            else
+                            {
+                                GuidBinary = StringBuilderExtensions.FromBytes(Guid.NewGuid().ToByteArray(), 0, 16);
+                                ClientGUID = new GUID(GuidBinary.ToByteArray());
                             }
 
                             if ((!ClientGUID.IsNull()) || (guest == false))
                             {
                                 uuid = ClientGUID.ToHex();
-                                memberIdLow = BitConverter.ToUInt64(GuidBinary.bytes, 0);
-                                memberIdHigh = BitConverter.ToUInt64(GuidBinary.bytes, 8);
+                                memberIdLow = BitConverter.ToUInt64(GuidBinary.ToByteArray(), 0);
+                                memberIdHigh = BitConverter.ToUInt64(GuidBinary.ToByteArray(), 8);
                                 server_sequence = (int)state.SSP_AUTHENTICATED;
                                 IsAuthenticated = true;
                                 return state.SSP_OK;
@@ -87,31 +91,32 @@ namespace Core.Authentication.Package
             return state.SSP_FAILED;
         }
         public override SSP Create() { return new GateKeeper(); }
-        public override String8 GetDomain() { return GateKeeper.DOMAIN; }
+        public override string GetDomain() { return GateKeeper.DOMAIN; }
         public override string GetNickMask() { return NicknameMask; }
 
-        public bool VerifySecurityContext(String8 challenge, byte[] context, String8 ip, uint version)
+        public bool VerifySecurityContext(string challenge, byte[] context, string ip, uint version)
         {
-            HMACMD5 md5 = new HMACMD5(key.bytes);
-            String8 ctx = new String8(challenge.length + ip.length);
-            ctx.append(challenge);
-            if (version == 3) { ctx.append(ip); }
-            byte[] h1 = md5.ComputeHash(ctx.bytes, 0, ctx.length);
-            return (String8.memcmp(context, h1, 16) == 0);
+            HMACMD5 md5 = new HMACMD5(key.ToByteArray());
+            StringBuilder ctx = new StringBuilder(challenge.Length + ip.Length);
+            ctx.Append(challenge);
+            if (version == 3) { ctx.Append(ip); }
+            byte[] h1 = md5.ComputeHash(ctx.ToByteArray(), 0, ctx.Length);
+            return h1.SequenceEqual(context);
         }
-        public override String8 CreateSecurityChallenge(state stage)
+        public override string CreateSecurityChallenge(state stage)
         {
             if (stage == state.SSP_SEC)
             {
                 ServerToken = GKSSPTokenHelper.CreateGateKeeperToken();
-                challenge = new String8(Guid.NewGuid().ToByteArray(), 0, 8);
-                for (int i = 0; i < challenge.length; i++) { challenge.bytes[i] = (byte)(challenge.bytes[i] % 0x7F); } // for mIRC
-                String8 message = new String8(Marshal.SizeOf<GKSSPToken>(ServerToken) + challenge.bytes.Length); //create new message with full size
+                //challenge = StringBuilderExtensions.FromBytes(Guid.NewGuid().ToByteArray(), 0, 8).ToString();
+                challenge = "AAAAAAAA";
+                for (int i = 0; i < challenge.Length; i++) { challenge.ToByteArray()[i] = (byte)(challenge.ToByteArray()[i] % 0x7F); } // for mIRC
+                StringBuilder message = new StringBuilder(Marshal.SizeOf<GKSSPToken>(ServerToken) + challenge.ToByteArray().Length); //create new message with full size
                 ServerToken.Version = ClientToken.Version;
                 ServerToken.Sequence = 2;
-                message.append(GKSSPTokenHelper.GetBytes(ServerToken));
-                message.append(challenge.bytes);
-                return message;
+                message.AppendByteArrayAsChars(GKSSPTokenHelper.GetBytes(ServerToken));
+                message.AppendByteArrayAsChars(challenge.ToByteArray());
+                return message.ToString();
             }
             return null;
         }
@@ -143,7 +148,7 @@ namespace Core.Authentication.Package
         public static GKSSPToken CreateGateKeeperToken()
         {
             GKSSPToken AuthToken = new GKSSPToken();
-            AuthToken.Signature = GateKeeper._gksspSig.bytes;
+            AuthToken.Signature = GateKeeper._gksspSig.ToByteArray();
             return AuthToken;
         }
         public static GKSSPToken CreateGuid()

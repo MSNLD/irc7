@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Core.Ircx.Objects;
 using CSharpTools;
 using System.Reflection;
+using System.Text;
 
 namespace Core.Ircx.Commands
 {
@@ -20,7 +21,7 @@ namespace Core.Ircx.Commands
             base.ForceFloodCheck = true;
         }
 
-        public static COM_RESULT ProcessJoinChannel(Frame Frame, Channel c, String8 Key)
+        public static COM_RESULT ProcessJoinChannel(Frame Frame, Channel c, string Key)
         {
             Server server = Frame.Server;
             User user = Frame.User;
@@ -96,7 +97,7 @@ namespace Core.Ircx.Commands
                 {
                     switch (AccessResult)
                     {
-                        case Access.AccessResultEnum.ERR_NICKINUSE: { user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NICKINUSE_433, Data: new String8[] { user.Address.Nickname })); break; }
+                        case Access.AccessResultEnum.ERR_NICKINUSE: { user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_NICKINUSE_433, Data: new string[] { user.Address.Nickname })); break; }
                         case Access.AccessResultEnum.ERR_ALREADYINCHANNEL: { user.Send(Raws.Create(Server: server, Channel: c, Client: user, Raw: Raws.IRCX_ERR_ALREADYONCHANNEL_927X)); break; }
                         case Access.AccessResultEnum.ERR_CHANNELISFULL:
                             {
@@ -151,8 +152,8 @@ namespace Core.Ircx.Commands
                 // To process 0
                 if ((message.Data[0] == Resources.Zero) && (message.Data.Count == 1)) { PART.ProcessPartUserChannels(Frame); return COM_RESULT.COM_SUCCESS; }
 
-                List<String8> Keys = new List<String8>();
-                String8 CurrentKey = Resources.Null;
+                List<string> Keys = new List<string>();
+                string CurrentKey = Resources.Null;
 
                 if (message.Data.Count > 1)
                 {
@@ -176,19 +177,19 @@ namespace Core.Ircx.Commands
 
                 // null
                 // No such channel
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403, Data: new String8[] { Frame.Message.Data[0] }));
+                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403, Data: new string[] { Frame.Message.Data[0] }));
             }
             else
             {
                 //insufficient parameters
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new String8[] { message.Data[0] }));
+                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new string[] { message.Data[0] }));
             }
             return COM_RESULT.COM_SUCCESS;
         }
 
-        public static void SendKnock(Server server, Channel c, User from, String8 Reason)
+        public static void SendKnock(Server server, Channel c, User from, string Reason)
         {
-            String8 RawKnock = Raws.Create(Server: server, Channel: c, Client: from, Raw: Raws.RPL_KNOCK_CHAN, Data: new String8[] { Reason });
+            string RawKnock = Raws.Create(Server: server, Channel: c, Client: from, Raw: Raws.RPL_KNOCK_CHAN, Data: new string[] { Reason });
             c.SendLevel(RawKnock, UserAccessLevel.ChatHost);
         }
 
@@ -202,20 +203,20 @@ namespace Core.Ircx.Commands
                 //else
                 //{
 
-                    String8 UserProfile = Member.User.Profile.GetProfile(ChannelMember.User.Profile.Ircvers);
-                    if (UserProfile.length > 0)
+                    string UserProfile = Member.User.Profile.GetProfile(ChannelMember.User.Profile.Ircvers);
+                    if (UserProfile.Length > 0)
                     {
                         //msn join
                         if (Member.ChannelMode.modeChar == 0x0)
                         {
-                            ChannelMember.User.Send(Raws.Create(Server: server, Channel: c, Client: Member.User, Raw: Raws.RPL_JOIN_MSN, Data: new String8[] { UserProfile }));
+                            ChannelMember.User.Send(Raws.Create(Server: server, Channel: c, Client: Member.User, Raw: Raws.RPL_JOIN_MSN, Data: new string[] { UserProfile }));
                         }
                         else
                         {
-                            String8 ProfMode = new String8(2);
-                            ProfMode.append(44);
-                            ProfMode.append(Member.ChannelMode.modeChar);
-                            ChannelMember.User.Send(Raws.Create(Server: server, Channel: c, Client: Member.User, Raw: Raws.RPL_JOIN_MSN, Data: new String8[] { UserProfile, ProfMode }));
+                            StringBuilder ProfMode = new StringBuilder(2);
+                            ProfMode.Append((char)44);
+                            ProfMode.Append((char)Member.ChannelMode.modeChar);
+                            ChannelMember.User.Send(Raws.Create(Server: server, Channel: c, Client: Member.User, Raw: Raws.RPL_JOIN_MSN, Data: new string[] { UserProfile, ProfMode.ToString() }));
                         }
                     }
                     else
@@ -229,17 +230,17 @@ namespace Core.Ircx.Commands
                     {
                         if (!Member.ChannelMode.IsNormal())
                         {
-                            String8 ProfMode = new String8(3);
-                            ProfMode.append(43); // '+'
-                            if (Member.ChannelMode.IsOwner()) { ProfMode.append(Resources.ChannelUserModeCharOwner); }
-                            else if (Member.ChannelMode.IsHost()) { ProfMode.append(Resources.ChannelUserModeCharHost); }
-                            else if (Member.ChannelMode.IsVoice()) { ProfMode.append(Resources.ChannelUserModeCharVoice); }
+                            StringBuilder ProfMode = new StringBuilder(3);
+                            ProfMode.Append((char)43); // '+'
+                            if (Member.ChannelMode.IsOwner()) { ProfMode.Append((char)Resources.ChannelUserModeCharOwner); }
+                            else if (Member.ChannelMode.IsHost()) { ProfMode.Append((char)Resources.ChannelUserModeCharHost); }
+                            else if (Member.ChannelMode.IsVoice()) { ProfMode.Append((char)Resources.ChannelUserModeCharVoice); }
 
-                            if (ProfMode.length == 2)
+                            if (ProfMode.Length == 2)
                             {
-                                ProfMode.append(0x20);
-                                //itll only be 2 length when it has passed above criteria
-                                ChannelMember.User.Send(Raws.Create(Server: server, Channel: c, Client: Member.User, Raw: Raws.RPL_MODE_IRC, Data: new String8[] { c.Name, ProfMode, Member.User.Address.Nickname }));
+                                ProfMode.Append((char)0x20);
+                                //itll only be 2 Length when it has passed above criteria
+                                ChannelMember.User.Send(Raws.Create(Server: server, Channel: c, Client: Member.User, Raw: Raws.RPL_MODE_IRC, Data: new string[] { c.Name, ProfMode.ToString(), Member.User.Address.Nickname }));
                             }
                         }
                     }

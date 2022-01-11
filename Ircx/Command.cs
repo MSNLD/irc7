@@ -47,7 +47,7 @@ namespace Core.Ircx
             }
         }
 
-        public object GetCommand(String8 Name)
+        public object GetCommand(string Name)
         {
             for (int c = 0; c < Commands.Count; c++)
             {
@@ -61,7 +61,7 @@ namespace Core.Ircx
     {
 
         CommandCode Code;
-        public String8 Name;
+        public string Name;
         public MethodInfo Function;
         public int MinParamCount;
         public bool RegistrationRequired;
@@ -102,7 +102,7 @@ namespace Core.Ircx
                     }
                     else { return (COM_RESULT)Function.Invoke(Frame.Command, new object[] { Frame }); }
 
-                    Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new String8[] { Frame.Message.Command }));
+                    Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new string[] { Frame.Message.Command }));
                 }
                 else if ((Frame.User.Registered) && (PreRegistration))
                 {
@@ -115,7 +115,7 @@ namespace Core.Ircx
             }
             else
             {
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_UNKNOWNCOMMAND_421, Data: new String8[] { Frame.Message.Command }));
+                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_UNKNOWNCOMMAND_421, Data: new string[] { Frame.Message.Command }));
                 //Frame.User.Send(DefaultFrames.NotImplemented);
             }
             //not implemented to irc user

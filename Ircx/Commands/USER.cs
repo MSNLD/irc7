@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Core.Ircx.Objects;
 using CSharpTools;
 using System.Reflection;
+using System.Text;
+using Core.CSharpTools;
 
 namespace Core.Ircx.Commands
 {
@@ -36,14 +38,14 @@ namespace Core.Ircx.Commands
 
                 if (bSetUser == true) { 
                     int iUsernameLen = (Frame.Message.Data[0].Length > Program.Config.MaxUsername ? Program.Config.MaxUsername : Frame.Message.Data[0].Length);
-                    String8 Userhost = new String8(iUsernameLen + 1);
-                    Userhost.append("~");
-                    Userhost.append(Frame.Message.Data[0].bytes, 0, iUsernameLen);
-                    u.Address.Userhost = Userhost;
+                    StringBuilder Userhost = new StringBuilder(iUsernameLen + 1);
+                    Userhost.Append("~");
+                    Userhost.Append(Frame.Message.Data[0].ToString().Substring(iUsernameLen));
+                    u.Address.Userhost = Userhost.ToString();
                 }
 
-                String8 Realname = Frame.Message.Data[3];
-                if (Realname.Length > Program.Config.MaxRealname) { Realname = new String8(Realname.bytes, 0, Program.Config.MaxRealname); }
+                string Realname = Frame.Message.Data[3];
+                if (Realname.Length > Program.Config.MaxRealname) { Realname = new string(Realname.ToString().Substring(Program.Config.MaxRealname)); }
                 
 
                 if (Realname.Length == 0) { Realname = Resources.Wildcard; }

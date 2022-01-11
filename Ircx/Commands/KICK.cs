@@ -36,7 +36,7 @@ namespace Core.Ircx.Commands
                             if (Members != null) {
                                 if (Members.Count > 0)
                                 {
-                                    String8 Reason = Resources.Null;
+                                    string Reason = Resources.Null;
                                     if (Frame.Message.Data.Count >= 3) { Reason = Frame.Message.Data[2]; }
 
                                     for (int x = 0; x < Members.Count; x++)
@@ -46,12 +46,12 @@ namespace Core.Ircx.Commands
                                 }
                                 else
                                 {
-                                    Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401, Data: new String8[] { Resources.Null }));
+                                    Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401, Data: new string[] { Resources.Null }));
                                 }
                             }
                             else
                             {
-                                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401, Data: new String8[] { Resources.Null }));
+                                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401, Data: new string[] { Resources.Null }));
                             }
 
                         }
@@ -64,24 +64,24 @@ namespace Core.Ircx.Commands
                     else
                     {
                         //you're not on that channel
-                        Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442, Data: new String8[] { Frame.Message.Data[0] }));
+                        Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442, Data: new string[] { Frame.Message.Data[0] }));
                     }
                 }
                 else
                 {
-                    Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403, Data: new String8[] { Frame.Message.Data[0] }));
+                    Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403, Data: new string[] { Frame.Message.Data[0] }));
                     //no such channel
                 }
             }
             else
             {
                 //insufficient parameters
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new String8[] { Frame.Message.Command }));
+                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461, Data: new string[] { Frame.Message.Command }));
             }
             return COM_RESULT.COM_SUCCESS;
         }
 
-        public void ProcessKick(Server server, ChannelMember Member, Channel channel, ChannelMember ChannelMember, String8 Reason)
+        public void ProcessKick(Server server, ChannelMember Member, Channel channel, ChannelMember ChannelMember, string Reason)
         {
             if (Member.Level < ChannelMember.Level)
             {
@@ -90,7 +90,7 @@ namespace Core.Ircx.Commands
             }
             else
             {
-                channel.Send(Raws.Create(Server: server, Channel: channel, Client: Member.User, Raw: Raws.RPL_KICK_IRC, Data: new String8[] { ChannelMember.User.Address.Nickname, Reason }), ChannelMember.User);
+                channel.Send(Raws.Create(Server: server, Channel: channel, Client: Member.User, Raw: Raws.RPL_KICK_IRC, Data: new string[] { ChannelMember.User.Address.Nickname, Reason }), ChannelMember.User);
                 ChannelMember.ChannelMode.SetNormal();
                 channel.RemoveMember(ChannelMember);
                 ChannelMember.User.RemoveChannel(channel);

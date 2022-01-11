@@ -20,7 +20,7 @@ namespace Core.Ircx.Commands
 
         public static void SendWhoChannelUser(Frame Frame, Channel c, ChannelMember TargetUser)
         {
-            Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_WHOREPLY_352, Data: new String8[] {
+            Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_WHOREPLY_352, Data: new string[] {
                                 //<channel> <user> <host> <server> <nick> \
                              //<H|G>[*][@|+] :<hopcount> <real name>
 
@@ -50,7 +50,7 @@ namespace Core.Ircx.Commands
                     }
                 }
             }
-            Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ENDOFWHO_315, Data: new String8[] { Frame.Message.Data[0] }));
+            Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ENDOFWHO_315, Data: new string[] { Frame.Message.Data[0] }));
         }
         public static void SendWho(Frame Frame, List<User> Members)
         {
@@ -77,7 +77,7 @@ namespace Core.Ircx.Commands
                                 if ((c.Modes.Hidden.Value != 0x1) && (c.Modes.Secret.Value != 0x1) && (c.Modes.Private.Value != 0x1))
                                 {
                                     ChannelMember TargetUser = User.ChannelList[x].Member;
-                                    Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_WHOREPLY_352, Data: new String8[] {
+                                    Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_WHOREPLY_352, Data: new string[] {
                                     //<channel> <user> <host> <server> <nick> \
                                      //<H|G>[*][@|+] :<hopcount> <real name>
 
@@ -97,10 +97,10 @@ namespace Core.Ircx.Commands
                         else
                         {
                             // output without channel
-                            Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_WHOREPLY_352, Data: new String8[] {
+                            Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_WHOREPLY_352, Data: new string[] {
                                     //<channel> <user> <host> <server> <nick>
                                      //<H|G>[*][@|+]<usermodes> :<hopcount> <real name>
-                                     //public static String8 IRCX_RPL_WHOREPLY_352 = ":%h 352 %n %s %s %s %h %s %s%s%s :0 %s";
+                                     //public static string IRCX_RPL_WHOREPLY_352 = ":%h 352 %n %s %s %s %h %s %s%s%s :0 %s";
                                         Resources.Wildcard,
                                         User.Address.Userhost, User.Address.Hostname, User.Address.Nickname,
                                         (User.Profile.Away ? Resources.Gone : Resources.Home),
@@ -115,7 +115,7 @@ namespace Core.Ircx.Commands
                     }
                 }
             }
-            Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ENDOFWHO_315, Data: new String8[] { Frame.Message.Data[0] }));
+            Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ENDOFWHO_315, Data: new string[] { Frame.Message.Data[0] }));
         }
 
         public new COM_RESULT Execute(Frame Frame)
@@ -181,7 +181,7 @@ namespace Core.Ircx.Commands
                     if (server.Users[i].Registered)
                     {
                         if ((server.Users[i].Modes.Invisible.Value == 0x1) && (user.Level < UserAccessLevel.ChatGuide) && (server.Users[i] != user)) ;
-                        else if (String8RegEx.EvaluateString8(message.Data[0], server.Users[i].Address.Nickname, true))
+                        else if (StringBuilderRegEx.EvaluateString(message.Data[0].ToString(), server.Users[i].Address.Nickname.ToString(), true))
                         {
                             WhoUsers.Add(server.Users[i]);
                         }

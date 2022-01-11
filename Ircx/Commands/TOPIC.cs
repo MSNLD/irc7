@@ -57,16 +57,16 @@ namespace Core.Ircx.Commands
 
                         if (canChange)
                         {
-                            if (Frame.Message.Data[1].length <= c.Properties.Topic.Limit)
+                            if (Frame.Message.Data[1].Length <= c.Properties.Topic.Limit)
                             {
                                 c.Properties.Topic.Value = Frame.Message.Data[1];
                                 c.Properties.TopicLastChanged = ((DateTime.UtcNow.Ticks - Resources.epoch) / TimeSpan.TicksPerSecond);
-                                c.Send(Raws.Create(Server: Frame.Server, Channel: c, Client: Frame.User, Raw: Raws.RPL_TOPIC_IRC, Data: new String8[] { c.Properties.Topic.Value }), Frame.User);
+                                c.Send(Raws.Create(Server: Frame.Server, Channel: c, Client: Frame.User, Raw: Raws.RPL_TOPIC_IRC, Data: new string[] { c.Properties.Topic.Value }), Frame.User);
                             }
                             else
                             {
                                 //421 String parameter must be 160 chars or less
-                                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_UNKNOWNCOMMAND_421_T, Data: new String8[] { Resources.CommandTopic }));
+                                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_UNKNOWNCOMMAND_421_T, Data: new string[] { Resources.CommandTopic }));
                             }
                         }
                         else
@@ -78,7 +78,7 @@ namespace Core.Ircx.Commands
                     else
                     {
                         //442 You are not on that channel
-                        Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442, Data: new String8[] { Frame.Message.Data[0] }));
+                        Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442, Data: new string[] { Frame.Message.Data[0] }));
                     }
                 }
             }
@@ -87,9 +87,9 @@ namespace Core.Ircx.Commands
 
         public static void SendTopicReply(Server server, User user, Channel c)
         {
-            if (c.Properties.Topic.Value.length > 0)
+            if (c.Properties.Topic.Value.Length > 0)
             {
-                user.Send(Raws.Create(Server: server, Channel: c, Client: user, Raw: Raws.IRCX_RPL_TOPIC_332, Data: new String8[] { c.Properties.Topic.Value }));
+                user.Send(Raws.Create(Server: server, Channel: c, Client: user, Raw: Raws.IRCX_RPL_TOPIC_332, Data: new string[] { c.Properties.Topic.Value }));
             }
         }
     }

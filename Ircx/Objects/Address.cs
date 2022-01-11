@@ -7,9 +7,9 @@ namespace Core.Ircx.Objects
 {
     public class Address
     {
-        public static String8 Unassigned = new String8("*");
+        public static string Unassigned = new string("*");
 
-        public String8[] _address = new String8[5];
+        public string[] _address = new string[5];
         public static int MaxNickLen = 64;
         public static int MaxFieldLen = 64;
         public enum AddressMaskType { NU, UH, NUH, NUHS };
@@ -21,40 +21,40 @@ namespace Core.Ircx.Objects
         //Address4     Nickname ! Userhost @ Hostname $ Server
         //Address5     Nickname ! Userhost @ IP       $ Server
 
-        private String8 InternalNickname = Unassigned, InternalNicknameU = Unassigned, InternalUserhost = Unassigned, InternalHostname = null, InternalServer = Unassigned, InternalRealname = null;
+        private string InternalNickname = Unassigned, InternalNicknameU = Unassigned, InternalUserhost = Unassigned, InternalHostname = null, InternalServer = Unassigned, InternalRealname = null;
 
-        public String8 RemoteIP = Resources.Wildcard;
-        public String8 RemoteHost = Resources.Wildcard;
+        public string RemoteIP = Resources.Wildcard;
+        public string RemoteHost = Resources.Wildcard;
 
-        public String8 RealName
+        public string RealName
         {
             get { return (InternalRealname == null ? Resources.Null : InternalRealname); }
             set {
                 InternalRealname = value;
-                if (InternalRealname.length > MaxFieldLen) { InternalRealname = new String8(InternalRealname.bytes, 0, (Address.MaxFieldLen - 1));  }
+                if (InternalRealname.Length > MaxFieldLen) { InternalRealname = new string(InternalRealname.ToString().Substring(Address.MaxFieldLen));  }
             }
         }
 
-        public String8 Nickname
+        public string Nickname
         {
             get { return (InternalNickname == null ? Unassigned : InternalNickname); }
-            set { InternalNickname = value; InternalNicknameU = new String8(InternalNickname.bytes); InternalNicknameU.toupper(); UpdateAddressMask(AddressMaskType.NU); }
+            set { InternalNickname = value; InternalNicknameU = new string(InternalNickname.ToString().ToUpper()); UpdateAddressMask(AddressMaskType.NU); }
         }
-        public String8 UNickname
+        public string UNickname
         {
             get { return (InternalNicknameU == null ? Unassigned : InternalNicknameU); }
         }
-        public String8 Userhost
+        public string Userhost
         {
             get { return (InternalUserhost == null ? Unassigned : InternalUserhost); }
             set { InternalUserhost = value; UpdateAddressMask(AddressMaskType.UH); }
         }
-        public String8 Hostname
+        public string Hostname
         {
             get { return (InternalHostname == null ? RemoteIP : InternalHostname); }
             set { InternalHostname = value; UpdateAddressMask(AddressMaskType.UH); }
         }
-        public String8 Server
+        public string Server
         {
             get { return (InternalServer == null ? Unassigned : InternalServer); }
             set { InternalServer = value; UpdateAddressMask(AddressMaskType.NUHS); }
@@ -92,52 +92,52 @@ namespace Core.Ircx.Objects
 
         public void InvalidateNickname() { Nickname = Unassigned; }
 
-        public bool FromMask(String8 Mask)
+        public bool FromMask(string Mask)
         {
-            if (Mask.length > 80) { Mask.length = 80; } //Verified in Exchange 5.5, accounts for !$@ + 1 more
+            if (Mask.Length > 80) { Mask.Substring(80); } //Verified in Exchange 5.5, accounts for !$@ + 1 more
 
-            String8 FieldData = new String8(MaxFieldLen);
+            StringBuilder FieldData = new StringBuilder(MaxFieldLen);
             int CurrentField = 0; //0 = Nick, 1 = User, 2 = Host, 3 = Server
 
-            for (int i = 0; i < Mask.length; i++)
+            for (int i = 0; i < Mask.Length; i++)
             {
-                switch (Mask.bytes[i])
+                switch (Mask[i])
                 {
-                    case 33:
+                    case (char)33:
                         {
-                            if (FieldData.length > 0) { _address[CurrentField] = new String8(FieldData.bytes, 0, FieldData.length); }
+                            if (FieldData.Length > 0) { _address[CurrentField] = new string(FieldData.ToString()); }
                             CurrentField = 1;
-                            FieldData.length = 0;
+                            FieldData.Length = 0;
                             break;
                         } //!
-                    case 64:
+                    case (char)64:
                         {
                             if (CurrentField == 0) { CurrentField = 1; }
-                            if (FieldData.length > 0) { _address[CurrentField] = new String8(FieldData.bytes, 0, FieldData.length); }
+                            if (FieldData.Length > 0) { _address[CurrentField] = new string(FieldData.ToString()); }
                             CurrentField = 2;
-                            FieldData.length = 0;
+                            FieldData.Length = 0;
                             break;
                         } //@
-                    case 36:
+                    case (char)36:
                         {
                             if (CurrentField == 0) { CurrentField = 2; }
-                            if (FieldData.length > 0) { _address[CurrentField] = new String8(FieldData.bytes, 0, FieldData.length); }
+                            if (FieldData.Length > 0) { _address[CurrentField] = new string(FieldData.ToString()); }
                             CurrentField = 3;
-                            FieldData.length = 0;
+                            FieldData.Length = 0;
                             break;
                         }  //$
                     default:
                         {
-                            if ((Mask.bytes[i] == 46) && (CurrentField == 2))
+                            if ((Mask[i] == 46) && (CurrentField == 2))
                             { // .
                                 UsesIP = true;
                             }
-                            FieldData.append(Mask.bytes[i]);
+                            FieldData.Append(Mask[i]);
                             break;
                         }
                 }
             }
-            if (FieldData.length > 0) { _address[CurrentField] = new String8(FieldData.bytes, 0, FieldData.length); }
+            if (FieldData.Length > 0) { _address[CurrentField] = new string(FieldData.ToString()); }
 
             InternalNickname = _address[0];
             InternalUserhost = _address[1];
@@ -150,49 +150,55 @@ namespace Core.Ircx.Objects
 
         public void UpdateAddressMask(AddressMaskType type)
         {
+            StringBuilder _addressBuilder;
             switch (type)
             {
                 case AddressMaskType.NU:
-                    {
-                        _address[0] = new String8(Nickname.length + Userhost.length + 1);
-                        _address[0].append(Nickname);
-                        _address[0].append('!');
-                        _address[0].append(Userhost);
+                {
+                        _addressBuilder = new StringBuilder(Nickname.Length + Userhost.Length + 1);
+                        _addressBuilder.Append(Nickname);
+                        _addressBuilder.Append('!');
+                        _addressBuilder.Append(Userhost);
+                        _address[0] = _addressBuilder.ToString();
                         UpdateAddressMask(AddressMaskType.NUH);
                         break;
                     }
                 case AddressMaskType.UH:
                     {
-                        _address[1] = new String8(Userhost.length + Hostname.length + 1);
-                        _address[1].append(Userhost);
-                        _address[1].append('@');
-                        _address[1].append(Hostname);
+                        _addressBuilder = new StringBuilder(Userhost.Length + Hostname.Length + 1);
+                        _addressBuilder.Append(Userhost);
+                        _addressBuilder.Append('@');
+                        _addressBuilder.Append(Hostname);
+                        _address[1] = _addressBuilder.ToString();
                         UpdateAddressMask(AddressMaskType.NU);
                         UpdateAddressMask(AddressMaskType.NUH);
                         break;
                     }
                 case AddressMaskType.NUH:
                     {
-                        _address[2] = new String8(Nickname.length + Userhost.length + Hostname.length + 2);
-                        _address[2].append(_address[0]);
-                        _address[2].append('@');
-                        _address[2].append(Hostname);
+                        _addressBuilder = new StringBuilder(Nickname.Length + Userhost.Length + Hostname.Length + 2);
+                        _addressBuilder.Append(_address[0]);
+                        _addressBuilder.Append('@');
+                        _addressBuilder.Append(Hostname);
+                        _address[2] = _addressBuilder.ToString();
                         UpdateAddressMask(AddressMaskType.NUHS);
                         break;
                     }
                 case AddressMaskType.NUHS:
                     {
-                        _address[3] = new String8(_address[2].Length + Server.Length + 1);
-                        _address[3].append(_address[2]);
-                        _address[3].append('$');
-                        _address[3].append(Server);
+                        _addressBuilder = new StringBuilder(_address[2].Length + Server.Length + 1);
+                        _addressBuilder.Append(_address[2]);
+                        _addressBuilder.Append('$');
+                        _addressBuilder.Append(Server);
+                        _address[3] = _addressBuilder.ToString();
 
-                        _address[4] = new String8(_address[0].Length + Hostname.Length + Server.length + 2);
-                        _address[4].append(_address[0]);
-                        _address[4].append('@');
-                        _address[4].append(Hostname);
-                        _address[4].append('$');
-                        _address[4].append(Server);
+                        _addressBuilder = new StringBuilder(_address[0].Length + Hostname.Length + Server.Length + 2);
+                        _addressBuilder.Append(_address[0]);
+                        _addressBuilder.Append('@');
+                        _addressBuilder.Append(Hostname);
+                        _addressBuilder.Append('$');
+                        _addressBuilder.Append(Server);
+                        _address[4] = _addressBuilder.ToString();
                         break;
                     }
             }

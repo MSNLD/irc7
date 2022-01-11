@@ -4,6 +4,7 @@ using System.Text;
 using CSharpTools;
 using System.IO;
 using System.Security.Cryptography;
+using Core.CSharpTools;
 
 namespace Core.Authentication
 {
@@ -22,13 +23,13 @@ namespace Core.Authentication
         public String8 Encrypt(String8 data)
         {
             DES.BlockSize = 128;
-            DES.Key = Key.bytes;
-            DES.IV = IV.bytes;
+            DES.Key = Key.bytes.GetBytes();
+            DES.IV = IV.bytes.GetBytes();
             using (MemoryStream MS = new MemoryStream())
             {
                 using (CryptoStream CS = new CryptoStream(MS, DES.CreateEncryptor(), CryptoStreamMode.Write))
                 {
-                    CS.Write(data.bytes, 0, data.Capacity);
+                    CS.Write(data.bytes.GetBytes(), 0, data.Capacity);
                     CS.FlushFinalBlock();
                 }
                 return new String8(MS.ToArray());
@@ -36,17 +37,17 @@ namespace Core.Authentication
         }
         public String8 Decrypt(String8 data)
         {
-            if ((data.length > 0) && (data.length % 8 == 0))
+            if ((data.Length > 0) && (data.Length % 8 == 0))
             {
-                if (System.Security.Cryptography.TripleDES.IsWeakKey(Key.bytes)) { return null; }
+                if (System.Security.Cryptography.TripleDES.IsWeakKey(Key.bytes.GetBytes())) { return null; }
 
-                DES.Key = Key.bytes;
-                DES.IV = IV.bytes;
+                DES.Key = Key.bytes.GetBytes();
+                DES.IV = IV.bytes.GetBytes();
                 using (MemoryStream MS = new MemoryStream())
                 {
                     using (CryptoStream CS = new CryptoStream(MS, DES.CreateDecryptor(), CryptoStreamMode.Write))
                     {
-                        CS.Write(data.bytes, 0, data.length);
+                        CS.Write(data.bytes.GetBytes(), 0, data.Length);
                         using (CS)
                         {
                             try
@@ -76,14 +77,14 @@ namespace Core.Authentication
         public String8 CreateKey()
         {
             String8 Key = new String8(Guid.NewGuid().ToByteArray(), 8, 16);
-            while (TripleDES.IsWeakKey(Key.bytes)) { Key = new String8(Guid.NewGuid().ToByteArray(), 8, 16); }
+            while (TripleDES.IsWeakKey(Key.bytes.GetBytes())) { Key = new String8(Guid.NewGuid().ToByteArray(), 8, 16); }
             return Key;
         }
 
         public String8 Encrypt(String8 data, String8 key)
         {
-            if (key.length < 8) { key = new String8(createDESkey(key.bytes)); }
-            if (TripleDES.IsWeakKey(key.bytes)) { return null; }
+            if (key.Length < 8) { key = new String8(createDESkey(key.bytes.GetBytes())); }
+            if (TripleDES.IsWeakKey(key.bytes.GetBytes())) { return null; }
 
             SymmetricAlgorithm DES;
             DES = TripleDES.Create();
@@ -93,9 +94,9 @@ namespace Core.Authentication
             using (MemoryStream MS = new MemoryStream())
             {
 
-                byte[] bytData = data.bytes;
+                byte[] bytData = data.bytes.GetBytes();
                 byte[] bytIV = { 0, 0, 0, 0, 0, 0, 0, 0 };
-                byte[] bytKey = key.bytes;
+                byte[] bytKey = key.bytes.GetBytes();
                 DES.Key = bytKey;
                 DES.IV = bytIV;
                 ICryptoTransform ICT = DES.CreateEncryptor();

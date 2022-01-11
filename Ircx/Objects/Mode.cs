@@ -96,7 +96,7 @@ namespace Core
             else if (IsVoice()) { modeChar = Resources.ChannelUserFlagVoice; }
             else { modeChar = 0x0; }
         }
-        public String8 ModeString
+        public string ModeString
         {
             get
             {
@@ -144,18 +144,18 @@ namespace Core
     public class AuditUserMode : AuditMode
     {
         public User TargetUser;
-        public String8 user;
-        public String8 modeData;
-        public AuditUserMode(User TargetUser, String8 user, byte modeChar, bool modeFlag) : base(modeChar, modeFlag) { this.TargetUser = TargetUser; this.user = user; modeData = CreateModeData(modeFlag, modeChar, false); }
+        public string user;
+        public string modeData;
+        public AuditUserMode(User TargetUser, string user, byte modeChar, bool modeFlag) : base(modeChar, modeFlag) { this.TargetUser = TargetUser; this.user = user; modeData = CreateModeData(modeFlag, modeChar, false); }
 
-        public static String8 CreateModeData(bool modeFlag, byte modeChar, bool bSpacePos)
+        public static string CreateModeData(bool modeFlag, byte modeChar, bool bSpacePos)
         {
-            String8 ModeData = new String8(3);
-            if (bSpacePos) { ModeData.append(0x20); }
-            ModeData.append((modeFlag ? (byte)'+' : (byte)'-'));
-            ModeData.append(modeChar);
-            if (!bSpacePos) { ModeData.append(0x20); }
-            return ModeData;
+            StringBuilder ModeData = new StringBuilder(3);
+            if (bSpacePos) { ModeData.Append((char)0x20); }
+            ModeData.Append((modeFlag ? '+' : '-'));
+            ModeData.Append((char)modeChar);
+            if (!bSpacePos) { ModeData.Append((char)0x20); }
+            return ModeData.ToString();
         }
     }
     public class AuditModeReport
@@ -206,7 +206,7 @@ namespace Core
 
     public class UserModeCollection : ModeCollection
     {
-        String8 UserModes;
+        StringBuilder UserModes;
 
         public UserModeAdmin Admin = new UserModeAdmin();
         public UserModeOper Oper = new UserModeOper();
@@ -216,7 +216,7 @@ namespace Core
         public UserModePasskey Passkey = new UserModePasskey();
         public UserModeSecure Secure = new UserModeSecure();
 
-        public String8 UserModeString { get { return UserModes; } }
+        public string UserModeString { get { return UserModes.ToString(); } }
 
         public UserModeCollection()
             : base()
@@ -228,21 +228,21 @@ namespace Core
             Modes.Add(Passkey);
             Modes.Add(Gag);
             Modes.Add(Secure);
-            UserModes = new String8(Modes.Count + 2); //Modes, extra 1 for +, extra 1 for Ircx 'x'
+            UserModes = new StringBuilder(Modes.Count + 2); //Modes, extra 1 for +, extra 1 for Ircx 'x'
             UpdateModes();
         }
 
         public void UpdateModes()
         {
-            UserModes.length = 0;
-            //UserModes.append('+');
+            UserModes.Length = 0;
+            //UserModes.Append('+');
             bool bHasLimit = false, bHasKey = false;
-            String8 limit = Resources.Null;
+            string limit = Resources.Null;
 
-            //UserModes.append(Ircx.ModeChar);
+            //UserModes.Append(Ircx.ModeChar);
             for (int i = 0; i < Modes.Count; i++)
             {
-                if (Modes[i].Value == 0x1) { UserModes.append(Modes[i].ModeChar); }
+                if (Modes[i].Value == 0x1) { UserModes.Append((char)Modes[i].ModeChar); }
             }
         }
     }
@@ -287,7 +287,7 @@ namespace Core
 
     public class ChannelModeCollection : ModeCollection
     {
-        String8 ChanModes;
+        StringBuilder ChanModes;
         int modeLen;
         int modeFullLen;
 
@@ -316,8 +316,8 @@ namespace Core
         public ChannelUserModeVoice Voice = new ChannelUserModeVoice();
         public ChannelUserModeBan Ban = new ChannelUserModeBan();
 
-        public String8 ChannelModeString { get { ChanModes.length = modeFullLen; return ChanModes; } }
-        public String8 ChannelModeShortString { get { ChanModes.length = modeLen; return ChanModes; } }
+        public string ChannelModeString { get { ChanModes.Length = modeFullLen; return ChanModes.ToString(); } }
+        public string ChannelModeShortString { get { ChanModes.Length = modeLen; return ChanModes.ToString(); } }
 
 
 
@@ -348,7 +348,7 @@ namespace Core
             Modes.Add(Auditorium);
             Modes.Add(Ban);
             //It might be worth considering having an array of 26a-z 26A-Z + other space and the modes not set will be ignored in raw processing '\0' then dont output
-            ChanModes = new String8(Modes.Count + 2 + 10 + 31); //Modes, 2 ' ', 10 Limit, 31 Key
+            ChanModes = new StringBuilder(Modes.Count + 2 + 10 + 31); //Modes, 2 ' ', 10 Limit, 31 Key
             NoExtern.Value = 1;
             TopicOp.Value = 1;
             UserLimit.Value = 50;
@@ -356,29 +356,29 @@ namespace Core
         }
         public void UpdateModes(Prop key)
         {
-            ChanModes.length = 0;
-            ChanModes.append('+');
+            ChanModes.Length = 0;
+            ChanModes.Append('+');
             bool bHasLimit = false, bHasKey = false;
-            String8 limit = Resources.Null;
+            string limit = Resources.Null;
 
             for (int i = 0; i < Modes.Count; i++)
             {
-                if (Modes[i].ModeChar == (byte)'l') { if (Modes[i].Value != 0) { bHasLimit = true; limit = new String8(Modes[i].Value.ToString()); } }
+                if (Modes[i].ModeChar == (byte)'l') { if (Modes[i].Value != 0) { bHasLimit = true; limit = new string(Modes[i].Value.ToString()); } }
                 else if (Modes[i].ModeChar == (byte)'k') { if (Modes[i].Value != 0) { bHasKey = true; } }
-                else { if (Modes[i].Value == 0x1) { ChanModes.append(Modes[i].ModeChar); } }
+                else { if (Modes[i].Value == 0x1) { ChanModes.Append((char)Modes[i].ModeChar); } }
             }
-            if (bHasLimit) { ChanModes.append((byte)'l'); }
-            if (bHasKey) { ChanModes.append((byte)'k'); }
+            if (bHasLimit) { ChanModes.Append('l'); }
+            if (bHasKey) { ChanModes.Append('k'); }
 
-            modeLen = ChanModes.length;
+            modeLen = ChanModes.Length;
 
-            if (bHasLimit) { ChanModes.append(' '); ChanModes.append(limit); }
+            if (bHasLimit) { ChanModes.Append(' '); ChanModes.Append(limit); }
             if (key != null)
             {
-                if (bHasKey) { ChanModes.append(' '); ChanModes.append(key.Value); }
+                if (bHasKey) { ChanModes.Append(' '); ChanModes.Append(key.Value); }
             }
 
-            modeFullLen = ChanModes.length;
+            modeFullLen = ChanModes.Length;
         }
 
     };

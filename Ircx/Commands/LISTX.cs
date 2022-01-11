@@ -32,7 +32,7 @@ namespace Core.Ircx.Commands
                 if (Channel.IsChannel(message.Data[1]))
                 {
                     //process as list of channels
-                    List<String8> ChannelNames = CSharpTools.Tools.CSVToArray(message.Data[1]);
+                    List<string> ChannelNames = CSharpTools.Tools.CSVToArray(message.Data[1]);
                     //LISTX [<query list>] <mask>
                     //<query list> One or more query terms separated by spaces or commas.
                     //<mask>         Sequence of characters that is used to select a matching channel name or topic. The character * and ? are used for wildcard searches.
@@ -59,7 +59,7 @@ namespace Core.Ircx.Commands
                         if (!Channel.IsChannel(ChannelNames[i]))
                         {
                             //<- :SERVER 900 Administrator LISTX :Bad command
-                            user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new String8[] { message.Data[0] }));
+                            user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new string[] { message.Data[0] }));
                             return COM_RESULT.COM_SUCCESS;
                         }
                         else
@@ -76,152 +76,146 @@ namespace Core.Ircx.Commands
                     int iMinMembers = 0, iMaxMembers = int.MaxValue;
                     int iMinutesBefore = int.MaxValue, iMinutesAfter = 0;
                     int iMinutesBeforeTopic = int.MaxValue, iMinutesAfterTopic = 0;
-                    String8 LanguageMask = Resources.Null;
-                    String8 NameMask = Resources.Null;
-                    String8 SubjectMask = Resources.Null;
-                    String8 TopicMask = Resources.Null;
+                    string LanguageMask = Resources.Null;
+                    string NameMask = Resources.Null;
+                    string SubjectMask = Resources.Null;
+                    string TopicMask = Resources.Null;
 
                     bool bCheckMembers = false, bCheckCreation = false, bCheckLanguage = false, bCheckName = false,
                          bCheckRegistered = false, bCheckSubject = false, bCheckTopicChanged = false, bCheckTopic = false;
 
                     //process as list of commands
-                    List<String8> Params = CSharpTools.Tools.CSVToArray(message.Data[1], true);
+                    List<string> Params = CSharpTools.Tools.CSVToArray(message.Data[1], true);
 
                     for (int i = 0; i < Params.Count; i++)
                     {
                         bool bMatch = false;
-                        if (Params[i].length >= 2)
+                        if (Params[i].Length >= 2)
                         {
-                            switch (Params[i].bytes[0])
+                            switch (Params[i][0])
                             {
-                                case (byte)'<':
+                                case '<':
                                     {
                                         //      <#Select channels with less than # members.
                                         iMinMembers = CSharpTools.Tools.Str2Int(Params[i], 1);
                                         bCheckMembers = true;
-                                        if (iMinMembers == -1) { /* Bad Command */ user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new String8[] { message.Data[0] })); return COM_RESULT.COM_SUCCESS; }
+                                        if (iMinMembers == -1) { /* Bad Command */ user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new string[] { message.Data[0] })); return COM_RESULT.COM_SUCCESS; }
                                         break;
                                     }
-                                case (byte)'>':
+                                case '>':
                                     {
                                         //      >#Select channels with more than # members.
                                         iMaxMembers = CSharpTools.Tools.Str2Int(Params[i], 1);
                                         bCheckMembers = true;
-                                        if (iMaxMembers == -1) { /* Bad Command */ user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new String8[] { message.Data[0] })); return COM_RESULT.COM_SUCCESS; }
+                                        if (iMaxMembers == -1) { /* Bad Command */ user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new string[] { message.Data[0] })); return COM_RESULT.COM_SUCCESS; }
                                         break;
                                     }
-                                case (byte)'C':
+                                case 'C':
                                     {
                                         //      C<#Select channels created less than # minutes ago.
                                         //      C>#Select channels created greater than # minutes ago.
                                         bCheckCreation = true;
                                         int iNumber = CSharpTools.Tools.Str2Int(Params[i], 2);
-                                        if (iNumber == -1) { /* Bad Command */user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new String8[] { message.Data[0] })); return COM_RESULT.COM_SUCCESS; }
+                                        if (iNumber == -1) { /* Bad Command */user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new string[] { message.Data[0] })); return COM_RESULT.COM_SUCCESS; }
                                         else
                                         {
-                                            if (Params[i].bytes[1] == (byte)'<')
+                                            if (Params[i][1] == (byte)'<')
                                             {
                                                 iMinutesBefore = iNumber;
                                             }
-                                            else if (Params[i].bytes[1] == (byte)'>')
+                                            else if (Params[i][1] == (byte)'>')
                                             {
                                                 iMinutesAfter = iNumber;
                                             }
-                                            else { /* Bad Command */user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new String8[] { message.Data[0] })); return COM_RESULT.COM_SUCCESS; }
+                                            else { /* Bad Command */user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new string[] { message.Data[0] })); return COM_RESULT.COM_SUCCESS; }
                                         }
                                         break;
                                     }
-                                case (byte)'L':
+                                case 'L':
                                     {
                                         //      L=<mask>Select channels with language property matching the mask string.
                                         bCheckLanguage = true;
-                                        if ((Params[i].bytes[1] == (byte)'=') && (Params[i].length > 2))
+                                        if ((Params[i][1] == (byte)'=') && (Params[i].Length > 2))
                                         {
-                                            LanguageMask = new String8(Params[i].bytes, 2, Params[i].length);
-
-                                            LanguageMask.toupper();
+                                            LanguageMask = new string(Params[i].ToString().Substring(2).ToUpper());
                                         }
-                                        else { /* bad command */ user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new String8[] { message.Data[0] })); return COM_RESULT.COM_SUCCESS; }
+                                        else { /* bad command */ user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new string[] { message.Data[0] })); return COM_RESULT.COM_SUCCESS; }
                                         break;
                                     }
-                                case (byte)'N':
+                                case 'N':
                                     {
                                         //      N=<mask>Select channels with name matching the mask string.
                                         bCheckName = true;
-                                        if ((Params[i].bytes[1] == (byte)'=') && (Params[i].length > 2))
+                                        if ((Params[i][1] == (byte)'=') && (Params[i].Length > 2))
                                         {
-                                            NameMask = new String8(Params[i].bytes, 2, Params[i].length);
-
-                                            NameMask.toupper();
+                                            NameMask = new string(Params[i].ToString().Substring(2).ToUpper());
                                         }
-                                        else { /* bad command */ user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new String8[] { message.Data[0] })); return COM_RESULT.COM_SUCCESS; }
+                                        else { /* bad command */ user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new string[] { message.Data[0] })); return COM_RESULT.COM_SUCCESS; }
                                         break;
                                     }
-                                case (byte)'R':
+                                case 'R':
                                     {
                                         //      R=1Select registered channels.
                                         bCheckRegistered = true;
-                                        if ((Params[i].bytes[1] == (byte)'=') && (Params[i].length == 3))
+                                        if ((Params[i][1] == (byte)'=') && (Params[i].Length == 3))
                                         {
-                                            if (Params[i].bytes[2] == (byte)'1') { iRegisteredFlag = 1; }
-                                            else if (Params[i].bytes[2] == (byte)'0') { iRegisteredFlag = 0; }
-                                            else { /* bad command */ user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new String8[] { message.Data[0] })); return COM_RESULT.COM_SUCCESS; }
+                                            if (Params[i][2] == (byte)'1') { iRegisteredFlag = 1; }
+                                            else if (Params[i][2] == (byte)'0') { iRegisteredFlag = 0; }
+                                            else { /* bad command */ user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new string[] { message.Data[0] })); return COM_RESULT.COM_SUCCESS; }
                                         }
-                                        else { /* bad command */ user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new String8[] { message.Data[0] })); return COM_RESULT.COM_SUCCESS; }
+                                        else { /* bad command */ user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new string[] { message.Data[0] })); return COM_RESULT.COM_SUCCESS; }
                                         break;
                                     }
-                                case (byte)'S':
+                                case 'S':
                                     {
                                         //      S=<mask>Select channels with subject matching the mask string.
                                         bCheckSubject = true;
-                                        if ((Params[i].bytes[1] == (byte)'=') && (Params[i].length > 2))
+                                        if ((Params[i][1] == (byte)'=') && (Params[i].Length > 2))
                                         {
-                                            SubjectMask = new String8(Params[i].bytes, 2, Params[i].length);
-                                            SubjectMask.toupper();
+                                            SubjectMask = new string(Params[i].ToString().Substring(2).ToUpper());
                                         }
-                                        else { /* bad command */ user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new String8[] { message.Data[0] })); return COM_RESULT.COM_SUCCESS; }
+                                        else { /* bad command */ user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new string[] { message.Data[0] })); return COM_RESULT.COM_SUCCESS; }
                                         break;
                                     }
-                                case (byte)'T':
+                                case 'T':
                                     {
                                         //      T<#Select channels with a topic changed less than # minutes ago.
                                         //      T>#Select channels with a topic changed greater than # minutes ago.
                                         //      T=<mask>Select channels that topic matches the mask string.
-                                        if (Params[i].length > 2)
+                                        if (Params[i].Length > 2)
                                         {
-                                            if (Params[i].bytes[1] == (byte)'<')
+                                            if (Params[i][1] == (byte)'<')
                                             {
                                                 bCheckTopicChanged = true;
                                                 int iNumber = CSharpTools.Tools.Str2Int(Params[i], 2);
                                                 iMinutesBefore = iNumber;
                                             }
-                                            else if (Params[i].bytes[1] == (byte)'>')
+                                            else if (Params[i][1] == (byte)'>')
                                             {
                                                 bCheckTopicChanged = true;
                                                 int iNumber = CSharpTools.Tools.Str2Int(Params[i], 2);
                                                 iMinutesAfter = iNumber;
                                             }
-                                            else if (Params[i].bytes[1] == (byte)'=')
+                                            else if (Params[i][1] == (byte)'=')
                                             {
                                                 bCheckTopic = true;
-                                                TopicMask = new String8(Params[i].bytes, 2, Params[i].length);
-                                                TopicMask.toupper();
+                                                TopicMask = new string(Params[i].ToString().Substring(2).ToUpper());
                                             }
-                                            else { /* Bad Command */ user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new String8[] { message.Data[0] })); return COM_RESULT.COM_SUCCESS; }
+                                            else { /* Bad Command */ user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new string[] { message.Data[0] })); return COM_RESULT.COM_SUCCESS; }
                                         }
-                                        else { /* Bad Command */ user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new String8[] { message.Data[0] })); return COM_RESULT.COM_SUCCESS; }
+                                        else { /* Bad Command */ user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new string[] { message.Data[0] })); return COM_RESULT.COM_SUCCESS; }
                                         break;
                                     }
                                 default:
                                     {
-                                        if ((Params[i].bytes[0] >= 48) && (Params[i].bytes[0] <= 57))
+                                        if ((Params[i][0] >= 48) && (Params[i][0] <= 57))
                                         {
                                             //process as a number
                                             int maxListEntries = CSharpTools.Tools.Str2Int(Params[i]);
                                             if (maxListEntries == -1)
                                             {
                                                 //<- :SERVER 900 Administrator LISTX :Bad command
-                                                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new String8[] { message.Data[0] }));
+                                                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new string[] { message.Data[0] }));
                                                 return COM_RESULT.COM_SUCCESS;
                                             }
                                             else if (maxListEntries > 1) { iMaxListEntries = maxListEntries; }
@@ -230,7 +224,7 @@ namespace Core.Ircx.Commands
                                         else
                                         {
                                             //<- :SERVER 900 Administrator LISTX :Bad command
-                                            user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new String8[] { message.Data[0] }));
+                                            user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new string[] { message.Data[0] }));
                                             return COM_RESULT.COM_SUCCESS;
                                         }
                                         break;
@@ -239,14 +233,14 @@ namespace Core.Ircx.Commands
                         }
                         else
                         {
-                            if ((Params[i].bytes[0] >= 48) && (Params[i].bytes[0] <= 57))
+                            if ((Params[i][0] >= 48) && (Params[i][0] <= 57))
                             {
                                 //process as a number
                                 int maxListEntries = CSharpTools.Tools.Str2Int(Params[i]);
                                 if (maxListEntries == -1)
                                 {
                                     //<- :SERVER 900 Administrator LISTX :Bad command
-                                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new String8[] { message.Data[0] }));
+                                    user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new string[] { message.Data[0] }));
                                     return COM_RESULT.COM_SUCCESS;
                                 }
                                 else if (maxListEntries > 1) { iMaxListEntries = maxListEntries; }
@@ -255,7 +249,7 @@ namespace Core.Ircx.Commands
                             else
                             {
                                 //<- :SERVER 900 Administrator LISTX :Bad command
-                                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new String8[] { message.Data[0] }));
+                                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new string[] { message.Data[0] }));
                                 return COM_RESULT.COM_SUCCESS;
                             }
                         }
@@ -282,12 +276,12 @@ namespace Core.Ircx.Commands
                         }
                         if (bCheckName)
                         {
-                            if (String8RegEx.EvaluateString8(NameMask, server.Channels[i].UCaseName, true)) { bFoundName = true; }
+                            if (StringBuilderRegEx.EvaluateString(NameMask.ToString(), server.Channels[i].UCaseName.ToString(), true)) { bFoundName = true; }
                             else { bFoundName = false; }
                         }
                         if (bCheckLanguage)
                         {
-                            if (String8RegEx.EvaluateString8(LanguageMask, server.Channels[i].Properties.Language.Value, true)) { bFoundLanguage = true; }
+                            if (StringBuilderRegEx.EvaluateString(LanguageMask.ToString(), server.Channels[i].Properties.Language.Value.ToString(), true)) { bFoundLanguage = true; }
                             else { bFoundLanguage = false; }
                         }
                         if (bCheckRegistered)
@@ -297,12 +291,12 @@ namespace Core.Ircx.Commands
                         }
                         if (bCheckSubject)
                         {
-                            if (String8RegEx.EvaluateString8(SubjectMask, server.Channels[i].Properties.Subject.Value, true)) { bFoundSubject = true; }
+                            if (StringBuilderRegEx.EvaluateString(SubjectMask.ToString(), server.Channels[i].Properties.Subject.Value.ToString(), true)) { bFoundSubject = true; }
                             else { bFoundSubject = false; }
                         }
                         if (bCheckTopic)
                         {
-                            if (String8RegEx.EvaluateString8(TopicMask, server.Channels[i].Properties.Topic.Value, true)) { bFoundTopic = true; }
+                            if (StringBuilderRegEx.EvaluateString(TopicMask.ToString(), server.Channels[i].Properties.Topic.Value.ToString(), true)) { bFoundTopic = true; }
                             else { bFoundTopic = false; }
                         }
                         if (bCheckTopicChanged)
@@ -327,7 +321,7 @@ namespace Core.Ircx.Commands
 
             for (int i = 0; i < Channels.Count; i++)
             {
-                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_RPL_LISTXLIST_812, Data: new String8[] { Channels[i].Name, Channels[i].Modes.ChannelModeShortString, Channels[i].Properties.Topic.Value }, IData: new int[] { Channels[i].MemberList.Count, Channels[i].Modes.UserLimit.Value }));
+                user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_RPL_LISTXLIST_812, Data: new string[] { Channels[i].Name, Channels[i].Modes.ChannelModeShortString, Channels[i].Properties.Topic.Value }, IData: new int[] { Channels[i].MemberList.Count, Channels[i].Modes.UserLimit.Value }));
 
             }
             user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_RPL_LISTXEND_817));

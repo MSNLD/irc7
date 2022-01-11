@@ -34,15 +34,15 @@ namespace Core.Ircx.Commands
 
             if (bCanSendToChannel)
             {
-                String8 Raw = Raws.RPL_PRIVMSG_CHAN;
+                string Raw = Raws.RPL_PRIVMSG_CHAN;
                 if (!Privmsg) { Raw = Raws.RPL_NOTICE_CHAN; }
 
-                Channel.Send(Raws.Create(Server: Frame.Server, Channel: Channel, Client: Frame.User, Raw: Raw, Data: new String8[] { Frame.Message.Data[1] }), Frame.User, true);
+                Channel.Send(Raws.Create(Server: Frame.Server, Channel: Channel, Client: Frame.User, Raw: Raw, Data: new string[] { Frame.Message.Data[1] }), Frame.User, true);
             }
             else
             {
                 // you are not on that channel
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_CANNOTSENDTOCHAN_404, Data: new String8[] { Channel.Name }));
+                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_CANNOTSENDTOCHAN_404, Data: new string[] { Channel.Name }));
             }
             return COM_RESULT.COM_SUCCESS;
         }
@@ -50,15 +50,14 @@ namespace Core.Ircx.Commands
         private static COM_RESULT ProcessServerPrivmsg(Frame Frame, bool Privmsg)
         {
             if (Flood.FloodCheck(CommandDataType.Standard, Frame.User) == FLD_RESULT.S_WAIT) { return COM_RESULT.COM_WAIT; }
-            List<String8> Nicknames = CSharpTools.Tools.CSVToArray(Frame.Message.Data[0]);
+            List<string> Nicknames = CSharpTools.Tools.CSVToArray(Frame.Message.Data[0]);
             if (Nicknames != null)
             {
 
                 for (int i = 0; i < Nicknames.Count; i++)
                 {
                     User TargetUser = null;
-                    String8 TargetNickname = new String8(Nicknames[i].bytes);
-                    TargetNickname.toupper();
+                    string TargetNickname = new string(Nicknames[i].ToString().ToUpper());
 
                     if (Frame.User.ActiveChannel != null)
                     {
@@ -71,18 +70,18 @@ namespace Core.Ircx.Commands
                     }
 
                     if (TargetUser != null) {
-                        TargetUser.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: (Privmsg == true ? Raws.RPL_PRIVMSG_USER : Raws.RPL_NOTICE_USER), Data: new String8[] { TargetUser.Name, Frame.Message.Data[1] }));
+                        TargetUser.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: (Privmsg == true ? Raws.RPL_PRIVMSG_USER : Raws.RPL_NOTICE_USER), Data: new string[] { TargetUser.Name, Frame.Message.Data[1] }));
                     }
                     else
                     {
-                        Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401, Data: new String8[] { Resources.Null }));
+                        Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401, Data: new string[] { Resources.Null }));
                     }
                 }
 
             }
             else
             {
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new String8[] { Resources.CommandWhois }));
+                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new string[] { Resources.CommandWhois }));
             }
             return COM_RESULT.COM_SUCCESS;
         }
@@ -101,7 +100,7 @@ namespace Core.Ircx.Commands
                 }
                 else
                 {
-                    Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new String8[] { Resources.CommandWhois }));
+                    Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_BADCOMMAND_900, Data: new string[] { Resources.CommandWhois }));
                 }
             }
             else

@@ -18,7 +18,7 @@ namespace Core.Ircx.Commands
 
         public new COM_RESULT Execute(Frame Frame)
         {
-            String8 Reason = null;
+            string Reason = null;
             if (Frame.Message.Data != null)
             {
                 Reason = Frame.Message.Data[0];
@@ -28,14 +28,14 @@ namespace Core.Ircx.Commands
             return COM_RESULT.COM_SUCCESS;
         }
 
-        public static void ProcessQuit(Server server, Client client, String8 Reason)
+        public static void ProcessQuit(Server server, Client client, string Reason)
         {
             if (client.Registered) { 
                 if (client.ObjectType == ObjType.UserObject) {
                     User user = (User)client;
                     if (Reason == null) { Reason = Resources.CONNRESETBYPEER; }
 
-                    String8 Raw = Raws.Create(Client: user, Raw: Raws.RPL_QUIT_IRC, Data: new String8[] { Reason });
+                    string Raw = Raws.Create(Client: user, Raw: Raws.RPL_QUIT_IRC, Data: new string[] { Reason });
 
                     for (int c = 0; c < user.ChannelList.Count; c++)
                     {

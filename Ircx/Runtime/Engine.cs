@@ -56,7 +56,7 @@ namespace Core
                 {
                     Client.Send(Raws.Create(Server: Frame.Server, Client: Client,
                         Raw: (Saturation == SAT_RESULT.S_INPUT_EXCEEDED ? Raws.IRCX_CLOSINGLINK_008_INPUTFLOODING : Raws.IRCX_CLOSINGLINK_009_OUTPUTSATURATION),
-                        Data: new String8[] { Frame.Client.Address.RemoteIP }));
+                        Data: new string[] { Frame.Client.Address.RemoteIP }));
                     Client.InputQueue.Clear();
                     Core.Ircx.Commands.QUIT.ProcessQuit(Frame.Server, Frame.Client, Resources.INPUTFLOODING);
                     Client.FloodProfile.currentInputBytes = 0;
@@ -67,7 +67,7 @@ namespace Core
                     if (Client.Process(Frame) != COM_RESULT.COM_WAIT) { 
                         Client.InputQueue.Dequeue();
                         if (Client.FloodProfile.currentInputBytes > 0) { 
-                            Client.FloodProfile.currentInputBytes -= (uint)Frame.Message.rawData.length;
+                            Client.FloodProfile.currentInputBytes -= (uint)Frame.Message.rawData.Length;
                         }
                     }
                 }
@@ -77,13 +77,13 @@ namespace Core
                     if (Client.InputQueue.Count > 0) { Client.InputQueue.Dequeue(); }
                     if (Client.FloodProfile.currentInputBytes > 0)
                     {
-                        Client.FloodProfile.currentInputBytes -= (uint)Frame.Message.rawData.length;
+                        Client.FloodProfile.currentInputBytes -= (uint)Frame.Message.rawData.Length;
                     }
-                    String8 Mask = Resources.Wildcard;
+                    string Mask = Resources.Wildcard;
                     if (Client.Address._address[3] != null) { Mask = Client.Address._address[3]; }
-                    Debug.Out((Client.Address.RemoteIP.chars + " (" + Mask.chars + ")\r\n =>" + Frame.Message.rawData.chars));
+                    Debug.Out((Client.Address.RemoteIP.ToString() + " (" + Mask.ToString() + ")\r\n =>" + Frame.Message.rawData.ToString()));
                     Debug.Out(e.Message);
-                    Client.Send(Raws.Create(Server: Frame.Server, Client: Client, Raw: Raws.IRCX_ERR_EXCEPTION, Data: new String8[] { Frame.Message.Data[0] }));
+                    Client.Send(Raws.Create(Server: Frame.Server, Client: Client, Raw: Raws.IRCX_ERR_EXCEPTION, Data: new string[] { Frame.Message.Data[0] }));
                 }
             }
             if (!Client.Registered)
@@ -149,17 +149,17 @@ namespace Core
                         else if ((!ClientConnections[c].Client.IsConnected) && (ClientConnections[c].Socket.IsConnected)) // if sockets gone no need to clean up
                         {
                             //Send
-                            Queue<String8> OutputData = ClientConnections[c].Client.BufferOut;
+                            Queue<string> OutputData = ClientConnections[c].Client.BufferOut;
                             while (OutputData.Count > 0)
                             {
-                                ClientConnections[c].Socket.Send(OutputData.Dequeue());
+                                ClientConnections[c].Socket.Send(OutputData.Dequeue().ToString());
                             }
                             ClientConnections[c].Socket.Process();
                             ClientConnections[c].Socket.Shutdown(SocketShutdown.Both);
                         }
                         else { 
                             //Recv
-                            List<String8> InputData = ClientConnections[c].Socket.Process();
+                            var InputData = ClientConnections[c].Socket.Process();
                             if (InputData != null) { 
                                 for (int x = 0; x < InputData.Count; x++)
                                 {
@@ -185,17 +185,17 @@ namespace Core
                                 // Check ping
                                 if ((!ClientConnections[c].Client.WaitPing) && ((DateTime.UtcNow.Ticks - ClientConnections[c].Client.LastPing) / TimeSpan.TicksPerSecond) > Program.Config.PingTimeout)
                                 {
-                                    if (Debug.Enabled) { Debug.Out(String.Format("Ping not received from {0} since {1}. WaitPing flag is {2}", ClientConnections[c].Client.Name.chars, new DateTime(ClientConnections[c].Client.LastPing).ToString(), ClientConnections[c].Client.WaitPing)); }
+                                    if (Debug.Enabled) { Debug.Out(String.Format("Ping not received from {0} since {1}. WaitPing flag is {2}", ClientConnections[c].Client.Name.ToString(), new DateTime(ClientConnections[c].Client.LastPing).ToString(), ClientConnections[c].Client.WaitPing)); }
                                     ClientConnections[c].Client.LastPing = DateTime.UtcNow.Ticks;
                                     ClientConnections[c].Client.Send(Raws.Create(Server, Client: ClientConnections[c].Client, Raw: Raws.RPL_PING));
                                     ClientConnections[c].Client.WaitPing = true;
                                 }
                                 else if ((ClientConnections[c].Client.WaitPing) && ((DateTime.UtcNow.Ticks - ClientConnections[c].Client.LastPing) / TimeSpan.TicksPerSecond) > Program.Config.PingTimeout)
                                 {
-                                    if (Debug.Enabled) { Debug.Out(String.Format("Ping timeout: no ping received from {0} since {1}. WaitPing flag is {2}", ClientConnections[c].Client.Name.chars, new DateTime(ClientConnections[c].Client.LastPing).ToString(), ClientConnections[c].Client.WaitPing)); }
+                                    if (Debug.Enabled) { Debug.Out(String.Format("Ping timeout: no ping received from {0} since {1}. WaitPing flag is {2}", ClientConnections[c].Client.Name.ToString(), new DateTime(ClientConnections[c].Client.LastPing).ToString(), ClientConnections[c].Client.WaitPing)); }
 
                                     // pingtimeout
-                                    if (ClientConnections[c].Client.Registered) { ClientConnections[c].Client.Send(Raws.Create(Server: Server, Client: ClientConnections[c].Client, Raw: Raws.IRCX_CLOSINGLINK_011_PINGTIMEOUT, Data: new String8[] { ClientConnections[c].Client.Address.RemoteIP })); }
+                                    if (ClientConnections[c].Client.Registered) { ClientConnections[c].Client.Send(Raws.Create(Server: Server, Client: ClientConnections[c].Client, Raw: Raws.IRCX_CLOSINGLINK_011_PINGTIMEOUT, Data: new string[] { ClientConnections[c].Client.Address.RemoteIP })); }
                                     Ircx.Commands.QUIT.ProcessQuit(Server, ClientConnections[c].Client, Resources.PINGTIMEOUT);
                                 }
                             }
@@ -205,10 +205,10 @@ namespace Core
                             ProcessData(ClientConnections[c]);
 
                             //Send
-                            Queue<String8> OutputData = ClientConnections[c].Client.BufferOut;
+                            Queue<string> OutputData = ClientConnections[c].Client.BufferOut;
                             while (OutputData.Count > 0)
                             {
-                                ClientConnections[c].Socket.Send(OutputData.Dequeue());
+                                ClientConnections[c].Socket.Send(OutputData.Dequeue().ToString());
                             }
                         }
                     }
