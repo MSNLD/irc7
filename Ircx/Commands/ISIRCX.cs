@@ -1,25 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Core.Ircx.Objects;
-using CSharpTools;
-using System.Reflection;
+﻿using Core.Ircx.Objects;
 
-namespace Core.Ircx.Commands
+namespace Core.Ircx.Commands;
+
+internal class ISIRCX : Command
 {
-    class ISIRCX : Command
+    public ISIRCX(CommandCode Code) : base(Code)
     {
-        public ISIRCX(CommandCode Code) : base(Code)
-        {
-            base.RegistrationRequired = false;
-            base.DataType = CommandDataType.Standard;
-            base.ForceFloodCheck = true;
-        }
-        public new COM_RESULT Execute(Frame Frame)
-        {
-            IRCX.ProcessIRCXReply(Frame);
-            return COM_RESULT.COM_SUCCESS;
-        }
+        RegistrationRequired = false;
+        DataType = CommandDataType.Standard;
+        ForceFloodCheck = true;
+    }
+
+    public new COM_RESULT Execute(Frame Frame)
+    {
+        IRCX.ProcessIRCXReply(Frame);
+        return COM_RESULT.COM_SUCCESS;
     }
 }

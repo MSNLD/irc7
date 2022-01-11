@@ -1,25 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Core.Ircx.Objects;
-using CSharpTools;
-using System.Reflection;
+﻿using Core.Ircx.Objects;
 
-namespace Core.Ircx.Commands
+namespace Core.Ircx.Commands;
+
+public class NOTICE : Command
 {
-    public class NOTICE : Command
+    public NOTICE(CommandCode Code) : base(Code)
     {
-        public NOTICE(CommandCode Code) : base(Code)
-        {
-            base.MinParamCount = 2;
-            base.RegistrationRequired = true;
-            base.DataType = CommandDataType.Standard;
-        }
-        
-        public new COM_RESULT Execute(Frame Frame)
-        {
-            return PRIVMSG.ProcessMessage(Frame, false);
-        }
+        MinParamCount = 2;
+        RegistrationRequired = true;
+        DataType = CommandDataType.Standard;
+    }
+
+    public new COM_RESULT Execute(Frame Frame)
+    {
+        return PRIVMSG.ProcessMessage(Frame, false);
     }
 }

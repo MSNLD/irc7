@@ -1,62 +1,56 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace Core.Ircx.Objects
+namespace Core.Ircx.Objects;
+
+public static class ObjIDGenerator
 {
-    public static class ObjIDGenerator
+    private static readonly long maxOID = 0xFFFFFF;
+
+    public static long OIDindex = 1;
+    public static bool bSecondRun = true;
+
+    public static HashSet<long> hsOID = new();
+
+    public static long ServerID { set; get; } // max 0xFF
+
+    public static long New()
     {
-        private static long maxOID = 0xFFFFFF;
-
-        public static long ServerID { set; get; } // max 0xFF
-
-        public static long OIDindex = 1;
-        public static bool bSecondRun = true;
-
-        public static HashSet<long> hsOID = new HashSet<long>();
-
-        public static long New()
+        if (!bSecondRun)
         {
-            if (!bSecondRun)
+            OIDindex++;
+            hsOID.Add(OIDindex);
+            return OIDindex;
+        }
+
+        // Check from current OID to Max OID
+        for (var c = OIDindex; c <= maxOID; c++)
+            if (!hsOID.Contains(c))
             {
-                OIDindex++;
-                hsOID.Add(OIDindex);
-                return OIDindex;
+                OIDindex = c;
+                return setOID(OIDindex);
             }
-            else
+
+        // Check from 1 to current OID
+        for (long c = 1; c < OIDindex; c++)
+            if (!hsOID.Contains(c))
             {
-                // Check from current OID to Max OID
-                for (long c = OIDindex; c <= maxOID; c++) { 
-                    if (!hsOID.Contains(c))
-                    {
-                        OIDindex = c;
-                        return setOID(OIDindex);
-                    }
-                }
-                // Check from 1 to current OID
-                for (long c = 1; c < OIDindex; c++)
-                {
-                    if (!hsOID.Contains(c))
-                    {
-                        OIDindex = c;
-                        return setOID(OIDindex);
-                    }
-                }
-                // Return 0 aka full
-                return 0;
+                OIDindex = c;
+                return setOID(OIDindex);
             }
-        }
 
-        private static long setOID(long index)
-        {
-            hsOID.Add(index);
-            return (long)((long)ServerID << 24) + index;
-        }
+        // Return 0 aka full
+        return 0;
+    }
 
-        public static void Free(long OID)
-        {
-            OID = (0x00FFFFFF & OID);
-            hsOID.Remove(OID);
-        }
+    private static long setOID(long index)
+    {
+        hsOID.Add(index);
+        return (ServerID << 24) + index;
+    }
+
+    public static void Free(long OID)
+    {
+        OID = 0x00FFFFFF & OID;
+        hsOID.Remove(OID);
     }
 }

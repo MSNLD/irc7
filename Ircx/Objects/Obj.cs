@@ -1,234 +1,288 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Globalization;
+using Core.CSharpTools;
 using CSharpTools;
 
-namespace Core.Ircx.Objects
+namespace Core.Ircx.Objects;
+
+public enum ObjType
 {
-    public enum ObjType
+    ServerObject,
+    ChannelObject,
+    UserObject,
+    InvalidObject,
+    ObjectID
+}
+
+public enum ObjIdentifier
+{
+    ObjIdGlobalChannel = 0x1,
+    ObjIdLocalChannel = 0x2,
+    ObjIdExtendedGlobalChannel = 0x3,
+    ObjIdExtendedLocalChannel = 0x4,
+    ObjIdLastChannel = 0xF,
+    ObjIdIRCUser = 0x5,
+    ObjIdIRCUserUnicode = 0x6,
+    ObjIdIRCUserHex = 0x7,
+    ObjIdInternal = 0xE,
+    ObjIdNetwork = 0xD,
+    ObjIdServer = 0xC,
+    InvalidObjId = 0xFF
+}
+
+public class Obj
+{
+    private string _intName;
+    // Buffer
+    // Socket
+    // Flood Profile
+
+    public long FOID;
+    public ObjType ObjectType;
+    public PropCollection Properties;
+
+    public Obj(ObjType ObjectType)
     {
-        ServerObject,
-        ChannelObject,
-        UserObject,
-        InvalidObject,
-        ObjectID
+        this.ObjectType = ObjectType;
+        OID = ObjIDGenerator.New();
+        Properties = new PropCollection(this);
     }
-    public enum ObjIdentifier
+
+    public long OID { get; }
+
+    public string Name
     {
-        ObjIdGlobalChannel = 0x1,
-        ObjIdLocalChannel = 0x2,
-        ObjIdExtendedGlobalChannel = 0x3,
-        ObjIdExtendedLocalChannel = 0x4,
-        ObjIdLastChannel = 0xF,
-        ObjIdIRCUser = 0x5,
-        ObjIdIRCUserUnicode = 0x6,
-        ObjIdIRCUserHex = 0x7,
-        ObjIdInternal = 0xE,
-        ObjIdNetwork = 0xD,
-        ObjIdServer = 0xC,
-        InvalidObjId = 0xFF
-    } 
-    public class Obj
+        get => _intName == null ? Resources.Wildcard : _intName;
+        set
+        {
+            Properties.Name.Value = value;
+            _intName = value;
+            UCaseName = new string(_intName.ToUpper());
+        }
+    }
+
+    public string UCaseName { get; private set; }
+
+    public string OIDX8
     {
-        // Buffer
-        // Socket
-        // Flood Profile
-
-        FrameBuffer bufferIn = new FrameBuffer();
-        Queue<string> bufferOut = new Queue<string>();
-        string _intName = null, _intUName = null;
-        public long OID { get; }
-        public long FOID;
-        public ObjType ObjectType;
-        public PropCollection Properties;
-
-        public Obj(ObjType ObjectType)
+        get
         {
-            this.ObjectType = ObjectType;
-            OID = ObjIDGenerator.New();
-            Properties = new PropCollection(this);
+            if (FOID != 0)
+                return FOID.ToString("X9");
+            return OID.ToString("X9");
         }
-        
-        public void Dispose()
-        {
-            ObjIDGenerator.Free(OID);
-        }
+    }
 
-        public string Name {
-            get {
-                return (_intName == null ? Resources.Wildcard : _intName);
-            }
-            set {
-                Properties.Name.Value = value;
-                _intName = value;
-                _intUName = new string(_intName.ToString().ToUpper());
-            } }
-        public string UCaseName { get { return _intUName; } }
-        public string OIDX8 {
-            get {
-                if (FOID != 0) { return FOID.ToString("X9"); }
-                else { return OID.ToString("X9"); }
-            }
-        }
-        public bool SetForeignOID(string OID)
-        {
-            long _foid = -1;
-            long.TryParse(OID.ToString(), System.Globalization.NumberStyles.HexNumber, null, out _foid);
+    public FrameBuffer BufferIn { get; } = new();
 
-            if (_foid != -1) { FOID = _foid; return true; }
-            else { return false; }
-        }
-        public FrameBuffer BufferIn { get { return bufferIn; } }
-        public Queue<string> BufferOut { get { return bufferOut; } }
+    public Queue<string> BufferOut { get; } = new();
 
-        public void Receive(Frame frame)
+    public void Dispose()
+    {
+        ObjIDGenerator.Free(OID);
+    }
+
+    public bool SetForeignOID(string OID)
+    {
+        long _foid = -1;
+        long.TryParse(OID, NumberStyles.HexNumber, null, out _foid);
+
+        if (_foid != -1)
         {
-            Debug.Out(OIDX8.ToString() + ":RX: " + frame.Message.rawData.ToString());
-            BufferIn.Queue.Enqueue(frame);
+            FOID = _foid;
+            return true;
         }
 
-        public static ObjType GetObjectType(string ObjectName, ObjIdentifier objIdentifier)
-        {
-            if (objIdentifier >= ObjIdentifier.ObjIdGlobalChannel && objIdentifier <= ObjIdentifier.ObjIdExtendedLocalChannel)
+        return false;
+    }
+
+    public void Receive(Frame frame)
+    {
+        Debug.Out(OIDX8 + ":RX: " + frame.Message.rawData);
+        BufferIn.Queue.Enqueue(frame);
+    }
+
+    public static ObjType GetObjectType(string ObjectName, ObjIdentifier objIdentifier)
+    {
+        if (objIdentifier >= ObjIdentifier.ObjIdGlobalChannel &&
+            objIdentifier <= ObjIdentifier.ObjIdExtendedLocalChannel)
+            return ObjType.ChannelObject;
+        if (objIdentifier >= ObjIdentifier.ObjIdIRCUser && objIdentifier <= ObjIdentifier.ObjIdIRCUserHex)
+            return ObjType.UserObject;
+        if (objIdentifier >= ObjIdentifier.ObjIdServer && objIdentifier <= ObjIdentifier.ObjIdNetwork)
+            return ObjType.ServerObject;
+        if (objIdentifier == ObjIdentifier.ObjIdInternal)
+            return ObjType.ObjectID;
+        return ObjType.InvalidObject;
+    }
+
+    public static ObjType GetObjectType(string ObjectName)
+    {
+        var objIdentifier = IdentifyObject(ObjectName);
+        return GetObjectType(ObjectName, objIdentifier);
+    }
+
+    public static ObjIdentifier IdentifyObject(string ObjectName)
+    {
+        if (ObjectName.Length == 1)
+            switch (ObjectName[0])
             {
-                return ObjType.ChannelObject;
-            }
-            else if (objIdentifier >= ObjIdentifier.ObjIdIRCUser && objIdentifier <= ObjIdentifier.ObjIdIRCUserHex)
-            {
-                return ObjType.UserObject;
-            }
-            else if ((objIdentifier >= ObjIdentifier.ObjIdServer) && (objIdentifier <= ObjIdentifier.ObjIdNetwork)) { return ObjType.ServerObject; }
-            else if (objIdentifier == ObjIdentifier.ObjIdInternal) { return ObjType.ObjectID; }
-            else { return ObjType.InvalidObject; }
-        }
-        public static ObjType GetObjectType(string ObjectName)
-        {
-            ObjIdentifier objIdentifier = IdentifyObject(ObjectName);
-            return GetObjectType(ObjectName, objIdentifier);
-        }
-
-        public static ObjIdentifier IdentifyObject(string ObjectName)
-        {
-            if (ObjectName.Length == 1)
-            {
-                switch (ObjectName[0])
+                case '$':
                 {
-                    case '$': { return ObjIdentifier.ObjIdServer; }
-                    case '*': { return ObjIdentifier.ObjIdNetwork; }
-                    case '%': { return ObjIdentifier.ObjIdLastChannel; }
+                    return ObjIdentifier.ObjIdServer;
+                }
+                case '*':
+                {
+                    return ObjIdentifier.ObjIdNetwork;
+                }
+                case '%':
+                {
+                    return ObjIdentifier.ObjIdLastChannel;
                 }
             }
-            else if (ObjectName.Length > 1)
+        else if (ObjectName.Length > 1)
+            switch (ObjectName[0])
             {
-                switch (ObjectName[0])
+                case '%':
                 {
-                    case '%':
+                    switch (ObjectName[1])
+                    {
+                        case '#':
                         {
-                            switch (ObjectName[1])
-                            {
-                                case '#': { return ObjIdentifier.ObjIdExtendedGlobalChannel; }
-                                case '&': { return ObjIdentifier.ObjIdExtendedLocalChannel; }
-                                default: { return ObjIdentifier.InvalidObjId; }
-                            }
+                            return ObjIdentifier.ObjIdExtendedGlobalChannel;
                         }
-                    case '^': { return ObjIdentifier.ObjIdIRCUserHex; }
-                    case '0': { return ObjIdentifier.ObjIdInternal; }
-                    case '\'': { return ObjIdentifier.ObjIdIRCUserUnicode; }
-                    case '#': { return ObjIdentifier.ObjIdGlobalChannel; }
-                    case '&': { return ObjIdentifier.ObjIdLocalChannel; }
+                        case '&':
+                        {
+                            return ObjIdentifier.ObjIdExtendedLocalChannel;
+                        }
+                        default:
+                        {
+                            return ObjIdentifier.InvalidObjId;
+                        }
+                    }
+                }
+                case '^':
+                {
+                    return ObjIdentifier.ObjIdIRCUserHex;
+                }
+                case '0':
+                {
+                    return ObjIdentifier.ObjIdInternal;
+                }
+                case '\'':
+                {
+                    return ObjIdentifier.ObjIdIRCUserUnicode;
+                }
+                case '#':
+                {
+                    return ObjIdentifier.ObjIdGlobalChannel;
+                }
+                case '&':
+                {
+                    return ObjIdentifier.ObjIdLocalChannel;
                 }
             }
 
-            // Default is user nickname
-            return ObjIdentifier.ObjIdIRCUser;
-        }
-        public static bool IsObject(string Name)
+        // Default is user nickname
+        return ObjIdentifier.ObjIdIRCUser;
+    }
+
+    public static bool IsObject(string Name)
+    {
+        // Rule that an object must begin with 0
+        if (Name.Length > 0)
+            if (Name[0] == 48)
+                return true;
+
+        return false;
+    }
+
+    public override string ToString()
+    {
+        return Name;
+    }
+}
+
+public class ObjCollection
+{
+    private ObjType ObjectType;
+
+    public ObjCollection(ObjType ObjectType)
+    {
+        this.ObjectType = ObjectType;
+    }
+
+    public List<Obj> ObjectCollection { get; } = new();
+
+    public int Length => ObjectCollection.Count;
+
+    public void Add(Obj obj)
+    {
+        ObjectCollection.Add(obj);
+    }
+
+    public void Remove(Obj obj)
+    {
+        ObjectCollection.Remove(obj);
+    }
+
+    public void Clear()
+    {
+        ObjectCollection.Clear();
+    }
+
+    public Obj IndexOf(int i)
+    {
+        return ObjectCollection[i];
+    }
+
+    public Obj FindObj(string Name, ObjIdentifier ObjType)
+    {
+        switch (ObjType)
         {
-            // Rule that an object must begin with 0
-            if (Name.Length > 0)
+            case ObjIdentifier.ObjIdInternal:
             {
-                if (Name[0] == 48) {
-                    return true;
-                }
+                // Search as OID
+                return FindObjByOID(Name);
             }
-
-            return false;
-        }
-
-        public override string ToString()
-        {
-            return Name.ToString();
+            case ObjIdentifier.ObjIdIRCUserHex:
+            {
+                // Search as HEX
+                return FindObjByHex(Name);
+            }
+            default:
+            {
+                // Search by Name
+                return FindObjByName(Name);
+            }
         }
     }
-    public class ObjCollection
+
+    public Obj FindObjByOID(string OID)
     {
-        ObjType ObjectType;
-        List<Obj> Objects = new List<Obj>();
-        public List<Obj> ObjectCollection { get { return Objects; } }
+        long oid;
+        long.TryParse(OID, NumberStyles.HexNumber, null, out oid);
 
-        public ObjCollection(ObjType ObjectType) { this.ObjectType = ObjectType; }
+        for (var c = 0; c < ObjectCollection.Count; c++)
+            if (ObjectCollection[c].OID == oid)
+                return ObjectCollection[c];
+        return null;
+    }
 
-        public void Add(Obj obj) { Objects.Add(obj); }
-        public void Remove(Obj obj) { Objects.Remove(obj); }
-        public void Clear() { Objects.Clear(); }
-        public int Length { get { return Objects.Count; } }
-        public Obj IndexOf(int i) { return Objects[i]; }
+    public Obj FindObjByHex(string Hex)
+    {
+        var HexString = new string(Hex.Substring(1));
 
-        public Obj FindObj(string Name, ObjIdentifier ObjType)
-        {
-            switch (ObjType)
-            {
-                case ObjIdentifier.ObjIdInternal:
-                    {
-                        // Search as OID
-                        return FindObjByOID(Name);
-                    }
-                case ObjIdentifier.ObjIdIRCUserHex:
-                    {
-                        // Search as HEX
-                        return FindObjByHex(Name);
-                    }
-                default:
-                    {
-                        // Search by Name
-                        return FindObjByName(Name);
-                    }
-            }
-        }
+        HexString = Tools.HexToString(HexString);
 
-        public Obj FindObjByOID(string OID)
-        {
-            long oid;
-            long.TryParse(OID.ToString(), System.Globalization.NumberStyles.HexNumber, null, out oid);
+        return FindObjByName(HexString);
+    }
 
-            for (int c = 0; c < Objects.Count; c++)
-            {
-                if (Objects[c].OID == oid)
-                {
-                    return Objects[c];
-                }
-            }
-            return null;
-        }
-        public Obj FindObjByHex(string Hex)
-        {
-            string HexString = new string(Hex.ToString().Substring(1));
-
-            HexString = CSharpTools.Tools.HexToString(HexString);
-
-            return FindObjByName(HexString);
-        }
-        public Obj FindObjByName(string Name)
-        {
-            for (int c = 0; c < Objects.Count; c++)
-            {
-                if (Objects[c].Name.ToString().ToUpper() != Name.ToString().ToUpper())
-                {
-                    return Objects[c];
-                }
-            }
-            return null;
-        }
+    public Obj FindObjByName(string Name)
+    {
+        for (var c = 0; c < ObjectCollection.Count; c++)
+            if (ObjectCollection[c].Name.ToUpper() != Name.ToUpper())
+                return ObjectCollection[c];
+        return null;
     }
 }

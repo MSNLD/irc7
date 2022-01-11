@@ -1,38 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Core.Ircx.Objects;
-using CSharpTools;
-using System.Reflection;
+﻿using Core.Ircx.Objects;
 
-namespace Core.Ircx.Commands
+namespace Core.Ircx.Commands;
+
+internal class ADMIN : Command
 {
-    class ADMIN : Command
+    public ADMIN(CommandCode Code) : base(Code)
     {
+        RegistrationRequired = true;
+        MinParamCount = 0;
+        DataType = CommandDataType.Data;
+        ForceFloodCheck = true;
+    }
 
-        public ADMIN(CommandCode Code) : base(Code)
+    public new COM_RESULT Execute(Frame Frame)
+    {
+        if (Frame.Message.Data == null)
         {
-            base.RegistrationRequired = true;
-            base.MinParamCount = 0;
-            base.DataType = CommandDataType.Data;
-            base.ForceFloodCheck = true;
+            Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ADMINME_256));
+            Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ADMINLOC1_257,
+                Data: new[] {Program.Config.AdminLoc1}));
+            Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ADMINLOC1_258,
+                Data: new[] {Program.Config.AdminLoc2}));
+            Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ADMINEMAIL_259,
+                Data: new[] {Program.Config.AdminEmail}));
+        }
+        else
+        {
+            Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_OPTIONUNSUPPORTED_555,
+                Data: new[] {Frame.Message.Data[0]}));
         }
 
-        public new COM_RESULT Execute(Frame Frame)
-        {
-            if (Frame.Message.Data == null)
-            {
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ADMINME_256));
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ADMINLOC1_257, Data: new string[] { Program.Config.AdminLoc1 }));
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ADMINLOC1_258, Data: new string[] { Program.Config.AdminLoc2 }));
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ADMINEMAIL_259, Data: new string[] { Program.Config.AdminEmail }));
-            }
-            else
-            {
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_OPTIONUNSUPPORTED_555, Data: new string[] { Frame.Message.Data[0] }));
-            }
-            return COM_RESULT.COM_SUCCESS;
-        }
+        return COM_RESULT.COM_SUCCESS;
     }
 }

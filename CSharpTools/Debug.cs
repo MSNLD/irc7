@@ -1,32 +1,35 @@
-﻿using Core;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 
-namespace CSharpTools
+namespace CSharpTools;
+
+public static class Debug
 {
-    public static class Debug
+    public static bool Enabled { get; private set; }
+
+    public static bool Verbose { get; private set; }
+
+    public static void Out(string s)
     {
-        private static bool bDebug;
-        private static bool bVerbose;
-        public static bool Enabled { get { return bDebug; } }
-        public static bool Verbose { get { return bVerbose; } }
-        public static void Out(string s)
-        {
-            if (bVerbose)
-            {
-                Console.WriteLine(s);
-            }
-        }
-        public static void Enable()
-        {
-            bDebug = true;
-        }
-        public static void Disable()
-        {
-            bDebug = false;
-        }
-        public static void EnableVerbose() { bVerbose = true; }
-        public static void DisableVerbose() { bVerbose = false; }
+        if (Verbose) Console.WriteLine(s);
+    }
+
+    public static void Enable()
+    {
+        Enabled = true;
+    }
+
+    public static void Disable()
+    {
+        Enabled = false;
+    }
+
+    public static void EnableVerbose()
+    {
+        Verbose = true;
+    }
+
+    public static void DisableVerbose()
+    {
+        Verbose = false;
     }
 }

@@ -1,32 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Core.Authentication;
 using Core.Ircx.Objects;
-using CSharpTools;
-using System.Reflection;
 
-namespace Core.Ircx.Commands
+namespace Core.Ircx.Commands;
+
+internal class PASS : Command
 {
-    class PASS : Command
+    public PASS(CommandCode Code) : base(Code)
     {
+        MinParamCount = 1;
+        PreRegistration = true;
+        DataType = CommandDataType.None;
+        ForceFloodCheck = true;
+    }
 
-        public PASS(CommandCode Code) : base(Code)
+    public new COM_RESULT Execute(Frame Frame)
+    {
+        if (Frame.User.Auth == null)
         {
-            base.MinParamCount = 1;
-            base.PreRegistration = true;
-            base.DataType = CommandDataType.None;
-            base.ForceFloodCheck = true;
+            Frame.User.Auth = new ANON();
+            Frame.User.Auth.UserCredentials = new SSPCredentials();
+            Frame.User.Auth.UserCredentials.Password = Frame.Message.Data[0];
         }
 
-        public new COM_RESULT Execute(Frame Frame)
-        {
-            if (Frame.User.Auth == null) {
-                Frame.User.Auth = new Authentication.ANON();
-                Frame.User.Auth.UserCredentials = new Authentication.SSPCredentials();
-                Frame.User.Auth.UserCredentials.Password = Frame.Message.Data[0];
-            }
-            return COM_RESULT.COM_SUCCESS;
-        }
+        return COM_RESULT.COM_SUCCESS;
     }
 }

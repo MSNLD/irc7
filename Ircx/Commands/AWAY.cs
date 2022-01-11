@@ -1,48 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Core.Ircx.Objects;
-using CSharpTools;
-using System.Reflection;
+﻿using Core.Ircx.Objects;
 
-namespace Core.Ircx.Commands
+namespace Core.Ircx.Commands;
+
+internal class AWAY : Command
 {
-    class AWAY : Command
+    public AWAY(CommandCode Code) : base(Code)
     {
+        RegistrationRequired = true;
+        MinParamCount = 0;
+        DataType = CommandDataType.Data;
+        ForceFloodCheck = true;
+    }
 
-        public AWAY(CommandCode Code) : base(Code)
+    public new COM_RESULT Execute(Frame Frame)
+    {
+        if (Frame.Message.Data != null)
         {
-            base.RegistrationRequired = true;
-            base.MinParamCount = 0;
-            base.DataType = CommandDataType.Data;
-            base.ForceFloodCheck = true;
+            string AwayReason;
+            AwayReason = Frame.Message.Data[0];
+            if (AwayReason.Length >= 64) AwayReason = new string(AwayReason.Substring(64));
+
+            Frame.User.Profile.AwayReason = AwayReason;
+
+            Frame.User.Profile.Away = true;
+            Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_NOWAWAY_306));
+            Frame.User.BroadcastToChannels(
+                Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_USERNOWAWAY_822,
+                    Data: new[] {AwayReason}), true);
+        }
+        else
+        {
+            //return
+            Frame.User.Profile.Away = false;
+            Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_UNAWAY_305));
+            Frame.User.BroadcastToChannels(
+                Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_USERUNAWAY_821), true);
         }
 
-        public new COM_RESULT Execute(Frame Frame)
-        {
-            if (Frame.Message.Data != null)
-            {
-                string AwayReason;
-                AwayReason = Frame.Message.Data[0];
-                if (AwayReason.Length >= 64) { AwayReason = new string(AwayReason.ToString().Substring(64)); }
 
-                Frame.User.Profile.AwayReason = AwayReason.ToString();
-
-                Frame.User.Profile.Away = true;
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_NOWAWAY_306));
-                Frame.User.BroadcastToChannels(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_USERNOWAWAY_822, Data: new string[] { AwayReason } ), true);
-            }
-            else
-            {
-                //return
-                Frame.User.Profile.Away = false;
-                Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_UNAWAY_305));
-                Frame.User.BroadcastToChannels(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_USERUNAWAY_821), true);
-            }
-
-
-            return COM_RESULT.COM_SUCCESS;
-        }
+        return COM_RESULT.COM_SUCCESS;
     }
 }
