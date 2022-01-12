@@ -1,0 +1,62 @@
+[
+  {
+    "Name": "%#The\\bLobby",
+    "Topic": "Welcome to the Lobby, home of IRC7",
+    "TopicLastChanged": 636372583981951310,
+    "Ownerkey": "OWNERKEY",
+    "Hostkey": "HOSTKEY",
+    "Subject": "1:-ST!EN-US!GN",
+    "Registered": 1,
+    "UserLimit": 200,
+    "AuthOnly": 0,
+    "Subscriber": 0
+  },
+  {
+    "Name": "%#Staff",
+    "Topic": "IRC7 Staff Only",
+    "TopicLastChanged": 636372583981975132,
+    "Ownerkey": "",
+    "Hostkey": "",
+    "Subject": "1:-ST!EN-US!GN",
+    "Registered": 1,
+    "UserLimit": 0,
+    "AuthOnly": 1,
+    "Subscriber": 0
+  },
+  {
+    "Name": "%#test",
+    "Topic": null,
+    "TopicLastChanged": 0,
+    "Ownerkey": "test",
+    "Hostkey": "",
+    "Subject": "1:-ST!EN-US!UL",
+    "Registered": 0,
+    "UserLimit": 0,
+    "AuthOnly": 0,
+    "Subscriber": 0
+  },
+  {
+    "Name": "%#test2",
+    "Topic": null,
+    "TopicLastChanged": 0,
+    "Ownerkey": "",
+    "Hostkey": "test",
+    "Subject": "1:-ST!EN-US!UL",
+    "Registered": 0,
+    "UserLimit": 0,
+    "AuthOnly": 0,
+    "Subscriber": 0
+  },
+  {
+    "Name": "%#secure",
+    "Topic": null,
+    "TopicLastChanged": 0,
+    "Ownerkey": "secure",
+    "Hostkey": "",
+    "Subject": "1:-ST!EN-US!UL",
+    "Registered": 1,
+    "UserLimit": 0,
+    "AuthOnly": 0,
+    "Subscriber": 1
+  }
+]
