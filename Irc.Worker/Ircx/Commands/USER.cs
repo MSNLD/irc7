@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Irc.Constants;
 using Irc.Extensions.Security.Packages;
 using Irc.Worker.Ircx.Objects;
 
@@ -17,27 +18,13 @@ public class USER : Command
         if (Frame.Message.Data.Count == 4)
         {
             var u = Frame.User;
-
-            var bSetUser = false;
-            if (u.Auth != null)
-            {
-                if (u.Auth.Signature == ANON.SIGNATURE) bSetUser = true;
-            }
-            else
-            {
-                bSetUser = true;
-            }
-
-            if (bSetUser)
-            {
-                var iUsernameLen = Frame.Message.Data[0].Length > Program.Config.MaxUsername
-                    ? Program.Config.MaxUsername
-                    : Frame.Message.Data[0].Length;
-                var Userhost = new StringBuilder(iUsernameLen + 1);
-                Userhost.Append("~");
-                Userhost.Append(Frame.Message.Data[0].Substring(iUsernameLen));
-                u.Address.Userhost = Userhost.ToString();
-            }
+            var iUsernameLen = Frame.Message.Data[0].Length > Program.Config.MaxUsername
+                ? Program.Config.MaxUsername
+                : Frame.Message.Data[0].Length;
+            var Userhost = new StringBuilder(iUsernameLen + 1);
+            Userhost.Append("~");
+            Userhost.Append(Frame.Message.Data[0].Substring(iUsernameLen));
+            u.Address.Userhost = Userhost.ToString();
 
             var Realname = Frame.Message.Data[3];
             if (Realname.Length > Program.Config.MaxRealname)

@@ -38,8 +38,6 @@ public class Program
             Config.build = Assembly.GetEntryAssembly().GetName().Version.Build;
         }
 
-        ObjIDGenerator.ServerID = Config.ServerID;
-
         Credentials =
             (List<Credentials>) Settings.LoadObject(BasePath + "credentials.json", typeof(List<Credentials>));
         if (Credentials == null) Credentials = new List<Credentials>();
@@ -86,7 +84,9 @@ public class Program
         Debug.Out(string.Format("port: {0} buffSize: {1} backLog: {2} maxClients: {3} maxClientsPerIP: {4}",
             Config.BindPort, Config.BufferSize, Config.BackLog, Config.MaxClients, Config.MaxClientsPerIP));
 
-        BaseServer = new Server(Config.ServerName, Config.ServerFullName);
+        BaseServer = new Server(new Access(Config.ServerName, false), new ServerProperties(), new ObjectCollection<Channel>());
+        BaseServer.ServerFields.FullName = Config.ServerFullName;
+        BaseServer.Name = Config.ServerName;
 
         var Channels =
             (List<ChannelSettings>) Settings.LoadObject(BasePath + "channels.json",
@@ -96,13 +96,12 @@ public class Program
         {
             var channel = BaseServer.AddChannel(Channels[c].Name);
             if (Channels[c].Topic != null)
-                channel.Properties.Topic.Value = Channels[c].Topic;
-            else
-                channel.Properties.Topic.Value = Resources.Null;
+                channel.Properties.Set("Topic", Channels[c].Topic);
+
             channel.Properties.TopicLastChanged = Channels[c].TopicLastChanged;
-            channel.Properties.Ownerkey.Value = Channels[c].Ownerkey;
-            channel.Properties.Hostkey.Value = Channels[c].Hostkey;
-            channel.Properties.Subject.Value = Channels[c].Subject;
+            channel.Properties.Set("Ownerkey", Channels[c].Ownerkey);
+            channel.Properties.Set("Hostkey", Channels[c].Hostkey);
+            channel.Properties.Set("Subject", Channels[c].Subject);
             channel.Modes.Registered.Value = Channels[c].Registered;
             channel.Modes.UserLimit.Value = Channels[c].UserLimit;
             channel.Modes.Subscriber.Value = Channels[c].Subscriber;

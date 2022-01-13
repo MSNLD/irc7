@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Irc.ClassExtensions.CSharpTools;
+using Irc.Constants;
 using Irc.Extensions.Access;
 
 namespace Irc.Worker.Ircx.Objects;
@@ -143,7 +144,7 @@ public class AccessCollection
     }
 }
 
-public class Access
+public class Access : IAccess
 {
     public enum AccessResultEnum
     {

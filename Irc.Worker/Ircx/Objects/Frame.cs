@@ -20,29 +20,8 @@ public class Frame
         this.Connection = Connection;
         var Client = Connection.Client;
         this.Client = Client;
-        if (Client.ObjectType == ObjType.ServerObject)
-        {
-            this.Server = (Server) Client;
-
-            if (Message != null)
-                if (Message.Prefix != null)
-                {
-                    var obj = Server.GetObject(Message.Prefix);
-                    if (obj != null)
-                    {
-                        if (obj.ObjectType == ObjType.UserObject) User = (User) obj;
-                    }
-                    else
-                    {
-                        obj = Server.AddObject(Message.Prefix, ObjType.UserObject, Message.Prefix);
-                    }
-                }
-        }
-        else
-        {
-            this.Server = Server;
-            User = (User) Client;
-        }
+        this.Server = Server;
+        User = (User) Client;
 
         if (Message != null)
         {

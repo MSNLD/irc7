@@ -68,20 +68,20 @@ internal class Stats
         {
             //"1:-ST!EN-US!GN"
             var ChannelCategory =
-                Server.Channels[i].Properties.Subject.Value.Split(new[] {'!'}, StringSplitOptions.None)[2];
+                Server.Channels.IndexOf(i).Properties.Get("Subject").Split(new[] {'!'}, StringSplitOptions.None)[2];
 
             if (ChannelCategory == Category)
             {
                 var c = new channel();
-                c.name = Server.Channels[i].Name;
-                c.topic = WebUtility.UrlEncode(Server.Channels[i].Properties.Topic.Value);
-                c.modes = new string(Server.Channels[i].Modes.ChannelModeShortString
-                    .Substring(Server.Channels[i].Modes.ChannelModeShortString.Length));
-                c.managed = Server.Channels[i].Modes.Registered.Value.ToString();
-                c.locale = Server.Channels[i].Properties.Subject.Value.Split(new[] {'!'}, StringSplitOptions.None)[1];
-                c.language = Server.Channels[i].Properties.Subject.Value.Split(new[] {':'}, StringSplitOptions.None)[0];
-                c.currentusers = Server.Channels[i].Members.MemberList.Count.ToString();
-                c.maxusers = Server.Channels[i].Modes.UserLimit.Value.ToString();
+                c.name = Server.Channels.IndexOf(i).Name;
+                c.topic = WebUtility.UrlEncode(Server.Channels.IndexOf(i).Properties.Get("Topic"));
+                c.modes = new string(Server.Channels.IndexOf(i).Modes.ChannelModeShortString
+                    .Substring(Server.Channels.IndexOf(i).Modes.ChannelModeShortString.Length));
+                c.managed = Server.Channels.IndexOf(i).Modes.Registered.Value.ToString();
+                c.locale = Server.Channels.IndexOf(i).Properties.Get("Subject").Split(new[] {'!'}, StringSplitOptions.None)[1];
+                c.language = Server.Channels.IndexOf(i).Properties.Get("Subject").Split(new[] {':'}, StringSplitOptions.None)[0];
+                c.currentusers = Server.Channels.IndexOf(i).Members.MemberList.Count.ToString();
+                c.maxusers = Server.Channels.IndexOf(i).Modes.UserLimit.Value.ToString();
                 cat.channels.Add(c);
             }
         }

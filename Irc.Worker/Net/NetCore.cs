@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection.PortableExecutable;
 using System.Threading.Tasks;
 using Irc.ClassExtensions.CSharpTools;
+using Irc.Helpers;
+using Irc.Helpers.CSharpTools;
 
 namespace Irc.Worker.Net;
 
@@ -32,14 +35,14 @@ public static class IPInfo
 
 public class CSocketInfo
 {
-    public int count;
-    public GUID ipaddress;
+    public int Count;
+    public IPAddress IpAddress;
 }
 
 public class CSocketListener
 {
     public int buffSize;
-    public GuidMap ClientMap;
+    public ConcurrentDictionary<Guid, long> ClientMap = new();
     public int maxClientsPerIP;
     public Socket Server;
 
@@ -61,16 +64,14 @@ public class CSocketListener
         Listen(IPAddress.Parse(bindip), port, backlog);
     }
 
-    public SocketException Listen(IPAddress bindip, int port, int backlog)
+    public SocketException Listen(IPAddress bindIp, int port, int backlog)
     {
         //The below isnt supported in .NET Core yet, but may help get information regarding the connection before accepting
         //Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.PacketInformation, true);
-
-        ClientMap = new GuidMap();
-
+        
         try
         {
-            Server.Bind(new IPEndPoint(bindip, port));
+            Server.Bind(new IPEndPoint(bindIp, port));
         }
         catch (SocketException se)
         {
@@ -88,7 +89,7 @@ public class CSocketListener
             return se;
         }
 
-        Debug.Out(string.Format("Listening on {0}:{1} backlog={2}", bindip, port, backlog));
+        Debug.Out(string.Format("Listening on {0}:{1} backlog={2}", bindIp, port, backlog));
 
         return null;
     }
@@ -101,29 +102,24 @@ public class CSocketListener
         // Changing this to IF to not block up the server if being spammed by sockets
         if (Server.Poll(0, SelectMode.SelectRead))
         {
-            //EndPoint ep1 = Server.RemoteEndPoint;
             var socket = new CSocket(Server.Accept(), buffSize);
-            //EndPoint ep2 = socket.RemoteEndPoint;
 
-            if (socket != null)
+            // Check Count
+            var count = ClientMap.GetOrAdd(socket.Address, 0);
+
+            if (count <= maxClientsPerIP)
             {
-                // Check count
-                var node = ClientMap.AddGuid(socket.Address);
-
-                if (node.count <= maxClientsPerIP)
-                {
-                    AcceptClients.Add(socket);
-                    Debug.Out("[" + AcceptClients.Count + "]connected " + socket.RemoteEndPoint);
-                    Debug.Out("[" + AcceptClients.Count + "]socket " +
-                              StringBuilderExtensions.FromBytes(node.guid.ToHex()) + " count = " + node.count);
-                }
-                else
-                {
-                    Debug.Out("[" + AcceptClients.Count + "]dumped socket " +
-                              StringBuilderExtensions.FromBytes(node.guid.ToHex()) + " count = " + node.count);
-                    socket.Shutdown(SocketShutdown.Both);
-                    ClientMap.DecGuid(socket.Address);
-                }
+                AcceptClients.Add(socket);
+                Debug.Out("[" + AcceptClients.Count + "]connected " + socket.RemoteEndPoint);
+                Debug.Out("[" + AcceptClients.Count + "]socket " +
+                          socket.Address.ToUnformattedString() + " Count = " + count);
+            }
+            else
+            {
+                Debug.Out("[" + AcceptClients.Count + "]dumped socket " +
+                          socket.Address.ToUnformattedString() + " Count = " + count);
+                socket.Shutdown(SocketShutdown.Both);
+                ClientMap.TryRemove(socket.Address, out _);
             }
         }
 
@@ -144,14 +140,14 @@ public class CSocket
         this.socket.LingerState = new LingerOption(true, 1);
         buffer = new StringBuffer(buffSize);
 
-        Address = new GUID();
-        if (socket.RemoteEndPoint.AddressFamily == AddressFamily.InterNetwork)
-            Address.Data1 = BitConverter.ToUInt32(((IPEndPoint) socket.RemoteEndPoint).Address.GetAddressBytes(), 0);
-        else
-            Address.SetBytes(((IPEndPoint) socket.RemoteEndPoint).Address.GetAddressBytes());
+        byte[] addressBytes = ((IPEndPoint) socket.RemoteEndPoint).Address.GetAddressBytes();
+        byte[] guidBytes = new byte[16];
+        Array.Copy(addressBytes, 0, guidBytes, 0, addressBytes.Length);
+
+        Address = new Guid(guidBytes);
     }
 
-    public GUID Address { get; }
+    public Guid Address { get; }
 
     public bool IsConnected => socket.Connected;
     public string RemoteIP => ((IPEndPoint) socket.RemoteEndPoint).Address.ToString();
@@ -160,7 +156,7 @@ public class CSocket
 
     public void Shutdown(SocketShutdown both)
     {
-        Debug.Out(socket.RemoteEndPoint + " has been Shutdown (" + StringBuilderExtensions.FromBytes(Address.ToHex()) +
+        Debug.Out(socket.RemoteEndPoint + " has been Shutdown (" + Address.ToUnformattedString() +
                   ")");
         try
         {

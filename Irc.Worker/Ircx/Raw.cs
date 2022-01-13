@@ -184,7 +184,7 @@ public static class Raw
 
     public static string IRCX_RPL_WELCOME_001(Server server, User user)
     {
-        return $":{server} 001 {user} :Welcome to the {server.FullName} server {user}";
+        return $":{server} 001 {user} :Welcome to the {server.ServerFields.FullName} server {user}";
     }
 
     public static string IRCX_RPL_WELCOME_002(Server server, User user, Version version)
@@ -195,7 +195,7 @@ public static class Raw
 
     public static string IRCX_RPL_WELCOME_003(Server server, User user)
     {
-        return $":{server} 003 {user} :This server was created {server.CreationDate}";
+        return $":{server} 003 {user} :This server was created {server.ServerFields.CreationDate}";
     }
 
     public static string IRCX_RPL_WELCOME_004(Server server, User user, Version version)

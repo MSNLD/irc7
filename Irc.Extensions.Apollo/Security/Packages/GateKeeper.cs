@@ -16,13 +16,12 @@ public class GateKeeper : SupportPackage
     // Credit to JD for discovering the below key through XOR'ing (Discovered 2017/05/04)
     private static readonly string key = "SRFMKSJANDRESKKC";
     private char[] challenge = new char[8];
-    protected GUID ClientGUID;
-
+    
     protected GateKeeperToken ServerToken, ClientToken;
 
     public GateKeeper()
     {
-        guest = true;
+        Guest = true;
         ServerSequence = EnumSupportPackageSequence.SSP_INIT;
     }
 
@@ -59,26 +58,25 @@ public class GateKeeper : SupportPackage
                     if (VerifySecurityContext(challenge, context.ToByteArray(), ip, ServerVersion))
                     {
                         //Note that I need to improve the below code. Guid needs a ToByteArray() function
-                        StringBuilder GuidBinary = null;
+                        StringBuilder guidBinary;
 
                         if (lit.Length >= 0x30)
                         {
-                            GuidBinary = StringBuilderExtensions.FromBytes(lit.ToByteArray(), 32, 48);
-                            ClientGUID = new GUID(GuidBinary.ToByteArray());
+                            guidBinary = StringBuilderExtensions.FromBytes(lit.ToByteArray(), 32, 48);
+                            Guid = new Guid(guidBinary.ToByteArray());
                         }
                         else
                         {
-                            GuidBinary = StringBuilderExtensions.FromBytes(Guid.NewGuid().ToByteArray(), 0, 16);
-                            ClientGUID = new GUID(GuidBinary.ToByteArray());
+                            guidBinary = StringBuilderExtensions.FromBytes(Guid.NewGuid().ToByteArray(), 0, 16);
+                            Guid = new Guid(guidBinary.ToByteArray());
                         }
 
-                        if (!ClientGUID.IsNull() || guest == false)
+                        if (Guid != Guid.Empty || Guest == false)
                         {
-                            Uuid = ClientGUID.ToHex();
-                            memberIdLow = BitConverter.ToUInt64(GuidBinary.ToByteArray(), 0);
-                            memberIdHigh = BitConverter.ToUInt64(GuidBinary.ToByteArray(), 8);
+                            var memberIdLow = BitConverter.ToUInt64(guidBinary.ToByteArray(), 0);
+                            var memberIdHigh = BitConverter.ToUInt64(guidBinary.ToByteArray(), 8);
                             ServerSequence = EnumSupportPackageSequence.SSP_AUTHENTICATED;
-                            IsAuthenticated = true;
+                            Authenticated = true;
                             return EnumSupportPackageSequence.SSP_OK;
                         }
                     }

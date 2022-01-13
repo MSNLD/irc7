@@ -16,7 +16,7 @@ public class GateKeeperPassport : GateKeeper
     {
         _credentialProvider = credentialProvider;
         ServerSequence = EnumSupportPackageSequence.SSP_INIT;
-        guest = false;
+        Guest = false;
         Listed = false;
     }
 
@@ -37,7 +37,7 @@ public class GateKeeperPassport : GateKeeper
             var s = base.AcceptSecurityContext(data, ip);
             if (s == EnumSupportPackageSequence.SSP_OK)
             {
-                IsAuthenticated = false;
+                Authenticated = false;
                 ServerSequence = EnumSupportPackageSequence.SSP_CREDENTIALS;
                 return EnumSupportPackageSequence.SSP_CREDENTIALS;
             }
@@ -62,7 +62,7 @@ public class GateKeeperPassport : GateKeeper
                     if (tConvSuccess)
                         if (_tLen > 0 && _pLen > 0 && data.Length >= 16 + _tLen + _pLen)
                         {
-                            StringBuilder ticket = null, profile = null;
+                            StringBuilder ticket, profile;
 
                             ticket = StringBuilderExtensions.FromBytes(data.ToByteArray(), 8, 8 + _tLen);
                             profile = StringBuilderExtensions.FromBytes(data.ToByteArray(), _tLen + 16,
@@ -74,14 +74,14 @@ public class GateKeeperPassport : GateKeeper
                             var p = _credentialProvider.Decrypt(profile, t.iv);
                             if (p == null) return EnumSupportPackageSequence.SSP_FAILED;
 
-                            memberIdLow = ulong.Parse(t.puid, NumberStyles.HexNumber);
+                            var memberIdLow = ulong.Parse(t.puid, NumberStyles.HexNumber);
 
                             if (memberIdLow != 0)
                             {
-                                Uuid = new StringBuilder(t.puid).ToByteArray();
+                                Guid = new Guid(t.puid);
                                 Puid = new StringBuilder(p.origId).ToString();
                                 ServerSequence = EnumSupportPackageSequence.SSP_AUTHENTICATED;
-                                IsAuthenticated = true;
+                                Authenticated = true;
                                 return EnumSupportPackageSequence.SSP_OK;
                             }
                         }

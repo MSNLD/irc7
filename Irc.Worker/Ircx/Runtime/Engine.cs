@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using Irc.ClassExtensions.CSharpTools;
+using Irc.Constants;
 using Irc.Extensions.Access;
 using Irc.Worker.Ircx;
 using Irc.Worker.Ircx.Commands;
@@ -56,7 +57,7 @@ public class Engine
 
             if (Saturation != SAT_RESULT.S_OK)
             {
-                Client.Send(Raws.Create(Frame.Server, Client: Client,
+                Client.Send(RawBuilder.Create(Frame.Server, Client: Client,
                     Raw: Saturation == SAT_RESULT.S_INPUT_EXCEEDED
                         ? Raws.IRCX_CLOSINGLINK_008_INPUTFLOODING
                         : Raws.IRCX_CLOSINGLINK_009_OUTPUTSATURATION,
@@ -85,12 +86,21 @@ public class Engine
                 if (Client.Address._address[3] != null) Mask = Client.Address._address[3];
                 Debug.Out(Client.Address.RemoteIP + " (" + Mask + ")\r\n =>" + Frame.Message.rawData);
                 Debug.Out(e.Message);
-                Client.Send(Raws.Create(Frame.Server, Client: Client, Raw: Raws.IRCX_ERR_EXCEPTION,
+                Client.Send(RawBuilder.Create(Frame.Server, Client: Client, Raw: Raws.IRCX_ERR_EXCEPTION,
                     Data: new[] {Frame.Message.Data[0]}));
             }
         }
 
         if (!Client.Registered) Register.QualifyUser(Server, Connection);
+    }
+
+    private void RemoveEmptyChannels()
+    {
+        for (var i = Server.Channels.Length - 1; i >= 0; i--)
+        {
+            var c = (Channel)Server.Channels.IndexOf(i);
+            if (c.MemberList.Count == 0 && c.Modes.Registered.Value != 0x1) Server.Channels.Remove(c);
+        }
     }
 
     public void Start(IPAddress listeningAddress, int port, int buffSize, int backLog)
@@ -127,7 +137,7 @@ public class Engine
                     else
                     {
                         Connections[c].Shutdown(SocketShutdown.Both);
-                        Listener.ClientMap.DecGuid(Connections[c].Address);
+                        Listener.ClientMap.TryRemove(Connections[c].Address, out _);
                     }
                 }
 
@@ -142,9 +152,9 @@ public class Engine
                         }
 
                         var cli = ClientConnections[c];
-                        Server.RemoveObject(cli.Client);
+                        Server.RemoveUser(cli.Client as User);
                         ClientConnections.Remove(cli);
-                        Listener.ClientMap.DecGuid(cli.Socket.Address);
+                        Listener.ClientMap.TryRemove(cli.Socket.Address, out _);
                     }
                     else if (!ClientConnections[c].Client.IsConnected &&
                              ClientConnections[c].Socket.IsConnected) // if sockets gone no need to clean up
@@ -189,7 +199,7 @@ public class Engine
                                         new DateTime(ClientConnections[c].Client.LastPing).ToString(),
                                         ClientConnections[c].Client.WaitPing));
                                 ClientConnections[c].Client.LastPing = DateTime.UtcNow.Ticks;
-                                ClientConnections[c].Client.Send(Raws.Create(Server,
+                                ClientConnections[c].Client.Send(RawBuilder.Create(Server,
                                     Client: ClientConnections[c].Client, Raw: Raws.RPL_PING));
                                 ClientConnections[c].Client.WaitPing = true;
                             }
@@ -206,7 +216,7 @@ public class Engine
 
                                 // pingtimeout
                                 if (ClientConnections[c].Client.Registered)
-                                    ClientConnections[c].Client.Send(Raws.Create(Server,
+                                    ClientConnections[c].Client.Send(RawBuilder.Create(Server,
                                         Client: ClientConnections[c].Client, Raw: Raws.IRCX_CLOSINGLINK_011_PINGTIMEOUT,
                                         Data: new[] {ClientConnections[c].Client.Address.RemoteIP}));
                                 QUIT.ProcessQuit(Server, ClientConnections[c].Client, Resources.PINGTIMEOUT);
@@ -226,7 +236,7 @@ public class Engine
 
                 if (iExportSecondCounter >= 300)
                 {
-                    Server.Channels.RemoveEmptyChannels();
+                    RemoveEmptyChannels();
                     try
                     {
                         Stats.ExportCategories(Server);

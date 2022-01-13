@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Irc.Constants;
 using Irc.Worker.Ircx.Objects;
 
 namespace Irc.Worker.Ircx;
@@ -147,22 +148,22 @@ public class Command
                     return (COM_RESULT) Function.Invoke(Frame.Command, new object[] {Frame});
                 }
 
-                Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461,
+                Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461,
                     Data: new[] {Frame.Message.Command}));
             }
             else if (Frame.User.Registered && PreRegistration)
             {
-                Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User,
+                Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User,
                     Raw: Raws.IRCX_ERR_ALREADYREGISTERED_462));
             }
             else
             {
-                Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOTREGISTERED_451));
+                Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOTREGISTERED_451));
             }
         }
         else
         {
-            Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_UNKNOWNCOMMAND_421,
+            Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_UNKNOWNCOMMAND_421,
                 Data: new[] {Frame.Message.Command}));
             //Frame.User.Send(DefaultFrames.NotImplemented);
         }

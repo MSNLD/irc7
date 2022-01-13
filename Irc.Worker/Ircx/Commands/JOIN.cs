@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using Irc.ClassExtensions.CSharpTools;
+using Irc.Constants;
 using Irc.Extensions.Access;
 using Irc.Worker.Ircx.Objects;
 
@@ -29,7 +30,7 @@ public class JOIN : Command
             if (user.Profile.Ircvers > 0 && user.Profile.Ircvers < 9)
                 if (user.ActiveChannel != null)
                 {
-                    user.Send(Raws.Create(server, c, user, Raws.IRCX_ERR_TOOMANYCHANNELS_405));
+                    user.Send(RawBuilder.Create(server, c, user, Raws.IRCX_ERR_TOOMANYCHANNELS_405));
                     return COM_RESULT.COM_SUCCESS;
                 }
 
@@ -118,48 +119,48 @@ public class JOIN : Command
                 {
                     case Access.AccessResultEnum.ERR_NICKINUSE:
                     {
-                        user.Send(Raws.Create(server, Client: user, Raw: Raws.IRCX_ERR_NICKINUSE_433,
+                        user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_NICKINUSE_433,
                             Data: new[] {user.Address.Nickname}));
                         break;
                     }
                     case Access.AccessResultEnum.ERR_ALREADYINCHANNEL:
                     {
-                        user.Send(Raws.Create(server, c, user, Raws.IRCX_ERR_ALREADYONCHANNEL_927X));
+                        user.Send(RawBuilder.Create(server, c, user, Raws.IRCX_ERR_ALREADYONCHANNEL_927X));
                         break;
                     }
                     case Access.AccessResultEnum.ERR_CHANNELISFULL:
                     {
-                        user.Send(Raws.Create(server, c, user, Raws.IRCX_ERR_CHANNELISFULL_471));
+                        user.Send(RawBuilder.Create(server, c, user, Raws.IRCX_ERR_CHANNELISFULL_471));
                         if (c.Modes.Knock.Value == 1) SendKnock(server, c, user, Resources.Raw471);
                         break;
                     }
                     case Access.AccessResultEnum.ERR_INVITEONLYCHAN:
                     {
-                        user.Send(Raws.Create(server, c, user, Raws.IRCX_ERR_INVITEONLYCHAN_473));
+                        user.Send(RawBuilder.Create(server, c, user, Raws.IRCX_ERR_INVITEONLYCHAN_473));
                         if (c.Modes.Knock.Value == 1) SendKnock(server, c, user, Resources.Raw473);
                         break;
                     }
                     case Access.AccessResultEnum.ERR_BANNEDFROMCHAN:
                     {
-                        user.Send(Raws.Create(server, c, user, Raws.IRCX_ERR_BANNEDFROMCHAN_474));
+                        user.Send(RawBuilder.Create(server, c, user, Raws.IRCX_ERR_BANNEDFROMCHAN_474));
                         if (c.Modes.Knock.Value == 1) SendKnock(server, c, user, Resources.Raw474);
                         break;
                     }
                     case Access.AccessResultEnum.ERR_BADCHANNELKEY:
                     {
-                        user.Send(Raws.Create(server, c, user, Raws.IRCX_ERR_BADCHANNELKEY_475));
+                        user.Send(RawBuilder.Create(server, c, user, Raws.IRCX_ERR_BADCHANNELKEY_475));
                         if (c.Modes.Knock.Value == 1) SendKnock(server, c, user, Resources.Raw475);
                         break;
                     }
                     case Access.AccessResultEnum.ERR_AUTHONLYCHAN:
                     {
-                        user.Send(Raws.Create(server, c, user, Raws.IRCX_ERR_AUTHONLYCHAN_556));
+                        user.Send(RawBuilder.Create(server, c, user, Raws.IRCX_ERR_AUTHONLYCHAN_556));
                         if (c.Modes.Knock.Value == 1) SendKnock(server, c, user, Resources.Raw556);
                         break;
                     }
                     case Access.AccessResultEnum.ERR_SECUREONLYCHAN:
                     {
-                        user.Send(Raws.Create(server, c, user, Raws.IRCX_ERR_SECUREONLYCHAN_557));
+                        user.Send(RawBuilder.Create(server, c, user, Raws.IRCX_ERR_SECUREONLYCHAN_557));
                         if (c.Modes.Knock.Value == 1) SendKnock(server, c, user, Resources.Raw557);
                         break;
                     }
@@ -168,7 +169,7 @@ public class JOIN : Command
         }
         else
         {
-            user.Send(Raws.Create(server, c, user, Raws.IRCX_ERR_ALREADYONCHANNEL_927X)); /* already in channel */
+            user.Send(RawBuilder.Create(server, c, user, Raws.IRCX_ERR_ALREADYONCHANNEL_927X)); /* already in channel */
         }
 
         return COM_RESULT.COM_SUCCESS;
@@ -192,7 +193,7 @@ public class JOIN : Command
 
             if (message.Data.Count > 1) Keys = Tools.CSVToArray(message.Data[1], true, Address.MaxFieldLen);
 
-            var channels = Frame.Server.Channels.GetChannels(Frame.Server, Frame.User, message.Data[0], true);
+            var channels = Common.GetChannels(Frame.Server, Frame.User, message.Data[0], true);
 
             if (channels != null)
                 if (channels.Count > 0)
@@ -208,13 +209,13 @@ public class JOIN : Command
 
             // null
             // No such channel
-            Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403,
+            Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403,
                 Data: new[] {Frame.Message.Data[0]}));
         }
         else
         {
             //insufficient parameters
-            Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461,
+            Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461,
                 Data: new[] {message.Data[0]}));
         }
 
@@ -223,7 +224,7 @@ public class JOIN : Command
 
     public static void SendKnock(Server server, Channel c, User from, string Reason)
     {
-        var RawKnock = Raws.Create(server, c, from, Raws.RPL_KNOCK_CHAN, new[] {Reason});
+        var RawKnock = RawBuilder.Create(server, c, from, Raws.RPL_KNOCK_CHAN, new[] {Reason});
         c.SendLevel(RawKnock, UserAccessLevel.ChatHost);
     }
 
@@ -243,7 +244,7 @@ public class JOIN : Command
                 //msn join
                 if (Member.ChannelMode.modeChar == 0x0)
                 {
-                    ChannelMember.User.Send(Raws.Create(server, c, Member.User, Raws.RPL_JOIN_MSN,
+                    ChannelMember.User.Send(RawBuilder.Create(server, c, Member.User, Raws.RPL_JOIN_MSN,
                         new[] {UserProfile}));
                 }
                 else
@@ -251,14 +252,14 @@ public class JOIN : Command
                     var ProfMode = new StringBuilder(2);
                     ProfMode.Append((char) 44);
                     ProfMode.Append((char) Member.ChannelMode.modeChar);
-                    ChannelMember.User.Send(Raws.Create(server, c, Member.User, Raws.RPL_JOIN_MSN,
+                    ChannelMember.User.Send(RawBuilder.Create(server, c, Member.User, Raws.RPL_JOIN_MSN,
                         new[] {UserProfile, ProfMode.ToString()}));
                 }
             }
             else
             {
                 //normal join
-                ChannelMember.User.Send(Raws.Create(server, c, Member.User, Raws.RPL_JOIN_IRC));
+                ChannelMember.User.Send(RawBuilder.Create(server, c, Member.User, Raws.RPL_JOIN_IRC));
                 //raw +o or +q
             }
 
@@ -277,7 +278,7 @@ public class JOIN : Command
                     {
                         ProfMode.Append((char) 0x20);
                         //itll only be 2 Length when it has passed above criteria
-                        ChannelMember.User.Send(Raws.Create(server, c, Member.User, Raws.RPL_MODE_IRC,
+                        ChannelMember.User.Send(RawBuilder.Create(server, c, Member.User, Raws.RPL_MODE_IRC,
                             new[] {c.Name, ProfMode.ToString(), Member.User.Address.Nickname}));
                     }
                 }

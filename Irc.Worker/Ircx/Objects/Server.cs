@@ -1,166 +1,68 @@
 ﻿using System;
 using System.Collections.Generic;
 using Irc.ClassExtensions.CSharpTools;
+using Irc.Constants;
+using Irc.Interfaces;
+using Irc.Objects;
 
 namespace Irc.Worker.Ircx.Objects;
 
-public class Server : Client
+public class Server: ChatObject
 {
-    //Prop
-    //Servers
-    //Channels
-    //Users
-    //Modes
-    //Access
-
-    public Access Access;
-    public ChannelCollection Channels = new();
+    public IAccess Access;
+    public IObjectCollection<Channel> Channels;
     public CommandCollection Commands = new();
 
-    public string CreationDate, TimeZone;
-
     // Statistics
-    private int iMaxUsers;
-    public ServerCollection Servers = new();
-    public UserCollection Users = new();
+    public IObjectCollection<User> Users = new ObjectCollection<User>();
 
-    public Server(string Name, string FullName = "") : base(ObjType.ServerObject)
+    public Server(IAccess access, IPropStore propStore, IObjectCollection<Channel> channels): base(propStore)
     {
-        Properties = new ServerProperties(this);
+        Channels = channels;
+        Properties = propStore;
+        this.Access = access;
         this.Name = Name;
-        this.FullName = FullName;
+        _serverFields = new ServerFields();
         Access = new Access("$", false);
-        CreationDate = new string(Resources.GetFullTimeString(Resources.GetTime()));
+        ServerFields.CreationDate = new string(Resources.GetFullTimeString(Resources.GetTime()));
         var TZ = DateTime.Now.GetDateTimeFormats('R')[0];
-        TimeZone = new string(TZ.Substring(TZ.LastIndexOf(' ') + 1));
+        ServerFields.TimeZone = new string(TZ.Substring(TZ.LastIndexOf(' ') + 1));
     }
 
     //Counting MaxUsers as total concurrent user objects (sockets)
-    public int MaxUsers => Users.Length;
-    public int RegisteredUsers { get; private set; }
+    private readonly ServerFields _serverFields;
 
-    public int InvisibleCount { get; private set; }
-
-    public int UnknownConnections { get; private set; }
-
-    public int OperatorCount { get; }
-
-    public int IrcxVersion { get; }
-
-    public string FullName { get; set; }
+    public ServerFields ServerFields
+    {
+        get { return _serverFields; }
+    }
 
     // Operations
-    public Obj AddObject(string Name, ObjType objType, string ObjID)
-    {
-        Obj obj = null;
-        switch (objType)
-        {
-            case ObjType.ServerObject:
-            {
-                var server = new Server(Name);
-                Servers.Add(server);
-                obj = server;
-                break;
-                //return server;
-            }
-            case ObjType.UserObject:
-            {
-                var user = new User();
-                Users.Add(user);
-                obj = user;
-                break;
-                //return user;
-            }
-            case ObjType.ChannelObject:
-            {
-                var channel = new Channel(Name);
-                Channels.Add(channel);
-                obj = channel;
-                break;
-                //return channel;
-            }
-            default:
-            {
-                return null;
-            }
-        }
-
-        if (obj != null)
-            if (ObjID != null)
-                obj.SetForeignOID(ObjID);
-        return obj;
-    }
-
-    public void RemoveObject(Obj Object)
-    {
-        if (Object != null)
-            switch (Object.ObjectType)
-            {
-                case ObjType.ServerObject:
-                {
-                    Servers.Remove(Object);
-                    break;
-                }
-                case ObjType.UserObject:
-                {
-                    Users.Remove(Object);
-                    break;
-                }
-                case ObjType.ChannelObject:
-                {
-                    Channels.Remove(Object);
-                    break;
-                }
-            }
-    }
-
     public User AddUser()
     {
-        UnknownConnections++;
-
-        // Check IP here
         var user = new User();
         Users.Add(user);
-
+        
         return user;
     }
 
-    public void RemUser(User user)
+    public void RemoveUser(User user)
     {
         if (user.Registered)
         {
             user.Unregister();
             if (user.Modes.Invisible.Value == 1)
             {
-                InvisibleCount--;
                 user.Modes.Invisible.Value = 0;
             }
-
-            RegisteredUsers--;
         }
 
         Users.Remove(user);
     }
 
-    public Server AddServer()
-    {
-        var server = new Server(Resources.Wildcard);
-        Servers.Add(server);
-        return server;
-    }
-
     public void RegisterUser(User user)
     {
         user.Register();
-        UnknownConnections--;
-        RegisteredUsers++;
-    }
-
-    public void InvisibleStatus(User user, bool IsInvisible)
-    {
-        if (IsInvisible && user.Modes.Invisible.Value == 0)
-            InvisibleCount++;
-        else if (!IsInvisible && user.Modes.Invisible.Value == 1) InvisibleCount--;
     }
 
     public Channel AddChannel(string Name)
@@ -170,14 +72,14 @@ public class Server : Client
         return channel;
     }
 
-    public void RemChannel(Channel channel)
+    public void RemoveChannel(Channel channel)
     {
         Channels.Remove(channel);
     }
 
-    public List<Obj> GetObjects(string Nicknames)
+    public List<ChatObject> GetObjects(string Nicknames)
     {
-        var objs = new List<Obj>();
+        var objs = new List<ChatObject>();
         var NicknameList = Tools.CSVToArray(Nicknames);
 
         for (var i = 0; i < NicknameList.Count; i++)
@@ -189,56 +91,36 @@ public class Server : Client
         return objs;
     }
 
-    public Obj GetObject(string Name)
+    public ChatObject GetObject(string Name)
     {
-        Obj obj = null;
-        var objIdentifier = IdentifyObject(Name);
-        var objType = GetObjectType(Name, objIdentifier);
-        switch (objType)
-        {
-            case ObjType.ObjectID:
-            {
-                // Find Object Recursively (Server highest priority)
-                obj = Servers.FindObjByOID(Name);
-                if (obj == null)
-                {
-                    // Next Channel Priority
-                    obj = Channels.FindObjByOID(Name);
-                    if (obj == null)
-                        // Next User Priority
-                        obj = Users.FindObjByOID(Name);
-                }
+        ChatObject chatObject = null;
+        var objIdentifier = IrcHelper.IdentifyObject(Name);
 
+
+        switch (objIdentifier)
+        {
+            case IrcHelper.ObjIdentifier.ObjIdExtendedGlobalChannel:
+            case IrcHelper.ObjIdentifier.ObjIdExtendedLocalChannel:
+            case IrcHelper.ObjIdentifier.ObjIdGlobalChannel:
+            case IrcHelper.ObjIdentifier.ObjIdLocalChannel:
+            {
+                chatObject = Channels.FindObj(Name, objIdentifier);
                 break;
             }
-            case ObjType.ServerObject:
+            case IrcHelper.ObjIdentifier.ObjIdIRCUser:
+            case IrcHelper.ObjIdentifier.ObjIdIRCUserHex:
+            case IrcHelper.ObjIdentifier.ObjIdIRCUserUnicode:
             {
-                // In cases of $
-                obj = this;
+                chatObject = Users.FindObj(Name, objIdentifier);
                 break;
             }
-            case ObjType.ChannelObject:
+            case IrcHelper.ObjIdentifier.ObjIdServer:
             {
-                obj = Channels.FindObj(Name, objIdentifier);
-                break;
-            }
-            case ObjType.UserObject:
-            {
-                obj = Users.FindObj(Name, objIdentifier);
+                chatObject = this;
                 break;
             }
         }
 
-        return obj;
-    }
-
-
-    public void UpdateUserNickname(User user, string Nickname)
-    {
-        // if OK
-        user.Address.Nickname = Nickname;
-        user.Access.ObjectName = Nickname;
-        user.Properties.GetPropByName("NAME").Value = Nickname;
-        user.Name = Nickname;
+        return chatObject;
     }
 }

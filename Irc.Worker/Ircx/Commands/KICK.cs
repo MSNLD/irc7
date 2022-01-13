@@ -1,4 +1,5 @@
-﻿using Irc.Extensions.Access;
+﻿using Irc.Constants;
+using Irc.Extensions.Access;
 using Irc.Worker.Ircx.Objects;
 
 namespace Irc.Worker.Ircx.Commands;
@@ -17,7 +18,8 @@ internal class KICK : Command
         if (Frame.Message.Data.Count >= 2)
         {
             //kick # nick,[...] :reason
-            var c = Frame.Server.Channels.GetChannel(Frame.Message.Data[0]);
+            var objType = IrcHelper.IdentifyObject(Frame.Message.Data[0]);
+            var c = Frame.Server.Channels.FindObj(Frame.Message.Data[0], objType);
             if (c != null)
             {
                 var uci = Frame.User.GetChannelInfo(c);
@@ -39,32 +41,32 @@ internal class KICK : Command
                             }
                             else
                             {
-                                Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User,
+                                Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User,
                                     Raw: Raws.IRCX_ERR_NOSUCHNICK_401, Data: new[] {Resources.Null}));
                             }
                         }
                         else
                         {
-                            Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User,
+                            Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User,
                                 Raw: Raws.IRCX_ERR_NOSUCHNICK_401, Data: new[] {Resources.Null}));
                         }
                     }
                     else
                     {
                         //not an operator
-                        Frame.User.Send(Raws.Create(Frame.Server, c, Frame.User, Raws.IRCX_ERR_CHANOPRIVSNEEDED_482));
+                        Frame.User.Send(RawBuilder.Create(Frame.Server, c, Frame.User, Raws.IRCX_ERR_CHANOPRIVSNEEDED_482));
                     }
                 }
                 else
                 {
                     //you're not on that channel
-                    Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442,
+                    Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442,
                         Data: new[] {Frame.Message.Data[0]}));
                 }
             }
             else
             {
-                Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403,
+                Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403,
                     Data: new[] {Frame.Message.Data[0]}));
                 //no such channel
             }
@@ -72,7 +74,7 @@ internal class KICK : Command
         else
         {
             //insufficient parameters
-            Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461,
+            Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461,
                 Data: new[] {Frame.Message.Command}));
         }
 
@@ -85,14 +87,14 @@ internal class KICK : Command
         if (Member.Level < ChannelMember.Level)
         {
             if (ChannelMember.Level >= UserAccessLevel.ChatGuide) /* you're not ircop */
-                Member.User.Send(Raws.Create(server, Client: Member.User, Raw: Raws.IRCX_ERR_NOPRIVILEGES_481));
+                Member.User.Send(RawBuilder.Create(server, Client: Member.User, Raw: Raws.IRCX_ERR_NOPRIVILEGES_481));
             else /* you're not an operator 482 */
-                Member.User.Send(Raws.Create(server, channel, Member.User, Raws.IRCX_ERR_CHANOPRIVSNEEDED_482));
+                Member.User.Send(RawBuilder.Create(server, channel, Member.User, Raws.IRCX_ERR_CHANOPRIVSNEEDED_482));
         }
         else
         {
             channel.Send(
-                Raws.Create(server, channel, Member.User, Raws.RPL_KICK_IRC,
+                RawBuilder.Create(server, channel, Member.User, Raws.RPL_KICK_IRC,
                     new[] {ChannelMember.User.Address.Nickname, Reason}), ChannelMember.User);
             ChannelMember.ChannelMode.SetNormal();
             channel.RemoveMember(ChannelMember);

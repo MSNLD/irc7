@@ -1,4 +1,5 @@
-﻿using Irc.Worker.Ircx.Objects;
+﻿using Irc.Constants;
+using Irc.Worker.Ircx.Objects;
 
 namespace Irc.Worker.Ircx.Commands;
 
@@ -22,12 +23,12 @@ public class QUIT : Command
     public static void ProcessQuit(Server server, Client client, string Reason)
     {
         if (client.Registered)
-            if (client.ObjectType == ObjType.UserObject)
+            if (client is User)
             {
                 var user = (User) client;
                 if (Reason == null) Reason = Resources.CONNRESETBYPEER;
 
-                var Raw = Raws.Create(Client: user, Raw: Raws.RPL_QUIT_IRC, Data: new[] {Reason});
+                var Raw = RawBuilder.Create(Client: user, Raw: Raws.RPL_QUIT_IRC, Data: new[] { Reason });
 
                 for (var c = 0; c < user.ChannelList.Count; c++)
                 {
@@ -41,6 +42,6 @@ public class QUIT : Command
         // Broadcast quit to server
 
         client.Terminate();
-        server.RemoveObject(client);
+        server.RemoveUser(client as User);
     }
 }

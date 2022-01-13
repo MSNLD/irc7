@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Irc.Constants;
 using Irc.Extensions.Access;
 
 namespace Irc.Worker.Ircx.Objects;
@@ -10,16 +11,13 @@ public class User : Client
     public UserChannelCollection Channels;
     public UserAccessLevel Level;
     public UserModeCollection Modes;
-
     public Profile Profile;
 
-    public User() : base(ObjType.UserObject)
+    public User()
     {
         Access = new Access(Name, false);
         Modes = new UserModeCollection();
         Channels = new UserChannelCollection();
-        Properties = new UserProperties(this);
-
         Profile = new Profile();
     }
 
@@ -84,5 +82,14 @@ public class User : Client
             if (Channels.ChannelList[c].Channel.Name.ToUpper() == Name.ToUpper())
                 return Channels.ChannelList[c];
         return null;
+    }
+
+    public void UpdateUserNickname(string Nickname)
+    {
+        // if OK
+        Address.Nickname = Nickname;
+        Access.ObjectName = Nickname;
+        Properties.Set(Resources.UserPropNickname, Nickname);
+        Name = Nickname;
     }
 }

@@ -1,39 +1,57 @@
-﻿using Irc.Extensions.Access;
+﻿using System;
+using System.Collections.Generic;
+using Irc.Constants;
+using Irc.Extensions.Access;
+using Irc.Helpers.CSharpTools;
 
 namespace Irc.Worker.Ircx.Objects;
 
 public class UserProperties : PropCollection
 {
-    public Prop Client = new(Resources.UserPropClient, Resources.Null, 0, UserAccessLevel.None, UserAccessLevel.None,
+    public static Prop Oid = new(Resources.UserPropOid, Resources.Null, 0, UserAccessLevel.None, UserAccessLevel.None,
         true, false);
 
-    public Prop Ircvers = new(Resources.UserPropIrcvers, Resources.Null, 0, UserAccessLevel.None, UserAccessLevel.None,
+    public static Prop Client = new(Resources.UserPropClient, Resources.Null, 0, UserAccessLevel.None, UserAccessLevel.None,
         true, false);
 
-    public Prop MsnProfile = new(Resources.UserPropMsnProfile, Resources.Null, 0, UserAccessLevel.None,
+    public static Prop Ircvers = new(Resources.UserPropIrcvers, Resources.Null, 0, UserAccessLevel.None, UserAccessLevel.None,
+        true, false);
+
+    public static Prop MsnProfile = new(Resources.UserPropMsnProfile, Resources.Null, 0, UserAccessLevel.None,
         UserAccessLevel.None, true, false);
 
-    public Prop MsnRegCookie = new(Resources.UserPropMsnRegCookie, Resources.Null, 256, UserAccessLevel.NoAccess,
+    public static Prop MsnRegCookie = new(Resources.UserPropMsnRegCookie, Resources.Null, 256, UserAccessLevel.NoAccess,
         UserAccessLevel.None, true, false);
-
-    // User Properties
-    public Prop Nick = new(Resources.UserPropNickname, Resources.Null, 0, UserAccessLevel.None, UserAccessLevel.None,
+    
+    public static Prop Nick = new(Resources.UserPropNickname, Resources.Null, 0, UserAccessLevel.None, UserAccessLevel.None,
         true, false);
 
-    public Prop Puid = new(Resources.UserPropPuid, Resources.Null, 0, UserAccessLevel.None, UserAccessLevel.NoAccess,
+    public static Prop Puid = new(Resources.UserPropPuid, Resources.Null, 0, UserAccessLevel.None, UserAccessLevel.NoAccess,
         true, false);
 
-    public Prop Role = new(Resources.UserPropRole, Resources.Null, 0, UserAccessLevel.None, UserAccessLevel.NoAccess,
+    public static Prop Role = new(Resources.UserPropRole, Resources.Null, 0, UserAccessLevel.None, UserAccessLevel.NoAccess,
         true, false);
 
-    public UserProperties(Client obj) : base(obj)
+    public static readonly Dictionary<string, Prop> PropertyRules =
+        new Dictionary<string, Prop>(StringComparer.InvariantCultureIgnoreCase)
+        {
+            { Resources.UserPropOid, Oid },
+            { Resources.UserPropClient, Client },
+            { Resources.UserPropIrcvers, Ircvers },
+            { Resources.UserPropMsnProfile, MsnProfile },
+            { Resources.UserPropMsnRegCookie, MsnRegCookie },
+            { Resources.UserPropNickname, Nick },
+            { Resources.UserPropPuid, Puid },
+            { Resources.UserPropRole, Role }
+        };
+
+    public UserProperties()
     {
-        Properties.Add(Nick);
-        Properties.Add(Ircvers);
-        Properties.Add(Client);
-        Properties.Add(MsnProfile);
-        Properties.Add(MsnRegCookie);
-        Properties.Add(Role);
-        Properties.Add(Puid);
+        foreach (string prop in PropertyRules.Keys)
+        {
+            Set(prop, null);
+        }
+
+        Set(Resources.UserPropNickname, Resources.Wildcard);
     }
 }

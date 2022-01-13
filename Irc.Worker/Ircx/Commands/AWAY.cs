@@ -1,4 +1,5 @@
-﻿using Irc.Worker.Ircx.Objects;
+﻿using Irc.Constants;
+using Irc.Worker.Ircx.Objects;
 
 namespace Irc.Worker.Ircx.Commands;
 
@@ -23,18 +24,18 @@ internal class AWAY : Command
             Frame.User.Profile.AwayReason = AwayReason;
 
             Frame.User.Profile.Away = true;
-            Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_NOWAWAY_306));
+            Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_NOWAWAY_306));
             Frame.User.BroadcastToChannels(
-                Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_USERNOWAWAY_822,
+                RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_USERNOWAWAY_822,
                     Data: new[] {AwayReason}), true);
         }
         else
         {
             //return
             Frame.User.Profile.Away = false;
-            Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_UNAWAY_305));
+            Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_UNAWAY_305));
             Frame.User.BroadcastToChannels(
-                Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_USERUNAWAY_821), true);
+                RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_USERUNAWAY_821), true);
         }
 
 

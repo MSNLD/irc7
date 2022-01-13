@@ -1,24 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Irc.ClassExtensions.CSharpTools;
+using Irc.Constants;
 using Irc.Extensions.Access;
 using Irc.Extensions.Apollo.Security.Packages;
 using Irc.Extensions.Security.Packages;
+using Irc.Helpers.CSharpTools;
+using Irc.Objects;
 
 namespace Irc.Worker.Ircx.Objects;
 
-public class Channel : Obj
+public class Channel : ChatObject
 {
     public Access Access;
     public FloodProfile FloodProfile = new();
-    public UserCollection InviteList = new();
+    public IObjectCollection<User> InviteList = new ObjectCollection<User>();
     public ChannelMemberCollection Members = new();
     public ChannelModeCollection Modes;
 
-    public Channel(string Name) : base(ObjType.ChannelObject)
+    public Channel(string Name): base(new ChannelProperties())
     {
-        Properties = new ChannelProperties(this);
         Access = new Access(Name, true);
         Modes = new ChannelModeCollection();
         SetName(Name);
@@ -173,11 +176,14 @@ public class Channel : Obj
 
         //Try pass if possible
 
-        if (Properties.Ownerkey.Value.Length > 0)
-            if (Param == Properties.Ownerkey.Value)
+        var ownerkey = Properties.Get("Ownerkey");
+        if (!string.IsNullOrWhiteSpace(ownerkey))
+            if (Param == ownerkey)
                 return Access.AccessResultEnum.SUCCESS_OWNER;
-        if (Properties.Hostkey.Value.Length > 0)
-            if (Param == Properties.Hostkey.Value)
+
+        var hostkey = Properties.Get("Hostkey");
+        if (!string.IsNullOrWhiteSpace(hostkey))
+            if (Param == hostkey)
                 return Access.AccessResultEnum.SUCCESS_HOST;
 
         if (user.Level >= UserAccessLevel.ChatGuide) return Access.AccessResultEnum.SUCCESS_OWNER;
@@ -186,7 +192,8 @@ public class Channel : Obj
 
         if (Modes.Key.Value == 1)
         {
-            if (Param == Properties.Memberkey.Value)
+            var memberkey = Properties.Get("Memberkey");
+            if (Param == memberkey)
                 return Access.AccessResultEnum.SUCCESS_MEMBERKEY;
             return Access.AccessResultEnum.ERR_BADCHANNELKEY;
         }

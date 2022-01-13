@@ -1,4 +1,5 @@
-﻿using Irc.Extensions.Security;
+﻿using Irc.Constants;
+using Irc.Extensions.Security;
 using Irc.Worker.Ircx.Objects;
 
 namespace Irc.Worker.Ircx.Commands;
@@ -29,9 +30,9 @@ internal class IRCX : Command
 
     public static void ProcessIRCXReply(Frame Frame)
     {
-        Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_IRCX_800,
+        Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_IRCX_800,
             Data: new[] {Program.Providers.SupportedPackages, Resources.IRCXOptions},
-            IData: new[] {Frame.User.Modes.Ircx.Value, Frame.Server.IrcxVersion, Program.Config.BufferSize}));
+            IData: new[] {Frame.User.Modes.Ircx.Value, Frame.Server.ServerFields.IrcxVersion, Program.Config.BufferSize}));
     }
 
     public new COM_RESULT Execute(Frame Frame)

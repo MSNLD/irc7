@@ -1,8 +1,6 @@
-﻿using System;
+﻿namespace Irc.Constants;
 
-namespace Irc.Worker;
-
-internal static class Resources
+public static class Resources
 {
     public static long epoch = 621355968000000000;
     public static string CommandAccess = "ACCESS";
@@ -137,6 +135,7 @@ internal static class Resources
 
     #region User Properties
 
+    public static string UserPropOid = "OID";
     public static string UserPropName = "NAME";
     public static string UserPropRole = "ROLE";
     public static string UserPropMsnProfile = "MSNPROFILE"; //
@@ -253,4 +252,6 @@ internal static class Resources
     public static string GuestNicknameMask = @"^>(?!(Sysop)|(Admin)|(Guide))[\x41-\xFF\-0-9]+$";
     public static string NicknameMask = @"^(?!(Sysop)|(Admin)|(Guide))[\x41-\xFF][\x41-\xFF\-0-9]*$";
     #endregion
+
+    public static string IrcOpNickMask = @"[\x41-\xFF\-0-9]+$";
 }

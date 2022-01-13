@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Irc.ClassExtensions.CSharpTools;
+using Irc.Constants;
 using Irc.Extensions.Access;
 using Irc.Worker.Ircx.Objects;
 
@@ -71,7 +72,7 @@ internal class CREATE : Command
         if (Frame.User.Level < UserAccessLevel.ChatUser)
         {
             //guests cannot create
-            Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_UNKNOWNCOMMAND_421,
+            Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_UNKNOWNCOMMAND_421,
                 Data: new[] {Frame.Message.Command}));
             return COM_RESULT.COM_SUCCESS;
         }
@@ -79,7 +80,7 @@ internal class CREATE : Command
         if (user.Profile.Ircvers > 0 && user.Profile.Ircvers < 9)
             if (user.Channels.ChannelList.Count > 0)
             {
-                user.Send(Raws.Create(server, user.Channels.ChannelList[0].Channel, user,
+                user.Send(RawBuilder.Create(server, user.Channels.ChannelList[0].Channel, user,
                     Raws.IRCX_ERR_TOOMANYCHANNELS_405));
                 return COM_RESULT.COM_SUCCESS;
             }
@@ -91,7 +92,7 @@ internal class CREATE : Command
         if (Cat == Category.None)
         {
             //:server 701 [yournick] :Category not found
-            user.Send(Raws.Create(server, Client: user, Raw: Raws.IRCX_RPL_FINDS_NOSUCHCAT_701));
+            user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_FINDS_NOSUCHCAT_701));
             return COM_RESULT.COM_SUCCESS;
         }
 
@@ -99,7 +100,7 @@ internal class CREATE : Command
         if (!Channel.IsValidChannelFormat(ChannelName))
         {
             //:server 706 [yournick] :Channel name is not valid
-            user.Send(Raws.Create(server, Client: user, Raw: Raws.IRCX_RPL_FINDS_INVALIDCHANNEL_706));
+            user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_FINDS_INVALIDCHANNEL_706));
             return COM_RESULT.COM_SUCCESS;
         }
 
@@ -177,10 +178,10 @@ internal class CREATE : Command
             return COM_RESULT.COM_SUCCESS;
         }
 
-        var channels = Frame.Server.Channels.GetChannels(Frame.Server, Frame.User, ChannelName, false);
+        var channels = Common.GetChannels(Frame.Server, Frame.User, ChannelName, false);
         if (channels.Count != 0)
         {
-            user.Send(Raws.Create(server, Client: user, Raw: Raws.IRCX_RPL_FINDS_CHANNELEXISTS_705));
+            user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_FINDS_CHANNELEXISTS_705));
             return COM_RESULT.COM_SUCCESS;
         }
 
@@ -189,9 +190,9 @@ internal class CREATE : Command
         //Send to MasterServer (via Load Balance function)
         //Send 613 to client
         var c = Frame.Server.AddChannel(ChannelName);
-        c.Properties.Subject.Value = CreateSubject(TimeZone.ServerTime, Zone, Cat, false);
-        c.Properties.Topic.Value = Topic;
-        c.Properties.Language.Value = Locale;
+        c.Properties.Set("Subject", CreateSubject(TimeZone.ServerTime, Zone, Cat, false));
+        c.Properties.Set("Topic", Topic);
+        c.Properties.Set("Language", Locale);
 
         // Apply modes to channel
         var limit = Tools.Str2Int(Limit);
@@ -210,7 +211,7 @@ internal class CREATE : Command
 
         //c.HostKey = Resources.Null;
 
-        c.Properties.Ownerkey.Value = OwnerKey;
+        c.Properties.Set("Ownerkey", OwnerKey);
 
         JOIN.ProcessJoinChannel(Frame, c, OwnerKey);
         return COM_RESULT.COM_SUCCESS;
@@ -218,7 +219,7 @@ internal class CREATE : Command
 
     public void BadlyFormed(Server server, User user)
     {
-        user.Send(Raws.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADLYFORMEDPARAMS_902));
+        user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADLYFORMEDPARAMS_902));
     }
 
     public bool IsModeValid(User user, string ModeString, string Limit)

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using Irc.Constants;
 using Irc.Worker.Ircx;
 using Irc.Worker.Ircx.Commands;
 using Irc.Worker.Ircx.Objects;
@@ -725,7 +726,7 @@ public class ChannelModeCollection : ModeCollection
         }
     }
 
-    public void UpdateModes(Prop key)
+    public void UpdateModes(string modeKey)
     {
         ChanModes.Length = 0;
         ChanModes.Append('+');
@@ -761,11 +762,11 @@ public class ChannelModeCollection : ModeCollection
             ChanModes.Append(limit);
         }
 
-        if (key != null)
+        if (modeKey != null)
             if (bHasKey)
             {
                 ChanModes.Append(' ');
-                ChanModes.Append(key.Value);
+                ChanModes.Append(modeKey);
             }
 
         modeFullLen = ChanModes.Length;

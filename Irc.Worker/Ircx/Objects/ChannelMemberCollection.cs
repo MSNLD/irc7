@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using Irc.ClassExtensions.CSharpTools;
+using Irc.Constants;
 
 namespace Irc.Worker.Ircx.Objects;
 
@@ -30,20 +31,16 @@ public class ChannelMemberCollection
 
     public ChannelMember GetMember(string TargetUser)
     {
-        if (!Obj.IsObject(TargetUser))
+        if (!IrcHelper.IsObject(TargetUser))
             // Find Channel normal way
             return GetMemberByName(TargetUser);
         return GetMemberByOID(TargetUser);
     }
 
-    public ChannelMember GetMemberByOID(string OID)
+    public ChannelMember GetMemberByOID(string oid)
     {
-        long oid;
-        long.TryParse(OID, NumberStyles.HexNumber, null, out oid);
+        foreach (var member in MemberList) if (member.User.Id.ToString() == oid) return member;
 
-        for (var c = 0; c < MemberList.Count; c++)
-            if (MemberList[c].User.OID == oid)
-                return MemberList[c];
         return null;
     }
 
@@ -82,7 +79,7 @@ public class ChannelMemberCollection
         if (MemberList.Count > 0)
             for (var x = 0; x < MemberList.Count; x++)
                 if (ReportMissing)
-                    User.Send(Raws.Create(Server, Client: User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401,
+                    User.Send(RawBuilder.Create(Server, Client: User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401,
                         Data: new[] {MemberList[x]}));
 
         return Members;

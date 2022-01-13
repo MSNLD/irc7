@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Irc.Constants;
 using Irc.Worker.Ircx.Objects;
 
 namespace Irc.Worker.Ircx.Commands;
@@ -22,7 +23,7 @@ internal class USERHOST : Command
             Userhost.Append(Frame.User.Name);
             Userhost.Append('=');
             Userhost.Append(Frame.User.Address._address[2]);
-            Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_USERHOST_302,
+            Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_USERHOST_302,
                 Data: new[] {Userhost.ToString()}));
         }
 

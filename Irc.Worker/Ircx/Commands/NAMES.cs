@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Irc.Constants;
 using Irc.Extensions.Access;
 using Irc.Worker.Ircx.Objects;
 
@@ -16,7 +17,8 @@ public class NAMES : Command
 
     public new COM_RESULT Execute(Frame Frame)
     {
-        var Channel = Frame.Server.Channels.GetChannel(Frame.Message.Data[0]);
+        var objType = IrcHelper.IdentifyObject(Frame.Message.Data[0]);
+        var Channel = Frame.Server.Channels.FindObj(Frame.Message.Data[0], objType);
         if (Channel != null)
         {
             var Member = Channel.GetMember(Frame.User);
@@ -24,13 +26,13 @@ public class NAMES : Command
                 ProcessNames(Frame.Server, Member, Channel);
             else
                 // you are not on that channel
-                Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442,
+                Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442,
                     Data: new[] {Frame.Message.Data[0]}));
         }
         else
         {
             //no such channel
-            Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403,
+            Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403,
                 Data: new[] {Frame.Message.Data[0]}));
         }
 
@@ -40,7 +42,7 @@ public class NAMES : Command
     public static void ProcessNames(Server server, ChannelMember Member, Channel c)
     {
         var Names = new StringBuilder(512);
-        var NameReply = Raws.Create(server, c, Member.User, Raws.IRCX_RPL_NAMEREPLY_353X, Newline: false);
+        var NameReply = RawBuilder.Create(server, c, Member.User, Raws.IRCX_RPL_NAMEREPLY_353X, Newline: false);
 
         Names.Append(NameReply);
         for (var i = 0; i < c.MemberList.Count; i++)
@@ -105,7 +107,7 @@ public class NAMES : Command
         Names.Length--; //to get rid of tailing space
         Names.Append(Resources.CRLF);
         Member.User.Send(new string(Names.ToString()));
-        Member.User.Send(Raws.Create(server, Client: Member.User, Raw: Raws.IRCX_RPL_ENDOFNAMES_366,
+        Member.User.Send(RawBuilder.Create(server, Client: Member.User, Raw: Raws.IRCX_RPL_ENDOFNAMES_366,
             Data: new[] {c.Name}));
     }
 }

@@ -2,7 +2,7 @@
 
 public class ServerProperties : PropCollection
 {
-    public ServerProperties(Client obj) : base(obj)
+    public ServerProperties()
     {
     }
 }

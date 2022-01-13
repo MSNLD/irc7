@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Irc.Constants;
 
 namespace Irc.Worker.Ircx.Objects;
 

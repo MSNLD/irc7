@@ -1,4 +1,5 @@
 ﻿using Irc.ClassExtensions.CSharpTools;
+using Irc.Constants;
 using Irc.Extensions.Access;
 using Irc.Worker.Ircx.Objects;
 
@@ -23,7 +24,7 @@ internal class RE : Command
         if (Frame.User.Level < UserAccessLevel.ChatGuide)
         {
             //no such command
-            Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_UNKNOWNCOMMAND_421,
+            Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_UNKNOWNCOMMAND_421,
                 Data: new[] {Frame.Message.Command}));
             return COM_RESULT.COM_SUCCESS;
         }
@@ -36,24 +37,24 @@ internal class RE : Command
         {
             for (var i = 0; i < Frame.Server.Users.Length; i++)
             {
-                var User = Frame.Server.Users[i];
+                var User = Frame.Server.Users.IndexOf(i);
                 if (User.Registered)
                     if (StringBuilderRegEx.EvaluateString(Frame.Message.Data[0], User.Address.Nickname, true))
                     {
                         if (User.ChannelList.Count == 0)
-                            Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_REVEAL_851,
+                            Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_REVEAL_851,
                                 Data: new[]
                                 {
-                                    User.Address.Nickname, User.OIDX8, User.Address.RemoteIP, User.Address._address[1],
+                                    User.Address.Nickname, User.Id.ToString(), User.Address.RemoteIP, User.Address._address[1],
                                     Resources.Null
                                 }));
                         else
                             for (var x = 0; x < User.ChannelList.Count; x++)
-                                Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User,
+                                Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User,
                                     Raw: Raws.IRCX_RPL_REVEAL_851,
                                     Data: new[]
                                     {
-                                        User.Address.Nickname, User.OIDX8, User.Address.RemoteIP,
+                                        User.Address.Nickname, User.Id.ToString(), User.Address.RemoteIP,
                                         User.Address._address[1], User.ChannelList[x].Channel.Name
                                     }));
                     }
@@ -61,7 +62,7 @@ internal class RE : Command
         }
 
 
-        Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_REVEALEND_852));
+        Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_REVEALEND_852));
         return COM_RESULT.COM_SUCCESS;
     }
 }

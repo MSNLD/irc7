@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Objects\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Irc.ClassExtensions\Irc.Helpers.csproj" />
   </ItemGroup>
 

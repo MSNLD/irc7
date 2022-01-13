@@ -1,4 +1,5 @@
-﻿using Irc.Worker.Ircx.Objects;
+﻿using Irc.Constants;
+using Irc.Worker.Ircx.Objects;
 
 namespace Irc.Worker.Ircx.Commands;
 
@@ -14,21 +15,21 @@ internal class LUSERS : Command
 
     public static void SendLusers(Server server, User user)
     {
-        user.Send(Raws.Create(server, Client: user, Raw: Raws.IRCX_RPL_LUSERCLIENT_251,
-            IData: new[] {server.RegisteredUsers, server.InvisibleCount, 1}));
+        user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_LUSERCLIENT_251,
+            IData: new[] {server.ServerFields.RegisteredUsers, server.ServerFields.InvisibleCount, 1}));
         user.Send(
-            Raws.Create(server, Client: user, Raw: Raws.IRCX_RPL_LUSEROP_252, IData: new[] {server.OperatorCount}));
-        if (server.UnknownConnections > 0)
-            user.Send(Raws.Create(server, Client: user, Raw: Raws.IRCX_RPL_LUSERUNKNOWN_253,
-                IData: new[] {server.UnknownConnections}));
-        user.Send(Raws.Create(server, Client: user, Raw: Raws.IRCX_RPL_LUSERCHANNELS_254,
+            RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_LUSEROP_252, IData: new[] {server.ServerFields.OperatorCount}));
+        if (server.ServerFields.UnknownConnections > 0)
+            user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_LUSERUNKNOWN_253,
+                IData: new[] {server.ServerFields.UnknownConnections}));
+        user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_LUSERCHANNELS_254,
             IData: new[] {server.Channels.Length}));
-        user.Send(Raws.Create(server, Client: user, Raw: Raws.IRCX_RPL_LUSERME_255,
-            IData: new[] {server.RegisteredUsers, 0}));
-        user.Send(Raws.Create(server, Client: user, Raw: Raws.IRCX_RPL_LUSERS_265,
-            IData: new[] {server.RegisteredUsers, server.MaxUsers}));
-        user.Send(Raws.Create(server, Client: user, Raw: Raws.IRCX_RPL_GUSERS_266,
-            IData: new[] {server.RegisteredUsers, server.MaxUsers}));
+        user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_LUSERME_255,
+            IData: new[] {server.ServerFields.RegisteredUsers, 0}));
+        user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_LUSERS_265,
+            IData: new[] {server.ServerFields.RegisteredUsers, server.ServerFields.MaxUsers}));
+        user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_GUSERS_266,
+            IData: new[] {server.ServerFields.RegisteredUsers, server.ServerFields.MaxUsers}));
     }
 
     public new COM_RESULT Execute(Frame Frame)

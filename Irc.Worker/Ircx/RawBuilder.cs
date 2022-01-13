@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using Irc.ClassExtensions.CSharpTools;
+using Irc.Constants;
 using Irc.Worker.Ircx.Objects;
 
 namespace Irc.Worker.Ircx;
@@ -10,103 +11,103 @@ public class RawBuilder
     public static string Create(Server Server = null, Channel Channel = null, Client Client = null, string Raw = null,
         string[] Data = null, int[] IData = null, bool Newline = true)
     {
-        var RawText = new StringBuilder(Raw);
         int dataLen = 0, offsetd = 0, offseti = 0, remainder = 0;
 
         var output = new StringBuilder(512);
         remainder = 510 - Raw.Length;
 
         for (var i = 0; i < Raw.Length; i++)
-            switch (RawText.ToByteArray()[i])
+            switch (Raw[i])
             {
-                case (byte) '%':
+                case '%':
                 {
                     i++;
                     if (i < Raw.Length)
-                        switch (RawText.ToByteArray()[i])
+                        switch (Raw[i])
                         {
-                            case (byte) 's':
+                            case 's':
                             {
                                 var len = Data[offsetd].Length;
                                 if (len > 0)
                                 {
                                     if (len > remainder) len = remainder;
-                                    remainder -= output.AppendByteArrayAsChars(Data[offsetd++].ToByteArray(), 0, len);
+                                    output.Append(Data[offsetd++].Substring(0, len));
+                                    remainder -= len;
                                 }
 
                                 break;
                             }
-                            case (byte) 'S':
+                            case 'S':
                             {
                                 //put all of string array in
                                 while (offsetd < Data.Length)
                                 {
-                                    var s = Convert.ToString(Data[offsetd++]);
-                                    output.Append(s);
-                                    remainder -= s.Length;
+                                    output.Append(Data[offsetd]);
+                                    remainder -= Data[offsetd++].Length;
                                 }
 
                                 break;
                             }
-                            case (byte) 'd':
+                            case 'd':
                             {
-                                // TODO: Check this works
-                                var s = IData[offseti++].ToString();
-                                output.Append(s);
-                                remainder -= s.Length;
+                                output.Append(IData[offseti].ToString());
+                                remainder -= IData[offseti++].ToString().Length;
                                 break;
                             }
-                            case (byte) 'x':
+                            case 'x':
                             {
-                                // TODO: Check this works
-                                var s = IData[offseti++].ToString("X");
-                                output.Append(s);
-                                remainder -= s.Length;
+                                var value = IData[offseti++].ToString("X");
+                                remainder -= value.Length;
+                                output.Append(value);
                                 break;
                             }
-                            case (byte) 'o':
+                            case 'o':
                             {
-                                // TODO: Check this works
-                                var s = IData[offseti++].ToString("X9");
-                                output.Append(s);
-                                remainder -= s.Length;
+                                var value = IData[offseti++].ToString("X9");
+                                remainder -= value.Length;
+                                output.Append(value);
                                 break;
                             }
-                            case (byte) 'l':
+                            case 'l':
                             {
-                                remainder -= output.AppendByteAsChar((byte) IData[offseti++]);
+                                remainder -= 1;
+                                output.Append((char) IData[offseti++]);
                                 break;
                             }
-                            case (byte) 'h':
+                            case 'h':
                             {
-                                output.Append(Server.Name);
-                                remainder -= Server.Name.Length;
+                                var value = Server.Name;
+                                remainder -= value.Length;
+                                output.Append(value);
                                 break;
                             }
-                            case (byte) 'n':
+                            case 'n':
                             {
-                                output.Append(Client.Name);
-                                remainder -= Client.Name.Length;
+                                var value = Client.Name;
+                                remainder -= value.Length;
+                                output.Append(value);
                                 break;
                             }
                             //case (byte)'a': { output += User.Nickname(); break; }
                             //case (byte)'i': { string sValue = (string)parameters[0]; output += sValue; parameters.RemoveAt(0); break; }
-                            case (byte) 'c':
+                            case 'c':
                             {
-                                output.Append(Channel.Name);
-                                remainder -= Channel.Name.Length;
+                                var value = Channel.Name;
+                                remainder -= value.Length;
+                                output.Append(value);
                                 break;
                             }
-                            case (byte) 'u':
+                            case 'u':
                             {
-                                output.Append(Client.Address._address[2]);
                                 remainder -= Client.Address._address[2].Length;
+                                output.Append(Client.Address._address[2]);
                                 break;
                             }
                             default:
                             {
                                 output.Append('%');
-                                remainder -= output.AppendByteAsChar(RawText.ToByteArray()[i]) - 1;
+                                output.Append(Raw[i]);
+                                remainder -= 2;
                                 break;
                             }
                         }
@@ -115,16 +116,17 @@ public class RawBuilder
                 }
                 default:
                 {
-                    remainder -= output.AppendByteAsChar(RawText.ToByteArray()[i]);
+                    output.Append(Raw[i]);
+                    remainder--;
                     break;
                 }
             }
 
-        if (Data != null) //append overflow
+        if (Data != null) //Append overflow
             while (offsetd < Data.Length)
                 output.Append(Data[offsetd++]);
 
         if (Newline) output.Append(Resources.CRLF);
-        return StringBuilderExtensions.FromBytes(output.ToByteArray(), 0, output.Length).ToString();
+        return new string(output.ToString());
     }
 }

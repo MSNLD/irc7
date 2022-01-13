@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using Irc.ClassExtensions.CSharpTools;
+using Irc.Constants;
 using Irc.Extensions.Security;
+using Irc.Helpers.CSharpTools;
+using Irc.Objects;
 
 namespace Irc.Worker.Ircx.Objects;
 
-public class Client : Obj
+public class Client : ChatObject
 {
     private bool _isGuest;
     public Address Address;
@@ -17,8 +20,9 @@ public class Client : Obj
     public long LoggedOn;
     public bool WaitPing;
 
-    public Client(ObjType objType) : base(objType)
+    public Client(): base(new UserProperties())
     {
+        base.Properties.Set(Resources.UserPropOid, Id.ToUnformattedString());
         LastActive = DateTime.UtcNow.Ticks;
         LastPing = DateTime.UtcNow.Ticks;
 
@@ -27,7 +31,7 @@ public class Client : Obj
         FloodProfile = new FloodProfile();
     }
 
-    public bool Guest => Auth != null ? Auth.guest : false;
+    public bool Guest => Auth != null ? Auth.Guest : false;
     public bool Registered { get; private set; }
 
     public bool Authenticated
@@ -39,6 +43,19 @@ public class Client : Obj
             return false;
         }
     }
+    public FrameBuffer BufferIn { get; } = new();
+
+    public Queue<string> BufferOut { get; } = new();
+
+    public void Receive(Frame frame)
+    {
+        WaitPing = false;
+        LastActive = DateTime.UtcNow.Ticks;
+        LastPing = LastActive; // Reset last ping as communication has taken place
+        FloodProfile.currentInputBytes += (uint)frame.Message.rawData.Length;
+        Debug.Out(ShortId + ":RX: " + frame.Message.rawData);
+        BufferIn.Queue.Enqueue(frame);
+    }
 
     public bool IsConnected { get; private set; }
 
@@ -46,19 +63,10 @@ public class Client : Obj
 
     public void Send(string data)
     {
-        Debug.Out(OIDX8 + ":TX: " + data);
-        BufferOut.Enqueue(data);
+        Debug.Out(ShortId + ":TX: " + data);
+        BufferOut.Enqueue($"{data}\r\n");
     }
-
-    public void Receive(Frame frame)
-    {
-        WaitPing = false;
-        LastActive = DateTime.UtcNow.Ticks;
-        LastPing = LastActive; // Reset last ping as communication has taken place
-        FloodProfile.currentInputBytes += (uint) frame.Message.rawData.Length;
-        base.Receive(frame);
-    }
-
+    
     public COM_RESULT Process(Frame Frame)
     {
         // to be moved somewhere better
@@ -71,7 +79,7 @@ public class Client : Obj
             return Frame.Command.Execute(Frame);
         }
 
-        Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_UNKNOWNCOMMAND_421,
+        Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_UNKNOWNCOMMAND_421,
             Data: new[] {Frame.Message.Command}));
         // No such command
         return COM_RESULT.COM_SUCCESS;

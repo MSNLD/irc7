@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Irc.ClassExtensions.CSharpTools;
+using Irc.Constants;
 using Irc.Extensions.Access;
 using Irc.Extensions.Security.Packages;
 using Irc.Worker.Ircx.Objects;
@@ -35,7 +36,7 @@ public class NICK : Command
                 if (!Frame.User.Guest)
                 {
                     // Nickname changes not permitted
-                    Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NONICKCHANGES_439,
+                    Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NONICKCHANGES_439,
                         Data: new[] {Frame.Message.Data[0]}));
                     return COM_RESULT.COM_SUCCESS;
                 }
@@ -58,7 +59,7 @@ public class NICK : Command
 
                 if (!bIsInUse)
                 {
-                    var NicknameChangeRaw = Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.RPL_NICK,
+                    var NicknameChangeRaw = RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.RPL_NICK,
                         Data: new[] {Frame.Message.Data[0]});
                     Frame.User.Send(NicknameChangeRaw);
                     Frame.User.BroadcastToChannels(NicknameChangeRaw, true);
@@ -66,13 +67,13 @@ public class NICK : Command
                 else
                 {
                     // Nickname is in use 
-                    Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NICKINUSE_433,
+                    Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NICKINUSE_433,
                         Data: new[] {Frame.Message.Data[0]}));
                     return COM_RESULT.COM_SUCCESS;
                 }
             }
 
-            Frame.Server.UpdateUserNickname(Frame.User, Frame.Message.Data[0]);
+            Frame.User.UpdateUserNickname(Frame.Message.Data[0]);
         }
         else if (result == ValidateNicknameResult.IDENTICAL)
         {
@@ -81,7 +82,7 @@ public class NICK : Command
         else
         {
             if (Frame.User.Authenticated)
-                Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_ERRONEOUSNICK_432,
+                Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_ERRONEOUSNICK_432,
                     Data: new[] {Frame.Message.Data[0]}));
         }
 
@@ -90,7 +91,7 @@ public class NICK : Command
 
     public static void UpdateNickname(Server Server, User User, string Nickname)
     {
-        var NicknameChangeRaw = Raws.Create(Server, Client: User, Raw: Raws.RPL_NICK, Data: new[] {Nickname});
+        var NicknameChangeRaw = RawBuilder.Create(Server, Client: User, Raw: Raws.RPL_NICK, Data: new[] {Nickname});
         User.Send(NicknameChangeRaw);
         User.BroadcastToChannels(NicknameChangeRaw, true);
     }
@@ -106,7 +107,7 @@ public class NICK : Command
 
         string NicknameMask;
         if (User.Level >= UserAccessLevel.ChatGuide)
-            NicknameMask = ANON.IRCOpNickMask;
+            NicknameMask = Resources.IrcOpNickMask;
         else if (User.Guest)
             NicknameMask = Resources.GuestNicknameMask;
         else

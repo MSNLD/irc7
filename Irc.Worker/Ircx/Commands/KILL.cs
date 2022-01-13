@@ -1,4 +1,5 @@
-﻿using Irc.Extensions.Access;
+﻿using Irc.Constants;
+using Irc.Extensions.Access;
 using Irc.Worker.Ircx.Objects;
 
 namespace Irc.Worker.Ircx.Commands;
@@ -31,12 +32,12 @@ internal class KILL : Command
                     //Determine type
                     //Kill with / without reason
 
-                    if (objs[i].ObjectType == ObjType.ChannelObject)
+                    if (objs[i] is Channel)
                     {
                         Frame.Channel = (Channel) objs[i];
                         ProcessChannelKill(Frame, Reason);
                     }
-                    else if (objs[i].ObjectType == ObjType.UserObject)
+                    else if (objs[i] is User)
                     {
                         var TargetUser = (User) objs[i];
                         ProcessKill(Frame, TargetUser, Reason);
@@ -53,7 +54,7 @@ internal class KILL : Command
         {
             var channels = TargetUser.ChannelList;
 
-            var KillRaw = Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.RPL_KILL_IRC,
+            var KillRaw = RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.RPL_KILL_IRC,
                 Data: new[] {TargetUser.Address.Nickname, Reason});
 
             while (channels.Count > 0)
@@ -74,7 +75,7 @@ internal class KILL : Command
             return true;
         }
 
-        Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_SECURITY_908));
+        Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_SECURITY_908));
         return false;
     }
 
@@ -100,7 +101,7 @@ internal class KILL : Command
                     //else
                     //{
                     // Some permissions error
-                    //Frame.User.Send(Raws.Create(Server: Frame.Server, Frame.Channel, Frame.User, Raw: Raws.IRCX_ERR_SECURITY_908));
+                    //Frame.User.Send(RawBuilder.Create(Server: Frame.Server, Frame.Channel, Frame.User, Raw: Raws.IRCX_ERR_SECURITY_908));
                     //}
                 }
 
@@ -108,22 +109,22 @@ internal class KILL : Command
                 if (Members.Count == 0 && Frame.Channel.Modes.Registered.Value != 0x1)
                 {
                     // Remove Channel
-                    var KillRaw = Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.RPL_KILL_IRC,
+                    var KillRaw = RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.RPL_KILL_IRC,
                         Data: new[] {Frame.Channel.Name, Reason});
-                    Frame.Server.RemoveObject(Frame.Channel);
+                    Frame.Server.RemoveChannel(Frame.Channel);
                     Frame.User.Send(KillRaw);
                 }
             }
             else
             {
-                Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401,
+                Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401,
                     Data: new[] {Resources.Null}));
             }
         }
         else
         {
             //not an operator
-            Frame.User.Send(Raws.Create(Frame.Server, Frame.Channel, Frame.User, Raws.IRCX_ERR_NOPRIVILEGES_481));
+            Frame.User.Send(RawBuilder.Create(Frame.Server, Frame.Channel, Frame.User, Raws.IRCX_ERR_NOPRIVILEGES_481));
         }
     }
 }

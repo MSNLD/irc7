@@ -1,4 +1,5 @@
-﻿using Irc.Worker.Ircx.Objects;
+﻿using Irc.Constants;
+using Irc.Worker.Ircx.Objects;
 
 namespace Irc.Worker.Ircx.Commands;
 
@@ -15,7 +16,7 @@ public class PART : Command
     {
         if (c.Contains(Frame.User))
         {
-            c.Send(Raws.Create(Frame.Server, c, Frame.User, Raws.RPL_PART_IRC), Frame.User);
+            c.Send(RawBuilder.Create(Frame.Server, c, Frame.User, Raws.RPL_PART_IRC), Frame.User);
             c.RemoveMember(Frame.User);
 
             Frame.User.RemoveChannel(c);
@@ -23,7 +24,7 @@ public class PART : Command
         else
         {
             // you are not on that channel
-            Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442,
+            Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442,
                 Data: new[] {c.Name}));
         }
     }
@@ -50,7 +51,7 @@ public class PART : Command
                 return COM_RESULT.COM_SUCCESS;
             }
 
-            var channels = Frame.Server.Channels.GetChannels(Frame.Server, Frame.User, message.Data[0], true);
+            var channels = Common.GetChannels(Frame.Server, Frame.User, message.Data[0], true);
 
             if (channels != null)
                 if (channels.Count > 0)
@@ -61,13 +62,13 @@ public class PART : Command
 
             // null
             // No such channel
-            Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403,
+            Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403,
                 Data: new[] {Frame.Message.Data[0]}));
         }
         else
         {
             //insufficient parameters
-            Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461,
+            Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461,
                 Data: new[] {message.Data[0]}));
         }
 

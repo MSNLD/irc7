@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Irc.Constants;
 using Irc.Extensions.Access;
 using Irc.Extensions.Security.Packages;
 using Irc.Worker.Ircx.Commands;
@@ -27,7 +28,7 @@ internal static class Register
                                 // TO FIX
 
                                 user.Level = Program.Credentials[c].Level;
-                                server.UpdateUserNickname(user, Program.Credentials[c].Nickname);
+                                user.UpdateUserNickname(Program.Credentials[c].Nickname);
                                 Client.Address.Userhost = Program.Credentials[c].Username;
                                 Client.Address.Hostname = "cg";
 
@@ -69,7 +70,7 @@ internal static class Register
                     var ChangeNick = new StringBuilder(nLen + 1);
                     ChangeNick.Append('>');
                     ChangeNick.Append(Client.Address.Nickname.Substring(nLen));
-                    server.UpdateUserNickname(user, ChangeNick.ToString());
+                    user.UpdateUserNickname(ChangeNick.ToString());
                 }
             }
 
@@ -85,14 +86,14 @@ internal static class Register
                 if (result.Entry != null)
                     if (result.Entry.Level.Level == EnumAccessLevel.DENY)
                     {
-                        Client.Send(Raws.Create(server, Client: Client, Raw: Raws.IRCX_CLOSINGLINK,
+                        Client.Send(RawBuilder.Create(server, Client: Client, Raw: Raws.IRCX_CLOSINGLINK,
                             Data: new[] {Client.Address.RemoteIP, result.Entry.Reason}));
                         Client.Terminate();
                         return;
                         // Deny user from network
                     }
 
-                if (user.ObjectType == ObjType.UserObject)
+                if (user is User)
                 {
                     server.RegisterUser(user);
                     // welcome raws
@@ -109,11 +110,11 @@ internal static class Register
                     // Below is not required anymore due to mIRC obeying IRCX with version >= 5.5
                     //switch (user.Profile.Ircvers)
                     //{
-                    //    case -1: case 0: case 9: { user.Send(Raws.Create(Server: server, Client: user, Raw: Raws.IRCX_RPL_WELCOME_005)); break; }
+                    //    case -1: case 0: case 9: { user.Send(RawBuilder.Create(Server: server, Client: user, Raw: Raws.IRCX_RPL_WELCOME_005)); break; }
                     //}
 
                     LUSERS.SendLusers(server, user);
-                    Client.Send(Raws.Create(server, Client: Client, Raw: Raws.IRCX_ERR_NOMOTD_422));
+                    Client.Send(RawBuilder.Create(server, Client: Client, Raw: Raws.IRCX_ERR_NOMOTD_422));
 
                     if (user.Level >= UserAccessLevel.ChatGuide)
                     {
@@ -163,19 +164,8 @@ internal static class Register
                         AdminMode.UserModes.Add(new AuditUserMode(user, Client.Address.Nickname,
                             Resources.UserModeCharInvisible, true));
                         MODE.ProcessUserReport(server, user, user, AdminMode);
-                        Client.Send(Raws.Create(server, Client: Client, Raw: RPLStaffRaw));
+                        Client.Send(RawBuilder.Create(server, Client: Client, Raw: RPLStaffRaw));
                     }
-                }
-                else if (user.ObjectType == ObjType.ServerObject)
-                {
-                    // Attempt at inter-server communication
-                    var serv = (Server) server.AddObject(user.Name, ObjType.ServerObject, user.Name);
-                    server.RemoveObject(user);
-                    user = null;
-                    Client = null;
-                    Connection.Client = serv;
-                    serv.Register();
-                    serv.Send(Raws.Create(serv, Raw: Raws.RPL_SERVICE_DATA, Data: new[] {"LOGON", serv.OIDX8}));
                 }
             }
             else if (vNicknameRes == NICK.ValidateNicknameResult.IDENTICAL)
@@ -185,7 +175,7 @@ internal static class Register
             else
             {
                 //user.Address.Nickname = Resources.Wildcard;
-                Client.Send(Raws.Create(server, Client: Client, Raw: Raws.IRCX_ERR_ERRONEOUSNICK_432,
+                Client.Send(RawBuilder.Create(server, Client: Client, Raw: Raws.IRCX_ERR_ERRONEOUSNICK_432,
                     Data: new[] {Client.Name}));
                 Client.Address.Nickname = Resources.Wildcard;
             }

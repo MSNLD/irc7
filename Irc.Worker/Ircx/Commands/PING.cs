@@ -1,4 +1,5 @@
-﻿using Irc.Worker.Ircx.Objects;
+﻿using Irc.Constants;
+using Irc.Worker.Ircx.Objects;
 
 namespace Irc.Worker.Ircx.Commands;
 
@@ -13,7 +14,7 @@ internal class PING : Command
 
     public new COM_RESULT Execute(Frame Frame)
     {
-        Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.RPL_PONG));
+        Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.RPL_PONG));
         return COM_RESULT.COM_SUCCESS;
     }
 }

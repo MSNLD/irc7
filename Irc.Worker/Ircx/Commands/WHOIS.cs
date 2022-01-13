@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using Irc.ClassExtensions.CSharpTools;
+using Irc.Constants;
 using Irc.Extensions.Access;
 using Irc.Worker.Ircx.Objects;
 
@@ -43,7 +44,8 @@ internal class WHOIS : Command
 
                     if (TargetUser == null)
                     {
-                        TargetUser = server.Users.GetUser(TargetNickname);
+                        var objIdentifier = IrcHelper.IdentifyObject(TargetNickname);
+                        TargetUser = server.Users.FindObj(TargetNickname, objIdentifier);
                         if (TargetUser != null)
                             if (TargetUser.Modes.Invisible.Value == 0x1 && user.Level <= UserAccessLevel.ChatGuide)
                                 TargetUser = null;
@@ -51,7 +53,7 @@ internal class WHOIS : Command
 
                     if (TargetUser != null)
                     {
-                        user.Send(Raws.Create(server, Client: user, Raw: Raws.IRCX_RPL_WHOISUSER_311,
+                        user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_WHOISUSER_311,
                             Data: new[]
                             {
                                 TargetUser.Address.Nickname, TargetUser.Address.Userhost, TargetUser.Address.Hostname,
@@ -61,7 +63,7 @@ internal class WHOIS : Command
                         if (TargetUser.Channels.ChannelList.Count > 0)
                         {
                             var OutputRaw = new StringBuilder(512);
-                            var WHOIS_319_RAW = Raws.Create(server, Client: user, Raw: Raws.IRCX_RPL_WHOISCHANNELS_319X,
+                            var WHOIS_319_RAW = RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_WHOISCHANNELS_319X,
                                 Data: new[] {TargetUser.Address.Nickname}, Newline: false);
                             OutputRaw.Append(WHOIS_319_RAW);
 
@@ -94,45 +96,45 @@ internal class WHOIS : Command
                             user.Send(new string(OutputRaw.ToString()));
                         }
 
-                        user.Send(Raws.Create(server, Client: user, Raw: Raws.IRCX_RPL_WHOISSERVER_312,
+                        user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_WHOISSERVER_312,
                             Data: new[] {TargetUser.Address.Nickname, server.Name, Resources.Null}));
 
                         if (TargetUser.Profile.Away)
-                            user.Send(Raws.Create(server, Client: user, Raw: Raws.IRCX_RPL_AWAY_301,
+                            user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_AWAY_301,
                                 Data: new[] {TargetUser.Address.Nickname, TargetUser.Profile.AwayReason}));
 
                         if (TargetUser.Level == UserAccessLevel.ChatAdministrator)
-                            user.Send(Raws.Create(server, Client: user, Raw: Raws.IRCX_RPL_WHOISOPERATOR_313A,
+                            user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_WHOISOPERATOR_313A,
                                 Data: new[] {TargetUser.Address.Nickname}));
                         else if (TargetUser.Level >= UserAccessLevel.ChatGuide)
-                            user.Send(Raws.Create(server, Client: user, Raw: Raws.IRCX_RPL_WHOISOPERATOR_313O,
+                            user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_WHOISOPERATOR_313O,
                                 Data: new[] {TargetUser.Address.Nickname}));
 
                         if (user.Level >= UserAccessLevel.ChatGuide)
-                            user.Send(Raws.Create(server, Client: user, Raw: Raws.IRCX_RPL_WHOISIP_320,
+                            user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_WHOISIP_320,
                                 Data: new[] {TargetUser.Address.Nickname, TargetUser.Address.RemoteIP}));
 
                         if (TargetUser.Modes.Secure.Value == 1)
-                            user.Send(Raws.Create(server, Client: user, Raw: Raws.IRC2_RPL_WHOISSECURE_671,
+                            user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRC2_RPL_WHOISSECURE_671,
                                 Data: new[] {TargetUser.Address.Nickname}));
 
                         int SecondsSinceLogon =
                                 (int) ((TargetUser.LoggedOn - Resources.epoch) / TimeSpan.TicksPerSecond),
                             SecondsIdle =
                                 (int) ((DateTime.UtcNow.Ticks - TargetUser.LastIdle) / TimeSpan.TicksPerSecond);
-                        user.Send(Raws.Create(server, Client: user, Raw: Raws.IRCX_RPL_WHOISIDLE_317,
+                        user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_WHOISIDLE_317,
                             Data: new[] {TargetUser.Address.Nickname}, IData: new[] {SecondsIdle, SecondsSinceLogon}));
-                        user.Send(Raws.Create(server, Client: user, Raw: Raws.IRCX_RPL_ENDOFWHOIS_318,
+                        user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_ENDOFWHOIS_318,
                             Data: new[] {TargetUser.Address.Nickname}));
                     }
                     else
                     {
-                        user.Send(Raws.Create(server, Client: user, Raw: Raws.IRCX_ERR_NOSUCHNICK_401_N,
+                        user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_NOSUCHNICK_401_N,
                             Data: new[] {Nicknames[i]}));
                     }
                 }
             else
-                user.Send(Raws.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900,
+                user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900,
                     Data: new[] {Resources.CommandWhois}));
         }
 

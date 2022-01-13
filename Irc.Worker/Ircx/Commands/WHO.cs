@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Irc.ClassExtensions.CSharpTools;
+using Irc.Constants;
 using Irc.Extensions.Access;
 using Irc.Worker.Ircx.Objects;
 
@@ -16,7 +17,7 @@ internal class WHO : Command
 
     public static void SendWhoChannelUser(Frame Frame, Channel c, ChannelMember TargetUser)
     {
-        Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_WHOREPLY_352, Data: new[]
+        Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_WHOREPLY_352, Data: new[]
         {
             //<channel> <user> <host> <server> <nick> \
             //<H|G>[*][@|+] :<hopcount> <real name>
@@ -41,7 +42,7 @@ internal class WHO : Command
             if (Members.MemberList.Count > 0)
                 for (var i = 0; i < Members.MemberList.Count; i++)
                     SendWhoChannelUser(Frame, c, Members.MemberList[i]);
-        Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ENDOFWHO_315,
+        Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ENDOFWHO_315,
             Data: new[] {Frame.Message.Data[0]}));
     }
 
@@ -66,7 +67,7 @@ internal class WHO : Command
                                 c.Modes.Private.Value != 0x1)
                             {
                                 var TargetUser = User.ChannelList[x].Member;
-                                Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User,
+                                Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User,
                                     Raw: Raws.IRCX_RPL_WHOREPLY_352, Data: new[]
                                     {
                                         //<channel> <user> <host> <server> <nick> \
@@ -85,7 +86,7 @@ internal class WHO : Command
                         }
                     else
                         // output without channel
-                        Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_WHOREPLY_352,
+                        Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_WHOREPLY_352,
                             Data: new[]
                             {
                                 //<channel> <user> <host> <server> <nick>
@@ -102,7 +103,7 @@ internal class WHO : Command
                             }));
                 }
 
-        Frame.User.Send(Raws.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ENDOFWHO_315,
+        Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ENDOFWHO_315,
             Data: new[] {Frame.Message.Data[0]}));
     }
 
@@ -115,40 +116,40 @@ internal class WHO : Command
 
         if (Channel.IsChannel(message.Data[0]))
         {
-            ChannelMemberCollection WhoUsers = null;
-
-            var c = server.Channels.GetChannel(message.Data[0]);
+            var objType = IrcHelper.IdentifyObject(message.Data[0]);
+            var c = server.Channels.FindObj(message.Data[0], objType);
             if (c != null)
             {
+                ChannelMemberCollection whoUsers;
                 if (user.IsOnChannel(c))
                 {
                     //permits listing
                     if (c.Modes.Auditorium.Value == 0x1 && user.Level < UserAccessLevel.ChatHost)
                         //filtered output
-                        WhoUsers = c.GetMembersByLevel(user, UserAccessLevel.ChatHost);
+                        whoUsers = c.GetMembersByLevel(user, UserAccessLevel.ChatHost);
                     else
-                        WhoUsers = c.Members;
+                        whoUsers = c.Members;
                 }
                 else
                 {
                     if (user.Level < UserAccessLevel.ChatGuide)
                     {
                         if (c.Modes.Private.Value == 0x1 || c.Modes.Secret.Value == 0x1)
-                            WhoUsers = new ChannelMemberCollection(); //No output
+                            whoUsers = new ChannelMemberCollection(); //No output
                         else if (c.Modes.Auditorium.Value == 0x1)
                             //filtered output
-                            WhoUsers = c.GetMembersByLevel(user, UserAccessLevel.ChatHost);
+                            whoUsers = c.GetMembersByLevel(user, UserAccessLevel.ChatHost);
                         else
-                            WhoUsers = c.Members;
+                            whoUsers = c.Members;
                     }
                     else
                     {
                         //Guides+ get everything
-                        WhoUsers = c.Members;
+                        whoUsers = c.Members;
                     }
                 }
 
-                SendWho(Frame, c, WhoUsers);
+                SendWho(Frame, c, whoUsers);
             }
         }
         else
@@ -156,12 +157,12 @@ internal class WHO : Command
             List<User> WhoUsers = null;
             WhoUsers = new List<User>();
             for (var i = 0; i < server.Users.Length; i++)
-                if (server.Users[i].Registered)
+                if (server.Users.IndexOf(i).Registered)
                 {
-                    if (server.Users[i].Modes.Invisible.Value == 0x1 && user.Level < UserAccessLevel.ChatGuide &&
-                        server.Users[i] != user) ;
-                    else if (StringBuilderRegEx.EvaluateString(message.Data[0], server.Users[i].Address.Nickname, true))
-                        WhoUsers.Add(server.Users[i]);
+                    if (server.Users.IndexOf(i).Modes.Invisible.Value == 0x1 && user.Level < UserAccessLevel.ChatGuide &&
+                        server.Users.IndexOf(i) != user) ;
+                    else if (StringBuilderRegEx.EvaluateString(message.Data[0], server.Users.IndexOf(i).Address.Nickname, true))
+                        WhoUsers.Add(server.Users.IndexOf(i));
                 }
 
             SendWho(Frame, WhoUsers);
