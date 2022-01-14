@@ -99,8 +99,8 @@ public class RawBuilder
                             }
                             case 'u':
                             {
-                                remainder -= Client.Address._address[2].Length;
-                                output.Append(Client.Address._address[2]);
+                                remainder -= Client.Address.GetAddress().Length;
+                                output.Append(Client.Address.GetAddress());
                                 break;
                             }
                             default:

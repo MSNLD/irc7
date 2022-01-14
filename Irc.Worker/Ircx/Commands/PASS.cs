@@ -14,15 +14,15 @@ internal class PASS : Command
         ForceFloodCheck = true;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
         if (Frame.User.Auth == null)
         {
             Frame.User.Auth = new ANON();
             Frame.User.Auth.UserCredentials = new Credentials();
-            Frame.User.Auth.UserCredentials.Password = Frame.Message.Data[0];
+            Frame.User.Auth.UserCredentials.Password = Frame.Message.Parameters[0];
         }
 
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 }

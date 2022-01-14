@@ -11,9 +11,9 @@ internal class ISIRCX : Command
         ForceFloodCheck = true;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
         IRCX.ProcessIRCXReply(Frame);
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 }

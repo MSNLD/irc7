@@ -23,12 +23,12 @@ internal class WHO : Command
             //<H|G>[*][@|+] :<hopcount> <real name>
 
             c.Name,
-            TargetUser.User.Address.Userhost, TargetUser.User.Address.Hostname, TargetUser.User.Address.Nickname,
+            TargetUser.User.Address.User, TargetUser.User.Address.Host, TargetUser.User.Address.Nickname,
             TargetUser.User.Profile.Away ? Resources.Gone : Resources.Home,
-            //(TargetUser.Level == UserAccessLevel.ChatAdministrator ? Resources.Admin : Resources.Null),
+            //(TargetUser.Level == UserAccessLevel.ChatAdministrator ? Resources.Admin : string.Empty),
             TargetUser.ChannelMode.ModeString,
             TargetUser.User.Modes.UserModeString,
-            TargetUser.User.Address.RealName
+            TargetUser.User.RealName
         }));
     }
 
@@ -36,14 +36,18 @@ internal class WHO : Command
     {
     }
 
-    public static void SendWho(Frame Frame, Channel c, ChannelMemberCollection Members)
+    public static void SendWho(Frame Frame, Channel c, IList<ChannelMember> Members)
     {
         if (Members != null)
-            if (Members.MemberList.Count > 0)
-                for (var i = 0; i < Members.MemberList.Count; i++)
-                    SendWhoChannelUser(Frame, c, Members.MemberList[i]);
-        Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ENDOFWHO_315,
-            Data: new[] {Frame.Message.Data[0]}));
+            if (Members.Count > 0)
+            {
+                foreach (var channelMember in Members)
+                {
+                    SendWhoChannelUser(Frame, c, channelMember);
+                    Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ENDOFWHO_315,
+                        Data: new[] { Frame.Message.Parameters[0] }));
+                }
+            }
     }
 
     public static void SendWho(Frame Frame, List<User> Members)
@@ -59,30 +63,32 @@ internal class WHO : Command
                     //list
                     var User = Members[i];
 
-                    if (User.ChannelList.Count > 0)
-                        for (var x = 0; x < User.ChannelList.Count; x++)
+                    if (User.Channels.Count > 0)
+                        foreach (var channelMemberPair in User.Channels)
                         {
-                            var c = User.ChannelList[x].Channel;
-                            if (c.Modes.Hidden.Value != 0x1 && c.Modes.Secret.Value != 0x1 &&
-                                c.Modes.Private.Value != 0x1)
+                            var channel = channelMemberPair.Key;
+                            var member = channelMemberPair.Value;
+                            if (channel.Modes.Hidden.Value != 0x1 && channel.Modes.Secret.Value != 0x1 &&
+                                channel.Modes.Private.Value != 0x1)
                             {
-                                var TargetUser = User.ChannelList[x].Member;
+                                var TargetUser = member;
                                 Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User,
                                     Raw: Raws.IRCX_RPL_WHOREPLY_352, Data: new[]
                                     {
                                         //<channel> <user> <host> <server> <nick> \
                                         //<H|G>[*][@|+] :<hopcount> <real name>
 
-                                        c.Name,
-                                        TargetUser.User.Address.Userhost, TargetUser.User.Address.Hostname,
+                                        channel.Name,
+                                        TargetUser.User.Address.User, TargetUser.User.Address.Host,
                                         TargetUser.User.Address.Nickname,
                                         TargetUser.User.Profile.Away ? Resources.Gone : Resources.Home,
-                                        //(TargetUser.Level == UserAccessLevel.ChatAdministrator ? Resources.Admin : Resources.Null),
+                                        //(TargetUser.Level == UserAccessLevel.ChatAdministrator ? Resources.Admin : string.Empty),
                                         TargetUser.ChannelMode.ModeString,
                                         TargetUser.User.Modes.UserModeString,
-                                        TargetUser.User.Address.RealName
+                                        TargetUser.User.RealName
                                     }));
                             }
+
                         }
                     else
                         // output without channel
@@ -93,35 +99,35 @@ internal class WHO : Command
                                 //<H|G>[*][@|+]<usermodes> :<hopcount> <real name>
                                 //public static string IRCX_RPL_WHOREPLY_352 = ":%h 352 %n %s %s %s %h %s %s%s%s :0 %s";
                                 Resources.Wildcard,
-                                User.Address.Userhost, User.Address.Hostname, User.Address.Nickname,
+                                User.Address.User, User.Address.Host, User.Address.Nickname,
                                 User.Profile.Away ? Resources.Gone : Resources.Home,
-                                //(User.Level == UserAccessLevel.ChatAdministrator ? Resources.Admin : Resources.Null),
+                                //(User.Level == UserAccessLevel.ChatAdministrator ? Resources.Admin : string.Empty),
                                 User.Modes.UserModeString,
-                                Resources.Null,
+                                string.Empty,
 
-                                User.Address.RealName
+                                User.RealName
                             }));
                 }
 
         Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_ENDOFWHO_315,
-            Data: new[] {Frame.Message.Data[0]}));
+            Data: new[] {Frame.Message.Parameters[0]}));
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
         var server = Frame.Server;
         var message = Frame.Message;
         var user = Frame.User;
 
 
-        if (Channel.IsChannel(message.Data[0]))
+        if (Channel.IsChannel(message.Parameters[0]))
         {
-            var objType = IrcHelper.IdentifyObject(message.Data[0]);
-            var c = server.Channels.FindObj(message.Data[0], objType);
+            var objType = IrcHelper.IdentifyObject(message.Parameters[0]);
+            var c = server.Channels.FindObj(message.Parameters[0], objType);
             if (c != null)
             {
-                ChannelMemberCollection whoUsers;
-                if (user.IsOnChannel(c))
+                IList<ChannelMember> whoUsers;
+                if (user.Channels.ContainsKey(c))
                 {
                     //permits listing
                     if (c.Modes.Auditorium.Value == 0x1 && user.Level < UserAccessLevel.ChatHost)
@@ -135,7 +141,7 @@ internal class WHO : Command
                     if (user.Level < UserAccessLevel.ChatGuide)
                     {
                         if (c.Modes.Private.Value == 0x1 || c.Modes.Secret.Value == 0x1)
-                            whoUsers = new ChannelMemberCollection(); //No output
+                            whoUsers = new List<ChannelMember>(); //No output
                         else if (c.Modes.Auditorium.Value == 0x1)
                             //filtered output
                             whoUsers = c.GetMembersByLevel(user, UserAccessLevel.ChatHost);
@@ -156,19 +162,19 @@ internal class WHO : Command
         {
             List<User> WhoUsers = null;
             WhoUsers = new List<User>();
-            for (var i = 0; i < server.Users.Length; i++)
-                if (server.Users.IndexOf(i).Registered)
+            for (var i = 0; i < server.Users.Count; i++)
+                if (server.Users[i].Registered)
                 {
-                    if (server.Users.IndexOf(i).Modes.Invisible.Value == 0x1 && user.Level < UserAccessLevel.ChatGuide &&
-                        server.Users.IndexOf(i) != user) ;
-                    else if (StringBuilderRegEx.EvaluateString(message.Data[0], server.Users.IndexOf(i).Address.Nickname, true))
-                        WhoUsers.Add(server.Users.IndexOf(i));
+                    if (server.Users[i].Modes.Invisible.Value == 0x1 && user.Level < UserAccessLevel.ChatGuide &&
+                        server.Users[i] != user) ;
+                    else if (StringBuilderRegEx.EvaluateString(message.Parameters[0], server.Users[i].Address.Nickname, true))
+                        WhoUsers.Add(server.Users[i]);
                 }
 
             SendWho(Frame, WhoUsers);
         }
 
         //display end of list
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 }

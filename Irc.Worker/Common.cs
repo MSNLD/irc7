@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Irc.ClassExtensions.CSharpTools;
 using Irc.Constants;
+using Irc.Objects;
 using Irc.Worker.Ircx;
 using Irc.Worker.Ircx.Objects;
 
@@ -30,11 +31,11 @@ namespace Irc.Worker
 
             var Channels = new List<Channel>();
 
-            for (var c = 0; c < Server.Channels.Length; c++)
+            for (var c = 0; c < Server.Channels.Count; c++)
             for (var x = 0; x < ChannelList.Count; x++)
-                if (Server.Channels.IndexOf(c).Name.ToUpper() == ChannelList[x].ToUpper())
+                if (Server.Channels[c].Name.ToUpper() == ChannelList[x].ToUpper())
                 {
-                    Channels.Add(Server.Channels.IndexOf(c));
+                    Channels.Add(Server.Channels[c]);
                     // Once found narrow the search further to save cycles
                     ChannelList.RemoveAt(x);
                     x--;
@@ -48,6 +49,56 @@ namespace Irc.Worker
                             Data: new[] { ChannelList[x] }));
 
             return Channels;
+        }
+
+        public static long GetCreationDate() => (DateTime.UtcNow.Ticks - Resources.epoch) / TimeSpan.TicksPerSecond;
+
+        public static T FindObj<T>(this IList<T> objectList, string Name, IrcHelper.ObjIdentifier objectType) where T : ChatObject
+        {
+            switch (objectType)
+            {
+                case IrcHelper.ObjIdentifier.ObjIdInternal:
+                {
+                    // Search as OID
+                    return objectList.FindObjByOID(Name);
+                }
+                case IrcHelper.ObjIdentifier.ObjIdIRCUserHex:
+                {
+                    // Search as HEX
+                    return objectList.FindObjByHex(Name);
+                }
+                default:
+                {
+                    // Search by Name
+                    return objectList.FindObjByName(Name);
+                }
+            }
+        }
+
+        public static T FindObjByOID<T>(this IList<T> objectList, string objectId) where T : ChatObject
+        {
+            foreach (var obj in objectList)
+                if (obj.Id.ToString() == objectId)
+                    return obj;
+
+            return default(T);
+        }
+
+        public static T FindObjByHex<T>(this IList<T> objectList, string Hex) where T : ChatObject
+        {
+            var HexString = new string(Hex.Substring(1));
+
+            HexString = Tools.HexToString(HexString);
+
+            return objectList.FindObjByName(HexString);
+        }
+
+        public static T FindObjByName<T>(this IList<T> objectList, string Name) where T : ChatObject
+        {
+            for (var c = 0; c < objectList.Count; c++)
+                if (objectList[c].Name.ToUpper() == Name.ToUpper())
+                    return objectList[c];
+            return default(T);
         }
     }
 }

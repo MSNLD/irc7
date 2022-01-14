@@ -13,9 +13,9 @@ internal class INFO : Command
         ForceFloodCheck = true;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
-        if (Frame.Message.Data == null)
+        if (Frame.Message.Parameters == null)
         {
             Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_RPL_INFO_371_VERS,
                 Data: new[] {Frame.Server.Name}, IData: new[] {Program.Config.major, Program.Config.minor}));
@@ -26,9 +26,9 @@ internal class INFO : Command
         else
         {
             Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_OPTIONUNSUPPORTED_555,
-                Data: new[] {Frame.Message.Data[0]}));
+                Data: new[] {Frame.Message.Parameters[0]}));
         }
 
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 }

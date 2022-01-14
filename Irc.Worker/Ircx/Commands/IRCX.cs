@@ -35,10 +35,10 @@ internal class IRCX : Command
             IData: new[] {Frame.User.Modes.Ircx.Value, Frame.Server.ServerFields.IrcxVersion, Program.Config.BufferSize}));
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
         Frame.User.Modes.Ircx.Value = 1;
         ProcessIRCXReply(Frame);
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 }

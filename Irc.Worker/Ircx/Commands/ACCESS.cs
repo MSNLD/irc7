@@ -14,17 +14,17 @@ internal class ACCESS : Command
         DataType = CommandDataType.Data;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
         var server = Frame.Server;
         var user = Frame.User;
         var message = Frame.Message;
 
-        if (message.Data.Count >= 1)
+        if (message.Parameters.Count >= 1)
         {
             IAccess AccessObject = null;
             var requiredLevel = UserAccessLevel.NoAccess;
-            var AccessObjectName = new string(message.Data[0].ToUpper());
+            var AccessObjectName = new string(message.Parameters[0].ToUpper());
 
             var obj = server.GetObject(AccessObjectName);
 
@@ -39,18 +39,18 @@ internal class ACCESS : Command
                         var c = server.Channels.FindObj(AccessObjectName, objType);
                         if (c != null)
                         {
-                            var uci = user.GetChannelInfo(c);
+                            var channelMemberInfo = user.GetChannelMemberInfo(c);
 
-                            if (Flood.FloodCheck(DataType, uci) == FLD_RESULT.S_WAIT) return COM_RESULT.COM_WAIT;
+                            if (Flood.FloodCheck(DataType, user) == FLD_RESULT.S_WAIT) return false;
 
                             if (UserLevel < UserAccessLevel.ChatGuide)
-                                if (uci != null)
-                                    UserLevel = uci.Member.Level;
+                                if (channelMemberInfo.Value != null)
+                                    UserLevel = channelMemberInfo.Value.Level;
 
                             AccessObject = c.Access;
                             if (UserLevel < UserAccessLevel.ChatSysop)
                             {
-                                if (uci != null && UserLevel >= UserAccessLevel.ChatHost)
+                                if (channelMemberInfo.Value != null && UserLevel >= UserAccessLevel.ChatHost)
                                     requiredLevel = UserAccessLevel.ChatHost;
                                 else
                                     requiredLevel = UserAccessLevel.NoAccess;
@@ -86,26 +86,26 @@ internal class ACCESS : Command
                 if (UserLevel >= requiredLevel)
                 {
                     //proceed with attempting to do the request
-                    if (message.Data.Count == 1)
+                    if (message.Parameters.Count == 1)
                     {
                         ProcessList(server, AccessObject as Access, user, message);
                         //Invoke List
                     }
-                    else if (message.Data.Count >= 2)
+                    else if (message.Parameters.Count >= 2)
                     {
-                        var Operator = AccessObject.ResolveAccessOperator(message.Data[1]);
+                        var Operator = AccessObject.ResolveAccessOperator(message.Parameters[1]);
                         if (Operator != EnumAccessOperator.NONE)
                         {
                             if (Operator == EnumAccessOperator.LIST)
                             {
                                 //Go ahead and list if possible and end here
                                 ProcessList(server, AccessObject as Access, user, message);
-                                return COM_RESULT.COM_SUCCESS;
+                                return true;
                             }
 
                             AccessLevel Level;
-                            if (message.Data.Count >= 3)
-                                Level = AccessObject.ResolveAccessLevel(message.Data[2]);
+                            if (message.Parameters.Count >= 3)
+                                Level = AccessObject.ResolveAccessLevel(message.Parameters[2]);
                             else
                                 Level = AccessLevel.None;
 
@@ -121,7 +121,7 @@ internal class ACCESS : Command
                                 else
                                     //<- :Default-Chat-Community 461 Sky ACCESS :Not enough parameters
                                     user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461,
-                                        Data: new[] {message.Command}));
+                                        Data: new[] {message.GetCommand()}));
                             }
                             else if (Operator == EnumAccessOperator.DELETE)
                             {
@@ -131,14 +131,14 @@ internal class ACCESS : Command
                                 else
                                     //<- :Default-Chat-Community 461 Sky ACCESS :Not enough parameters
                                     user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461,
-                                        Data: new[] {message.Command}));
+                                        Data: new[] {message.GetCommand() }));
                             }
                         }
                         else
                         {
                             //<- :Default-Chat-Community 900 Sky moo :Bad command
                             user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900,
-                                Data: new[] {message.Data[1]}));
+                                Data: new[] {message.Parameters[1]}));
                         }
                     }
                 }
@@ -146,30 +146,30 @@ internal class ACCESS : Command
                 {
                     //<- :Default-Chat-Community 913 Sky2k #x :No access
                     user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_NOACCESS_913,
-                        Data: new[] {message.Data[0]}));
+                        Data: new[] {message.Parameters[0]}));
                 }
             }
             else
             {
                 //<- :Default-Chat-Community 924 Sky test :No such object found
                 user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_NOSUCHOBJECT_924,
-                    Data: new[] {message.Data[0]}));
+                    Data: new[] {message.Parameters[0]}));
             }
         }
         else
         {
             //insufficient parameters
             user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461,
-                Data: new[] {message.Command}));
+                Data: new[] {message.GetCommand() }));
         }
 
         //
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 
     public void ProcessList(Server server, Access Access, User user, Message message)
     {
-        if (message.Data.Count <= 3)
+        if (message.Parameters.Count <= 3)
         {
             //by this point the user will already be at least host...
             /*
@@ -185,7 +185,7 @@ internal class ACCESS : Command
                     {
                         Access.ObjectName,
                         Access.Entries.Entries[i].Level.LevelText,
-                        Access.Entries.Entries[i].Mask._address[3],
+                        Access.Entries.Entries[i].Mask.GetFullAddress(),
                         Access.Entries.Entries[i].EntryAddress,
                         Access.Entries.Entries[i].Reason
                     },
@@ -197,7 +197,7 @@ internal class ACCESS : Command
         else
         {
             user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_TOOMANYARGUMENTS_901,
-                Data: new[] {message.Data[3]}));
+                Data: new[] {message.Parameters[3]}));
             //<- :Default-Chat-Community 901 Sky e :Too many arguments
         }
     }
@@ -244,14 +244,14 @@ internal class ACCESS : Command
         {
             //<- :Default-Chat-Community 903 Sky2k OWNER :Bad level
             user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADLEVEL_903,
-                Data: new[] {message.Data[2]}));
+                Data: new[] {message.Parameters[2]}));
             return;
         }
 
-        if (message.Data.Count >= 4)
+        if (message.Parameters.Count >= 4)
         {
             var Mask = new Address();
-            if (Mask.FromMask(message.Data[3]))
+            if (Mask.Parse(message.Parameters[3]))
             {
                 if (Access.Entries.Contains(Mask) == null)
                 {
@@ -263,18 +263,18 @@ internal class ACCESS : Command
                     }
 
                     var duration = 0;
-                    if (message.Data.Count >= 5) duration = Tools.Str2Int(message.Data[4]);
+                    if (message.Parameters.Count >= 5) duration = Tools.Str2Int(message.Parameters[4]);
 
                     if (duration == -1 || duration > 999999)
                     {
                         user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900,
-                            Data: new[] {message.Data[4]}));
+                            Data: new[] {message.Parameters[4]}));
                         //<- :organisa-e679d0 900 Sky a :Bad command
                         return;
                     }
 
-                    var Reason = Resources.Null;
-                    if (message.Data.Count >= 6) Reason = message.Data[5];
+                    var Reason = string.Empty;
+                    if (message.Parameters.Count >= 6) Reason = message.Parameters[5];
                     //Would be good to check the Length of the reason with a given limit... Exchange 5.5 flat out does not care
 
                     var ae = new AccessEntry();
@@ -287,7 +287,7 @@ internal class ACCESS : Command
                     ae.Level = level;
                     ae.Mask = Mask;
                     ae.EntryLevel = UserAccessLevel;
-                    ae.EntryAddress = user.Address._address[1]; //userhost@hostname
+                    ae.EntryAddress = user.Address.GetUserHost(); //userhost@hostname
                     ae.Duration = duration;
                     ae.Reason = Reason;
 
@@ -296,7 +296,7 @@ internal class ACCESS : Command
                     user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_ACCESSADD_801,
                         Data: new[]
                         {
-                            Access.ObjectName, ae.Level.LevelText, ae.Mask._address[3], ae.EntryAddress, ae.Reason
+                            Access.ObjectName, ae.Level.LevelText, ae.Mask.GetFullAddress(), ae.EntryAddress, ae.Reason
                         }, IData: new[] {ae.DurationInSeconds}));
                 }
                 else
@@ -309,14 +309,14 @@ internal class ACCESS : Command
             {
                 //<- :Default-Chat-Community 461 Sky ACCESS :Not enough parameters
                 user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461,
-                    Data: new[] {message.Data[0]}));
+                    Data: new[] {message.Parameters[0]}));
             }
         }
         else
         {
             //<- :organisa-e679d0 903 Sky #Test :Bad level
             user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADLEVEL_903,
-                Data: new[] {message.Data[1]}));
+                Data: new[] {message.Parameters[1]}));
         }
     }
 
@@ -327,14 +327,14 @@ internal class ACCESS : Command
         {
             //<- :Default-Chat-Community 903 Sky2k OWNER :Bad level
             user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADLEVEL_903,
-                Data: new[] {message.Data[3]}));
+                Data: new[] {message.Parameters[3]}));
             return;
         }
 
-        if (message.Data.Count >= 3)
+        if (message.Parameters.Count >= 3)
         {
             var Mask = new Address();
-            if (Mask.FromMask(message.Data[3]))
+            if (Mask.Parse(message.Parameters[3]))
             {
                 var ae = Access.Entries.Contains(Mask);
                 if (ae != null)
@@ -346,7 +346,7 @@ internal class ACCESS : Command
                         user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_ACCESSDELETE_802,
                             Data: new[]
                             {
-                                Access.ObjectName, ae.Level.LevelText, ae.Mask._address[3], ae.EntryAddress, ae.Reason
+                                Access.ObjectName, ae.Level.LevelText, ae.Mask.GetFullAddress(), ae.EntryAddress, ae.Reason
                             }, IData: new[] {ae.DurationInSeconds}));
                     }
                 }
@@ -360,14 +360,14 @@ internal class ACCESS : Command
             {
                 //<- :Default-Chat-Community 461 Sky ACCESS :Not enough parameters
                 user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461,
-                    Data: new[] {message.Command}));
+                    Data: new[] {message.GetCommand() }));
             }
         }
         else
         {
             //<- :organisa-e679d0 903 Sky #Test :Bad level
             user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADLEVEL_903,
-                Data: new[] {message.Data[0]}));
+                Data: new[] {message.Parameters[0]}));
         }
     }
 }

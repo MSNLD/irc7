@@ -15,28 +15,29 @@ internal class TOPIC : Command
         ForceFloodCheck = true;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
-        var uci = Frame.User.GetChannelInfo(Frame.Message.Data[0]);
-        if (uci != null)
+        var channelMemberPair = Frame.User.GetChannelInfo(Frame.Message.Parameters[0]);
+        var channel = channelMemberPair.Key;
+        var channelMember = channelMemberPair.Value;
+        if (channel != null)
         {
-            if (Flood.FloodCheck(DataType, uci) == FLD_RESULT.S_WAIT) return COM_RESULT.COM_WAIT;
+            if (Flood.FloodCheck(DataType, channelMember.User) == FLD_RESULT.S_WAIT) return false;
 
-            var c = uci.Channel;
-            var cm = c.GetMember(Frame.User);
-            if (Frame.Message.Data.Count == 1)
+            var cm = channel.GetMember(Frame.User);
+            if (Frame.Message.Parameters.Count == 1)
             {
                 if (cm != null)
                     //give topic 332
-                    SendTopicReply(Frame.Server, Frame.User, c);
-                else if (c.Modes.Private.Value == 0 && c.Modes.Secret.Value == 0)
-                    SendTopicReply(Frame.Server, Frame.User, c);
+                    SendTopicReply(Frame.Server, Frame.User, channel);
+                else if (channel.Modes.Private.Value == 0 && channel.Modes.Secret.Value == 0)
+                    SendTopicReply(Frame.Server, Frame.User, channel);
                 //give topic 332
                 else
                     //331 No topic is set
-                    Frame.User.Send(RawBuilder.Create(Frame.Server, c, Frame.User, Raws.IRCX_RPL_NOTOPIC_331));
+                    Frame.User.Send(RawBuilder.Create(Frame.Server, channel, Frame.User, Raws.IRCX_RPL_NOTOPIC_331));
             }
-            else if (Frame.Message.Data.Count >= 2)
+            else if (Frame.Message.Parameters.Count >= 2)
             {
                 if (cm != null)
                 {
@@ -44,18 +45,18 @@ internal class TOPIC : Command
                     var canChange = false;
                     if (cm.Level >= UserAccessLevel.ChatHost)
                         canChange = true;
-                    else if (c.Modes.TopicOp.Value == 0) canChange = true;
+                    else if (channel.Modes.TopicOp.Value == 0) canChange = true;
 
                     if (canChange)
                     {
-                        if (Frame.Message.Data[1].Length <= ChannelProperties.PropertyRules["Topic"].Limit)
+                        if (Frame.Message.Parameters[1].Length <= ChannelProperties.PropertyRules["Topic"].Limit)
                         {
-                            c.Properties.Set("Topic", Frame.Message.Data[1]);
-                            c.Properties.TopicLastChanged =
+                            channel.Properties.Set("Topic", Frame.Message.Parameters[1]);
+                            channel.TopicLastChanged =
                                 (DateTime.UtcNow.Ticks - Resources.epoch) / TimeSpan.TicksPerSecond;
-                            c.Send(
-                                RawBuilder.Create(Frame.Server, c, Frame.User, Raws.RPL_TOPIC_IRC,
-                                    new[] {c.Properties.Get("Topic")}), Frame.User);
+                            channel.Send(
+                                RawBuilder.Create(Frame.Server, channel, Frame.User, Raws.RPL_TOPIC_IRC,
+                                    new[] {channel.Properties.Get("Topic")}), Frame.User);
                         }
                         else
                         {
@@ -67,19 +68,19 @@ internal class TOPIC : Command
                     else
                     {
                         //482 You're not channel operator
-                        Frame.User.Send(RawBuilder.Create(Frame.Server, c, Frame.User, Raws.IRCX_ERR_CHANOPRIVSNEEDED_482));
+                        Frame.User.Send(RawBuilder.Create(Frame.Server, channel, Frame.User, Raws.IRCX_ERR_CHANOPRIVSNEEDED_482));
                     }
                 }
                 else
                 {
                     //442 You are not on that channel
                     Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442,
-                        Data: new[] {Frame.Message.Data[0]}));
+                        Data: new[] {Frame.Message.Parameters[0]}));
                 }
             }
         }
 
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 
     public static void SendTopicReply(Server server, User user, Channel c)

@@ -18,60 +18,57 @@ public class JOIN : Command
         ForceFloodCheck = true;
     }
 
-    public static COM_RESULT ProcessJoinChannel(Frame Frame, Channel c, string Key)
+    public static bool ProcessJoinChannel(Frame Frame, Channel c, string Key)
     {
         var server = Frame.Server;
         var user = Frame.User;
-        var message = Frame.Message;
 
-
-        if (!user.IsOnChannel(c))
+        if (!user.Channels.ContainsKey(c))
         {
             if (user.Profile.Ircvers > 0 && user.Profile.Ircvers < 9)
-                if (user.ActiveChannel != null)
+                if (user.Channels.Count > 1)
                 {
                     user.Send(RawBuilder.Create(server, c, user, Raws.IRCX_ERR_TOOMANYCHANNELS_405));
-                    return COM_RESULT.COM_SUCCESS;
+                    return true;
                 }
 
-            Access.AccessResultEnum AccessResult;
+            AccessResultEnum AccessResult;
 
             //ACCESS check is performed here
             AccessResult = c.Access.GetAccess(user.Address).Result;
 
             var Allowed = c.AllowsUser(user, Key, false);
 
-            if (Allowed == Access.AccessResultEnum.ERR_ALREADYINCHANNEL)
+            if (Allowed == AccessResultEnum.ERR_ALREADYINCHANNEL)
                 AccessResult = Allowed;
-            else if (Allowed == Access.AccessResultEnum.ERR_NICKINUSE)
+            else if (Allowed == AccessResultEnum.ERR_NICKINUSE)
                 AccessResult = Allowed;
             else if (user.Level >= UserAccessLevel.ChatGuide)
-                AccessResult = Access.AccessResultEnum.SUCCESS_OWNER;
-            else if (Allowed == Access.AccessResultEnum.ERR_AUTHONLYCHAN)
+                AccessResult = AccessResultEnum.SUCCESS_OWNER;
+            else if (Allowed == AccessResultEnum.ERR_AUTHONLYCHAN)
                 AccessResult = Allowed;
-            else if (AccessResult == Access.AccessResultEnum.ERR_BANNEDFROMCHAN)
+            else if (AccessResult == AccessResultEnum.ERR_BANNEDFROMCHAN)
                 Allowed = AccessResult;
-            else if (Allowed == Access.AccessResultEnum.ERR_CHANNELISFULL &&
-                     AccessResult > Access.AccessResultEnum.SUCCESS_HOST)
+            else if (Allowed == AccessResultEnum.ERR_CHANNELISFULL &&
+                     AccessResult > AccessResultEnum.SUCCESS_HOST)
                 AccessResult = Allowed;
-            else if (Allowed == Access.AccessResultEnum.SUCCESS_MEMBERKEY &&
-                     AccessResult > Access.AccessResultEnum.NONE)
+            else if (Allowed == AccessResultEnum.SUCCESS_MEMBERKEY &&
+                     AccessResult > AccessResultEnum.NONE)
                 Allowed = AccessResult;
-            else if (AccessResult == Access.AccessResultEnum.NONE) AccessResult = Allowed;
+            else if (AccessResult == AccessResultEnum.NONE) AccessResult = Allowed;
 
-            if (Allowed <= Access.AccessResultEnum.SUCCESS_HOST && Allowed < AccessResult) AccessResult = Allowed;
+            if (Allowed <= AccessResultEnum.SUCCESS_HOST && Allowed < AccessResult) AccessResult = Allowed;
 
-            //if (c.IsInvited(user))
+            //if (channel.IsInvited(user))
             //{
-            //    if ((c.Modes.Invite.Value == 0x1) && (AccessResult == Access.AccessResultEnum.ERR_INVITEONLYCHAN))
+            //    if ((channel.Modes.Invite.Value == 0x1) && (AccessResult == AccessResultEnum.ERR_INVITEONLYCHAN))
             //    {
-            //        AccessResult = Access.AccessResultEnum.SUCCESS;
+            //        AccessResult = AccessResultEnum.SUCCESS;
             //    }
-            //    if (AccessResult <= 0) { c.InviteList.Remove(user); } //remove user as it is a successful join
+            //    if (AccessResult <= 0) { channel.InviteList.Remove(user); } //remove user as it is a successful join
             //}
 
             var Member = new ChannelMember(Frame.User);
-            var uci = new UserChannelInfo(c, Member);
 
             if (AccessResult <= 0)
             {
@@ -79,31 +76,31 @@ public class JOIN : Command
                 //user.ChannelMode.SetOwner(true);
 
                 if (user.Level >= UserAccessLevel.ChatGuide)
-                    AccessResult = Access.AccessResultEnum.SUCCESS_OWNER;
-                else if (user.Level == UserAccessLevel.ChatHost && AccessResult < Access.AccessResultEnum.SUCCESS_HOST)
-                    AccessResult = Access.AccessResultEnum.SUCCESS_HOST;
+                    AccessResult = AccessResultEnum.SUCCESS_OWNER;
+                else if (user.Level == UserAccessLevel.ChatHost && AccessResult < AccessResultEnum.SUCCESS_HOST)
+                    AccessResult = AccessResultEnum.SUCCESS_HOST;
 
                 switch (AccessResult)
                 {
-                    case Access.AccessResultEnum.SUCCESS_OWNER:
+                    case AccessResultEnum.SUCCESS_OWNER:
                     {
-                        uci.Member.ChannelMode.SetOwner(true);
+                        Member.ChannelMode.SetOwner(true);
                         break;
                     }
-                    case Access.AccessResultEnum.SUCCESS_HOST:
+                    case AccessResultEnum.SUCCESS_HOST:
                     {
-                        uci.Member.ChannelMode.SetHost(true);
+                        Member.ChannelMode.SetHost(true);
                         break;
                     }
-                    case Access.AccessResultEnum.SUCCESS_VOICE:
+                    case AccessResultEnum.SUCCESS_VOICE:
                     {
-                        uci.Member.ChannelMode.SetVoice(true);
+                        Member.ChannelMode.SetVoice(true);
                         break;
                     }
                 }
 
-                c.AddMember(Member);
-                user.AddChannel(uci);
+                c.Members.Add(Member);
+                user.AddChannel(c, Member);
 
                 ProcessJoinToChannel(server, c, Member);
 
@@ -111,54 +108,54 @@ public class JOIN : Command
                 //Send Topic
                 TOPIC.SendTopicReply(server, user, c);
 
-                //ChannelPropOnJoin.ProcessMessage(server, c, user, c.Props.OnJoin);
+                //ChannelPropOnJoin.ProcessMessage(server, channel, user, channel.Props.OnJoin);
             }
             else
             {
                 switch (AccessResult)
                 {
-                    case Access.AccessResultEnum.ERR_NICKINUSE:
+                    case AccessResultEnum.ERR_NICKINUSE:
                     {
                         user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_NICKINUSE_433,
                             Data: new[] {user.Address.Nickname}));
                         break;
                     }
-                    case Access.AccessResultEnum.ERR_ALREADYINCHANNEL:
+                    case AccessResultEnum.ERR_ALREADYINCHANNEL:
                     {
                         user.Send(RawBuilder.Create(server, c, user, Raws.IRCX_ERR_ALREADYONCHANNEL_927X));
                         break;
                     }
-                    case Access.AccessResultEnum.ERR_CHANNELISFULL:
+                    case AccessResultEnum.ERR_CHANNELISFULL:
                     {
                         user.Send(RawBuilder.Create(server, c, user, Raws.IRCX_ERR_CHANNELISFULL_471));
                         if (c.Modes.Knock.Value == 1) SendKnock(server, c, user, Resources.Raw471);
                         break;
                     }
-                    case Access.AccessResultEnum.ERR_INVITEONLYCHAN:
+                    case AccessResultEnum.ERR_INVITEONLYCHAN:
                     {
                         user.Send(RawBuilder.Create(server, c, user, Raws.IRCX_ERR_INVITEONLYCHAN_473));
                         if (c.Modes.Knock.Value == 1) SendKnock(server, c, user, Resources.Raw473);
                         break;
                     }
-                    case Access.AccessResultEnum.ERR_BANNEDFROMCHAN:
+                    case AccessResultEnum.ERR_BANNEDFROMCHAN:
                     {
                         user.Send(RawBuilder.Create(server, c, user, Raws.IRCX_ERR_BANNEDFROMCHAN_474));
                         if (c.Modes.Knock.Value == 1) SendKnock(server, c, user, Resources.Raw474);
                         break;
                     }
-                    case Access.AccessResultEnum.ERR_BADCHANNELKEY:
+                    case AccessResultEnum.ERR_BADCHANNELKEY:
                     {
                         user.Send(RawBuilder.Create(server, c, user, Raws.IRCX_ERR_BADCHANNELKEY_475));
                         if (c.Modes.Knock.Value == 1) SendKnock(server, c, user, Resources.Raw475);
                         break;
                     }
-                    case Access.AccessResultEnum.ERR_AUTHONLYCHAN:
+                    case AccessResultEnum.ERR_AUTHONLYCHAN:
                     {
                         user.Send(RawBuilder.Create(server, c, user, Raws.IRCX_ERR_AUTHONLYCHAN_556));
                         if (c.Modes.Knock.Value == 1) SendKnock(server, c, user, Resources.Raw556);
                         break;
                     }
-                    case Access.AccessResultEnum.ERR_SECUREONLYCHAN:
+                    case AccessResultEnum.ERR_SECUREONLYCHAN:
                     {
                         user.Send(RawBuilder.Create(server, c, user, Raws.IRCX_ERR_SECUREONLYCHAN_557));
                         if (c.Modes.Knock.Value == 1) SendKnock(server, c, user, Resources.Raw557);
@@ -172,28 +169,28 @@ public class JOIN : Command
             user.Send(RawBuilder.Create(server, c, user, Raws.IRCX_ERR_ALREADYONCHANNEL_927X)); /* already in channel */
         }
 
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
         var message = Frame.Message;
 
-        if (message.Data.Count >= 1)
+        if (message.Parameters.Count >= 1)
         {
             // To process 0
-            if (message.Data[0] == Resources.Zero && message.Data.Count == 1)
+            if (message.Parameters[0] == Resources.Zero && message.Parameters.Count == 1)
             {
                 PART.ProcessPartUserChannels(Frame);
-                return COM_RESULT.COM_SUCCESS;
+                return true;
             }
 
             var Keys = new List<string>();
-            var CurrentKey = Resources.Null;
+            var CurrentKey = string.Empty;
 
-            if (message.Data.Count > 1) Keys = Tools.CSVToArray(message.Data[1], true, Address.MaxFieldLen);
+            if (message.Parameters.Count > 1) Keys = Tools.CSVToArray(message.Parameters[1], true, Resources.MaxFieldLen);
 
-            var channels = Common.GetChannels(Frame.Server, Frame.User, message.Data[0], true);
+            var channels = Common.GetChannels(Frame.Server, Frame.User, message.Parameters[0], true);
 
             if (channels != null)
                 if (channels.Count > 0)
@@ -204,22 +201,22 @@ public class JOIN : Command
                         ProcessJoinChannel(Frame, channels[c], CurrentKey);
                     }
 
-                    return COM_RESULT.COM_SUCCESS;
+                    return true;
                 }
 
             // null
             // No such channel
             Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403,
-                Data: new[] {Frame.Message.Data[0]}));
+                Data: new[] {Frame.Message.Parameters[0]}));
         }
         else
         {
             //insufficient parameters
             Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461,
-                Data: new[] {message.Data[0]}));
+                Data: new[] {message.Parameters[0]}));
         }
 
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 
     public static void SendKnock(Server server, Channel c, User from, string Reason)
@@ -228,23 +225,21 @@ public class JOIN : Command
         c.SendLevel(RawKnock, UserAccessLevel.ChatHost);
     }
 
-    public static void ProcessJoinToChannel(Server server, Channel c, ChannelMember Member)
+    public static void ProcessJoinToChannel(Server server, Channel channel, ChannelMember Member)
     {
-        for (var i = 0; i < c.MemberList.Count; i++)
+        foreach (var channelMember in channel.Members)
         {
-            var ChannelMember = c.MemberList[i];
-
-            //if (((c.Modes.Auditorium.Value == 1) && (c.users[i].Level < UserAccessLevel.ChatHost) && (user.Level <= UserAccessLevel.ChatMember)) && (user != c.users[i])) ;
+            //if (((channel.Modes.Auditorium.Value == 1) && (channel.users[i].Level < UserAccessLevel.ChatHost) && (user.Level <= UserAccessLevel.ChatMember)) && (user != channel.users[i])) ;
             //else
             //{
 
-            var UserProfile = Member.User.Profile.GetProfile(ChannelMember.User.Profile.Ircvers);
+            var UserProfile = Member.User.Profile.GetProfile(channelMember.User.Profile.Ircvers);
             if (UserProfile.Length > 0)
             {
                 //msn join
                 if (Member.ChannelMode.modeChar == 0x0)
                 {
-                    ChannelMember.User.Send(RawBuilder.Create(server, c, Member.User, Raws.RPL_JOIN_MSN,
+                    channelMember.User.Send(RawBuilder.Create(server, channel, Member.User, Raws.RPL_JOIN_MSN,
                         new[] {UserProfile}));
                 }
                 else
@@ -252,18 +247,18 @@ public class JOIN : Command
                     var ProfMode = new StringBuilder(2);
                     ProfMode.Append((char) 44);
                     ProfMode.Append((char) Member.ChannelMode.modeChar);
-                    ChannelMember.User.Send(RawBuilder.Create(server, c, Member.User, Raws.RPL_JOIN_MSN,
+                    channelMember.User.Send(RawBuilder.Create(server, channel, Member.User, Raws.RPL_JOIN_MSN,
                         new[] {UserProfile, ProfMode.ToString()}));
                 }
             }
             else
             {
                 //normal join
-                ChannelMember.User.Send(RawBuilder.Create(server, c, Member.User, Raws.RPL_JOIN_IRC));
+                channelMember.User.Send(RawBuilder.Create(server, channel, Member.User, Raws.RPL_JOIN_IRC));
                 //raw +o or +q
             }
 
-            if (ChannelMember.User.Profile.Ircvers <= 6)
+            if (channelMember.User.Profile.Ircvers <= 6)
                 if (!Member.ChannelMode.IsNormal())
                 {
                     var ProfMode = new StringBuilder(3);
@@ -278,8 +273,8 @@ public class JOIN : Command
                     {
                         ProfMode.Append((char) 0x20);
                         //itll only be 2 Length when it has passed above criteria
-                        ChannelMember.User.Send(RawBuilder.Create(server, c, Member.User, Raws.RPL_MODE_IRC,
-                            new[] {c.Name, ProfMode.ToString(), Member.User.Address.Nickname}));
+                        channelMember.User.Send(RawBuilder.Create(server, channel, Member.User, Raws.RPL_MODE_IRC,
+                            new[] {channelMember.User.Name, ProfMode.ToString(), Member.User.Address.Nickname}));
                     }
                 }
 

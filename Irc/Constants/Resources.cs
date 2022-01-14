@@ -43,7 +43,6 @@ public static class Resources
     public static string PROP_LAG = "LAG";
     public static string S_OK = "OK";
     public static string IRC = "IRC";
-    public static string Null = "";
     public static string Wildcard = "*";
     public static string Self = "$";
     public static string Home = "H";
@@ -225,9 +224,7 @@ public static class Resources
     public static byte ChannelUserFlagOwner = (byte) '.';
     public static byte ChannelUserFlagHost = (byte) '@';
     public static byte ChannelUserFlagVoice = (byte) '+';
-
-    public static string ChannelModeDefault = "ntl50";
-
+    
     #endregion
 
     #region "User Modes"
@@ -254,4 +251,5 @@ public static class Resources
     #endregion
 
     public static string IrcOpNickMask = @"[\x41-\xFF\-0-9]+$";
+    public static int MaxFieldLen = 64;
 }

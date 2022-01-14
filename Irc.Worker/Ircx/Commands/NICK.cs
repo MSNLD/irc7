@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Linq;
+using System.Text;
 using Irc.ClassExtensions.CSharpTools;
 using Irc.Constants;
 using Irc.Extensions.Access;
@@ -23,10 +24,10 @@ public class NICK : Command
         ForceFloodCheck = true;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
         // Is Nickname supported in current auth?
-        var result = ValidateNickname(Frame.User, Frame.Message.Data[0]);
+        var result = ValidateNickname(Frame.User, Frame.Message.Parameters[0]);
         if (result == ValidateNicknameResult.VALID)
         {
             // Below is after register
@@ -37,30 +38,32 @@ public class NICK : Command
                 {
                     // Nickname changes not permitted
                     Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NONICKCHANGES_439,
-                        Data: new[] {Frame.Message.Data[0]}));
-                    return COM_RESULT.COM_SUCCESS;
+                        Data: new[] {Frame.Message.Parameters[0]}));
+                    return true;
                 }
 
                 if (Frame.User.Level >= UserAccessLevel.ChatGuide)
                 {
-                    var tempNick = new StringBuilder(Frame.Message.Data[0].Length + 1);
+                    var tempNick = new StringBuilder(Frame.Message.Parameters[0].Length + 1);
                     tempNick.Append('\'');
-                    tempNick.Append(Frame.Message.Data[0]);
-                    Frame.Message.Data[0] = tempNick.ToString();
+                    tempNick.Append(Frame.Message.Parameters[0]);
+                    Frame.Message.Parameters[0] = tempNick.ToString();
                 }
 
                 var bIsInUse = false;
-                for (var c = 0; c < Frame.User.ChannelList.Count; c++)
-                    if (Frame.User.ChannelList[c].Channel.Members.GetMemberByName(Frame.Message.Data[0]) != null)
+                foreach (var channel in Frame.User.Channels.Keys.ToList())
+                {
+                    if (channel.Members.FirstOrDefault(member => member.User.Name == Frame.Message.Parameters[0]) != null)
                     {
                         bIsInUse = true;
                         break;
                     }
+                }
 
                 if (!bIsInUse)
                 {
                     var NicknameChangeRaw = RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.RPL_NICK,
-                        Data: new[] {Frame.Message.Data[0]});
+                        Data: new[] {Frame.Message.Parameters[0]});
                     Frame.User.Send(NicknameChangeRaw);
                     Frame.User.BroadcastToChannels(NicknameChangeRaw, true);
                 }
@@ -68,12 +71,12 @@ public class NICK : Command
                 {
                     // Nickname is in use 
                     Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NICKINUSE_433,
-                        Data: new[] {Frame.Message.Data[0]}));
-                    return COM_RESULT.COM_SUCCESS;
+                        Data: new[] {Frame.Message.Parameters[0]}));
+                    return true;
                 }
             }
 
-            Frame.User.UpdateUserNickname(Frame.Message.Data[0]);
+            Frame.User.UpdateUserNickname(Frame.Message.Parameters[0]);
         }
         else if (result == ValidateNicknameResult.IDENTICAL)
         {
@@ -83,10 +86,10 @@ public class NICK : Command
         {
             if (Frame.User.Authenticated)
                 Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_ERRONEOUSNICK_432,
-                    Data: new[] {Frame.Message.Data[0]}));
+                    Data: new[] {Frame.Message.Parameters[0]}));
         }
 
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 
     public static void UpdateNickname(Server Server, User User, string Nickname)

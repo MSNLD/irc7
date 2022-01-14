@@ -23,7 +23,7 @@ internal class LUSERS : Command
             user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_LUSERUNKNOWN_253,
                 IData: new[] {server.ServerFields.UnknownConnections}));
         user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_LUSERCHANNELS_254,
-            IData: new[] {server.Channels.Length}));
+            IData: new[] {server.Channels.Count}));
         user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_LUSERME_255,
             IData: new[] {server.ServerFields.RegisteredUsers, 0}));
         user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_LUSERS_265,
@@ -32,9 +32,9 @@ internal class LUSERS : Command
             IData: new[] {server.ServerFields.RegisteredUsers, server.ServerFields.MaxUsers}));
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
         SendLusers(Frame.Server, Frame.User);
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 }

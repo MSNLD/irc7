@@ -15,18 +15,19 @@ internal class USERHOST : Command
         ForceFloodCheck = true;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
         if (Frame.User.Registered)
         {
-            var Userhost = new StringBuilder(Frame.User.Name.Length + 1 + Frame.User.Address._address[2].Length);
-            Userhost.Append(Frame.User.Name);
-            Userhost.Append('=');
-            Userhost.Append(Frame.User.Address._address[2]);
+            var userHost = $"{Frame.User.Address.Nickname}!~{Frame.User.Address.GetUserHost()}";
+            var userHostReply = new StringBuilder(Frame.User.Name.Length + 1 + userHost.Length);
+            userHostReply.Append(Frame.User.Name);
+            userHostReply.Append('=');
+            userHostReply.Append(userHost);
             Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_USERHOST_302,
-                Data: new[] {Userhost.ToString()}));
+                Data: new[] {userHostReply.ToString()}));
         }
 
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 }

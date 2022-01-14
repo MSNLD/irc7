@@ -15,10 +15,10 @@ public class NAMES : Command
         ForceFloodCheck = true;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
-        var objType = IrcHelper.IdentifyObject(Frame.Message.Data[0]);
-        var Channel = Frame.Server.Channels.FindObj(Frame.Message.Data[0], objType);
+        var objType = IrcHelper.IdentifyObject(Frame.Message.Parameters[0]);
+        var Channel = Frame.Server.Channels.FindObj(Frame.Message.Parameters[0], objType);
         if (Channel != null)
         {
             var Member = Channel.GetMember(Frame.User);
@@ -27,16 +27,16 @@ public class NAMES : Command
             else
                 // you are not on that channel
                 Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442,
-                    Data: new[] {Frame.Message.Data[0]}));
+                    Data: new[] {Frame.Message.Parameters[0]}));
         }
         else
         {
             //no such channel
             Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403,
-                Data: new[] {Frame.Message.Data[0]}));
+                Data: new[] {Frame.Message.Parameters[0]}));
         }
 
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 
     public static void ProcessNames(Server server, ChannelMember Member, Channel c)
@@ -45,16 +45,16 @@ public class NAMES : Command
         var NameReply = RawBuilder.Create(server, c, Member.User, Raws.IRCX_RPL_NAMEREPLY_353X, Newline: false);
 
         Names.Append(NameReply);
-        for (var i = 0; i < c.MemberList.Count; i++)
-            if (c.Modes.Auditorium.Value == 1 && c.MemberList[i].Level < UserAccessLevel.ChatHost &&
-                Member.Level <= UserAccessLevel.ChatMember && Member != c.MemberList[i])
+        foreach (var channelMember in c.Members)
+            if (c.Modes.Auditorium.Value == 1 && channelMember.Level < UserAccessLevel.ChatHost &&
+                Member.Level <= UserAccessLevel.ChatMember && Member != channelMember)
             {
                 ;
             }
             else
             {
-                string Nickname = c.MemberList[i].User.Address.Nickname,
-                    PassportProf = c.MemberList[i].User.Profile.GetProfile(Member.User.Profile.Ircvers);
+                string Nickname = channelMember.User.Address.Nickname,
+                    PassportProf = channelMember.User.Profile.GetProfile(Member.User.Profile.Ircvers);
                 var expectedLength = Nickname.Length + PassportProf.Length + (Member.User.Profile.Ircvers > 3 ? 1 : 0) +
                                      (Member.ChannelMode.UserMode != ChanUserMode.Normal ? 1 : 0);
 
@@ -66,13 +66,13 @@ public class NAMES : Command
                         Names.Append((char) 44);
                     }
 
-                    if (c.MemberList[i].ChannelMode.IsHost() || c.MemberList[i].ChannelMode.IsOwner())
+                    if (channelMember.ChannelMode.IsHost() || channelMember.ChannelMode.IsOwner())
                     {
-                        Names.Append((char) c.MemberList[i].ChannelMode.modeChar);
+                        Names.Append((char)channelMember.ChannelMode.modeChar);
 
                         // If the member is host or owner, the + voice flag is suffixed after the . or @
-                        if (c.MemberList[i].ChannelMode.UserMode > ChanUserMode.Voice)
-                            if (c.MemberList[i].ChannelMode.IsVoice())
+                        if (channelMember.ChannelMode.UserMode > ChanUserMode.Voice)
+                            if (channelMember.ChannelMode.IsVoice())
                                 // however only under non-ircvers, irc0 and irc9
                                 switch (Member.User.Profile.Ircvers)
                                 {
@@ -85,12 +85,12 @@ public class NAMES : Command
                                     }
                                 }
                     }
-                    else if (c.MemberList[i].ChannelMode.IsVoice())
+                    else if (channelMember.ChannelMode.IsVoice())
                     {
-                        Names.Append((char) c.MemberList[i].ChannelMode.modeChar);
+                        Names.Append((char)channelMember.ChannelMode.modeChar);
                     }
 
-                    Names.Append(c.MemberList[i].User.Address.Nickname);
+                    Names.Append(channelMember.User.Address.Nickname);
                     Names.Append(' ');
                 }
                 else
@@ -100,7 +100,6 @@ public class NAMES : Command
                     Member.User.Send(new string(Names.ToString()));
                     Names.Length = 0;
                     Names.Append(NameReply);
-                    i--;
                 }
             }
 

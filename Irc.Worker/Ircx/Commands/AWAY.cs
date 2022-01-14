@@ -13,12 +13,12 @@ internal class AWAY : Command
         ForceFloodCheck = true;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
-        if (Frame.Message.Data != null)
+        if (Frame.Message.Parameters != null)
         {
             string AwayReason;
-            AwayReason = Frame.Message.Data[0];
+            AwayReason = Frame.Message.Parameters[0];
             if (AwayReason.Length >= 64) AwayReason = new string(AwayReason.Substring(64));
 
             Frame.User.Profile.AwayReason = AwayReason;
@@ -39,6 +39,6 @@ internal class AWAY : Command
         }
 
 
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 }

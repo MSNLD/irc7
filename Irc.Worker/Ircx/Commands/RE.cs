@@ -16,7 +16,7 @@ internal class RE : Command
         ForceFloodCheck = true;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
         // Find Nicknames and output as follows
         // IRCX_RPL_REVEAL_852 = ":SERVER 851 Sky Nickname Address IP OID :%s"
@@ -25,44 +25,47 @@ internal class RE : Command
         {
             //no such command
             Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_UNKNOWNCOMMAND_421,
-                Data: new[] {Frame.Message.Command}));
-            return COM_RESULT.COM_SUCCESS;
+                Data: new[] {Frame.Message.GetCommand() }));
+            return true;
         }
 
-        if (Frame.Message.Data.Count == 0)
+        if (Frame.Message.Parameters.Count == 0)
         {
             //nothing
         }
         else
         {
-            for (var i = 0; i < Frame.Server.Users.Length; i++)
+            for (var i = 0; i < Frame.Server.Users.Count; i++)
             {
-                var User = Frame.Server.Users.IndexOf(i);
+                var User = Frame.Server.Users[i];
                 if (User.Registered)
-                    if (StringBuilderRegEx.EvaluateString(Frame.Message.Data[0], User.Address.Nickname, true))
+                    if (StringBuilderRegEx.EvaluateString(Frame.Message.Parameters[0], User.Address.Nickname, true))
                     {
-                        if (User.ChannelList.Count == 0)
+                        if (User.Channels.Count == 0)
                             Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_REVEAL_851,
                                 Data: new[]
                                 {
-                                    User.Address.Nickname, User.Id.ToString(), User.Address.RemoteIP, User.Address._address[1],
-                                    Resources.Null
+                                    User.Address.Nickname, User.Id.ToString(), User.RemoteIP, User.Address.GetUserHost(),
+                                    string.Empty
                                 }));
                         else
-                            for (var x = 0; x < User.ChannelList.Count; x++)
+                            foreach (var channelMemberPair in User.Channels)
+                            {
+                                var channel = channelMemberPair.Key;
                                 Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User,
                                     Raw: Raws.IRCX_RPL_REVEAL_851,
                                     Data: new[]
                                     {
-                                        User.Address.Nickname, User.Id.ToString(), User.Address.RemoteIP,
-                                        User.Address._address[1], User.ChannelList[x].Channel.Name
+                                        User.Address.Nickname, User.Id.ToString(), User.RemoteIP,
+                                        User.Address.GetUserHost(), channel.Name
                                     }));
+                            }
                     }
             }
         }
 
 
         Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_REVEALEND_852));
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 }

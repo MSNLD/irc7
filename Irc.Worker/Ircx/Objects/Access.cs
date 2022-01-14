@@ -1,171 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Irc.ClassExtensions.CSharpTools;
-using Irc.Constants;
-using Irc.Extensions.Access;
 
 namespace Irc.Worker.Ircx.Objects;
 
-public enum AccessResultEnum
+public partial class Access : IAccess
 {
-    SUCCESS_OWNER = -6,
-    SUCCESS_HOST = -5,
-    SUCCESS_VOICE = -4,
-    SUCCESS_GRANTED = -3,
-    SUCCESS_MEMBERKEY = -2,
-    SUCCESS = -1,
-    NONE = 0,
-    ERR_ALREADYINCHANNEL = 1,
-    ERR_NOSUCHNICK = 401,
-    ERR_NICKINUSE = 433,
-    ERR_CHANNELISFULL = 471,
-    ERR_INVITEONLYCHAN = 473,
-    ERR_BANNEDFROMCHAN = 474,
-    ERR_BADCHANNELKEY = 475,
-    ERR_AUTHONLYCHAN = 904
-}
-
-public enum EnumAccessLevel
-{
-    NONE = -2,
-    DENY = -1,
-    GRANT = 0,
-    VOICE = 1,
-    HOST = 2,
-    OWNER = 3,
-    All = 4
-}
-
-public enum EnumAccessOperator
-{
-    NONE = -1,
-    ADD = 0,
-    DELETE = 2,
-    LIST = 3,
-    CLEAR = 4
-}
-
-public class AccessLevel
-{
-    public static AccessLevel None = new(EnumAccessLevel.NONE, Resources.Null);
-    public EnumAccessLevel Level;
-    public string LevelText;
-
-    public AccessLevel(EnumAccessLevel Level, string LevelText)
-    {
-        this.Level = Level;
-        this.LevelText = LevelText;
-    }
-}
-
-public class AccessOperator
-{
-    public EnumAccessOperator Operator;
-    public string OperatorText;
-
-    public AccessOperator(EnumAccessOperator Operator, string OperatorText)
-    {
-        this.Operator = Operator;
-        this.OperatorText = OperatorText;
-    }
-}
-
-public class AccessLevelCollection
-{
-    public List<AccessLevel> Levels;
-
-    public AccessLevelCollection(bool IsChannel)
-    {
-        Levels = new List<AccessLevel>();
-        if (IsChannel)
-        {
-            Levels.Add(new AccessLevel(EnumAccessLevel.OWNER, Resources.AccessLevelOwner));
-            Levels.Add(new AccessLevel(EnumAccessLevel.HOST, Resources.AccessLevelHost));
-            Levels.Add(new AccessLevel(EnumAccessLevel.VOICE, Resources.AccessLevelVoice));
-        }
-
-        Levels.Add(new AccessLevel(EnumAccessLevel.GRANT, Resources.AccessLevelGrant));
-        Levels.Add(new AccessLevel(EnumAccessLevel.DENY, Resources.AccessLevelDeny));
-    }
-}
-
-public class AccessOperatorCollection
-{
-    public List<AccessOperator> Operators;
-
-    public AccessOperatorCollection()
-    {
-        Operators = new List<AccessOperator>();
-        Operators.Add(new AccessOperator(EnumAccessOperator.ADD, Resources.AccessEntryOperatorAdd));
-        Operators.Add(new AccessOperator(EnumAccessOperator.DELETE, Resources.AccessEntryOperatorDelete));
-        Operators.Add(new AccessOperator(EnumAccessOperator.LIST, Resources.AccessEntryOperatorList));
-        Operators.Add(new AccessOperator(EnumAccessOperator.CLEAR, Resources.AccessEntryOperatorClear));
-    }
-}
-
-public class AccessEntry
-{
-    public int Duration;
-    public string EntryAddress;
-    public UserAccessLevel EntryLevel;
-    public bool Fixed;
-    public AccessLevel Level;
-    public Address Mask;
-    public string Reason;
-
-    public int DurationInSeconds => (int) Math.Ceiling((double) Duration / 60);
-}
-
-public class AccessCollection
-{
-    public List<AccessEntry> Entries;
-
-    public AccessCollection()
-    {
-        Entries = new List<AccessEntry>();
-    }
-
-    public AccessEntry Contains(Address QueryMask)
-    {
-        for (var i = 0; i < Entries.Count; i++)
-            if (QueryMask._address[3] == Entries[i].Mask._address[3])
-                return Entries[i];
-        return null;
-    }
-
-    public void Add(AccessEntry Entry)
-    {
-        Entries.Add(Entry);
-    }
-
-    public void Remove(AccessEntry Entry)
-    {
-        Entries.Remove(Entry);
-    }
-}
-
-public class Access : IAccess
-{
-    public enum AccessResultEnum
-    {
-        SUCCESS_OWNER = -6,
-        SUCCESS_HOST = -5,
-        SUCCESS_VOICE = -4,
-        SUCCESS_GRANTED = -3,
-        SUCCESS_MEMBERKEY = -2,
-        SUCCESS = -1,
-        NONE = 0,
-        ERR_ALREADYINCHANNEL = 1,
-        ERR_NOSUCHNICK = 401,
-        ERR_NICKINUSE = 433,
-        ERR_CHANNELISFULL = 471,
-        ERR_INVITEONLYCHAN = 473,
-        ERR_BANNEDFROMCHAN = 474,
-        ERR_BADCHANNELKEY = 475,
-        ERR_AUTHONLYCHAN = 904,
-        ERR_SECUREONLYCHAN = 557
-    }
-
     public AccessCollection Entries;
     private readonly AccessLevelCollection LevelCollection;
     public string ObjectName;
@@ -202,16 +41,18 @@ public class Access : IAccess
         return EnumAccessOperator.NONE;
     }
 
-    public ObjectAccessResult GetAccess(Address Mask)
+    public AccessObjectResult GetAccess(Address Mask)
     {
-        var AccessResult = new ObjectAccessResult();
+        var AccessResult = new AccessObjectResult();
         var GrantExists = false;
         for (var i = 0; i < Entries.Entries.Count; i++)
         {
             if (Entries.Entries[i].Level.Level == EnumAccessLevel.GRANT) GrantExists = true;
             var Entry = Entries.Entries[i].Mask;
-            var TestAddress = Entry.UsesIP ? Mask._address[4] : Mask._address[3];
-            if (StringBuilderRegEx.EvaluateString(Entry._address[3], TestAddress, true))
+            // TODO: Fix below
+            //var TestAddress = Entry.UsesIP ? Mask._address[4] : Mask._address[3];
+            var TestAddress = Mask.GetFullAddress();
+            if (StringBuilderRegEx.EvaluateString(Entry.GetFullAddress(), TestAddress, true))
             {
                 var EntryResult = AccessResultEnum.ERR_AUTHONLYCHAN;
                 switch (Entries.Entries[i].Level.Level)
@@ -256,7 +97,7 @@ public class Access : IAccess
         return AccessResult;
     }
 
-    public void Decrement()
+    private void Decrement()
     {
         var ExpiredEntries = new List<AccessEntry>();
         for (var i = 0; i < Entries.Entries.Count; i++)
@@ -268,16 +109,5 @@ public class Access : IAccess
         }
 
         for (var i = 0; i < ExpiredEntries.Count; i++) Entries.Entries.Remove(ExpiredEntries[i]);
-    }
-
-    public class ObjectAccessResult
-    {
-        public AccessEntry Entry;
-        public AccessResultEnum Result;
-
-        public ObjectAccessResult()
-        {
-            Result = AccessResultEnum.NONE;
-        }
     }
 }

@@ -11,8 +11,8 @@ internal class PONG : Command
         ForceFloodCheck = true;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 }

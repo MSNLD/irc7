@@ -19,7 +19,7 @@ internal static class Register
             if (Client.Auth.UserCredentials != null)
                 if (Client.Auth.UserCredentials.Password != null)
                 {
-                    Client.Auth.UserCredentials.Username = Client.Address.Userhost;
+                    Client.Auth.UserCredentials.Username = Client.Address.User;
 
                     for (var c = 0; c < Program.Credentials.Count; c++)
                         if (Client.Auth.UserCredentials.Username == Program.Credentials[c].Username)
@@ -29,8 +29,8 @@ internal static class Register
 
                                 user.Level = Program.Credentials[c].Level;
                                 user.UpdateUserNickname(Program.Credentials[c].Nickname);
-                                Client.Address.Userhost = Program.Credentials[c].Username;
-                                Client.Address.Hostname = "cg";
+                                Client.Address.User = Program.Credentials[c].Username;
+                                Client.Address.Host = "cg";
 
                                 switch (user.Level)
                                 {
@@ -58,13 +58,13 @@ internal static class Register
 
         // Check user's user and nickname
         //if ((user.Address.Nickname != Resources.Wildcard) && (user.Authenticated))
-        if (Client.Address.Nickname != Resources.Wildcard && Client.Address.Userhost != Resources.Wildcard &&
-            Client.Address.Hostname != Resources.Wildcard && Client.IsConnected)
+        if (Client.Address.Nickname != Resources.Wildcard && Client.Address.User != Resources.Wildcard &&
+            Client.Address.Host != Resources.Wildcard && Client.IsConnected)
         {
             if (Client.Auth == null)
             {
                 Client.Auth = new ANON();
-                if (Client.Address.Nickname[0] != '>')
+                if (Client.Address.Nickname.StartsWith('>'))
                 {
                     var nLen = Client.Address.Nickname.Length > 62 ? 63 : Client.Address.Nickname.Length;
                     var ChangeNick = new StringBuilder(nLen + 1);
@@ -78,16 +78,13 @@ internal static class Register
 
             if (vNicknameRes != NICK.ValidateNicknameResult.INVALID || user.Level >= UserAccessLevel.ChatGuide)
             {
-                Client.Address.UpdateAddressMask(Address.AddressMaskType.NUHS);
-
-
                 // Check against access
                 var result = server.Access.GetAccess(Client.Address);
                 if (result.Entry != null)
                     if (result.Entry.Level.Level == EnumAccessLevel.DENY)
                     {
                         Client.Send(RawBuilder.Create(server, Client: Client, Raw: Raws.IRCX_CLOSINGLINK,
-                            Data: new[] {Client.Address.RemoteIP, result.Entry.Reason}));
+                            Data: new[] {Client.RemoteIP, result.Entry.Reason}));
                         Client.Terminate();
                         return;
                         // Deny user from network
@@ -118,7 +115,7 @@ internal static class Register
 
                     if (user.Level >= UserAccessLevel.ChatGuide)
                     {
-                        var RPLStaffRaw = Resources.Null;
+                        var RPLStaffRaw = string.Empty;
                         byte StaffChar = 0x0;
 
                         switch (user.Level)

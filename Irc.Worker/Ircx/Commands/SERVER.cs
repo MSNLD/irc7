@@ -13,10 +13,10 @@ public class SERVER : Command
         RegistrationRequired = false;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
-        return COM_RESULT.COM_SUCCESS;
-        //if (Frame.Message.Data.Count == 4)
+        return true;
+        //if (Frame.Message.Parameters.Count == 4)
         //{
         //    User u = Frame.User;
 
@@ -35,14 +35,14 @@ public class SERVER : Command
 
         //    if (bSetUser == true)
         //    {
-        //        int iUsernameLen = (Frame.Message.Data[0].Length > Program.Config.MaxUsername ? Program.Config.MaxUsername : Frame.Message.Data[0].Length);
-        //        string Userhost = new string(iUsernameLen + 1);
-        //        Userhost.Append("~");
-        //        Userhost.Append(Frame.Message.Data[0].bytes.ToString().Substring(iUsernameLen));
-        //        u.Address.Userhost = Userhost;
+        //        int iUsernameLen = (Frame.Message.Parameters[0].Length > Program.Config.MaxUsername ? Program.Config.MaxUsername : Frame.Message.Parameters[0].Length);
+        //        string User = new string(iUsernameLen + 1);
+        //        User.Append("~");
+        //        User.Append(Frame.Message.Parameters[0].bytes.ToString().Substring(iUsernameLen));
+        //        u.Address.User = User;
         //    }
 
-        //    string Realname = Frame.Message.Data[3];
+        //    string Realname = Frame.Message.Parameters[3];
         //    if (Realname.Length > Program.Config.MaxRealname) { Realname = new string(Realname.bytes, 0, Program.Config.MaxRealname); }
 
 
@@ -51,6 +51,6 @@ public class SERVER : Command
 
         //    u.ObjectType = ObjType.ServerObject;
         //}
-        //return COM_RESULT.COM_SUCCESS;
+        //return true;
     }
 }

@@ -16,27 +16,27 @@ internal class IRCVERS : Command
         ForceFloodCheck = true;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
         if (!Frame.User.Registered)
         {
-            if (Frame.Message.Data[0].Length == 4)
+            if (Frame.Message.Parameters[0].Length == 4)
             {
-                if (Frame.Message.Data[0].StartsWith(Resources.IRC))
-                    if (Frame.Message.Data[0][3] >= 48 && Frame.Message.Data[0][3] <= 57)
+                if (Frame.Message.Parameters[0].StartsWith(Resources.IRC))
+                    if (Frame.Message.Parameters[0][3] >= 48 && Frame.Message.Parameters[0][3] <= 57)
                     {
-                        Frame.User.Properties.Set("Ircvers", Frame.Message.Data[0]);
+                        Frame.User.Properties.Set("Ircvers", Frame.Message.Parameters[0]);
                         Frame.User.Modes.Ircx.Value = 1;
-                        Frame.User.Profile.Ircvers = (byte) (Frame.Message.Data[0][3] - 48);
-                        Frame.User.Properties.Set("Client", Frame.Message.Data[1]);
+                        Frame.User.Profile.Ircvers = (byte) (Frame.Message.Parameters[0][3] - 48);
+                        Frame.User.Properties.Set("Client", Frame.Message.Parameters[1]);
 
                         IRCX.ProcessIRCXReply(Frame);
 
-                        return COM_RESULT.COM_SUCCESS;
+                        return true;
                     }
 
                 Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_BADVALUE_906,
-                    Data: new[] {Frame.Message.Data[0]}));
+                    Data: new[] {Frame.Message.Parameters[0]}));
             }
         }
         else
@@ -44,6 +44,6 @@ internal class IRCVERS : Command
             Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_ALREADYREGISTERED_462));
         }
 
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 }

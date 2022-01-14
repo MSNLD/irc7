@@ -13,7 +13,7 @@ internal class VERSION : Command
         ForceFloodCheck = true;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
         Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_VERSION_351,
             IData: new[]
@@ -21,6 +21,6 @@ internal class VERSION : Command
                 Program.Config.major, Program.Config.minor, Program.Config.build, Program.Config.major,
                 Program.Config.minor
             }));
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 }

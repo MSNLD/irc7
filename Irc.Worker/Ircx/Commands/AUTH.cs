@@ -20,9 +20,9 @@ internal class AUTH : Command
         ForceFloodCheck = true;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
-        if (Frame.Message.Data[1] == "I")
+        if (Frame.Message.Parameters[1] == "I")
         {
             if (Frame.User.Auth == null)
             {
@@ -30,39 +30,39 @@ internal class AUTH : Command
                 {
                     // You are already authenticated
                     Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User,
-                        Raw: Raws.IRCX_ERR_ALREADYAUTHENTICATED_909, Data: new[] {Frame.Message.Data[0]}));
+                        Raw: Raws.IRCX_ERR_ALREADYAUTHENTICATED_909, Data: new[] {Frame.Message.Parameters[0]}));
                 }
                 else
                 {
-                    Frame.User.Auth = Program.Providers.CreatePackageInstance(Frame.Message.Data[0], new Passport(Program.Config.PassportKey));
+                    Frame.User.Auth = Program.Providers.CreatePackageInstance(Frame.Message.Parameters[0], new Passport(Program.Config.PassportKey));
                     if (Frame.User.Auth == null)
                     {
                         // No such authentication package
                         Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User,
-                            Raw: Raws.IRCX_ERR_UNKNOWNPACKAGE_912, Data: new[] {Frame.Message.Data[0]}));
+                            Raw: Raws.IRCX_ERR_UNKNOWNPACKAGE_912, Data: new[] {Frame.Message.Parameters[0]}));
                     }
                     else
                     {
-                        if (Frame.User.Auth.InitializeSecurityContext(Frame.Message.Data[2],
+                        if (Frame.User.Auth.InitializeSecurityContext(Frame.Message.Parameters[2],
                                 Program.Config.ExternalIP) == SupportPackage.EnumSupportPackageSequence.SSP_OK)
                         {
                             var data = StringExtensions.ToEscape(
                                 Frame.User.Auth.CreateSecurityChallenge(SupportPackage.EnumSupportPackageSequence.SSP_SEC));
                             var reply = RawBuilder.Create(Frame.Server, Raw: Raws.RPL_AUTH_SEC_REPLY,
-                                Data: new[] {Frame.Message.Data[0], data});
+                                Data: new[] {Frame.Message.Parameters[0], data});
                             Frame.User.Send(reply);
                         }
                         else
                         {
                             // Authentication failed
                             Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User,
-                                Raw: Raws.IRCX_ERR_AUTHENTICATIONFAILED_910, Data: new[] {Frame.Message.Data[0]}));
+                                Raw: Raws.IRCX_ERR_AUTHENTICATIONFAILED_910, Data: new[] {Frame.Message.Parameters[0]}));
                         }
                     }
                 }
             }
         }
-        else if (Frame.Message.Data[1] == "S")
+        else if (Frame.Message.Parameters[1] == "S")
         {
             if (Frame.User.Auth != null)
             {
@@ -70,11 +70,11 @@ internal class AUTH : Command
                 {
                     // You are already authenticated
                     Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User,
-                        Raw: Raws.IRCX_ERR_ALREADYAUTHENTICATED_909, Data: new[] {Frame.Message.Data[0]}));
+                        Raw: Raws.IRCX_ERR_ALREADYAUTHENTICATED_909, Data: new[] {Frame.Message.Parameters[0]}));
                 }
                 else
                 {
-                    var State = Frame.User.Auth.AcceptSecurityContext(Frame.Message.Data[2], Program.Config.ExternalIP);
+                    var State = Frame.User.Auth.AcceptSecurityContext(Frame.Message.Parameters[2], Program.Config.ExternalIP);
                     if (State == SupportPackage.EnumSupportPackageSequence.SSP_OK)
                     {
                         if (Frame.User.Auth is GateKeeperPassport)
@@ -90,29 +90,29 @@ internal class AUTH : Command
                             Frame.User.Level = UserAccessLevel.ChatUser;
                         }
 
-                        Frame.User.Address.Userhost =
+                        Frame.User.Address.User =
                             new string(Frame.User.Auth.Guid.ToUnformattedString().ToUpper());
-                        Frame.User.Address.Hostname = Frame.User.Auth.GetDomain();
+                        Frame.User.Address.Host = Frame.User.Auth.GetDomain();
 
                         var reply = RawBuilder.Create(Frame.Server, Raw: Raws.RPL_AUTH_SUCCESS,
-                            Data: new[] {Frame.Message.Data[0], Frame.User.Address._address[1]},
+                            Data: new[] {Frame.Message.Parameters[0], Frame.User.Address.GetUserHost()},
                             IData: new[] { 0 });
                         Frame.User.Send(reply);
                     }
                     else if (State == SupportPackage.EnumSupportPackageSequence.SSP_CREDENTIALS)
                     {
                         Frame.User.Send(RawBuilder.Create(Frame.Server, Raw: Raws.RPL_AUTH_SEC_REPLY,
-                            Data: new[] {Frame.Message.Data[0], Resources.S_OK}));
+                            Data: new[] {Frame.Message.Parameters[0], Resources.S_OK}));
                     }
                     else
                     {
                         Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User,
-                            Raw: Raws.IRCX_ERR_AUTHENTICATIONFAILED_910, Data: new[] {Frame.Message.Data[0]}));
+                            Raw: Raws.IRCX_ERR_AUTHENTICATIONFAILED_910, Data: new[] {Frame.Message.Parameters[0]}));
                     }
                 }
             }
         }
 
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 }

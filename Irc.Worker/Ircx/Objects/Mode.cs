@@ -74,7 +74,7 @@ public class ChanUserMode
                 return Resources.FlagHost;
             if (IsVoice())
                 return Resources.FlagVoice;
-            return Resources.Null;
+            return string.Empty;
         }
     }
 
@@ -387,7 +387,7 @@ public class UserModeCollection : ModeCollection
         UserModes.Length = 0;
         //UserModes.Append('+');
         bool bHasLimit = false, bHasKey = false;
-        var limit = Resources.Null;
+        var limit = string.Empty;
 
         //UserModes.Append(Ircx.ModeChar);
         for (var i = 0; i < Modes.Count; i++)
@@ -731,7 +731,7 @@ public class ChannelModeCollection : ModeCollection
         ChanModes.Length = 0;
         ChanModes.Append('+');
         bool bHasLimit = false, bHasKey = false;
-        var limit = Resources.Null;
+        var limit = string.Empty;
 
         for (var i = 0; i < Modes.Count; i++)
             if (Modes[i].ModeChar == (byte) 'l')

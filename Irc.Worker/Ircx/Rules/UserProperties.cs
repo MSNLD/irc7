@@ -8,28 +8,28 @@ namespace Irc.Worker.Ircx.Objects;
 
 public class UserProperties : PropCollection
 {
-    public static Prop Oid = new(Resources.UserPropOid, Resources.Null, 0, UserAccessLevel.None, UserAccessLevel.None,
+    public static Prop Oid = new(Resources.UserPropOid, string.Empty, 0, UserAccessLevel.None, UserAccessLevel.None,
         true, false);
 
-    public static Prop Client = new(Resources.UserPropClient, Resources.Null, 0, UserAccessLevel.None, UserAccessLevel.None,
+    public static Prop Client = new(Resources.UserPropClient, string.Empty, 0, UserAccessLevel.None, UserAccessLevel.None,
         true, false);
 
-    public static Prop Ircvers = new(Resources.UserPropIrcvers, Resources.Null, 0, UserAccessLevel.None, UserAccessLevel.None,
+    public static Prop Ircvers = new(Resources.UserPropIrcvers, string.Empty, 0, UserAccessLevel.None, UserAccessLevel.None,
         true, false);
 
-    public static Prop MsnProfile = new(Resources.UserPropMsnProfile, Resources.Null, 0, UserAccessLevel.None,
+    public static Prop MsnProfile = new(Resources.UserPropMsnProfile, string.Empty, 0, UserAccessLevel.None,
         UserAccessLevel.None, true, false);
 
-    public static Prop MsnRegCookie = new(Resources.UserPropMsnRegCookie, Resources.Null, 256, UserAccessLevel.NoAccess,
+    public static Prop MsnRegCookie = new(Resources.UserPropMsnRegCookie, string.Empty, 256, UserAccessLevel.NoAccess,
         UserAccessLevel.None, true, false);
     
-    public static Prop Nick = new(Resources.UserPropNickname, Resources.Null, 0, UserAccessLevel.None, UserAccessLevel.None,
+    public static Prop Nick = new(Resources.UserPropNickname, string.Empty, 0, UserAccessLevel.None, UserAccessLevel.None,
         true, false);
 
-    public static Prop Puid = new(Resources.UserPropPuid, Resources.Null, 0, UserAccessLevel.None, UserAccessLevel.NoAccess,
+    public static Prop Puid = new(Resources.UserPropPuid, string.Empty, 0, UserAccessLevel.None, UserAccessLevel.NoAccess,
         true, false);
 
-    public static Prop Role = new(Resources.UserPropRole, Resources.Null, 0, UserAccessLevel.None, UserAccessLevel.NoAccess,
+    public static Prop Role = new(Resources.UserPropRole, string.Empty, 0, UserAccessLevel.None, UserAccessLevel.NoAccess,
         true, false);
 
     public static readonly Dictionary<string, Prop> PropertyRules =

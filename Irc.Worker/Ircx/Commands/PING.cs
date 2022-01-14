@@ -12,9 +12,9 @@ internal class PING : Command
         ForceFloodCheck = true;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
         Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.RPL_PONG));
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 }

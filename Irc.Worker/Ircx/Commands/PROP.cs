@@ -17,7 +17,7 @@ internal class PROP : Command
         DataType = CommandDataType.Data;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
         var server = Frame.Server;
         var user = Frame.User;
@@ -29,101 +29,103 @@ internal class PROP : Command
             //PROP # TOPIC
             //PROP # TOPIC :TEXT
             //PROP # TOPIC TEXT TEXT
-            if (message.Data.Count >= 2)
+            if (message.Parameters.Count >= 2)
             {
                 #region CHAN PROP
 
-                if (Channel.IsChannel(message.Data[0]))
+                if (Channel.IsChannel(message.Parameters[0]))
                 {
                     if (!user.Registered)
                     {
                         user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_NOTREGISTERED_451));
-                        return COM_RESULT.COM_SUCCESS;
+                        return true;
                     }
-                    var objType = IrcHelper.IdentifyObject(message.Data[0]);
-                    var c = server.Channels.FindObj(message.Data[0], objType);
+                    var objType = IrcHelper.IdentifyObject(message.Parameters[0]);
+                    var targetChannel = server.Channels.FindObj(message.Parameters[0], objType);
 
-                    if (c != null)
+                    if (targetChannel != null)
                     {
-                        var UserLevel = user.Level;
-                        if (UserLevel < UserAccessLevel.ChatGuide)
-                        {
-                            var uci = user.GetChannelInfo(c);
+                        var userFoundChannelMemberPair = Frame.User.Channels.FirstOrDefault(c => c.Key == targetChannel);
+                        var userFoundChannel = userFoundChannelMemberPair.Key;
+                        var userFoundChannelMember = userFoundChannelMemberPair.Value;
 
-                            if (uci != null)
+                        var userLevel = user.Level;
+                        if (userLevel < UserAccessLevel.ChatGuide)
+                        {
+                            if (userFoundChannel != null)
                             {
-                                if (Flood.FloodCheck(DataType, uci) == FLD_RESULT.S_WAIT) return COM_RESULT.COM_WAIT;
-                                UserLevel = uci.Member.Level;
+                                if (Flood.FloodCheck(DataType, userFoundChannelMember.User) == FLD_RESULT.S_WAIT) return false;
+                                userLevel = userFoundChannelMember.Level;
                             }
                         }
 
-                        if (message.Data[1][0] == (byte) '*')
+                        if (message.Parameters[1][0] == (byte) '*')
                         {
                             //list properties for current user level
                             var eligible = true;
-                            if (UserLevel >= UserAccessLevel.ChatGuide)
+                            if (userLevel >= UserAccessLevel.ChatGuide)
                                 eligible = true;
-                            else if ((c.Modes.Private.Value == 1 || c.Modes.Secret.Value == 1) && !user.IsOnChannel(c))
+                            else if ((targetChannel.Modes.Private.Value == 1 || targetChannel.Modes.Secret.Value == 1) && userFoundChannel != null)
                                 eligible = false;
 
                             if (eligible)
-                                for (var i = 0; i < c.Properties.GetList().Count; i++)
-                                    if (!string.IsNullOrWhiteSpace(c.Properties.GetList()[i].Value))
+                                for (var i = 0; i < targetChannel.Properties.GetList().Count; i++)
+                                    if (!string.IsNullOrWhiteSpace(targetChannel.Properties.GetList()[i].Value))
                                     {
                                         Prop prop = ChannelProperties.PropertyRules.FirstOrDefault(x =>
-                                            x.Key == c.Properties.GetList()[i].Key).Value;
+                                            x.Key == targetChannel.Properties.GetList()[i].Key).Value;
                                         if (prop != null)
                                         {
-                                            if (prop.ReadLevel <= UserLevel &&
+                                            if (prop.ReadLevel <= userLevel &&
                                                 !prop.Hidden) /* display prop */
-                                                user.Send(RawBuilder.Create(server, c, user, Raws.IRCX_RPL_PROPLIST_818,
-                                                    new[] { c.Name, prop.Name, c.Properties.GetList()[i].Value }));
+                                                user.Send(RawBuilder.Create(server, targetChannel, user, Raws.IRCX_RPL_PROPLIST_818,
+                                                    new[] { targetChannel.Name, prop.Name, targetChannel.Properties.GetList()[i].Value }));
                                         }
                                     }
 
                             //send end of properties
-                            user.Send(RawBuilder.Create(server, c, user, Raws.IRCX_RPL_PROPEND_819, new[] {c.Name}));
+                            user.Send(RawBuilder.Create(server, targetChannel, user, Raws.IRCX_RPL_PROPEND_819, new[] {targetChannel.Name}));
                         }
                         else
                         {
                             //resolve property
-                            var propertyName = new string(message.Data[1].ToUpper());
+                            var propertyName = new string(message.Parameters[1].ToUpper());
 
-                            var propertyValue = c.Properties.Get(propertyName);
+                            var propertyValue = targetChannel.Properties.Get(propertyName);
                             ChannelProperties.PropertyRules.TryGetValue(propertyName, out var prop);
 
                             if (propertyValue != null)
                             {
-                                if (message.Data.Count >= 3)
+                                if (message.Parameters.Count >= 3)
                                 {
                                     //user wants to change a property
 
-                                    if (!user.IsOnChannel(c))
+                                    if (userFoundChannel != null)
                                     {
                                         user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442,
-                                            Data: new[] {message.Data[0]}));
+                                            Data: new[] {message.Parameters[0]}));
                                         //not on channel
                                     }
-                                    else if (prop.WriteLevel <= UserLevel)
+                                    else if (prop.WriteLevel <= userLevel)
                                     {
                                         //change and send PROP to channel
                                         if (prop.Limit > 0)
                                         {
-                                            if (message.Data[2].Length <= prop.Limit)
+                                            if (message.Parameters[2].Length <= prop.Limit)
                                             {
-                                                var Value = message.Data[2];
+                                                var Value = message.Parameters[2];
                                                 if (propertyValue == Resources.ChannelPropMemberkey)
                                                 {
                                                     if (Value.Length > 0)
-                                                        c.Modes.Key.Value = 1;
+                                                        targetChannel.Modes.Key.Value = 1;
                                                     else
-                                                        c.Modes.Key.Value = 0;
+                                                        targetChannel.Modes.Key.Value = 0;
 
-                                                    c.Modes.UpdateModes(propertyValue);
+                                                    targetChannel.Modes.UpdateModes(propertyValue);
                                                 }
                                                 else if (propertyValue == Resources.ChannelPropTopic)
                                                 {
-                                                    c.Properties.TopicLastChanged =
+                                                    targetChannel.TopicLastChanged =
                                                         (DateTime.UtcNow.Ticks - Resources.epoch) /
                                                         TimeSpan.TicksPerSecond;
                                                 }
@@ -136,30 +138,30 @@ internal class PROP : Command
                                                         if (guid == Guid.Empty)
                                                         {
                                                             //bad value specified
-                                                            user.Send(RawBuilder.Create(server, c, user,
-                                                                Raws.IRCX_ERR_BADVALUE_906, new[] {message.Data[2]}));
-                                                            return COM_RESULT.COM_SUCCESS;
+                                                            user.Send(RawBuilder.Create(server, targetChannel, user,
+                                                                Raws.IRCX_ERR_BADVALUE_906, new[] {message.Parameters[2]}));
+                                                            return true;
                                                         }
                                                     }
                                                     else
                                                     {
-                                                        user.Send(RawBuilder.Create(server, c, user,
-                                                            Raws.IRCX_ERR_BADVALUE_906, new[] {message.Data[2]}));
-                                                        return COM_RESULT.COM_SUCCESS;
+                                                        user.Send(RawBuilder.Create(server, targetChannel, user,
+                                                            Raws.IRCX_ERR_BADVALUE_906, new[] {message.Parameters[2]}));
+                                                        return true;
                                                     }
                                                 }
 
-                                                c.Properties.Set(propertyName, propertyValue);
-                                                c.SendLevel(
-                                                    RawBuilder.Create(server, c, user, Raws.RPL_PROP_IRCX,
+                                                targetChannel.Properties.Set(propertyName, propertyValue);
+                                                targetChannel.SendLevel(
+                                                    RawBuilder.Create(server, targetChannel, user, Raws.RPL_PROP_IRCX,
                                                         new[] {prop.Name, propertyValue}),
                                                     prop.ReadLevel);
                                             }
                                             else
                                             {
                                                 //bad value specified
-                                                user.Send(RawBuilder.Create(server, c, user, Raws.IRCX_ERR_BADVALUE_906,
-                                                    new[] {message.Data[2]}));
+                                                user.Send(RawBuilder.Create(server, targetChannel, user, Raws.IRCX_ERR_BADVALUE_906,
+                                                    new[] {message.Parameters[2]}));
                                             }
                                         }
                                         else if (!string.IsNullOrWhiteSpace(propertyValue))
@@ -169,26 +171,26 @@ internal class PROP : Command
                                             //then rest of logic
                                             //else
                                             //bad command
-                                            if (message.Data[2].Length <= 9)
+                                            if (message.Parameters[2].Length <= 9)
                                             {
-                                                var number = Tools.Str2Int(message.Data[2]);
+                                                var number = Tools.Str2Int(message.Parameters[2]);
                                                 if (number > -1)
                                                 {
                                                     //treat like LAG
                                                     if (number >= 0 && number <= 2)
                                                     {
-                                                        c.Properties.Set(propertyName, message.Data[2]);
-                                                        c.SendLevel(
-                                                            RawBuilder.Create(server, c, user, Raws.RPL_PROP_IRCX,
+                                                        targetChannel.Properties.Set(propertyName, message.Parameters[2]);
+                                                        targetChannel.SendLevel(
+                                                            RawBuilder.Create(server, targetChannel, user, Raws.RPL_PROP_IRCX,
                                                                 new[] {prop.Name, propertyValue}),
                                                             prop.ReadLevel);
-                                                        c.FloodProfile.FloodProtectionLevel.Delay = number;
+                                                        targetChannel.FloodProfile.FloodProtectionLevel.Delay = number;
                                                     }
                                                     else
                                                     {
                                                         //bad value specified
-                                                        user.Send(RawBuilder.Create(server, c, user,
-                                                            Raws.IRCX_ERR_BADVALUE_906, new[] {message.Data[2]}));
+                                                        user.Send(RawBuilder.Create(server, targetChannel, user,
+                                                            Raws.IRCX_ERR_BADVALUE_906, new[] {message.Parameters[2]}));
                                                     }
                                                 }
                                                 else
@@ -222,21 +224,21 @@ internal class PROP : Command
                                     //user wants to read a property
                                     if (!string.IsNullOrWhiteSpace(propertyValue))
                                     {
-                                        if (prop.ReadLevel <= UserLevel &&
+                                        if (prop.ReadLevel <= userLevel &&
                                             !prop.Hidden) /* display prop */
-                                            user.Send(RawBuilder.Create(server, c, user, Raws.IRCX_RPL_PROPLIST_818,
-                                                new[] { c.Name, prop.Name, propertyValue }));
+                                            user.Send(RawBuilder.Create(server, targetChannel, user, Raws.IRCX_RPL_PROPLIST_818,
+                                                new[] { targetChannel.Name, prop.Name, propertyValue }));
                                     }
 
                                     //send end of properties
-                                    user.Send(RawBuilder.Create(server, c, user, Raws.IRCX_RPL_PROPEND_819, new[] {c.Name}));
+                                    user.Send(RawBuilder.Create(server, targetChannel, user, Raws.IRCX_RPL_PROPEND_819, new[] {targetChannel.Name}));
                                 }
                             }
                             else
                             {
                                 //<- :Default-Chat-Community 905 Sky2k #test :Bad property specified (muel)
                                 user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADPROPERTY_905,
-                                    Data: new[] {message.Data[1]}));
+                                    Data: new[] {message.Parameters[1]}));
                             }
                         }
                     }
@@ -244,7 +246,7 @@ internal class PROP : Command
                     {
                         //<- :Default-Chat-Community 461 Sky2k PROP :Not enough parameters
                         user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461,
-                            Data: new[] {message.Command}));
+                            Data: new[] {message.GetCommand() }));
                     }
                 }
 
@@ -255,15 +257,15 @@ internal class PROP : Command
                 //resolve 2nd param, is it
                 else
                 {
-                    if (Flood.FloodCheck(DataType, Frame.User) == FLD_RESULT.S_WAIT) return COM_RESULT.COM_WAIT;
+                    if (Flood.FloodCheck(DataType, Frame.User) == FLD_RESULT.S_WAIT) return false;
 
                     User TargetUser = null;
-                    var ObjectNickname = new string(message.Data[0].ToUpper());
+                    var ObjectNickname = new string(message.Parameters[0].ToUpper());
                     var objIdentifier = IrcHelper.IdentifyObject(ObjectNickname);
 
                     if (ObjectNickname.Length == 1 && ObjectNickname[0] == (byte) '$')
                         TargetUser = user;
-                    else if (user.Address.UNickname == ObjectNickname)
+                    else if (user.Address.Nickname.ToUpper() == ObjectNickname)
                         TargetUser = user;
                     else
                         TargetUser = server.Users.FindObj(ObjectNickname, objIdentifier);
@@ -271,7 +273,7 @@ internal class PROP : Command
                     if (TargetUser != null)
                     {
                         //for PROP $ NICK, PROP $ MSNPROFILE etc
-                        if (message.Data[1][0] == (byte) '*')
+                        if (message.Parameters[1][0] == (byte) '*')
                         {
                             //send end of properties
                             user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_SECURITY_908));
@@ -279,27 +281,27 @@ internal class PROP : Command
                         else
                         {
                             //resolve property
-                            var propertyName = new string(message.Data[1].ToUpper());
+                            var propertyName = new string(message.Parameters[1].ToUpper());
                                 UserProperties.PropertyRules.TryGetValue(propertyName, out var propertyRule);
 
 
                             var propertyValue = TargetUser.Properties.Get(propertyName);
                             if (propertyRule != null && !string.IsNullOrWhiteSpace(propertyValue))
                             {
-                                if (message.Data.Count >= 3)
+                                if (message.Parameters.Count >= 3)
                                 {
                                     //user wants to change a property
                                     if (propertyRule.WriteLevel <= user.Level)
                                     {
-                                        var Value = message.Data[2];
+                                        var Value = message.Parameters[2];
                                         //change and send PROP to channel
                                         if (propertyRule.Limit > 0)
                                         {
-                                            if (message.Data[2].Length <= propertyRule.Limit)
+                                            if (message.Parameters[2].Length <= propertyRule.Limit)
                                             {
                                                 if (!user.Guest && propertyRule.Name == Resources.UserPropMsnRegCookie)
                                                 {
-                                                    var RegCookie = message.Data[2];
+                                                    var RegCookie = message.Parameters[2];
                                                     var r = (new Passport(Program.Config.PassportKey)).DecryptRegCookie(RegCookie);
                                                     if (r.version == 3)
                                                     {
@@ -319,14 +321,14 @@ internal class PROP : Command
                                                 {
                                                     user.Send(RawBuilder.Create(server, Client: user,
                                                         Raw: Raws.IRCX_ERR_BADVALUE_906,
-                                                        Data: new[] {message.Data[3]}));
+                                                        Data: new[] {message.Parameters[3]}));
                                                 }
                                             }
                                             else
                                             {
                                                 //bad value specified
                                                 user.Send(RawBuilder.Create(server, Client: user,
-                                                    Raw: Raws.IRCX_ERR_BADVALUE_906, Data: new[] {message.Data[2]}));
+                                                    Raw: Raws.IRCX_ERR_BADVALUE_906, Data: new[] {message.Parameters[2]}));
                                             }
                                         }
                                         else
@@ -339,9 +341,9 @@ internal class PROP : Command
                                                 //then rest of logic
                                                 //else
                                                 //bad command
-                                                if (message.Data[2].Length <= 9)
+                                                if (message.Parameters[2].Length <= 9)
                                                 {
-                                                    var number = Tools.Str2Int(message.Data[2]);
+                                                    var number = Tools.Str2Int(message.Parameters[2]);
                                                     if (number > -1)
                                                     {
                                                         switch (number)
@@ -391,12 +393,12 @@ internal class PROP : Command
                                                             {
                                                                 user.Send(RawBuilder.Create(server, Client: user,
                                                                     Raw: Raws.IRCX_ERR_BADVALUE_906,
-                                                                    Data: new[] {message.Data[3]}));
-                                                                return COM_RESULT.COM_SUCCESS;
+                                                                    Data: new[] {message.Parameters[3]}));
+                                                                return true;
                                                             }
                                                         }
 
-                                                        user.Properties.Set(propertyName, message.Data[2]);
+                                                        user.Properties.Set(propertyName, message.Parameters[2]);
                                                         user.Send(RawBuilder.Create(server, Client: user,
                                                             Raw: Raws.IRCX_RPL_PROPLIST_818,
                                                             Data: new[]
@@ -445,7 +447,7 @@ internal class PROP : Command
                                             //    {
                                             //        TargetUser.Name = UserProperty.Value;
                                             //        Runtime.Register.QualifyUser(server, Frame.Connection);
-                                            //        return COM_RESULT.COM_SUCCESS;
+                                            //        return true;
                                             //    }
                                             //}
                                             /* display prop */
@@ -463,7 +465,7 @@ internal class PROP : Command
                             {
                                 //<- :Default-Chat-Community 905 Sky2k #test :Bad property specified (muel)
                                 user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADPROPERTY_905,
-                                    Data: new[] {message.Data[1]}));
+                                    Data: new[] {message.Parameters[1]}));
                             }
                         }
                     }
@@ -471,7 +473,7 @@ internal class PROP : Command
                     {
                         //NO such object!
                         user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_NOSUCHOBJECT_924,
-                            Data: new[] {message.Data[0]}));
+                            Data: new[] {message.Parameters[0]}));
                     }
                 }
 
@@ -481,10 +483,10 @@ internal class PROP : Command
             {
                 //insufficient parameters
                 user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461,
-                    Data: new[] {message.Command}));
+                    Data: new[] {message.GetCommand() }));
             }
         }
 
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 }

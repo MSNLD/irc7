@@ -64,24 +64,24 @@ internal class Stats
         var serializer = new XmlSerializer(typeof(category));
         var ns = new XmlSerializerNamespaces();
         ns.Add("", "");
-        for (var i = 0; i < Server.Channels.Length; i++)
+        for (var i = 0; i < Server.Channels.Count; i++)
         {
             //"1:-ST!EN-US!GN"
             var ChannelCategory =
-                Server.Channels.IndexOf(i).Properties.Get("Subject").Split(new[] {'!'}, StringSplitOptions.None)[2];
+                Server.Channels[i].Properties.Get("Subject").Split(new[] {'!'}, StringSplitOptions.None)[2];
 
             if (ChannelCategory == Category)
             {
                 var c = new channel();
-                c.name = Server.Channels.IndexOf(i).Name;
-                c.topic = WebUtility.UrlEncode(Server.Channels.IndexOf(i).Properties.Get("Topic"));
-                c.modes = new string(Server.Channels.IndexOf(i).Modes.ChannelModeShortString
-                    .Substring(Server.Channels.IndexOf(i).Modes.ChannelModeShortString.Length));
-                c.managed = Server.Channels.IndexOf(i).Modes.Registered.Value.ToString();
-                c.locale = Server.Channels.IndexOf(i).Properties.Get("Subject").Split(new[] {'!'}, StringSplitOptions.None)[1];
-                c.language = Server.Channels.IndexOf(i).Properties.Get("Subject").Split(new[] {':'}, StringSplitOptions.None)[0];
-                c.currentusers = Server.Channels.IndexOf(i).Members.MemberList.Count.ToString();
-                c.maxusers = Server.Channels.IndexOf(i).Modes.UserLimit.Value.ToString();
+                c.name = Server.Channels[i].Name;
+                c.topic = WebUtility.UrlEncode(Server.Channels[i].Properties.Get("Topic"));
+                c.modes = new string(Server.Channels[i].Modes.ChannelModeShortString
+                    .Substring(Server.Channels[i].Modes.ChannelModeShortString.Length));
+                c.managed = Server.Channels[i].Modes.Registered.Value.ToString();
+                c.locale = Server.Channels[i].Properties.Get("Subject").Split(new[] {'!'}, StringSplitOptions.None)[1];
+                c.language = Server.Channels[i].Properties.Get("Subject").Split(new[] {':'}, StringSplitOptions.None)[0];
+                c.currentusers = Server.Channels[i].Members.Count.ToString();
+                c.maxusers = Server.Channels[i].Modes.UserLimit.Value.ToString();
                 cat.channels.Add(c);
             }
         }
@@ -115,9 +115,9 @@ internal class Stats
         //        }
         //    }
 
-        //    for (int x = 0; x < Server.Users[i].ChannelList.Count; x++)
+        //    for (int x = 0; x < Server.Users[i].Channels.Count; x++)
         //    {
-        //        sm.channels.Add(Server.Users[i].ChannelList[x].Channel.Name.chars);
+        //        sm.channels.Add(Server.Users[i].Channels[x].Channel.Name.chars);
         //    }
 
         //    members.members.Add(sm);

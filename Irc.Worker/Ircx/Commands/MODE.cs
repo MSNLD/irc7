@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Irc.ClassExtensions.CSharpTools;
 using Irc.Constants;
@@ -15,26 +17,26 @@ internal class MODE : Command
         DataType = CommandDataType.Data;
     }
 
-    public static COM_RESULT ProcessChannelModes(Server server, User user, Channel channel, Message message)
+    public static bool ProcessChannelModes(Server server, User user, Channel channel, Message message)
     {
         //Mode %#Lobby <modes> <param1> <param2> ...
-        if (message.Data.Count == 1)
+        if (message.Parameters.Count == 1)
         {
             user.Send(RawBuilder.Create(server, channel, user, Raws.IRCX_RPL_MODE_324,
                 new[] {channel.Modes.ChannelModeString}));
             //Display Modes to user
         }
-        else if (message.Data.Count > 1)
+        else if (message.Parameters.Count > 1)
         {
-            var uci = user.GetChannelInfo(channel);
+            var channelMember = user.GetChannelMemberInfo(channel).Value;
 
-            if (uci == null)
+            if (channelMember == null)
             {
                 // you're not on that channel
                 user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442,
-                    Data: new[] {message.Data[0]}));
+                    Data: new[] {message.Parameters[0]}));
             }
-            else if (uci.Member.ChannelMode.UserMode < ChanUserMode.Host)
+            else if (channelMember.ChannelMode.UserMode < ChanUserMode.Host)
             {
                 //you are not an operator
                 user.Send(RawBuilder.Create(server, channel, user, Raws.IRCX_ERR_CHANOPRIVSNEEDED_482));
@@ -47,13 +49,13 @@ internal class MODE : Command
                  *        before negative ones, therefore two Lists will need to be created here
                  */
 
-                if (Flood.FloodCheck(CommandDataType.Data, uci) == FLD_RESULT.S_WAIT) return COM_RESULT.COM_WAIT;
+                if (Flood.FloodCheck(CommandDataType.Data, user) == FLD_RESULT.S_WAIT) return false;
 
                 var Report = new AuditModeReport();
                 var bModeFlag = true;
                 message.ParamOffset = 2;
-                for (var i = 0; i < message.Data[1].Length; i++)
-                    switch (message.Data[1][i])
+                for (var i = 0; i < message.Parameters[1].Length; i++)
+                    switch (message.Parameters[1][i])
                     {
                         case '-':
                         {
@@ -67,7 +69,7 @@ internal class MODE : Command
                         }
                         default:
                         {
-                            var m = channel.Modes.ResolveMode((byte) message.Data[1][i]);
+                            var m = channel.Modes.ResolveMode((byte) message.Parameters[1][i]);
                             if (m != null)
                             {
                                 //At this point its Host vs Owner vs Oper
@@ -75,7 +77,7 @@ internal class MODE : Command
                                 //if m.Function is null then its a usermode and needs processing via the chanuser mode function
                                 //else ...
 
-                                if (uci.Member.ChannelMode.UserMode >= m.Level)
+                                if (channelMember.ChannelMode.UserMode >= m.Level)
                                 {
                                     if (m.Function != null)
                                     {
@@ -91,7 +93,7 @@ internal class MODE : Command
                                             {
                                                 //if report contains no modes and we are at the end of the string then update modes
                                                 //update wont be invoked unless the mode change was announced
-                                                if (Report.Modes.Count == 0 && i + 1 == message.Data[1].Length)
+                                                if (Report.Modes.Count == 0 && i + 1 == message.Parameters[1].Length)
                                                     channel.Modes.UpdateModes(channel.Properties.Get("Memberkey"));
                                             }
                                         }
@@ -99,7 +101,7 @@ internal class MODE : Command
                                     else
                                     {
                                         //user mode
-                                        ProcessChanUserMode(server, uci.Member, channel, message, Report, m, bModeFlag);
+                                        ProcessChanUserMode(server, channelMember, channel, message, Report, m, bModeFlag);
                                     }
                                 }
                                 else
@@ -112,7 +114,7 @@ internal class MODE : Command
                             {
                                 // unknown mode char
                                 user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_UNKNOWNMODE_472,
-                                    IData: new int[] {message.Data[1][i]}));
+                                    IData: new int[] {message.Parameters[1][i]}));
                             }
 
                             break;
@@ -124,7 +126,7 @@ internal class MODE : Command
             }
         }
 
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 
     public static void ProcessChanModeReport(Server server, User user, Channel channel, AuditModeReport Report)
@@ -204,10 +206,10 @@ internal class MODE : Command
     public static void ProcessChanUserMode(Server server, ChannelMember Member, Channel channel, Message message,
         AuditModeReport Report, Mode m, bool bModeFlag)
     {
-        var UserParam = message.GetNextParam();
+        var UserParam = ++message.ParamOffset >= message.Parameters.Count ? null : message.Parameters[message.ParamOffset];
         if (UserParam != null)
         {
-            var TargetUser = channel.Members.GetMemberByName(UserParam);
+            var TargetUser = channel.Members.FirstOrDefault(member => member.User.Name == UserParam);
             if (TargetUser != null)
             {
                 if (TargetUser.Level > Member.Level && TargetUser.Level >= UserAccessLevel.ChatGuide)
@@ -314,7 +316,7 @@ internal class MODE : Command
         //Is Oper/Admin?
         //Else <- :SERVER 403 sky9 s :No such channel
 
-        var Object = message.Data[0];
+        var Object = message.Parameters[0];
         User TargetUser = null;
 
         var objIdentifier = IrcHelper.IdentifyObject(Object);
@@ -332,7 +334,7 @@ internal class MODE : Command
         {
             //Else <- :SERVER 403 sky9 s :No such channel
             user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403,
-                Data: new[] {message.Data[0]}));
+                Data: new[] {message.Parameters[0]}));
             return;
         }
         else if (user.Level >= UserAccessLevel.ChatGuide)
@@ -341,25 +343,25 @@ internal class MODE : Command
             {
                 //Else <- :SERVER 403 sky9 s :No such channel
                 user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403,
-                    Data: new[] {message.Data[0]}));
+                    Data: new[] {message.Parameters[0]}));
                 return;
             }
         }
 
         //At this point its either a self mode or an admin change so go ahead
 
-        if (message.Data.Count == 1)
+        if (message.Parameters.Count == 1)
         {
             user.Send(RawBuilder.Create(server, Client: TargetUser, Raw: Raws.IRCX_RPL_UMODEIS_221,
                 Data: new[] {TargetUser.Modes.UserModeString}));
         }
-        else if (message.Data.Count > 1)
+        else if (message.Parameters.Count > 1)
         {
             var Report = new AuditModeReport();
             var bModeFlag = true;
             message.ParamOffset = 2;
-            for (var i = 0; i < message.Data[1].Length; i++)
-                switch (message.Data[1][i])
+            for (var i = 0; i < message.Parameters[1].Length; i++)
+                switch (message.Parameters[1][i])
                 {
                     case '-':
                     {
@@ -373,7 +375,7 @@ internal class MODE : Command
                     }
                     default:
                     {
-                        var m = TargetUser.Modes.ResolveMode((byte) message.Data[1][i]);
+                        var m = TargetUser.Modes.ResolveMode((byte) message.Parameters[1][i]);
                         if (m != null)
                         {
                             if (!Report.GetModeFlagProcessed(m.ModeChar))
@@ -399,7 +401,7 @@ internal class MODE : Command
                         {
                             // unknown mode char
                             user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_UNKNOWNMODE_472,
-                                IData: new int[] {message.Data[1][i]}));
+                                IData: new int[] {message.Parameters[1][i]}));
                         }
 
                         break;
@@ -410,16 +412,16 @@ internal class MODE : Command
         }
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
         var server = Frame.Server;
         var user = Frame.User;
         var message = Frame.Message;
-        if (message.Data.Count >= 1)
+        if (message.Parameters.Count >= 1)
         {
             if (user.Registered)
             {
-                var ObjectName = message.Data[0];
+                var ObjectName = message.Parameters[0];
                 var objType = IrcHelper.IdentifyObject(ObjectName);
                 Channel c = null;
                 if (Channel.IsChannel(ObjectName))
@@ -432,8 +434,8 @@ internal class MODE : Command
                     }
 
                     user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403,
-                        Data: new[] {message.Data[0]}));
-                    return COM_RESULT.COM_SUCCESS;
+                        Data: new[] {message.Parameters[0]}));
+                    return true;
                 }
 
                 if (IrcHelper.IsObject(ObjectName))
@@ -441,18 +443,18 @@ internal class MODE : Command
                     c = server.Channels.FindObj(ObjectName, objType);
                     if (c != null)
                     {
-                        message.Data[0] = c.Name;
+                        message.Parameters[0] = c.Name;
                         // Process Channel Modes
                         return ProcessChannelModes(server, user, c, message);
                     }
                 }
 
-                if (Flood.FloodCheck(DataType, Frame.User) == FLD_RESULT.S_WAIT) return COM_RESULT.COM_WAIT;
+                if (Flood.FloodCheck(DataType, Frame.User) == FLD_RESULT.S_WAIT) return false;
                 ProcessUserModes(server, user, message);
             }
             else
             {
-                if (message.Data[0] == Resources.ISIRCX)
+                if (message.Parameters[0] == Resources.ISIRCX)
                     IRCX.ProcessIRCXReply(Frame);
                 else
                     /* have not registered */
@@ -463,13 +465,13 @@ internal class MODE : Command
         {
             if (user.Registered)
                 user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461,
-                    Data: new[] {message.Command}));
+                    Data: new[] {message.GetCommand() }));
             else
                 user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_NOTREGISTERED_451));
             /* insufficient params */
         }
 
-        return COM_RESULT.COM_SUCCESS;
+        return true;
         //
     }
     ////
@@ -587,42 +589,44 @@ public class UserModePasskeyFunction : UserModeFunction
     {
         //    user.Modes.Gag.Value = (bModeFlag == true ? 1 : 0); return true; 
         //self mode
-        if (message.Data.Count >= 3)
+        if (message.Parameters.Count >= 3)
         {
-            if (message.Data[2].Length == 0) return false;
+            if (message.Parameters[2].Length == 0) return false;
 
-            if (user.ActiveChannel != null)
+            if (user.Channels.Count > 0)
             {
-                var ChannelReport = new AuditModeReport();
-                if (message.Data[2] == user.ActiveChannel.Channel.Properties.Get("Ownerkey"))
+                var channelReport = new AuditModeReport();
+                var channel = user.Channels.Last().Key;
+                var channelMember = user.Channels.Last().Value;
+                if (message.Parameters[2] == channel.Properties.Get("Ownerkey"))
                 {
                     //-o
-                    if (user.ActiveChannel.Member.ChannelMode.IsHost())
+                    if (channelMember.ChannelMode.IsHost())
                     {
-                        TargetUser.ActiveChannel.Member.ChannelMode.SetHost(false);
-                        ChannelReport.UserModes.Add(new AuditUserMode(TargetUser, TargetUser.Address.Nickname,
+                        channelMember.ChannelMode.SetHost(false);
+                        channelReport.UserModes.Add(new AuditUserMode(TargetUser, TargetUser.Address.Nickname,
                             Resources.ChannelUserModeCharHost, false));
                     }
 
                     //+q
-                    TargetUser.ActiveChannel.Member.ChannelMode.SetOwner(true);
-                    ChannelReport.UserModes.Add(new AuditUserMode(TargetUser, TargetUser.Address.Nickname,
+                    channelMember.ChannelMode.SetOwner(true);
+                    channelReport.UserModes.Add(new AuditUserMode(TargetUser, TargetUser.Address.Nickname,
                         Resources.ChannelUserModeCharOwner, true));
-                    MODE.ProcessChanUserModeReport(server, user, user.ActiveChannel.Channel, ChannelReport);
+                    MODE.ProcessChanUserModeReport(server, user, channel, channelReport);
                 }
-                else if (message.Data[2] == user.ActiveChannel.Channel.Properties.Get("Hostkey"))
+                else if (message.Parameters[2] == channel.Properties.Get("Hostkey"))
                 {
-                    if (TargetUser.ActiveChannel.Member.ChannelMode.IsOwner())
+                    if (channelMember.ChannelMode.IsOwner())
                     {
-                        TargetUser.ActiveChannel.Member.ChannelMode.SetOwner(false);
-                        ChannelReport.UserModes.Add(new AuditUserMode(TargetUser, TargetUser.Address.Nickname,
+                        channelMember.ChannelMode.SetOwner(false);
+                        channelReport.UserModes.Add(new AuditUserMode(TargetUser, TargetUser.Address.Nickname,
                             Resources.ChannelUserModeCharOwner, false));
                     }
 
-                    TargetUser.ActiveChannel.Member.ChannelMode.SetHost(true);
-                    ChannelReport.UserModes.Add(new AuditUserMode(TargetUser, TargetUser.Address.Nickname,
+                    channelMember.ChannelMode.SetHost(true);
+                    channelReport.UserModes.Add(new AuditUserMode(TargetUser, TargetUser.Address.Nickname,
                         Resources.ChannelUserModeCharHost, true));
-                    MODE.ProcessChanUserModeReport(server, user, user.ActiveChannel.Channel, ChannelReport);
+                    MODE.ProcessChanUserModeReport(server, user, channel, channelReport);
                 }
             }
         }
@@ -630,7 +634,7 @@ public class UserModePasskeyFunction : UserModeFunction
         {
             //not enough params
             user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461,
-                Data: new[] {message.Command}));
+                Data: new[] {message.GetCommand() }));
         }
 
         return false;
@@ -710,7 +714,7 @@ public class ChannelModeKeyFunction : ChannelModeFunction
     public override bool Execute(Server server, Channel channel, User user, bool bModeFlag, ref AuditModeReport report,
         Message message)
     {
-        var KeyParam = message.GetNextParam();
+        var KeyParam = ++message.ParamOffset >= message.Parameters.Count ? null : message.Parameters[message.ParamOffset];
         if (KeyParam != null)
         {
             if (bModeFlag)
@@ -735,7 +739,7 @@ public class ChannelModeKeyFunction : ChannelModeFunction
                 if (UKey == UKeyParam)
                 {
                     //unset key
-                    channel.Properties.Set("Memberkey", Resources.Null);
+                    channel.Properties.Set("Memberkey", string.Empty);
                     channel.Modes.Key.Value = 0;
                     report.UserModes.Add(new AuditUserMode(null, KeyParam, Resources.ChannelModeCharKey, bModeFlag));
                 }
@@ -782,7 +786,7 @@ public class ChannelModeUserLimitFunction : ChannelModeFunction
         }
         else
         {
-            var LimitParam = message.GetNextParam();
+            var LimitParam =  ++message.ParamOffset >= message.Parameters.Count ? null : message.Parameters[message.ParamOffset];
             if (LimitParam != null)
             {
                 var limit = Tools.Str2Int(LimitParam);
@@ -992,12 +996,12 @@ public class ChannelModeBanFunction : ChannelModeFunction
         //list ban access list
         //<- :Default-Chat-Community 367 Sky2k #test BarneyTheDinosaur!*@*$*
         //<- :Default-Chat-Community 368 Sky2k #test :End of Channel Ban List
-        if (bModeFlag && message.Data.Count == 2)
+        if (bModeFlag && message.Parameters.Count == 2)
         {
             for (var i = 0; i < channel.Access.Entries.Entries.Count; i++)
                 if (channel.Access.Entries.Entries[i].Level.Level == EnumAccessLevel.DENY)
                     user.Send(RawBuilder.Create(server, channel, user, Raws.IRCX_RPL_BANLIST_367,
-                        new[] {channel.Access.Entries.Entries[i].Mask._address[3]}));
+                        new[] {channel.Access.Entries.Entries[i].Mask.GetFullAddress()}));
             user.Send(RawBuilder.Create(server, channel, user, Raws.IRCX_RPL_ENDOFBANLIST_368));
         }
 

@@ -14,12 +14,12 @@ internal class TIME : Command
         ForceFloodCheck = true;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
         //<- :Default-Chat-Community 391 Sky Default-Chat-Community :Saturday, August 24, 2013 17:45:02 GMT
         // dddd, MMMM dd, yyyy HH:mm:ss Z
         Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_RPL_TIME_391,
             Data: new[] {new(DateTime.Now.ToString("dddd, MMMM dd, yyyy HH:mm:ss ")), Frame.Server.ServerFields.TimeZone}));
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 }

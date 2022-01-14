@@ -63,13 +63,6 @@ public enum CommandDataType
     None
 }
 
-public enum COM_RESULT
-{
-    COM_SUCCESS = 0,
-    COM_ERR = -1,
-    COM_WAIT = -2
-}
-
 public class CommandCollection
 {
     private readonly List<Command> Commands = new();
@@ -126,11 +119,11 @@ public class Command
         return true;
     }
 
-    public COM_RESULT Execute(Frame Frame)
+    public bool Execute(Frame Frame)
     {
         if (ForceFloodCheck)
             if (!fldchk(Frame.User))
-                return COM_RESULT.COM_WAIT;
+                return false;
 
         if (Function != null)
         {
@@ -139,17 +132,17 @@ public class Command
             {
                 if (MinParamCount > 0)
                 {
-                    if (Frame.Message.Data != null)
-                        if (Frame.Message.Data.Count >= MinParamCount)
-                            return (COM_RESULT) Function.Invoke(Frame.Command, new object[] {Frame});
+                    if (Frame.Message.Parameters != null)
+                        if (Frame.Message.Parameters.Count >= MinParamCount)
+                            return (bool) Function.Invoke(Frame.Command, new object[] {Frame});
                 }
                 else
                 {
-                    return (COM_RESULT) Function.Invoke(Frame.Command, new object[] {Frame});
+                    return (bool) Function.Invoke(Frame.Command, new object[] {Frame});
                 }
 
                 Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461,
-                    Data: new[] {Frame.Message.Command}));
+                    Data: new[] {Frame.Message.GetCommand()}));
             }
             else if (Frame.User.Registered && PreRegistration)
             {
@@ -164,11 +157,11 @@ public class Command
         else
         {
             Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_UNKNOWNCOMMAND_421,
-                Data: new[] {Frame.Message.Command}));
+                Data: new[] {Frame.Message.GetCommand() }));
             //Frame.User.Send(DefaultFrames.NotImplemented);
         }
 
         //not implemented to irc user
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 }

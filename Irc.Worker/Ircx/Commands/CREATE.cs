@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Linq;
+using System.Text;
 using Irc.ClassExtensions.CSharpTools;
 using Irc.Constants;
 using Irc.Extensions.Access;
@@ -63,7 +64,7 @@ internal class CREATE : Command
         ForceFloodCheck = true;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
         var server = Frame.Server;
         var user = Frame.User;
@@ -73,43 +74,43 @@ internal class CREATE : Command
         {
             //guests cannot create
             Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_UNKNOWNCOMMAND_421,
-                Data: new[] {Frame.Message.Command}));
-            return COM_RESULT.COM_SUCCESS;
+                Data: new[] {Frame.Message.GetCommand() }));
+            return true;
         }
 
         if (user.Profile.Ircvers > 0 && user.Profile.Ircvers < 9)
-            if (user.Channels.ChannelList.Count > 0)
+            if (user.Channels.Count > 0)
             {
-                user.Send(RawBuilder.Create(server, user.Channels.ChannelList[0].Channel, user,
+                user.Send(RawBuilder.Create(server, user.Channels.First().Key, user,
                     Raws.IRCX_ERR_TOOMANYCHANNELS_405));
-                return COM_RESULT.COM_SUCCESS;
+                return true;
             }
 
         var currentIndex = 0;
 
-        var CatCode = new string(message.Data[currentIndex++].ToUpper());
+        var CatCode = new string(message.Parameters[currentIndex++].ToUpper());
         var Cat = ResolveCategoryByString(CatCode);
         if (Cat == Category.None)
         {
             //:server 701 [yournick] :Category not found
             user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_FINDS_NOSUCHCAT_701));
-            return COM_RESULT.COM_SUCCESS;
+            return true;
         }
 
-        var ChannelName = message.Data[currentIndex++];
+        var ChannelName = message.Parameters[currentIndex++];
         if (!Channel.IsValidChannelFormat(ChannelName))
         {
             //:server 706 [yournick] :Channel name is not valid
             user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_FINDS_INVALIDCHANNEL_706));
-            return COM_RESULT.COM_SUCCESS;
+            return true;
         }
 
-        var Topic = message.Data[currentIndex++];
+        var Topic = message.Parameters[currentIndex++];
 
         //Validate Mode
         //If - then no Limit
         //Else Mode + Limit
-        var ModeString = message.Data[currentIndex++];
+        var ModeString = message.Parameters[currentIndex++];
         var Limit = Resources.DefaultCreateUserLimit;
         if (ModeString.Length == 1 && ModeString[0] == 45)
         {
@@ -117,7 +118,7 @@ internal class CREATE : Command
         }
         else
         {
-            Limit = message.Data[currentIndex++];
+            Limit = message.Parameters[currentIndex++];
 
             //Validate Limit
             //Validate Modes
@@ -125,64 +126,64 @@ internal class CREATE : Command
             {
                 //:server 902 [yournick] :Badly formed parameters IRCX_ERR_BADLYFORMEDPARAMS_902
                 BadlyFormed(server, user);
-                return COM_RESULT.COM_SUCCESS;
+                return true;
             }
         }
 
-        var Region = message.Data[currentIndex++].ToUpper();
+        var Region = message.Parameters[currentIndex++].ToUpper();
         var Zone = CountryLanguageZone.ENUS;
         Zone = ResolveCountry(Region);
         if (Zone == CountryLanguageZone.None)
         {
             //:server 902 [yournick] :Badly formed parameters IRCX_ERR_BADLYFORMEDPARAMS_902
             BadlyFormed(server, user);
-            return COM_RESULT.COM_SUCCESS;
+            return true;
         }
         //check for en-us etc
 
         //Validate Locale (A language const from 1 - 24)
-        var Locale = message.Data[currentIndex++];
+        var Locale = message.Parameters[currentIndex++];
         var locale = Tools.Str2Int(Locale);
         if (locale < 1 || locale > 24)
         {
             //:server 902 [yournick] :Badly formed parameters IRCX_ERR_BADLYFORMEDPARAMS_902
             BadlyFormed(server, user);
-            return COM_RESULT.COM_SUCCESS;
+            return true;
         }
 
         //Validate Ownerkey
-        var OwnerKey = Resources.Null;
+        var OwnerKey = string.Empty;
 
-        if (currentIndex < message.Data.Count) OwnerKey = message.Data[currentIndex++];
+        if (currentIndex < message.Parameters.Count) OwnerKey = message.Parameters[currentIndex++];
 
         if (OwnerKey.Length <= 0 || OwnerKey.Length > 31)
         {
             //:server 902 [yournick] :Badly formed parameters IRCX_ERR_BADLYFORMEDPARAMS_902
             BadlyFormed(server, user);
-            return COM_RESULT.COM_SUCCESS;
+            return true;
         }
 
-        if (currentIndex < message.Data.Count)
+        if (currentIndex < message.Parameters.Count)
         {
-            if (message.Data[currentIndex++] != Resources.Zero)
+            if (message.Parameters[currentIndex++] != Resources.Zero)
             {
                 //:server 902 [yournick] :Badly formed parameters IRCX_ERR_BADLYFORMEDPARAMS_902
                 BadlyFormed(server, user);
-                return COM_RESULT.COM_SUCCESS;
+                return true;
             }
         }
         else
         {
             //:server 902 [yournick] :Badly formed parameters IRCX_ERR_BADLYFORMEDPARAMS_902
             BadlyFormed(server, user);
-            return COM_RESULT.COM_SUCCESS;
+            return true;
         }
 
         var channels = Common.GetChannels(Frame.Server, Frame.User, ChannelName, false);
         if (channels.Count != 0)
         {
             user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_FINDS_CHANNELEXISTS_705));
-            return COM_RESULT.COM_SUCCESS;
+            return true;
         }
 
         //Create
@@ -209,12 +210,12 @@ internal class CREATE : Command
 
         c.Modes.UpdateModes(null);
 
-        //c.HostKey = Resources.Null;
+        //c.HostKey = string.Empty;
 
         c.Properties.Set("Ownerkey", OwnerKey);
 
         JOIN.ProcessJoinChannel(Frame, c, OwnerKey);
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 
     public void BadlyFormed(Server server, User user)
@@ -401,7 +402,7 @@ internal class CREATE : Command
             }
         }
 
-        return Resources.Null;
+        return string.Empty;
     }
 
     public static Category ResolveCategoryByString(string Cat)
@@ -459,7 +460,7 @@ internal class CREATE : Command
             }
         }
 
-        return Resources.Null;
+        return string.Empty;
     }
 
     public static string ResolveCountry(CountryLanguageZone Country)
@@ -488,7 +489,7 @@ internal class CREATE : Command
             }
         }
 
-        return Resources.Null;
+        return string.Empty;
     }
 
     public static CountryLanguageZone ResolveCountry(string Country)

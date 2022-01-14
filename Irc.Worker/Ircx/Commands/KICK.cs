@@ -1,4 +1,6 @@
-﻿using Irc.Constants;
+﻿using System.Linq;
+using Irc.ClassExtensions.CSharpTools;
+using Irc.Constants;
 using Irc.Extensions.Access;
 using Irc.Worker.Ircx.Objects;
 
@@ -13,42 +15,38 @@ internal class KICK : Command
         DataType = CommandDataType.Standard;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
-        if (Frame.Message.Data.Count >= 2)
+        if (Frame.Message.Parameters.Count >= 2)
         {
             //kick # nick,[...] :reason
-            var objType = IrcHelper.IdentifyObject(Frame.Message.Data[0]);
-            var c = Frame.Server.Channels.FindObj(Frame.Message.Data[0], objType);
+            var objType = IrcHelper.IdentifyObject(Frame.Message.Parameters[0]);
+            var c = Frame.Server.Channels.FindObj(Frame.Message.Parameters[0], objType);
             if (c != null)
             {
-                var uci = Frame.User.GetChannelInfo(c);
-                if (uci != null)
+                var channelMemberPair = Frame.User.GetChannelInfo(Frame.Message.Parameters[0]);
+                var channel = channelMemberPair.Key;
+                var channelMember = channelMemberPair.Value;
+                if (channel != null)
                 {
-                    if (uci.Member.Level >= UserAccessLevel.ChatHost)
+                    if (channelMember.Level >= UserAccessLevel.ChatHost)
                     {
-                        var Members = c.Members.GetMembers(Frame.Server, c, Frame.User, Frame.Message.Data[1], true);
+                        // TODO: Fix below to report users that do not exist
+                        var memberList = Tools.CSVToArray(Frame.Message.Parameters[1].ToUpper());
+                        var members = c.Members.Where(member => memberList.Contains(member.User.Name.ToUpper())).ToList();
 
-                        if (Members != null)
+                        if (members.Count > 0)
                         {
-                            if (Members.Count > 0)
-                            {
-                                var Reason = Resources.Null;
-                                if (Frame.Message.Data.Count >= 3) Reason = Frame.Message.Data[2];
+                            var Reason = string.Empty;
+                            if (Frame.Message.Parameters.Count >= 3) Reason = Frame.Message.Parameters[2];
 
-                                for (var x = 0; x < Members.Count; x++)
-                                    ProcessKick(Frame.Server, uci.Member, c, Members[x], Reason);
-                            }
-                            else
-                            {
-                                Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User,
-                                    Raw: Raws.IRCX_ERR_NOSUCHNICK_401, Data: new[] {Resources.Null}));
-                            }
+                            for (var x = 0; x < members.Count; x++)
+                                ProcessKick(Frame.Server, channelMember, c, members[x], Reason);
                         }
                         else
                         {
                             Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User,
-                                Raw: Raws.IRCX_ERR_NOSUCHNICK_401, Data: new[] {Resources.Null}));
+                                Raw: Raws.IRCX_ERR_NOSUCHNICK_401, Data: new[] { string.Empty }));
                         }
                     }
                     else
@@ -61,13 +59,13 @@ internal class KICK : Command
                 {
                     //you're not on that channel
                     Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOTONCHANNEL_442,
-                        Data: new[] {Frame.Message.Data[0]}));
+                        Data: new[] {Frame.Message.Parameters[0]}));
                 }
             }
             else
             {
                 Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHCHANNEL_403,
-                    Data: new[] {Frame.Message.Data[0]}));
+                    Data: new[] {Frame.Message.Parameters[0]}));
                 //no such channel
             }
         }
@@ -75,10 +73,10 @@ internal class KICK : Command
         {
             //insufficient parameters
             Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NEEDMOREPARAMS_461,
-                Data: new[] {Frame.Message.Command}));
+                Data: new[] {Frame.Message.GetCommand() }));
         }
 
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 
     public void ProcessKick(Server server, ChannelMember Member, Channel channel, ChannelMember ChannelMember,
@@ -97,7 +95,7 @@ internal class KICK : Command
                 RawBuilder.Create(server, channel, Member.User, Raws.RPL_KICK_IRC,
                     new[] {ChannelMember.User.Address.Nickname, Reason}), ChannelMember.User);
             ChannelMember.ChannelMode.SetNormal();
-            channel.RemoveMember(ChannelMember);
+            channel.Members.Remove(ChannelMember);
             ChannelMember.User.RemoveChannel(channel);
         }
     }

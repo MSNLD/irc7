@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using Irc.ClassExtensions.CSharpTools;
 using Irc.Constants;
@@ -20,26 +21,27 @@ internal class WHOIS : Command
         DataType = CommandDataType.None;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
         var message = Frame.Message;
         var user = Frame.User;
         var server = Frame.Server;
 
-        if (message.Data.Count >= 1)
+        if (message.Parameters.Count >= 1)
         {
-            var Nicknames = Tools.CSVToArray(message.Data[0]);
+            var Nicknames = Tools.CSVToArray(message.Parameters[0]);
             if (Nicknames != null)
                 for (var i = 0; i < Nicknames.Count; i++)
                 {
                     User TargetUser = null;
                     var TargetNickname = new string(Nicknames[i].ToUpper());
 
-                    if (user.ChannelList.Count > 0)
-                        for (var x = 0; x < user.ChannelList.Count; x++)
+                    if (user.Channels.Count > 0)
+                        foreach (var channelMemberPair in Frame.User.Channels)
                         {
-                            var c = user.ChannelList[x].Channel.Members.GetMemberByName(Nicknames[i]);
-                            if (c != null) TargetUser = c.User;
+                            var channel = channelMemberPair.Key;
+                            var targetMember = channel.Members.FirstOrDefault(member => member.User.Name == Nicknames[i]);
+                            if (targetMember != null) TargetUser = targetMember.User;
                         }
 
                     if (TargetUser == null)
@@ -56,29 +58,31 @@ internal class WHOIS : Command
                         user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_WHOISUSER_311,
                             Data: new[]
                             {
-                                TargetUser.Address.Nickname, TargetUser.Address.Userhost, TargetUser.Address.Hostname,
-                                TargetUser.Address.RealName
+                                TargetUser.Address.Nickname, TargetUser.Address.User, TargetUser.Address.Host,
+                                TargetUser.RealName
                             }));
 
-                        if (TargetUser.Channels.ChannelList.Count > 0)
+                        if (TargetUser.Channels.Count > 0)
                         {
                             var OutputRaw = new StringBuilder(512);
                             var WHOIS_319_RAW = RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_WHOISCHANNELS_319X,
                                 Data: new[] {TargetUser.Address.Nickname}, Newline: false);
                             OutputRaw.Append(WHOIS_319_RAW);
 
-                            for (var c = 0; c < TargetUser.ChannelList.Count; c++)
+                            foreach (var channelMemberPair in TargetUser.Channels)
                             {
+                                var channel = channelMemberPair.Key;
+                                var member = channelMemberPair.Value;
                                 var HasMode =
-                                    TargetUser.ChannelList[c].Member.ChannelMode.UserMode > ChanUserMode.Normal
+                                    member.ChannelMode.UserMode > ChanUserMode.Normal
                                         ? true
                                         : false;
-                                if (OutputRaw.Length + TargetUser.ChannelList[c].Channel.Name.Length +
+                                if (OutputRaw.Length + channel.Name.Length +
                                     (HasMode ? 1 : 0) < 510)
                                 {
                                     if (HasMode)
-                                        OutputRaw.Append((char) TargetUser.ChannelList[c].Member.ChannelMode.modeChar);
-                                    OutputRaw.Append(TargetUser.ChannelList[c].Channel.Name);
+                                        OutputRaw.Append((char)member.ChannelMode.modeChar);
+                                    OutputRaw.Append(channel.Name);
                                     OutputRaw.Append(' ');
                                 }
                                 else
@@ -97,7 +101,7 @@ internal class WHOIS : Command
                         }
 
                         user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_WHOISSERVER_312,
-                            Data: new[] {TargetUser.Address.Nickname, server.Name, Resources.Null}));
+                            Data: new[] {TargetUser.Address.Nickname, server.Name, string.Empty}));
 
                         if (TargetUser.Profile.Away)
                             user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_AWAY_301,
@@ -112,7 +116,7 @@ internal class WHOIS : Command
 
                         if (user.Level >= UserAccessLevel.ChatGuide)
                             user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_WHOISIP_320,
-                                Data: new[] {TargetUser.Address.Nickname, TargetUser.Address.RemoteIP}));
+                                Data: new[] {TargetUser.Address.Nickname, TargetUser.RemoteIP}));
 
                         if (TargetUser.Modes.Secure.Value == 1)
                             user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRC2_RPL_WHOISSECURE_671,
@@ -138,6 +142,6 @@ internal class WHOIS : Command
                     Data: new[] {Resources.CommandWhois}));
         }
 
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 }

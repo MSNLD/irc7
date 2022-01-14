@@ -13,28 +13,28 @@ public class USER : Command
         DataType = CommandDataType.None;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
-        if (Frame.Message.Data.Count == 4)
+        if (Frame.Message.Parameters.Count == 4)
         {
             var u = Frame.User;
-            var iUsernameLen = Frame.Message.Data[0].Length > Program.Config.MaxUsername
+            var iUsernameLen = Frame.Message.Parameters[0].Length > Program.Config.MaxUsername
                 ? Program.Config.MaxUsername
-                : Frame.Message.Data[0].Length;
+                : Frame.Message.Parameters[0].Length;
             var Userhost = new StringBuilder(iUsernameLen + 1);
             Userhost.Append("~");
-            Userhost.Append(Frame.Message.Data[0].Substring(iUsernameLen));
-            u.Address.Userhost = Userhost.ToString();
+            Userhost.Append(Frame.Message.Parameters[0].Substring(iUsernameLen));
+            u.Address.User = Userhost.ToString();
 
-            var Realname = Frame.Message.Data[3];
+            var Realname = Frame.Message.Parameters[3];
             if (Realname.Length > Program.Config.MaxRealname)
                 Realname = new string(Realname.Substring(Program.Config.MaxRealname));
 
 
             if (Realname.Length == 0) Realname = Resources.Wildcard;
-            u.Address.RealName = Realname;
+            u.RealName = Realname;
         }
 
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 }

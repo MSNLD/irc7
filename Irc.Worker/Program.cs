@@ -84,7 +84,7 @@ public class Program
         Debug.Out(string.Format("port: {0} buffSize: {1} backLog: {2} maxClients: {3} maxClientsPerIP: {4}",
             Config.BindPort, Config.BufferSize, Config.BackLog, Config.MaxClients, Config.MaxClientsPerIP));
 
-        BaseServer = new Server(new Access(Config.ServerName, false), new ServerProperties(), new ObjectCollection<Channel>());
+        BaseServer = new Server(new Access(Config.ServerName, false), new PropCollection(), new List<Channel>());
         BaseServer.ServerFields.FullName = Config.ServerFullName;
         BaseServer.Name = Config.ServerName;
 
@@ -98,7 +98,7 @@ public class Program
             if (Channels[c].Topic != null)
                 channel.Properties.Set("Topic", Channels[c].Topic);
 
-            channel.Properties.TopicLastChanged = Channels[c].TopicLastChanged;
+            channel.TopicLastChanged = Channels[c].TopicLastChanged;
             channel.Properties.Set("Ownerkey", Channels[c].Ownerkey);
             channel.Properties.Set("Hostkey", Channels[c].Hostkey);
             channel.Properties.Set("Subject", Channels[c].Subject);

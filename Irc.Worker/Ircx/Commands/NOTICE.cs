@@ -11,7 +11,7 @@ public class NOTICE : Command
         DataType = CommandDataType.Standard;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
         return PRIVMSG.ProcessMessage(Frame, false);
     }

@@ -17,20 +17,20 @@ internal class LISTX : Command
         ForceFloodCheck = true;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
         var server = Frame.Server;
         var message = Frame.Message;
         var user = Frame.User;
 
-        var Channels = new List<Channel>();
-        if (message.Data.Count > 1)
+        IList<Channel> Channels = new List<Channel>();
+        if (message.Parameters.Count > 1)
         {
             //
-            if (Channel.IsChannel(message.Data[1]))
+            if (Channel.IsChannel(message.Parameters[1]))
             {
                 //process as list of channels
-                var ChannelNames = Tools.CSVToArray(message.Data[1]);
+                var ChannelNames = Tools.CSVToArray(message.Parameters[1]);
                 //LISTX [<query list>] <mask>
                 //<query list> One or more query terms separated by spaces or commas.
                 //<mask>         Sequence of characters that is used to select a matching channel name or topic. The character * and ? are used for wildcard searches.
@@ -57,8 +57,8 @@ internal class LISTX : Command
                     {
                         //<- :SERVER 900 Administrator LISTX :Bad command
                         user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900,
-                            Data: new[] {message.Data[0]}));
-                        return COM_RESULT.COM_SUCCESS;
+                            Data: new[] {message.Parameters[0]}));
+                        return true;
                     }
                     else
                     {
@@ -74,10 +74,10 @@ internal class LISTX : Command
                 int iMinMembers = 0, iMaxMembers = int.MaxValue;
                 int iMinutesBefore = int.MaxValue, iMinutesAfter = 0;
                 int iMinutesBeforeTopic = int.MaxValue, iMinutesAfterTopic = 0;
-                var LanguageMask = Resources.Null;
-                var NameMask = Resources.Null;
-                var SubjectMask = Resources.Null;
-                var TopicMask = Resources.Null;
+                var LanguageMask = string.Empty;
+                var NameMask = string.Empty;
+                var SubjectMask = string.Empty;
+                var TopicMask = string.Empty;
 
                 bool bCheckMembers = false,
                     bCheckCreation = false,
@@ -89,7 +89,7 @@ internal class LISTX : Command
                     bCheckTopic = false;
 
                 //process as list of commands
-                var Params = Tools.CSVToArray(message.Data[1], true, Address.MaxFieldLen);
+                var Params = Tools.CSVToArray(message.Parameters[1], true, Resources.MaxFieldLen);
 
                 for (var i = 0; i < Params.Count; i++)
                 {
@@ -107,8 +107,8 @@ internal class LISTX : Command
                                 {
                                     /* Bad Command */
                                     user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900,
-                                        Data: new[] {message.Data[0]}));
-                                    return COM_RESULT.COM_SUCCESS;
+                                        Data: new[] {message.Parameters[0]}));
+                                    return true;
                                 }
 
                                 break;
@@ -122,8 +122,8 @@ internal class LISTX : Command
                                 {
                                     /* Bad Command */
                                     user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900,
-                                        Data: new[] {message.Data[0]}));
-                                    return COM_RESULT.COM_SUCCESS;
+                                        Data: new[] {message.Parameters[0]}));
+                                    return true;
                                 }
 
                                 break;
@@ -138,8 +138,8 @@ internal class LISTX : Command
                                 {
                                     /* Bad Command */
                                     user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900,
-                                        Data: new[] {message.Data[0]}));
-                                    return COM_RESULT.COM_SUCCESS;
+                                        Data: new[] {message.Parameters[0]}));
+                                    return true;
                                 }
 
                                 if (Params[i][1] == (byte) '<')
@@ -154,8 +154,8 @@ internal class LISTX : Command
                                 {
                                     /* Bad Command */
                                     user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900,
-                                        Data: new[] {message.Data[0]}));
-                                    return COM_RESULT.COM_SUCCESS;
+                                        Data: new[] {message.Parameters[0]}));
+                                    return true;
                                 }
 
                                 break;
@@ -172,8 +172,8 @@ internal class LISTX : Command
                                 {
                                     /* bad command */
                                     user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900,
-                                        Data: new[] {message.Data[0]}));
-                                    return COM_RESULT.COM_SUCCESS;
+                                        Data: new[] {message.Parameters[0]}));
+                                    return true;
                                 }
 
                                 break;
@@ -190,8 +190,8 @@ internal class LISTX : Command
                                 {
                                     /* bad command */
                                     user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900,
-                                        Data: new[] {message.Data[0]}));
-                                    return COM_RESULT.COM_SUCCESS;
+                                        Data: new[] {message.Parameters[0]}));
+                                    return true;
                                 }
 
                                 break;
@@ -214,16 +214,16 @@ internal class LISTX : Command
                                     {
                                         /* bad command */
                                         user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900,
-                                            Data: new[] {message.Data[0]}));
-                                        return COM_RESULT.COM_SUCCESS;
+                                            Data: new[] {message.Parameters[0]}));
+                                        return true;
                                     }
                                 }
                                 else
                                 {
                                     /* bad command */
                                     user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900,
-                                        Data: new[] {message.Data[0]}));
-                                    return COM_RESULT.COM_SUCCESS;
+                                        Data: new[] {message.Parameters[0]}));
+                                    return true;
                                 }
 
                                 break;
@@ -240,8 +240,8 @@ internal class LISTX : Command
                                 {
                                     /* bad command */
                                     user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900,
-                                        Data: new[] {message.Data[0]}));
-                                    return COM_RESULT.COM_SUCCESS;
+                                        Data: new[] {message.Parameters[0]}));
+                                    return true;
                                 }
 
                                 break;
@@ -274,16 +274,16 @@ internal class LISTX : Command
                                     {
                                         /* Bad Command */
                                         user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900,
-                                            Data: new[] {message.Data[0]}));
-                                        return COM_RESULT.COM_SUCCESS;
+                                            Data: new[] {message.Parameters[0]}));
+                                        return true;
                                     }
                                 }
                                 else
                                 {
                                     /* Bad Command */
                                     user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900,
-                                        Data: new[] {message.Data[0]}));
-                                    return COM_RESULT.COM_SUCCESS;
+                                        Data: new[] {message.Parameters[0]}));
+                                    return true;
                                 }
 
                                 break;
@@ -298,8 +298,8 @@ internal class LISTX : Command
                                     {
                                         //<- :SERVER 900 Administrator LISTX :Bad command
                                         user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900,
-                                            Data: new[] {message.Data[0]}));
-                                        return COM_RESULT.COM_SUCCESS;
+                                            Data: new[] {message.Parameters[0]}));
+                                        return true;
                                     }
 
                                     if (maxListEntries > 1)
@@ -311,8 +311,8 @@ internal class LISTX : Command
                                 {
                                     //<- :SERVER 900 Administrator LISTX :Bad command
                                     user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900,
-                                        Data: new[] {message.Data[0]}));
-                                    return COM_RESULT.COM_SUCCESS;
+                                        Data: new[] {message.Parameters[0]}));
+                                    return true;
                                 }
 
                                 break;
@@ -329,8 +329,8 @@ internal class LISTX : Command
                             {
                                 //<- :SERVER 900 Administrator LISTX :Bad command
                                 user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900,
-                                    Data: new[] {message.Data[0]}));
-                                return COM_RESULT.COM_SUCCESS;
+                                    Data: new[] {message.Parameters[0]}));
+                                return true;
                             }
 
                             if (maxListEntries > 1)
@@ -346,8 +346,8 @@ internal class LISTX : Command
                         {
                             //<- :SERVER 900 Administrator LISTX :Bad command
                             user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_ERR_BADCOMMAND_900,
-                                Data: new[] {message.Data[0]}));
-                            return COM_RESULT.COM_SUCCESS;
+                                Data: new[] {message.Parameters[0]}));
+                            return true;
                         }
                     }
                 }
@@ -355,7 +355,7 @@ internal class LISTX : Command
                 /* Find channel logic here */
 
 
-                for (var i = 0; i < server.Channels.Length; i++)
+                for (var i = 0; i < server.Channels.Count; i++)
                 {
                     bool bFoundMembers = true,
                         bFoundCreation = true,
@@ -367,8 +367,8 @@ internal class LISTX : Command
                         bFoundSubject = true;
                     if (bCheckMembers)
                     {
-                        if (server.Channels.IndexOf(i).MemberList.Count <= iMinMembers &&
-                            server.Channels.IndexOf(i).MemberList.Count >= iMaxMembers)
+                        if (server.Channels[i].Members.Count <= iMinMembers &&
+                            server.Channels[i].Members.Count >= iMaxMembers)
                             bFoundMembers = true;
                         else
                             bFoundMembers = false;
@@ -377,7 +377,7 @@ internal class LISTX : Command
                     if (bCheckCreation)
                     {
                         long iTime = (DateTime.UtcNow.Ticks - Resources.epoch) / TimeSpan.TicksPerSecond,
-                            iAge = iTime - server.Channels.IndexOf(i).Properties.CreationDate;
+                            iAge = iTime - server.Channels[i].CreationDate;
                         iAge = iAge / 60;
                         if (iAge <= iMinutesBefore && iAge >= iMinutesAfter)
                             bFoundCreation = true;
@@ -387,7 +387,7 @@ internal class LISTX : Command
 
                     if (bCheckName)
                     {
-                        if (StringBuilderRegEx.EvaluateString(NameMask, server.Channels.IndexOf(i).Name.ToUpper(), true))
+                        if (StringBuilderRegEx.EvaluateString(NameMask, server.Channels[i].Name.ToUpper(), true))
                             bFoundName = true;
                         else
                             bFoundName = false;
@@ -396,7 +396,7 @@ internal class LISTX : Command
                     if (bCheckLanguage)
                     {
                         if (StringBuilderRegEx.EvaluateString(LanguageMask,
-                                server.Channels.IndexOf(i).Properties.Get("Language"), true))
+                                server.Channels[i].Properties.Get("Language"), true))
                             bFoundLanguage = true;
                         else
                             bFoundLanguage = false;
@@ -404,7 +404,7 @@ internal class LISTX : Command
 
                     if (bCheckRegistered)
                     {
-                        if (iRegisteredFlag == server.Channels.IndexOf(i).Modes.Registered.Value)
+                        if (iRegisteredFlag == server.Channels[i].Modes.Registered.Value)
                             bFoundRegistered = true;
                         else
                             bFoundRegistered = false;
@@ -412,7 +412,7 @@ internal class LISTX : Command
 
                     if (bCheckSubject)
                     {
-                        if (StringBuilderRegEx.EvaluateString(SubjectMask, server.Channels.IndexOf(i).Properties.Get("Subject"),
+                        if (StringBuilderRegEx.EvaluateString(SubjectMask, server.Channels[i].Properties.Get("Subject"),
                                 true))
                             bFoundSubject = true;
                         else
@@ -421,7 +421,7 @@ internal class LISTX : Command
 
                     if (bCheckTopic)
                     {
-                        if (StringBuilderRegEx.EvaluateString(TopicMask, server.Channels.IndexOf(i).Properties.Get("Topic"),
+                        if (StringBuilderRegEx.EvaluateString(TopicMask, server.Channels[i].Properties.Get("Topic"),
                                 true))
                             bFoundTopic = true;
                         else
@@ -431,7 +431,7 @@ internal class LISTX : Command
                     if (bCheckTopicChanged)
                     {
                         long iTime = (DateTime.UtcNow.Ticks - Resources.epoch) / TimeSpan.TicksPerSecond,
-                            iAge = iTime - server.Channels.IndexOf(i).Properties.TopicLastChanged;
+                            iAge = iTime - server.Channels[i].TopicLastChanged;
                         if (iTime < iMinutesBeforeTopic && iTime > iMinutesAfterTopic)
                             bFoundTopicChanged = true;
                         else
@@ -439,13 +439,13 @@ internal class LISTX : Command
                     }
 
                     if (bFoundMembers && bFoundCreation && bFoundName && bFoundLanguage && bFoundRegistered &&
-                        bFoundSubject && bFoundTopic && bFoundTopicChanged) Channels.Add(server.Channels.IndexOf(i));
+                        bFoundSubject && bFoundTopic && bFoundTopicChanged) Channels.Add(server.Channels[i]);
                 }
             }
         }
         else
         {
-            Channels = server.Channels.ChatObjects.Cast<Channel>().ToList();
+            Channels = server.Channels;
         }
 
 
@@ -456,8 +456,8 @@ internal class LISTX : Command
                 Data: new[]
                 {
                     Channels[i].Name, Channels[i].Modes.ChannelModeShortString, Channels[i].Properties.Get("Topic")
-                }, IData: new[] {Channels[i].MemberList.Count, Channels[i].Modes.UserLimit.Value}));
+                }, IData: new[] {Channels[i].Members.Count, Channels[i].Modes.UserLimit.Value}));
         user.Send(RawBuilder.Create(server, Client: user, Raw: Raws.IRCX_RPL_LISTXEND_817));
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 }

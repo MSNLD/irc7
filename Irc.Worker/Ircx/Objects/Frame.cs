@@ -25,7 +25,7 @@ public class Frame
 
         if (Message != null)
         {
-            Command = (Command) Server.Commands.GetCommand(Message.Command);
+            Command = (Command) Server.Commands.GetCommand(Message.GetCommand());
             this.Message = Message;
         }
     }

@@ -19,8 +19,9 @@ public class Client : ChatObject
     public long LastPing;
     public long LoggedOn;
     public bool WaitPing;
+    public string RemoteIP = Resources.Wildcard;
 
-    public Client(): base(new UserProperties())
+    public Client(): base(new PropCollection())
     {
         base.Properties.Set(Resources.UserPropOid, Id.ToUnformattedString());
         LastActive = DateTime.UtcNow.Ticks;
@@ -52,8 +53,8 @@ public class Client : ChatObject
         WaitPing = false;
         LastActive = DateTime.UtcNow.Ticks;
         LastPing = LastActive; // Reset last ping as communication has taken place
-        FloodProfile.currentInputBytes += (uint)frame.Message.rawData.Length;
-        Debug.Out(ShortId + ":RX: " + frame.Message.rawData);
+        FloodProfile.currentInputBytes += (uint)frame.Message.OriginalText.Length;
+        Debug.Out(ShortId + ":RX: " + frame.Message.OriginalText);
         BufferIn.Queue.Enqueue(frame);
     }
 
@@ -67,7 +68,7 @@ public class Client : ChatObject
         BufferOut.Enqueue($"{data}\r\n");
     }
     
-    public COM_RESULT Process(Frame Frame)
+    public bool Process(Frame Frame)
     {
         // to be moved somewhere better
         //Frame iFrame = base.BufferIn.Queue.Dequeue();
@@ -80,9 +81,9 @@ public class Client : ChatObject
         }
 
         Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_UNKNOWNCOMMAND_421,
-            Data: new[] {Frame.Message.Command}));
+            Data: new[] {Frame.Message.GetCommand() }));
         // No such command
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 
     public void Register()

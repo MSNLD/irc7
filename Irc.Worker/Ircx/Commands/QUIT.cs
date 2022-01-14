@@ -1,4 +1,5 @@
-﻿using Irc.Constants;
+﻿using System.ComponentModel.DataAnnotations;
+using Irc.Constants;
 using Irc.Worker.Ircx.Objects;
 
 namespace Irc.Worker.Ircx.Commands;
@@ -11,13 +12,13 @@ public class QUIT : Command
         DataType = CommandDataType.None;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
         string Reason = null;
-        if (Frame.Message.Data != null) Reason = Frame.Message.Data[0];
+        if (Frame.Message.Parameters != null) Reason = Frame.Message.Parameters[0];
 
         ProcessQuit(Frame.Server, Frame.User, Reason);
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 
     public static void ProcessQuit(Server server, Client client, string Reason)
@@ -30,10 +31,11 @@ public class QUIT : Command
 
                 var Raw = RawBuilder.Create(Client: user, Raw: Raws.RPL_QUIT_IRC, Data: new[] { Reason });
 
-                for (var c = 0; c < user.ChannelList.Count; c++)
+                foreach (var channelMemberPair in user.Channels)
                 {
-                    var channel = user.ChannelList[c].Channel;
-                    channel.RemoveMember(user);
+                    var channel = channelMemberPair.Key;
+                    var member = channelMemberPair.Value;
+                    channel.Members.Remove(member);
                     channel.Send(Raw, user);
                 }
 

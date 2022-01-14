@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using Irc.Constants;
 using Irc.Extensions.Access;
 
@@ -7,81 +9,48 @@ namespace Irc.Worker.Ircx.Objects;
 public class User : Client
 {
     public Access Access;
-    public UserChannelInfo ActiveChannel;
-    public UserChannelCollection Channels;
+    public IDictionary<Channel, ChannelMember> Channels;
     public UserAccessLevel Level;
     public UserModeCollection Modes;
     public Profile Profile;
 
+    public string RealName;
+
     public User()
     {
-        Access = new Access(Name, false);
+        Access = new Access(Resources.Wildcard, false);
         Modes = new UserModeCollection();
-        Channels = new UserChannelCollection();
+        Channels = new ConcurrentDictionary<Channel, ChannelMember>();
         Profile = new Profile();
+        UpdateUserNickname(Resources.Wildcard);
     }
-
-    public UserProperties Properties
-    {
-        get => (UserProperties) base.Properties;
-        set => base.Properties = value;
-    }
-
-    public List<UserChannelInfo> ChannelList => Channels.ChannelList;
-
-    public bool IsOnChannel(Channel Channel)
-    {
-        //return (this.Channel == Channel);
-        for (var c = 0; c < Channels.ChannelList.Count; c++)
-            if (Channels.ChannelList[c].Channel == Channel)
-                return true;
-        return false;
-    }
-
 
     public void BroadcastToChannels(string data, bool ExcludeUser)
     {
-        for (var c = 0; c < ChannelList.Count; c++)
+        foreach (Channel channel in Channels.Keys)
         {
-            var channel = ChannelList[c].Channel;
             channel.Send(data, this, ExcludeUser);
         }
     }
     
-    public void AddChannel(UserChannelInfo c)
+    public void AddChannel(Channel channel, ChannelMember member)
     {
-        ActiveChannel = c;
-        Channels.AddChannelInfo(c);
+        Channels.Add(channel, member);
     }
 
-    public void RemoveChannel(Channel c)
+    public void RemoveChannel(Channel channel)
     {
-        Channels.RemChannel(c);
-        if (ActiveChannel != null)
-            if (ActiveChannel.Channel == c)
-                ActiveChannel = null;
+        Channels.Remove(channel);
     }
 
-    public UserChannelInfo GetChannelInfo(Channel Channel)
+    public KeyValuePair<Channel, ChannelMember> GetChannelMemberInfo(Channel channel)
     {
-        if (ActiveChannel != null)
-            if (ActiveChannel.Channel == Channel)
-                return ActiveChannel;
-
-        for (var c = 0; c < Channels.ChannelList.Count; c++)
-            if (Channels.ChannelList[c].Channel == Channel)
-                return Channels.ChannelList[c];
-        return null;
+        return Channels.FirstOrDefault(c => c.Key == channel);
     }
 
-    public UserChannelInfo GetChannelInfo(string Name)
+    public KeyValuePair<Channel, ChannelMember> GetChannelInfo(string Name)
     {
-        if (ActiveChannel.Channel.Name.ToUpper() == Name.ToUpper()) return ActiveChannel;
-
-        for (var c = 0; c < Channels.ChannelList.Count; c++)
-            if (Channels.ChannelList[c].Channel.Name.ToUpper() == Name.ToUpper())
-                return Channels.ChannelList[c];
-        return null;
+        return Channels.FirstOrDefault(c => c.Key.Name == Name);
     }
 
     public void UpdateUserNickname(string Nickname)

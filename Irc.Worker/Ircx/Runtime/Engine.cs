@@ -23,7 +23,7 @@ public class Connection
     {
         Socket = ConnectingSocket;
         Client = ConnectingUser;
-        Client.Address.RemoteIP = Socket.RemoteIP;
+        Client.RemoteIP = Socket.RemoteIP;
     }
 }
 
@@ -61,7 +61,7 @@ public class Engine
                     Raw: Saturation == SAT_RESULT.S_INPUT_EXCEEDED
                         ? Raws.IRCX_CLOSINGLINK_008_INPUTFLOODING
                         : Raws.IRCX_CLOSINGLINK_009_OUTPUTSATURATION,
-                    Data: new[] {Frame.Client.Address.RemoteIP}));
+                    Data: new[] {Frame.Client.RemoteIP}));
                 Client.InputQueue.Clear();
                 QUIT.ProcessQuit(Frame.Server, Frame.Client, Resources.INPUTFLOODING);
                 Client.FloodProfile.currentInputBytes = 0;
@@ -69,11 +69,11 @@ public class Engine
 
             try
             {
-                if (Client.Process(Frame) != COM_RESULT.COM_WAIT)
+                if (Client.Process(Frame) != false)
                 {
                     Client.InputQueue.Dequeue();
                     if (Client.FloodProfile.currentInputBytes > 0)
-                        Client.FloodProfile.currentInputBytes -= (uint) Frame.Message.rawData.Length;
+                        Client.FloodProfile.currentInputBytes -= (uint) Frame.Message.OriginalText.Length;
                 }
             }
             catch (Exception e)
@@ -81,13 +81,13 @@ public class Engine
                 //lets get rid of the thing that caused the error and report it
                 if (Client.InputQueue.Count > 0) Client.InputQueue.Dequeue();
                 if (Client.FloodProfile.currentInputBytes > 0)
-                    Client.FloodProfile.currentInputBytes -= (uint) Frame.Message.rawData.Length;
+                    Client.FloodProfile.currentInputBytes -= (uint) Frame.Message.OriginalText.Length;
                 var Mask = Resources.Wildcard;
-                if (Client.Address._address[3] != null) Mask = Client.Address._address[3];
-                Debug.Out(Client.Address.RemoteIP + " (" + Mask + ")\r\n =>" + Frame.Message.rawData);
+                if (Client.Address.GetFullAddress() != null) Mask = Client.Address.GetFullAddress();
+                Debug.Out(Client.RemoteIP + " (" + Mask + ")\r\n =>" + Frame.Message.OriginalText);
                 Debug.Out(e.Message);
                 Client.Send(RawBuilder.Create(Frame.Server, Client: Client, Raw: Raws.IRCX_ERR_EXCEPTION,
-                    Data: new[] {Frame.Message.Data[0]}));
+                    Data: new[] {Frame.Message.Parameters[0]}));
             }
         }
 
@@ -96,10 +96,10 @@ public class Engine
 
     private void RemoveEmptyChannels()
     {
-        for (var i = Server.Channels.Length - 1; i >= 0; i--)
+        for (var i = Server.Channels.Count - 1; i >= 0; i--)
         {
-            var c = (Channel)Server.Channels.IndexOf(i);
-            if (c.MemberList.Count == 0 && c.Modes.Registered.Value != 0x1) Server.Channels.Remove(c);
+            var c = (Channel)Server.Channels[i];
+            if (c.Members.Count == 0 && c.Modes.Registered.Value != 0x1) Server.Channels.Remove(c);
         }
     }
 
@@ -141,7 +141,7 @@ public class Engine
                     }
                 }
 
-                // Data Block
+                // Parameters Block
                 for (var c = 0; c < ClientConnections.Count; c++)
                     if (!ClientConnections[c].Socket.IsConnected)
                     {
@@ -175,7 +175,7 @@ public class Engine
                             {
                                 var message = new Message(InputData[x]);
                                 if (message != null)
-                                    if (message.Command != null)
+                                    if (message.GetCommand() != null)
                                     {
                                         var frame = new Frame(Server, ClientConnections[c], new Message(InputData[x]));
                                         ClientConnections[c].Client.Receive(frame);
@@ -218,7 +218,7 @@ public class Engine
                                 if (ClientConnections[c].Client.Registered)
                                     ClientConnections[c].Client.Send(RawBuilder.Create(Server,
                                         Client: ClientConnections[c].Client, Raw: Raws.IRCX_CLOSINGLINK_011_PINGTIMEOUT,
-                                        Data: new[] {ClientConnections[c].Client.Address.RemoteIP}));
+                                        Data: new[] {ClientConnections[c].Client.RemoteIP}));
                                 QUIT.ProcessQuit(Server, ClientConnections[c].Client, Resources.PINGTIMEOUT);
                             }
                         }

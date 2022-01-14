@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Irc.Extensions.Access;
 
 namespace Irc.Worker.Ircx.Objects;
@@ -16,7 +17,7 @@ namespace Irc.Worker.Ircx.Objects;
  */
 public class FloodProtectionLevel
 {
-    //Data, Invitation, Join, WrongChannelPassword, Standard, HostMessage, None
+    //Parameters, Invitation, Join, WrongChannelPassword, Standard, HostMessage, None
     public int Delay, DelayData, DelayInvite, DelayJoin, DelayWrongPass, DelayStandard, DelayHostMessage;
 
     public long LastProcessedTicks,
@@ -256,9 +257,11 @@ public class Flood
         return Audit(user.FloodProfile, type, user.Level);
     }
 
-    public static FLD_RESULT FloodCheck(CommandDataType type, UserChannelInfo c)
+    public static FLD_RESULT FloodCheck(CommandDataType type, KeyValuePair<Channel, ChannelMember> channelMemberPair)
     {
-        return Audit(c.Channel.FloodProfile, type, c.Member.Level);
+        var channel = channelMemberPair.Key;
+        var member = channelMemberPair.Value;
+        return Audit(channel.FloodProfile, type, member.Level);
     }
 
     public static FLD_RESULT Audit(FloodProfile profile, CommandDataType type, UserAccessLevel level)

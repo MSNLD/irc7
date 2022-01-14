@@ -1,4 +1,5 @@
-﻿using Irc.Constants;
+﻿using System.Linq;
+using Irc.Constants;
 using Irc.Extensions.Access;
 using Irc.Worker.Ircx.Objects;
 
@@ -14,19 +15,19 @@ internal class KILL : Command
         PreRegistration = false;
     }
 
-    public new COM_RESULT Execute(Frame Frame)
+    public new bool Execute(Frame Frame)
     {
-        if (Frame.Message.Data.Count >= 1)
+        if (Frame.Message.Parameters.Count >= 1)
         {
-            var objs = Frame.Server.GetObjects(Frame.Message.Data[0]);
+            var objs = Frame.Server.GetObjects(Frame.Message.Parameters[0]);
 
             if (objs.Count > 0)
             {
                 // Supports KILL OID1,OID2,OID3 Reason
                 // Can mix user / chan
 
-                var Reason = Resources.Null;
-                if (Frame.Message.Data.Count > 1) Reason = Frame.Message.Data[1];
+                var Reason = string.Empty;
+                if (Frame.Message.Parameters.Count > 1) Reason = Frame.Message.Parameters[1];
 
                 for (var i = 0; i < objs.Count; i++)
                     //Determine type
@@ -45,24 +46,25 @@ internal class KILL : Command
             }
         }
 
-        return COM_RESULT.COM_SUCCESS;
+        return true;
     }
 
     public bool ProcessKill(Frame Frame, User TargetUser, string Reason)
     {
         if (Frame.User.Level >= UserAccessLevel.ChatGuide && Frame.User.Level >= TargetUser.Level)
         {
-            var channels = TargetUser.ChannelList;
+            var channels = TargetUser.Channels;
 
             var KillRaw = RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.RPL_KILL_IRC,
                 Data: new[] {TargetUser.Address.Nickname, Reason});
 
-            while (channels.Count > 0)
+            foreach (var channelMemberPair in channels)
             {
-                var channel = channels[0].Channel;
+                var channel = channelMemberPair.Key;
                 //TargetUser.ChannelMode.SetNormal();
                 // Need to reset usermodes
-                channel.RemoveMember(TargetUser);
+                var member = channelMemberPair.Value;
+                channel.Members.Remove(member);
                 TargetUser.RemoveChannel(channel);
 
                 //Broadcast to channel after user has been removed
@@ -83,14 +85,14 @@ internal class KILL : Command
     {
         if (Frame.User.Level >= UserAccessLevel.ChatGuide)
         {
-            var Members = Frame.Channel.MemberList;
+            var Members = Frame.Channel.Members;
 
             if (Members != null)
             {
                 if (Members.Count > 0)
                 {
                     // Dispose of all users first
-                    if (Frame.Message.Data.Count >= 2) Reason = Frame.Message.Data[1];
+                    if (Frame.Message.Parameters.Count >= 2) Reason = Frame.Message.Parameters[1];
 
                     for (var x = 0; x < Members.Count; x++)
                         // Channel kill doesnt kill people of same level if they are in the chan
@@ -118,7 +120,7 @@ internal class KILL : Command
             else
             {
                 Frame.User.Send(RawBuilder.Create(Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_NOSUCHNICK_401,
-                    Data: new[] {Resources.Null}));
+                    Data: new[] {string.Empty}));
             }
         }
         else

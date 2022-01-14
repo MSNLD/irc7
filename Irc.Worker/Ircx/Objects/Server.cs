@@ -10,13 +10,13 @@ namespace Irc.Worker.Ircx.Objects;
 public class Server: ChatObject
 {
     public IAccess Access;
-    public IObjectCollection<Channel> Channels;
+    public IList<Channel> Channels;
     public CommandCollection Commands = new();
 
     // Statistics
-    public IObjectCollection<User> Users = new ObjectCollection<User>();
+    public IList<User> Users = new List<User>();
 
-    public Server(IAccess access, IPropStore propStore, IObjectCollection<Channel> channels): base(propStore)
+    public Server(IAccess access, IPropStore propStore, IList<Channel> channels): base(propStore)
     {
         Channels = channels;
         Properties = propStore;
