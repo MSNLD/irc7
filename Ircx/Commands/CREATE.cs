@@ -32,9 +32,9 @@ namespace Core.Ircx.Commands
             User user = Frame.User;
             Message message = Frame.Message;
 
-            if (Frame.User.Level < UserAccessLevel.ChatUser)
+            if (Frame.User.Level < UserAccessLevel.ChatGuest)
             {
-                //guests cannot create
+                //has to be at least a guest to create (temporarily)
                 Frame.User.Send(Raws.Create(Server: Frame.Server, Client: Frame.User, Raw: Raws.IRCX_ERR_UNKNOWNCOMMAND_421, Data: new String8[] { Frame.Message.Command }));
                 return COM_RESULT.COM_SUCCESS;
             }
