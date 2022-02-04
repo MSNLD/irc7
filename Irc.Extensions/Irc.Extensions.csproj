@@ -7,7 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Irc.Extensions.NTLM\Irc.Extensions.NTLM.csproj" />
     <ProjectReference Include="..\Irc\Irc.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Access\" />
   </ItemGroup>
 
 </Project>

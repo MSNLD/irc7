@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using Irc.ClassExtensions.CSharpTools;
+﻿using Irc.Commands;
+using Irc.Interfaces;
 
-namespace Irc.Worker.Ircx;
+namespace Irc;
 
 public class Message
 {
@@ -24,9 +24,11 @@ public class Message
     public int ParamOffset;
 
 
+    private readonly IProtocol _protocol;
     private readonly string _message;
     private string _prefix;
-    private string _command;
+    private ICommand _command;
+    private string _commandName;
     private List<string> _params = new();
     public List<string> Parameters
     {
@@ -37,14 +39,16 @@ public class Message
         get { return _message; }
     }
 
-    public Message(string message)
+    public Message(IProtocol protocol, string message)
     {
+        _protocol = protocol;
         _message = message;
         parse();
     }
 
     public string GetPrefix => _prefix;
-    public string GetCommand() => _command;
+    public ICommand GetCommand() => _command;
+    public string GetCommandName() => _commandName;
     public List<string> GetParameters() => _params;
 
     private bool getPrefix(string prefix)
@@ -62,7 +66,8 @@ public class Message
     {
         if (!string.IsNullOrWhiteSpace(command))
         {
-            _command = command;
+            _commandName = command;
+            _command = _protocol.GetCommand(command);
             return true;
         }
 
@@ -88,8 +93,8 @@ public class Message
 
             if (getCommand(parts[index]))
             {
+                cursor += parts[index].Length + 1;
                 index++;
-                cursor += _command.Length + 1;
             }
 
             for (; index < parts.Length; index++)

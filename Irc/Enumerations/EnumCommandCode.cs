@@ -1,0 +1,47 @@
+﻿namespace Irc.Worker.Ircx;
+
+public enum EnumCommandCode
+{
+    WEBIRC,
+    PING,
+    PONG,
+    AUTH,
+    IRCVERS,
+    IRCX,
+    ISIRCX,
+    VERSION,
+    NICK,
+    USER,
+    QUIT,
+    CREATE,
+    FINDS,
+    FINDU,
+    KILL,
+    GOTO,
+    MODE,
+    PROP,
+    KICK,
+    TIME,
+    TOPIC,
+    PRIVMSG,
+    NOTICE,
+    WHISPER,
+    ACCESS,
+    JOIN,
+    PART,
+    WHO,
+    AWAY,
+    NAMES,
+    WHOIS,
+    INVITE,
+    LISTX,
+    EVENT,
+    USERHOST,
+    ADMIN,
+    INFO,
+    PASS,
+    SERVER,
+
+    RE
+    //, NONE obsoleted?
+}

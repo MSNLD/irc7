@@ -41,16 +41,16 @@ public static class StringBuilderRegEx
         return r.Match(sbRegExEval.ToString()).Success;
     }
 
-    public static bool EvaluteEx(string sRegularExpression, string data, bool IgnoreCase, int offset, int length)
+    public static bool EvaluteEx(string sRegularExpression, string data, bool IgnoreCase, int offset, int Length)
     {
         var r = new Regex(sRegularExpression, IgnoreCase ? RegexOptions.IgnoreCase : RegexOptions.None);
-        return r.Match(data, offset, length).Success;
+        return r.Match(data, offset, Length).Success;
     }
 
-    public static bool EvaluateAbs(string sRegularExpression, string data, bool IgnoreCase, int offset, int length)
+    public static bool EvaluateAbs(string sRegularExpression, string data, bool IgnoreCase, int offset, int Length)
     {
         var r = new Regex(sRegularExpression, IgnoreCase ? RegexOptions.IgnoreCase : RegexOptions.None);
-        return r.Match(data, offset, length).Length == length;
+        return r.Match(data, offset, Length).Length == Length;
     }
 
     public static bool Evalute(string sRegularExpression, string data, bool IgnoreCase)

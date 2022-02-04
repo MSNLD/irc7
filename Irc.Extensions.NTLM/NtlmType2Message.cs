@@ -1,0 +1,122 @@
+﻿using System.Dynamic;
+using System.Runtime.InteropServices;
+using System.Text;
+using Irc.ClassExtensions.CSharpTools;
+using Irc.Extensions.NTLM;
+using Irc.Helpers.CSharpTools;
+
+public class NtlmType2Message
+{
+    private readonly string _targetName;
+    private readonly NTLMShared.TargetInformation _targetInformation;
+    private NTLMShared.NTLMSSPMessageType2 _messageType2;
+    private Dictionary<NtlmFlag, bool> _flags = new();
+
+    public uint Flags
+    {
+        get => _messageType2.Flags;
+        set { _messageType2.Flags = value; EnumerateFlags(_messageType2.Flags); }
+    }
+
+    public byte[] Challenge => _messageType2.Challenge;
+
+    public NtlmType2Message(uint flags, string targetName, NTLMShared.TargetInformation targetInformation)
+    {
+        Flags = flags;
+        _targetName = targetName;
+        _targetInformation = targetInformation;
+
+        EnumerateFlags(flags);
+        Configure();
+    }
+
+    private void Configure()
+    {
+        _messageType2.Type = 2;
+        _messageType2.Signature = NTLMShared.NTLMSignature.ToByteArray();
+        _messageType2.Challenge = "AAAAAAAA".ToByteArray();
+
+        if (Flags == 0)
+        {
+            Flags = (uint)(NtlmFlag.NTLMSSP_NEGOTIATE_UNICODE |
+                    NtlmFlag.NTLMSSP_REQUEST_TARGET |
+                    NtlmFlag.NTLMSSP_NEGOTIATE_NTLM2 |
+                    NtlmFlag.NTLMSSP_NEGOTIATE_128);
+        }
+
+        // If the choice has been given select NTLM2
+        if (_flags[NtlmFlag.NTLMSSP_NEGOTIATE_NTLM] && _flags[NtlmFlag.NTLMSSP_NEGOTIATE_NTLM2])
+            _flags[NtlmFlag.NTLMSSP_NEGOTIATE_NTLM] = false;
+    }
+
+    private string Serialize()
+    {
+        StringBuilder payload = new StringBuilder();
+        StringBuilder targetPayload = new StringBuilder();
+
+        var payloadOffset = Marshal.SizeOf<NTLMShared.NTLMSSPMessageType2>();
+        var targetOffset = 0;
+
+        bool requestTarget = _flags[NtlmFlag.NTLMSSP_REQUEST_TARGET];
+        bool requestTargetInformation = _flags[NtlmFlag.NTLMSSP_NEGOTIATE_TARGET_INFO] | (_targetInformation != null);
+
+        if (requestTarget)
+        {
+            targetOffset = payloadOffset;
+
+            _messageType2.TargetName.Offset = payloadOffset;
+            _messageType2.TargetName.AllocatedSpace = (short)_targetName.Length;
+            _messageType2.TargetName.Length = (short)_targetName.Length;
+        }
+
+        if (requestTargetInformation)
+        {
+            var targetInformationOffset = (targetOffset > 0 ? targetOffset : payloadOffset);
+
+            _messageType2.TargetInformation.Offset = targetInformationOffset;
+            _messageType2.Flags |= (uint)NtlmFlag.NTLMSSP_NEGOTIATE_TARGET_INFO;
+
+            var domainNameSubBlock = new NTLMShared.NTLMSSPSubBlock(2, (short)_targetInformation.DomainName.Length);
+            targetPayload.Append(domainNameSubBlock.Serialize<NTLMShared.NTLMSSPSubBlock>().ToAsciiString());
+            targetPayload.Append(_targetInformation.DomainName);
+
+            var serverNameSubBlock = new NTLMShared.NTLMSSPSubBlock(1, (short)_targetInformation.ServerName.Length);
+            targetPayload.Append(serverNameSubBlock.Serialize<NTLMShared.NTLMSSPSubBlock>().ToAsciiString());
+            targetPayload.Append(_targetInformation.ServerName);
+
+            var dnsDomainNameSubBlock = new NTLMShared.NTLMSSPSubBlock(4, (short)_targetInformation.DNSDomainName.Length);
+            targetPayload.Append(dnsDomainNameSubBlock.Serialize<NTLMShared.NTLMSSPSubBlock>().ToAsciiString());
+            targetPayload.Append(_targetInformation.DNSDomainName);
+
+            var dnsServerNameSubBlock = new NTLMShared.NTLMSSPSubBlock(3, (short)_targetInformation.DNSServerName.Length);
+            targetPayload.Append(dnsServerNameSubBlock.Serialize<NTLMShared.NTLMSSPSubBlock>().ToAsciiString());
+            targetPayload.Append(_targetInformation.DNSServerName);
+
+            var terminatorSubBlock = new NTLMShared.NTLMSSPSubBlock(0, 0);
+            targetPayload.Append(terminatorSubBlock.Serialize<NTLMShared.NTLMSSPSubBlock>().ToAsciiString());
+
+            _messageType2.TargetInformation.Length = (short)targetPayload.Length;
+            _messageType2.TargetInformation.AllocatedSpace = (short)targetPayload.Length;
+        }
+
+        payload.Append(_messageType2.Serialize<NTLMShared.NTLMSSPMessageType2>().ToAsciiString());
+        if (requestTarget) payload.Append(_targetName);
+        if (requestTargetInformation) payload.Append(targetPayload.ToString());
+
+        return payload.ToString();
+    }
+
+    private void EnumerateFlags(uint flags)
+    {
+        _flags = new Dictionary<NtlmFlag, bool>();
+        foreach (var flag in Enum.GetValues<NtlmFlag>())
+        {
+            _flags.Add(flag, ((uint)flag & flags) != 0);
+        }
+    }
+
+    public override string ToString()
+    {
+        return Serialize();
+    }
+}

@@ -1,9 +1,11 @@
 ﻿using System.Globalization;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using Irc.ClassExtensions.CSharpTools;
 using Irc.Extensions.Apollo.Security.Credentials;
 using Irc.Extensions.Security;
 using Irc.Extensions.Security.Packages;
+using Irc.Security;
 
 namespace Irc.Extensions.Apollo.Security.Packages;
 
@@ -20,74 +22,53 @@ public class GateKeeperPassport : GateKeeper
         Listed = false;
     }
 
-    public override string GetDomain()
-    {
-        return nameof(GateKeeperPassport);
-    }
-
-    public new SupportPackage CreateInstance(ICredentialProvider credentialProvider)
+    public override SupportPackage CreateInstance(ICredentialProvider credentialProvider)
     {
         return new GateKeeperPassport(credentialProvider);
     }
 
     public override EnumSupportPackageSequence AcceptSecurityContext(string data, string ip)
     {
-        if (ServerSequence != EnumSupportPackageSequence.SSP_CREDENTIALS)
+        if (ServerSequence == EnumSupportPackageSequence.SSP_EXT)
         {
-            var s = base.AcceptSecurityContext(data, ip);
-            if (s == EnumSupportPackageSequence.SSP_OK)
-            {
-                Authenticated = false;
-                ServerSequence = EnumSupportPackageSequence.SSP_CREDENTIALS;
-                return EnumSupportPackageSequence.SSP_CREDENTIALS;
-            }
+            var result = base.AcceptSecurityContext(data, ip);
+            if (result != EnumSupportPackageSequence.SSP_OK) return EnumSupportPackageSequence.SSP_FAILED;
 
-            return s;
+            Authenticated = false;
+            ServerSequence = EnumSupportPackageSequence.SSP_CREDENTIALS;
+            return EnumSupportPackageSequence.SSP_CREDENTIALS;
         }
-
-        if (data.Length >= 8)
+        else if (ServerSequence == EnumSupportPackageSequence.SSP_CREDENTIALS)
         {
-            int _tLen, _pLen;
-            bool tConvSuccess;
+            var ticket = extractCookie(data.Substring(0x10));
+            if (ticket == null) return EnumSupportPackageSequence.SSP_FAILED;
 
-            tConvSuccess = int.TryParse(StringBuilderExtensions.FromBytes(data.ToByteArray(), 0, 8).ToString(),
-                NumberStyles.HexNumber, null, out _tLen);
-            if (tConvSuccess)
-                if (data.Length >= 16 + _tLen)
+            var profile = extractCookie(data.Substring(0x10 + 8 + ticket.Length));
+            if (profile == null) return EnumSupportPackageSequence.SSP_FAILED;
+
+            _credentials = _credentialProvider.ValidateTokens(
+                new ()
                 {
-                    tConvSuccess =
-                        int.TryParse(
-                            StringBuilderExtensions.FromBytes(data.ToByteArray(), _tLen + 8, _tLen + 16).ToString(),
-                            NumberStyles.HexNumber, null, out _pLen);
-                    if (tConvSuccess)
-                        if (_tLen > 0 && _pLen > 0 && data.Length >= 16 + _tLen + _pLen)
-                        {
-                            StringBuilder ticket, profile;
+                    { "ticket", ticket },
+                    { "profile", profile }
+                });
 
-                            ticket = StringBuilderExtensions.FromBytes(data.ToByteArray(), 8, 8 + _tLen);
-                            profile = StringBuilderExtensions.FromBytes(data.ToByteArray(), _tLen + 16,
-                                _tLen + 16 + _pLen);
+            if (_credentials == null) return EnumSupportPackageSequence.SSP_FAILED;
 
-                            var t = _credentialProvider.Decrypt(ticket);
-                            if (t == null) return EnumSupportPackageSequence.SSP_FAILED;
-
-                            var p = _credentialProvider.Decrypt(profile, t.iv);
-                            if (p == null) return EnumSupportPackageSequence.SSP_FAILED;
-
-                            var memberIdLow = ulong.Parse(t.puid, NumberStyles.HexNumber);
-
-                            if (memberIdLow != 0)
-                            {
-                                Guid = new Guid(t.puid);
-                                Puid = new StringBuilder(p.origId).ToString();
-                                ServerSequence = EnumSupportPackageSequence.SSP_AUTHENTICATED;
-                                Authenticated = true;
-                                return EnumSupportPackageSequence.SSP_OK;
-                            }
-                        }
-                }
+            Authenticated = true;
+            return EnumSupportPackageSequence.SSP_OK;
         }
+        else return EnumSupportPackageSequence.SSP_FAILED;
+    }
 
-        return EnumSupportPackageSequence.SSP_FAILED;
+    private string extractCookie(string cookie)
+    {
+        if (cookie.Length < 8) return null;
+
+        int.TryParse(cookie.Substring(0, 8), NumberStyles.HexNumber, null, out var cookieLen);
+
+        if (cookie.Length < 8 + cookieLen) return null;
+
+        return cookie.Substring(8, cookieLen);
     }
 }

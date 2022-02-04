@@ -18,9 +18,12 @@ public class Address
     public string Host { set; get; }
     public string Server { set; get; }
 
+    public string RealName { set; get; }
+    public string RemoteIP { set; get; }
     public string GetUserHost() => $"{User}@{Host}";
     public string GetAddress() => $"{Nickname}!{User}@{Host}";
     public string GetFullAddress() => $"{Nickname}!{User}@{Host}${Server}";
+    public bool IsAddressPopulated() => !string.IsNullOrWhiteSpace(User) && !string.IsNullOrWhiteSpace(Host) && !string.IsNullOrWhiteSpace(Server) && RealName != null;
     
     public bool Parse(string address)
     {
@@ -41,5 +44,10 @@ public class Address
         }
 
         return false;
+    }
+
+    public override string ToString()
+    {
+        return GetAddress();
     }
 }

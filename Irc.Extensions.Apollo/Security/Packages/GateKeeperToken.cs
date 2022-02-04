@@ -10,4 +10,8 @@ public struct GateKeeperToken
     public ushort TimeStamp;
     public uint Version;
     public uint Sequence;
+
+    // Consider adding below for Type 2 message
+    //[MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
+    //public byte[] Challenge;
 }

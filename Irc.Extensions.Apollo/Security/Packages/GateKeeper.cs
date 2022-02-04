@@ -2,40 +2,46 @@
 using System.Security.Cryptography;
 using System.Text;
 using Irc.ClassExtensions.CSharpTools;
-using Irc.Extensions.Apollo.Security.Credentials;
+using Irc.Enumerations;
 using Irc.Extensions.Apollo.Security.Packages;
-using Irc.Extensions.Security;
+using Irc.Helpers.CSharpTools;
+using Irc.Interfaces;
+using Irc.Security;
 
 // ReSharper disable once CheckNamespace
 namespace Irc.Extensions.Security.Packages;
 
-public class GateKeeper : SupportPackage
+public class GateKeeper : SupportPackage, ISupportPackage
 {
     private static string _signature = "GKSSP\0";
 
     // Credit to JD for discovering the below key through XOR'ing (Discovered 2017/05/04)
     private static readonly string key = "SRFMKSJANDRESKKC";
     private char[] challenge = new char[8];
-    
-    protected GateKeeperToken ServerToken, ClientToken;
+    protected GateKeeperToken ServerToken;
 
     public GateKeeper()
     {
         Guest = true;
+        ServerToken.Signature = _signature.ToByteArray();
         ServerSequence = EnumSupportPackageSequence.SSP_INIT;
     }
-
-    public override EnumSupportPackageSequence InitializeSecurityContext(string data, string ip)
+    public override SupportPackage CreateInstance(ICredentialProvider credentialProvider)
     {
-        var lit = StringBuilderExtensions.ToLiteral(data);
-        if (lit.Length >= 0x10)
-            if (lit.ToString().StartsWith(_signature))
+        return new GateKeeper();
+    }
+
+    public override EnumSupportPackageSequence InitializeSecurityContext(string token, string ip)
+    {
+        // <byte(6) signature><byte(2)??><int(4) version><int(4) stage>
+        if (token.Length >= 0x10)
+            if (token.StartsWith(_signature))
             {
-                ClientToken = GateKeeperTokenHelper.InitializeFromBytes(lit.ToByteArray());
-                if ((EnumSupportPackageSequence)ClientToken.Sequence == ServerSequence && ClientToken.Version >= 2 && ClientToken.Version <= 3)
+                var clientToken = GateKeeperTokenHelper.InitializeFromBytes(token.ToByteArray());
+                if ((EnumSupportPackageSequence)clientToken.Sequence == EnumSupportPackageSequence.SSP_INIT && clientToken.Version is >= 1 and <= 3)
                 {
-                    ServerSequence = EnumSupportPackageSequence.SSP_EXT; //expecting a SSP_EXT reply after challenge is sent
-                    ServerVersion = ClientToken.Version;
+                    ServerSequence = EnumSupportPackageSequence.SSP_EXT;
+                    ServerVersion = clientToken.Version;
                     return EnumSupportPackageSequence.SSP_OK;
                 }
             }
@@ -43,86 +49,67 @@ public class GateKeeper : SupportPackage
         return EnumSupportPackageSequence.SSP_FAILED;
     }
 
-    public override EnumSupportPackageSequence AcceptSecurityContext(string data, string ip)
+    public override EnumSupportPackageSequence AcceptSecurityContext(string token, string ip)
     {
-        var lit = StringBuilderExtensions.ToLiteral(data);
-        if (lit.Length >= 0x20)
-            if (lit.ToString().StartsWith(_signature))
+        // <byte(6) signature><byte(2)??><int(4) version><int(4) stage><byte(16) challenge response><byte(16) guid>
+        if (token.Length >= 0x20)
+            if (token.StartsWith(_signature))
             {
-                ClientToken = GateKeeperTokenHelper.InitializeFromBytes(lit.ToByteArray());
-                var _clientVersion = ClientToken.Version;
-                var _clientStage = (EnumSupportPackageSequence)ClientToken.Sequence;
-                if (_clientStage == ServerSequence && _clientVersion >= 2 && _clientVersion <= 3)
+                var clientToken = GateKeeperTokenHelper.InitializeFromBytes(token.ToByteArray());
+                var clientVersion = clientToken.Version;
+                var clientStage = (EnumSupportPackageSequence)clientToken.Sequence;
+
+                if (clientStage != ServerSequence || clientVersion != ServerVersion)
+                    return EnumSupportPackageSequence.SSP_FAILED;
+
+                if (clientVersion == 1 && token.Length > 0x20) return EnumSupportPackageSequence.SSP_FAILED;
+
+                var context = token.Substring(0x10, 0x10).ToByteArray();
+
+                if (!VerifySecurityContext(new string(challenge), context, ip, ServerVersion))
+                    return EnumSupportPackageSequence.SSP_FAILED;
+
+                var guid = Guid.NewGuid();
+                if (token.Length >= 0x30) guid = new Guid(token.Substring(0x20, 0x10).ToByteArray());
+
+                if (guid != Guid.Empty || Guest == false)
                 {
-                    var context = StringBuilderExtensions.FromBytes(lit.ToByteArray(), 16, 32).ToString();
-                    if (VerifySecurityContext(challenge, context.ToByteArray(), ip, ServerVersion))
+                    ServerSequence = EnumSupportPackageSequence.SSP_AUTHENTICATED;
+                    Authenticated = true;
+
+                    _credentials = new Credential()
                     {
-                        //Note that I need to improve the below code. Guid needs a ToByteArray() function
-                        StringBuilder guidBinary;
+                        Level = Guest ? EnumUserAccessLevel.ChatGuest : EnumUserAccessLevel.ChatUser,
+                        Domain = GetType().Name,
+                        Username = guid.ToUnformattedString().ToUpper()
+                    };
 
-                        if (lit.Length >= 0x30)
-                        {
-                            guidBinary = StringBuilderExtensions.FromBytes(lit.ToByteArray(), 32, 48);
-                            Guid = new Guid(guidBinary.ToByteArray());
-                        }
-                        else
-                        {
-                            guidBinary = StringBuilderExtensions.FromBytes(Guid.NewGuid().ToByteArray(), 0, 16);
-                            Guid = new Guid(guidBinary.ToByteArray());
-                        }
-
-                        if (Guid != Guid.Empty || Guest == false)
-                        {
-                            var memberIdLow = BitConverter.ToUInt64(guidBinary.ToByteArray(), 0);
-                            var memberIdHigh = BitConverter.ToUInt64(guidBinary.ToByteArray(), 8);
-                            ServerSequence = EnumSupportPackageSequence.SSP_AUTHENTICATED;
-                            Authenticated = true;
-                            return EnumSupportPackageSequence.SSP_OK;
-                        }
-                    }
+                    return EnumSupportPackageSequence.SSP_OK;
                 }
             }
 
         return EnumSupportPackageSequence.SSP_FAILED;
     }
 
-    public override string GetDomain()
+    private bool VerifySecurityContext(string challenge, byte[] context, string ip, uint version)
     {
-        return nameof(GateKeeper);
-    }
+        ip = (version == 3 && ip != null ? ip : "");
 
-    public bool VerifySecurityContext(char[] challenge, byte[] context, string ip, uint version)
-    {
         var md5 = new HMACMD5(key.ToByteArray());
-        var ctx = new StringBuilder(challenge.Length + ip.Length);
-        ctx.Append(challenge);
-        if (version == 3) ctx.Append(ip);
+        var ctx = $"{challenge}{ip}";
         var h1 = md5.ComputeHash(ctx.ToByteArray(), 0, ctx.Length);
         return h1.SequenceEqual(context);
     }
 
-    public override SupportPackage CreateInstance(ICredentialProvider credentialProvider)
+    public override string CreateSecurityChallenge()
     {
-        return new GateKeeper();
-    }
-
-    public override string CreateSecurityChallenge(EnumSupportPackageSequence stage)
-    {
-        if (stage == EnumSupportPackageSequence.SSP_SEC)
-        {
-            ServerToken = GateKeeperTokenHelper.CreateGateKeeperToken(_signature);
-            Array.Copy(Guid.NewGuid().ToByteArray(), 0, challenge, 0, 8);
-          
-            var message =
-                new StringBuilder(Marshal.SizeOf(ServerToken) +
-                                  challenge.Length); //create new message with full size
-            ServerToken.Version = ClientToken.Version;
-            ServerToken.Sequence = 2;
-            message.AppendByteArrayAsChars(GateKeeperTokenHelper.GetBytes(ServerToken));
-            message.Append(challenge);
-            return message.ToString();
-        }
-
-        return null;
+        ServerToken.Sequence = (int)EnumSupportPackageSequence.SSP_SEC;
+        ServerToken.Version = ServerVersion;
+        Array.Copy(Guid.NewGuid().ToByteArray(), 0, challenge, 0, 8);
+      
+        var message = new StringBuilder(Marshal.SizeOf(ServerToken) + challenge.Length);
+        message.Append(ServerToken.Serialize<GateKeeperToken>().ToAsciiString());
+        message.Append(challenge);
+        return message.ToString();
     }
 }

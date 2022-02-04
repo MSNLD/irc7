@@ -25,41 +25,4 @@ public class GateKeeperTokenHelper
 
         return AuthToken;
     }
-
-    public static GateKeeperToken CreateGateKeeperToken(string signature)
-    {
-        var AuthToken = new GateKeeperToken();
-        AuthToken.Signature = signature.ToByteArray();
-        return AuthToken;
-    }
-
-    public static GateKeeperToken CreateGuid()
-    {
-        var AuthToken = new GateKeeperToken();
-        InitializeFromBytes(new Guid().ToByteArray());
-        return AuthToken;
-    }
-
-    public static byte[] GetBytes(GateKeeperToken AuthToken)
-    {
-        var ptrSize = Marshal.SizeOf(AuthToken);
-        var _iGuid = new byte[ptrSize];
-        var pBuf = Marshal.AllocHGlobal(ptrSize);
-        try
-        {
-            Marshal.StructureToPtr(AuthToken, pBuf, false);
-
-            for (var i = 0; i < ptrSize; i++) _iGuid[i] = Marshal.ReadByte(pBuf, i);
-        }
-        catch (Exception)
-        {
-            return null;
-        }
-        finally
-        {
-            Marshal.FreeHGlobal(pBuf);
-        }
-
-        return _iGuid;
-    }
 }

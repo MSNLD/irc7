@@ -193,10 +193,10 @@ public static class StringBuilderExtensions
         return BytesToChars(bytes, 0, bytes.Length);
     }
 
-    public static bool Compare(string c1, string c2, int length)
+    public static bool Compare(string c1, string c2, int Length)
     {
-        if (c1.Length < length || c2.Length < length)
+        if (c1.Length < Length || c2.Length < Length)
             return false;
-        return c1.Substring(length) == c2.Substring(length);
+        return c1.Substring(Length) == c2.Substring(Length);
     }
 }

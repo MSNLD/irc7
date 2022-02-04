@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Irc.Helpers.CSharpTools;
 
 namespace Irc.ClassExtensions.CSharpTools;
 
@@ -24,8 +25,17 @@ public static class StringExtensions
         return b;
     }
 
+    public static string ToUnicodeString(this string text)
+    {
+        return ToByteArray(text).ToUnicodeString();
+    }
 
-    public static string ToLiteral(string data)
+    public static string toutf16(byte[] data)
+    {
+        return Encoding.Unicode.GetString(data);
+    }
+
+    public static string ToLiteral(this string data)
     {
         var literal = new StringBuilder(data.Length);
 
@@ -96,7 +106,7 @@ public static class StringExtensions
         return literal.ToString();
     }
 
-    public static string ToEscape(string data)
+    public static string ToEscape(this string data)
     {
         var escape = new StringBuilder(data.Length * 2);
 
