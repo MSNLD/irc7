@@ -1,6 +1,7 @@
 ﻿namespace Irc;
 
-public static class IrcHelper {
+public static class IrcHelper
+{
     public enum ObjIdentifier
     {
         ObjIdGlobalChannel = 0x1,
@@ -23,59 +24,59 @@ public static class IrcHelper {
             switch (ObjectName[0])
             {
                 case '$':
-                    {
-                        return ObjIdentifier.ObjIdServer;
-                    }
+                {
+                    return ObjIdentifier.ObjIdServer;
+                }
                 case '*':
-                    {
-                        return ObjIdentifier.ObjIdNetwork;
-                    }
+                {
+                    return ObjIdentifier.ObjIdNetwork;
+                }
                 case '%':
-                    {
-                        return ObjIdentifier.ObjIdLastChannel;
-                    }
+                {
+                    return ObjIdentifier.ObjIdLastChannel;
+                }
             }
         else if (ObjectName.Length > 1)
             switch (ObjectName[0])
             {
                 case '%':
+                {
+                    switch (ObjectName[1])
                     {
-                        switch (ObjectName[1])
+                        case '#':
                         {
-                            case '#':
-                                {
-                                    return ObjIdentifier.ObjIdExtendedGlobalChannel;
-                                }
-                            case '&':
-                                {
-                                    return ObjIdentifier.ObjIdExtendedLocalChannel;
-                                }
-                            default:
-                                {
-                                    return ObjIdentifier.InvalidObjId;
-                                }
+                            return ObjIdentifier.ObjIdExtendedGlobalChannel;
+                        }
+                        case '&':
+                        {
+                            return ObjIdentifier.ObjIdExtendedLocalChannel;
+                        }
+                        default:
+                        {
+                            return ObjIdentifier.InvalidObjId;
                         }
                     }
+                }
                 case '^':
-                    {
-                        return ObjIdentifier.ObjIdIRCUserHex;
-                    }
+                {
+                    return ObjIdentifier.ObjIdIRCUserHex;
+                }
                 case '0':
-                    {
-                        return ObjIdentifier.ObjIdInternal;
-                    }
+                {
+                    return ObjIdentifier.ObjIdInternal;
+                }
                 case '\'':
-                    {
-                        return ObjIdentifier.ObjIdIRCUserUnicode;
-                    }
+                {
+                    return ObjIdentifier.ObjIdIRCUserUnicode;
+                }
                 case '#':
-                    {
-                        return ObjIdentifier.ObjIdGlobalChannel;
-                    }
+                {
+                    return ObjIdentifier.ObjIdGlobalChannel;
+                }
                 case '&':
-                    {
-                        return ObjIdentifier.ObjIdLocalChannel;
-                    }
+                {
+                    return ObjIdentifier.ObjIdLocalChannel;
+                }
             }
 
         // Default is user nickname
@@ -91,6 +92,4 @@ public static class IrcHelper {
 
         return false;
     }
-
-
 }

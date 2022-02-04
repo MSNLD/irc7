@@ -1,38 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Irc.Enumerations;
+﻿using Irc.Enumerations;
 
-namespace Irc.Commands
+namespace Irc.Commands;
+
+internal class Privmsg : Command, ICommand
 {
-    internal class Privmsg : Command, ICommand
+    public Privmsg()
     {
-        public EnumCommandDataType GetDataType() => EnumCommandDataType.Standard;
+        _requiredMinimumParameters = 2;
+    }
 
-        public Privmsg()
-        {
-            _requiredMinimumParameters = 2;
-        }
+    public EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.Standard;
+    }
 
-        public void Execute(ChatFrame chatFrame)
-        {
-            var channelName = chatFrame.Message.Parameters.First();
-            var message = chatFrame.Message.Parameters[1];
+    public void Execute(ChatFrame chatFrame)
+    {
+        var channelName = chatFrame.Message.Parameters.First();
+        var message = chatFrame.Message.Parameters[1];
 
-            var channel = chatFrame.Server.GetChannelByName(channelName);
+        var channel = chatFrame.Server.GetChannelByName(channelName);
 
-            if (channel != null)
-            {
-                channel.SendMessage(chatFrame.User, message);
-            }
-            else
-            {
-                // TODO: To make common function for this
-                chatFrame.User.Send(Raw.IRCX_ERR_NOSUCHCHANNEL_403(chatFrame.Server, chatFrame.User, channelName));
-            }
-        }
+        if (channel != null)
+            channel.SendMessage(chatFrame.User, message);
+        else
+            // TODO: To make common function for this
+            chatFrame.User.Send(Raw.IRCX_ERR_NOSUCHCHANNEL_403(chatFrame.Server, chatFrame.User, channelName));
     }
 }

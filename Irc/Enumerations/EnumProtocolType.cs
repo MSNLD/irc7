@@ -1,4 +1,4 @@
-﻿namespace Irc.Worker.Ircx.Objects;
+﻿namespace Irc.Enumerations;
 
 public enum EnumProtocolType
 {
@@ -12,5 +12,5 @@ public enum EnumProtocolType
     IRC6 = 6,
     IRC7 = 7,
     IRC8 = 8,
-    IRC9 = 9,
+    IRC9 = 9
 }

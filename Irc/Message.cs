@@ -1,10 +1,13 @@
 ﻿using Irc.Commands;
-using Irc.Interfaces;
 
 namespace Irc;
 
 public class Message
 {
+    private readonly IProtocol _protocol;
+    private ICommand _command;
+    private string _commandName;
+
     /*
        <message>  ::= [':' <prefix> <SPACE> ] <command> <params> <crlf>
         <prefix>   ::= <servername> | <nick> [ '!' <user> ] [ '@' <host> ]
@@ -23,39 +26,39 @@ public class Message
     // TODO: To get rid of below
     public int ParamOffset;
 
-
-    private readonly IProtocol _protocol;
-    private readonly string _message;
-    private string _prefix;
-    private ICommand _command;
-    private string _commandName;
-    private List<string> _params = new();
-    public List<string> Parameters
-    {
-        get { return _params; }
-    }
-    public string OriginalText
-    {
-        get { return _message; }
-    }
-
     public Message(IProtocol protocol, string message)
     {
         _protocol = protocol;
-        _message = message;
+        OriginalText = message;
         parse();
     }
 
-    public string GetPrefix => _prefix;
-    public ICommand GetCommand() => _command;
-    public string GetCommandName() => _commandName;
-    public List<string> GetParameters() => _params;
+    public List<string> Parameters { get; } = new();
+
+    public string OriginalText { get; }
+
+    public string GetPrefix { get; private set; }
+
+    public ICommand GetCommand()
+    {
+        return _command;
+    }
+
+    public string GetCommandName()
+    {
+        return _commandName;
+    }
+
+    public List<string> GetParameters()
+    {
+        return Parameters;
+    }
 
     private bool getPrefix(string prefix)
     {
         if (prefix.StartsWith(':'))
         {
-            _prefix = prefix.Substring(1);
+            GetPrefix = prefix.Substring(1);
             return true;
         }
 
@@ -76,9 +79,9 @@ public class Message
 
     private void parse()
     {
-        if (string.IsNullOrWhiteSpace(_message)) return;
+        if (string.IsNullOrWhiteSpace(OriginalText)) return;
 
-        var parts = _message.Split(' ');
+        var parts = OriginalText.Split(' ');
 
         if (parts.Length > 0)
         {
@@ -88,7 +91,7 @@ public class Message
             if (getPrefix(parts[index]))
             {
                 index++;
-                cursor = _prefix.Length + 1;
+                cursor = GetPrefix.Length + 1;
             }
 
             if (getCommand(parts[index]))
@@ -102,11 +105,11 @@ public class Message
                 if (parts[index].StartsWith(':'))
                 {
                     cursor++;
-                    _params.Add(_message.Substring(cursor));
+                    Parameters.Add(OriginalText.Substring(cursor));
                     break;
                 }
 
-                _params.Add(parts[index]);
+                Parameters.Add(parts[index]);
                 cursor += parts[index].Length + 1;
             }
         }

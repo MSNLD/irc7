@@ -1,35 +1,41 @@
 ﻿using Irc.Extensions.Security;
 
-namespace Irc.Security
+namespace Irc.Security;
+
+public class SecurityManager : ISecurityManager
 {
-    public class SecurityManager : ISecurityManager
+    private readonly Dictionary<string, SupportPackage> _supportProviders =
+        new(StringComparer.InvariantCultureIgnoreCase);
+
+    private string _supportedPackages = string.Empty;
+
+    public void AddSupportPackage(SupportPackage supportPackage)
     {
-        private readonly Dictionary<string, SupportPackage> _supportProviders = new(StringComparer.InvariantCultureIgnoreCase);
-        private string _supportedPackages = string.Empty;
+        _supportProviders.Add(supportPackage.GetType().Name, supportPackage);
+        UpdateSupportPackages();
+    }
 
-        public void AddSupportPackage(SupportPackage supportPackage)
+    public SupportPackage CreatePackageInstance(string name, ICredentialProvider credentialProvider)
+    {
+        try
         {
-            _supportProviders.Add(supportPackage.GetType().Name, supportPackage);
-            UpdateSupportPackages();
+            return _supportProviders[name].CreateInstance(credentialProvider);
         }
-
-        public SupportPackage CreatePackageInstance(string name, ICredentialProvider credentialProvider)
+        catch (Exception)
         {
-            try
-            {
-                return _supportProviders[name].CreateInstance(credentialProvider);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
+            return null;
         }
+    }
 
-        private void UpdateSupportPackages()
-        {
-            _supportedPackages = string.Join(',', _supportProviders.Where(provider => provider.Value.Listed).Select(provider => provider.Value.GetPackageName()));
-        }
+    public string GetSupportedPackages()
+    {
+        return _supportedPackages;
+    }
 
-        public string GetSupportedPackages() => _supportedPackages;
+    private void UpdateSupportPackages()
+    {
+        _supportedPackages = string.Join(',',
+            _supportProviders.Where(provider => provider.Value.Listed)
+                .Select(provider => provider.Value.GetPackageName()));
     }
 }

@@ -1,8 +1,6 @@
-﻿using System.Text;
-using System.Text.RegularExpressions;
-using Irc.Constants;
+﻿using System.Text.RegularExpressions;
 
-namespace Irc.Worker.Ircx.Objects;
+namespace Irc.Objects;
 
 public class Address
 {
@@ -15,24 +13,43 @@ public class Address
 
     public string Nickname { set; get; }
     public string User { set; get; }
+    // TODO: NOTE: In Apollo, domain names are not supported in the host field; it must be a valid IP address.
     public string Host { set; get; }
     public string Server { set; get; }
 
     public string RealName { set; get; }
     public string RemoteIP { set; get; }
-    public string GetUserHost() => $"{User}@{Host}";
-    public string GetAddress() => $"{Nickname}!{User}@{Host}";
-    public string GetFullAddress() => $"{Nickname}!{User}@{Host}${Server}";
-    public bool IsAddressPopulated() => !string.IsNullOrWhiteSpace(User) && !string.IsNullOrWhiteSpace(Host) && !string.IsNullOrWhiteSpace(Server) && RealName != null;
-    
+
+    public string GetUserHost()
+    {
+        return $"{User}@{Host}";
+    }
+
+    public string GetAddress()
+    {
+        return $"{Nickname}!{User}@{Host}";
+    }
+
+    public string GetFullAddress()
+    {
+        return $"{Nickname}!{User}@{Host}${Server}";
+    }
+
+    public bool IsAddressPopulated()
+    {
+        return !string.IsNullOrWhiteSpace(User) && !string.IsNullOrWhiteSpace(Host) &&
+               !string.IsNullOrWhiteSpace(Server) && RealName != null;
+    }
+
     public bool Parse(string address)
     {
         if (string.IsNullOrWhiteSpace(address)) return false;
 
         // TODO: Check for bad characters
 
-        Regex regex = new Regex(@"((?<nick>\w+)(?:\!)(?<user>\w+)(?:\@)(?<host>\w+)(?:\$)(?<server>\w*))|((?<nick>\w+)(?:\!)(?<user>\w+)(?:\@)(?<host>\w+))|((?<user>\w+)(?:\@)(?<host>\w+))|(?<nick>\w+)");
-        Match match = regex.Match(address);
+        var regex = new Regex(
+            @"((?<nick>\w+)(?:\!)(?<user>\w+)(?:\@)(?<host>\w+)(?:\$)(?<server>\w*))|((?<nick>\w+)(?:\!)(?<user>\w+)(?:\@)(?<host>\w+))|((?<user>\w+)(?:\@)(?<host>\w+))|(?<nick>\w+)");
+        var match = regex.Match(address);
 
         if (match.Groups.Count > 0)
         {

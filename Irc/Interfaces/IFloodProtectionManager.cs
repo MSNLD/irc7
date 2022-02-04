@@ -7,5 +7,7 @@ namespace Irc.IO;
 public interface IFloodProtectionManager
 {
     EnumFloodResult FloodCheck(EnumCommandDataType type, User user);
-    EnumFloodResult Audit(IFloodProtectionProfile protectionProfile, EnumCommandDataType type, EnumUserAccessLevel level);
+
+    EnumFloodResult Audit(IFloodProtectionProfile protectionProfile, EnumCommandDataType type,
+        EnumUserAccessLevel level);
 }

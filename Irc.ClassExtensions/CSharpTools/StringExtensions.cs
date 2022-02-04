@@ -39,7 +39,7 @@ public static class StringExtensions
     {
         var literal = new StringBuilder(data.Length);
 
-        for (int i = 0; i < data.Length; i++)
+        for (var i = 0; i < data.Length; i++)
             switch (data[i])
             {
                 case '\\':

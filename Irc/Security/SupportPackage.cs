@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Irc.Extensions.Security;
+﻿using Irc.Extensions.Security;
 using Irc.Interfaces;
 
 namespace Irc.Security;
@@ -8,11 +7,11 @@ public class SupportPackage : ISupportPackage
 {
     protected ICredential _credentials;
     public bool Guest;
-    public bool Authenticated { get; protected set; }
     public bool Listed = true;
+    public EnumSupportPackageSequence ServerSequence;
 
     public uint ServerVersion;
-    public EnumSupportPackageSequence ServerSequence;
+    public bool Authenticated { get; protected set; }
 
     public virtual SupportPackage CreateInstance(ICredentialProvider credentialProvider)
     {
@@ -34,11 +33,23 @@ public class SupportPackage : ISupportPackage
         throw new NotImplementedException();
     }
 
-    public string GetDomain() => GetPackageName();
+    public string GetDomain()
+    {
+        return GetPackageName();
+    }
 
-    public string GetPackageName() => this.GetType().Name;
+    public string GetPackageName()
+    {
+        return GetType().Name;
+    }
 
-    public ICredential GetCredentials() => _credentials;
+    public ICredential GetCredentials()
+    {
+        return _credentials;
+    }
 
-    public bool IsAuthenticated() => Authenticated;
+    public bool IsAuthenticated()
+    {
+        return Authenticated;
+    }
 }

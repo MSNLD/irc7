@@ -1,6 +1,6 @@
 ﻿using Irc.Interfaces;
 using Irc.Objects;
-using Irc.Worker.Ircx.Objects;
+using Irc.Objects.Server;
 
 namespace Irc;
 
@@ -202,12 +202,7 @@ public static class Raw
     public static string IRCX_RPL_WELCOME_004(Server server, User user, Version version)
     {
         return
-            $":{server} 004 {user} {server} {version.Major}.{version.Minor}.{version.Build} aioxz abcdefhiklmnoprstuvxyz";
-    }
-
-    public static string IRCX_RPL_WELCOME_005(Server server, User user)
-    {
-        return $":{server} 005 {user} IRCX PREFIX=(qov).@+ CHANTYPES=%# CHANLIMIT=%#:1";
+            $":{server} 004 {user} {server} {version.Major}.{version.Minor}.{version.Build} {server.GetSupportedUserModes()} {server.GetSupportedChannelModes()}";
     }
 
     public static string IRCX_RPL_UMODEIS_221(Server server, User user)
@@ -340,9 +335,9 @@ public static class Raw
         return $":{server} 320 {user} %s :from IP %s";
     }
 
-    public static string IRCX_RPL_MODE_324(Server server, User user, IChannel channel)
+    public static string IRCX_RPL_MODE_324(Server server, User user, IChannel channel, string modes)
     {
-        return $":{server} 324 {user} {channel} %s";
+        return $":{server} 324 {user} {channel} +{modes}";
     }
 
     public static string IRCX_RPL_NOTOPIC_331(Server server, User user, IChannel channel)
@@ -355,9 +350,9 @@ public static class Raw
         return $":{server} 332 {user} {channel} :{topic}";
     }
 
-    public static string IRCX_RPL_VERSION_351(Server server, User user)
+    public static string IRCX_RPL_VERSION_351(Server server, User user, Version version)
     {
-        return $":{server} 351 {user} %d.%d.%d {server} :{server} %d.%d";
+        return $":{server} 351 {user} {version.Major}.{version.Minor}.{version.Revision} {server} :{server} {version.Major}.{version.Minor}";
     }
 
     public static string IRCX_RPL_WHOREPLY_352(Server server, User user)
@@ -390,14 +385,22 @@ public static class Raw
         return $":{server} 368 {user} {channel} :End of Channel Ban List";
     }
 
-    public static string IRCX_RPL_RPL_INFO_371(Server server, User user)
+    public static string IRCX_RPL_RPL_INFO_371_UPTIME(Server server, User user, DateTime creationDate)
     {
-        return $":{server} 371 {user} :On-line since %s";
+        // TODO: Format creation date
+        return $":{server} 371 {user} :On-line since {creationDate}";
     }
 
-    public static string IRCX_RPL_RPL_INFO_371_VERS(Server server, User user)
+    public static string IRCX_RPL_RPL_INFO_371_VERS(Server server, User user, Version version)
     {
-        return $":{server} 371 {user} :%s %d.%d";
+        // TODO: Get Full Name
+        return $":{server} 371 {user} :{server.Name} {server.GetVersion().Major}.{server.GetVersion().Minor}";
+    }
+
+    public static string IRCX_RPL_RPL_INFO_371_RUNAS(Server server, User user)
+    {
+        // TODO: Get Full Name
+        return $":{server} 371 {user} :This server is running as an IRC.{server.GetType().Name}";
     }
 
     public static string IRCX_RPL_RPL_MOTD_372(Server server, User user)
@@ -585,6 +588,11 @@ public static class Raw
         return $":{server} 502 {user} :Cant change mode for other users";
     }
 
+    public static string IRCX_ERR_COMMANDUNSUPPORTED_554(Server server, User user, string command)
+    {
+        return $":{server} 555 {user} {command} :Command not supported.";
+    }
+
     public static string IRCX_ERR_OPTIONUNSUPPORTED_555(Server server, User user)
     {
         return $":{server} 555 {user} %s :Server option for this command is not supported.";
@@ -655,7 +663,8 @@ public static class Raw
         return $":{server} 706 {user} :Channel name is not valid";
     }
 
-    public static string IRCX_RPL_IRCX_800(Server server, User user, int isircx, int ircxversion, int buffsize, string options)
+    public static string IRCX_RPL_IRCX_800(Server server, User user, int isircx, int ircxversion, int buffsize,
+        string options)
     {
         return $":{server} 800 {user} {isircx} {ircxversion} {server.SecurityPackages} {buffsize} {options}";
     }
@@ -889,7 +898,7 @@ public static class Raw
     {
         return $":{server} 927 {user} {channel} :Already in the channel.";
     }
-    
+
     public static string IRCX_ERR_U_NOTINCHANNEL_928(Server server, User user)
     {
         return $"{server} 928 {user} :You're not in a channel";
@@ -900,7 +909,7 @@ public static class Raw
         return $":{server} 929 {user} %s %s :Cannot invite. Too many invites.";
     }
 
-    public static string IRCX_ERR_NOTIMPLEMENTED(Server server, User user)
+    public static string IRCX_ERR_NOTIMPLEMENTED(Server server, User user, string command)
     {
         return $":{server} 999 {user} :%s Sorry, this command is not implemented yet.";
     }

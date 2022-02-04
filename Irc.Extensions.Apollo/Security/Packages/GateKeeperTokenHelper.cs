@@ -1,6 +1,4 @@
 ﻿using System.Runtime.InteropServices;
-using Irc.ClassExtensions.CSharpTools;
-using Irc.Extensions.Security.Packages;
 
 namespace Irc.Extensions.Apollo.Security.Packages;
 

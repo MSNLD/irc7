@@ -1,42 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Irc.Enumerations;
+﻿using Irc.Enumerations;
 
-namespace Irc.Commands
+namespace Irc.Commands;
+
+internal class Nick : Command, ICommand
 {
-    internal class Nick : Command, ICommand
+    public Nick()
     {
-        public EnumCommandDataType GetDataType() => EnumCommandDataType.Standard;
+        _requiredMinimumParameters = 1;
+    }
 
-        public Nick()
-        {
-            _requiredMinimumParameters = 1;
-        }
+    public EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.Standard;
+    }
 
-        public void Execute(ChatFrame chatFrame)
-        {
-            // Is user not registered?
-            // Set nickname according to regulations (should be available in user object and changes based on what they authenticated as)
-            if (!chatFrame.User.Registered) HandleUnregisteredNicknameChange(chatFrame);
-            else HandleRegisteredNicknameChange(chatFrame);
-        }
+    public void Execute(ChatFrame chatFrame)
+    {
+        // Is user not registered?
+        // Set nickname according to regulations (should be available in user object and changes based on what they authenticated as)
+        if (!chatFrame.User.Registered) HandleUnregisteredNicknameChange(chatFrame);
+        else HandleRegisteredNicknameChange(chatFrame);
+    }
 
-        private bool HandleUnregisteredNicknameChange(ChatFrame chatFrame)
-        {
-            chatFrame.User.Address.Nickname = chatFrame.Message.Parameters.First();
-            chatFrame.User.Name = chatFrame.User.Address.Nickname;
-            return true;
-        }
+    private bool HandleUnregisteredNicknameChange(ChatFrame chatFrame)
+    {
+        chatFrame.User.Address.Nickname = chatFrame.Message.Parameters.First();
+        chatFrame.User.Name = chatFrame.User.Address.Nickname;
+        return true;
+    }
 
-        private bool HandleRegisteredNicknameChange(ChatFrame chatFrame)
-        {
-            chatFrame.User.Address.Nickname = chatFrame.Message.Parameters.First();
-            chatFrame.User.Name = chatFrame.User.Address.Nickname;
-            return true;
-        }
+    private bool HandleRegisteredNicknameChange(ChatFrame chatFrame)
+    {
+        chatFrame.User.Address.Nickname = chatFrame.Message.Parameters.First();
+        chatFrame.User.Name = chatFrame.User.Address.Nickname;
+        return true;
     }
 }

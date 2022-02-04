@@ -12,12 +12,38 @@ public class Credential : ICredential
     public string Modes { get; set; }
     public EnumUserAccessLevel Level { get; set; }
 
-    public string GetDomain() => Domain;
-    public string GetUsername() => Username;
+    public string GetDomain()
+    {
+        return Domain;
+    }
 
-    public string GetPassword() => Password;
-    public string GetNickname() => Nickname;
-    public string GetUserGroup() => UserGroup;
-    public string GetModes() => Modes;
-    public EnumUserAccessLevel GetLevel() => Level;
+    public string GetUsername()
+    {
+        return Username;
+    }
+
+    public string GetPassword()
+    {
+        return Password;
+    }
+
+    public string GetNickname()
+    {
+        return Nickname;
+    }
+
+    public string GetUserGroup()
+    {
+        return UserGroup;
+    }
+
+    public string GetModes()
+    {
+        return Modes;
+    }
+
+    public EnumUserAccessLevel GetLevel()
+    {
+        return Level;
+    }
 }

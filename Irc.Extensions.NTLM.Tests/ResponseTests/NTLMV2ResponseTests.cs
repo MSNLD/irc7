@@ -10,11 +10,12 @@ public class NTLMV2ResponseTests
     [Test]
     public void NTLMv2Response_Test()
     {
-        var expectedResult = new byte[] { 0xcb, 0xab, 0xbc, 0xa7, 0x13, 0xeb, 0x79, 0x5d, 0x04, 0xc9, 0x7a, 0xbc, 0x01, 0xee, 0x49, 0x83 };
+        var expectedResult = new byte[]
+            {0xcb, 0xab, 0xbc, 0xa7, 0x13, 0xeb, 0x79, 0x5d, 0x04, 0xc9, 0x7a, 0xbc, 0x01, 0xee, 0x49, 0x83};
 
         var username = "user".ToUnicodeString();
         var password = "SecREt01".ToUnicodeString();
-        var challenge = new byte[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
+        var challenge = new byte[] {0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef};
         var blob = new byte[] //Hash from client passed in the NTLM hash field of Message3
         {
             0xcb, 0xab, 0xbc, 0xa7, 0x13, 0xeb, 0x79, 0x5d, 0x04, 0xc9, 0x7a, 0xbc, 0x01, 0xee, 0x49, 0x83,
@@ -46,7 +47,7 @@ public class NTLMV2ResponseTests
         var serverChallenge = "AAAAAAAA";
         var username = "username";
         var password = "password";
-            
+
         var ntlmAlgorithms = new NtlmResponses();
         var result = ntlmAlgorithms.NtlmV2Response(username.ToUnicodeString(), password.ToUnicodeString(),
             serverChallenge, dataBlob);
@@ -65,7 +66,7 @@ public class NTLMV2ResponseTests
         var serverChallenge = "AAAAAAAA";
         var username = "username";
         var password = "password";
-            
+
         var ntlmAlgorithms = new NtlmResponses();
         var result = ntlmAlgorithms.NtlmV2Response(username.ToUnicodeString(), password.ToUnicodeString(),
             serverChallenge, dataBlob);
@@ -76,36 +77,36 @@ public class NTLMV2ResponseTests
     [Test]
     public void NTLMv2MSResponse_BlankUsernameThrowsException()
     {
-        Assert.Throws<ArgumentException>(() => (new NtlmResponses()).NtlmV2Response(string.Empty, "A", "A", "A"));
+        Assert.Throws<ArgumentException>(() => new NtlmResponses().NtlmV2Response(string.Empty, "A", "A", "A"));
     }
 
     [Test]
     public void NTLMv2MSResponse_BlankPasswordThrowsException()
     {
-        Assert.Throws<ArgumentException>(() => (new NtlmResponses()).NtlmV2Response("A", string.Empty, "A", "A"));
+        Assert.Throws<ArgumentException>(() => new NtlmResponses().NtlmV2Response("A", string.Empty, "A", "A"));
     }
 
     [Test]
     public void NTLMv2MSResponse_BlankChallengeThrowsException()
     {
-        Assert.Throws<ArgumentException>(() => (new NtlmResponses()).NtlmV2Response("A", "A", string.Empty, "A"));
+        Assert.Throws<ArgumentException>(() => new NtlmResponses().NtlmV2Response("A", "A", string.Empty, "A"));
     }
 
     [Test]
     public void NTLMv2MSResponse_BlankBlobThrowsException()
     {
-        Assert.Throws<ArgumentException>(() => (new NtlmResponses()).NtlmV2Response("A", "A", "A", string.Empty));
+        Assert.Throws<ArgumentException>(() => new NtlmResponses().NtlmV2Response("A", "A", "A", string.Empty));
     }
 
     [Test]
     public void NTLMv2MSResponse_HashOnlyDoesNotThrowException()
     {
-        Assert.DoesNotThrow(() => (new NtlmResponses()).NtlmV2Response("A", "A", "A", new string('A', 16)));
+        Assert.DoesNotThrow(() => new NtlmResponses().NtlmV2Response("A", "A", "A", new string('A', 16)));
     }
 
     [Test]
     public void NTLMv2MSResponse_GarbledStringDoesNotThrowException()
     {
-        Assert.DoesNotThrow(() => (new NtlmResponses()).NtlmV2Response("A", "A", "A", new string('A', 1024)));
+        Assert.DoesNotThrow(() => new NtlmResponses().NtlmV2Response("A", "A", "A", new string('A', 1024)));
     }
 }

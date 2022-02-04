@@ -1,12 +1,10 @@
 ﻿using Irc.Enumerations;
 using Irc.Objects;
 
-namespace Irc.Worker.Ircx.Objects;
+namespace Irc.Interfaces;
 
-public interface IChannelMember
+public interface IChannelMember : IMemberModes
 {
     EnumUserAccessLevel GetLevel();
-    void SetLevel(EnumUserAccessLevel level);
-    IChatMemberModes GetChanUserMode();
     User GetUser();
 }

@@ -1,4 +1,4 @@
-﻿namespace Irc.Worker.Ircx;
+﻿namespace Irc.Enumerations;
 
 public enum EnumCommandCode
 {

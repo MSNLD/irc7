@@ -1,4 +1,4 @@
-﻿namespace Irc.Worker;
+﻿namespace Irc.Interfaces;
 
 public interface IMode
 {

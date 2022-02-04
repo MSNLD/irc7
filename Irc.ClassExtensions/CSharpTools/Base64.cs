@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Irc.Helpers.CSharpTools;
+﻿using Irc.Helpers.CSharpTools;
 
 namespace Irc.ClassExtensions.CSharpTools;
 

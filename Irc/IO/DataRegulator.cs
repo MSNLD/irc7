@@ -1,77 +1,91 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Irc;
 
-namespace Irc
+public class DataRegulator : IDataRegulator
 {
-    public class DataRegulator : IDataRegulator
+    private readonly int _incomingByteThreshold;
+
+    private readonly Queue<Message> _incomingQueue = new();
+    private readonly int _outgoingByteThreshold;
+    private readonly Queue<string> _outgoingQueue = new();
+    private int _incomingBytes;
+    private bool _incomingThresholdExceeded;
+    private int _outgoingBytes;
+    private bool _outgoingThresholdExceeded;
+
+    public DataRegulator(int incomingByteThreshold, int outgoingByteThreshold)
     {
-        private readonly int _incomingByteThreshold;
-        private readonly int _outgoingByteThreshold;
-        private bool _incomingThresholdExceeded;
-        private bool _outgoingThresholdExceeded;
-        private int _incomingBytes;
-        private int _outgoingBytes;
+        _incomingByteThreshold = incomingByteThreshold;
+        _outgoingByteThreshold = outgoingByteThreshold;
+    }
 
-        readonly Queue<Message> _incomingQueue = new();
-        readonly Queue<string> _outgoingQueue = new();
+    public int GetIncomingBytes()
+    {
+        return _incomingBytes;
+    }
 
-        public DataRegulator(int incomingByteThreshold, int outgoingByteThreshold)
-        {
-            _incomingByteThreshold = incomingByteThreshold;
-            _outgoingByteThreshold = outgoingByteThreshold;
-        }
+    public int GetOutgoingBytes()
+    {
+        return _outgoingBytes;
+    }
 
-        public int GetIncomingBytes() => _incomingBytes;
+    public bool IsIncomingThresholdExceeded()
+    {
+        return _incomingThresholdExceeded;
+    }
 
-        public int GetOutgoingBytes() => _outgoingBytes;
+    public bool IsOutgoingThresholdExceeded()
+    {
+        return _outgoingThresholdExceeded;
+    }
 
-        public bool IsIncomingThresholdExceeded() => _incomingThresholdExceeded;
-        public bool IsOutgoingThresholdExceeded() => _outgoingThresholdExceeded;
+    public int GeIncomingQueueLength()
+    {
+        return _outgoingQueue.Count;
+    }
 
-        public int GeIncomingQueueLength() => _outgoingQueue.Count;
-        public int GetOutgoingQueueLength() => _outgoingQueue.Count;
-        public int PushIncoming(Message message)
-        {
-            _incomingQueue.Enqueue(message);
-            _incomingBytes += message.OriginalText.Length;
-            if (_incomingBytes > _incomingByteThreshold) _incomingThresholdExceeded = true;
-            return _incomingBytes;
-        }
+    public int GetOutgoingQueueLength()
+    {
+        return _outgoingQueue.Count;
+    }
 
-        public int PushOutgoing(string message)
-        {
-            _outgoingQueue.Enqueue(message);
-            _outgoingBytes += message.Length;
-            if (_outgoingBytes > _outgoingByteThreshold) _outgoingThresholdExceeded = true;
-            return _outgoingBytes;
-        }
+    public int PushIncoming(Message message)
+    {
+        _incomingQueue.Enqueue(message);
+        _incomingBytes += message.OriginalText.Length;
+        if (_incomingBytes > _incomingByteThreshold) _incomingThresholdExceeded = true;
+        return _incomingBytes;
+    }
 
-        public Message PeekIncoming()
-        {
-            return _incomingQueue.Peek();
-        }
+    public int PushOutgoing(string message)
+    {
+        _outgoingQueue.Enqueue(message);
+        _outgoingBytes += message.Length;
+        if (_outgoingBytes > _outgoingByteThreshold) _outgoingThresholdExceeded = true;
+        return _outgoingBytes;
+    }
 
-        public Message PopIncoming()
-        {
-            var message = _incomingQueue.Dequeue();
-            _incomingBytes -= message.OriginalText.Length;
-            return message;
-        }
+    public Message PeekIncoming()
+    {
+        return _incomingQueue.Peek();
+    }
 
-        public string PopOutgoing()
-        {
-            string message = _outgoingQueue.Dequeue();
-            _outgoingBytes -= message.Length;
-            return message;
-        }
+    public Message PopIncoming()
+    {
+        var message = _incomingQueue.Dequeue();
+        _incomingBytes -= message.OriginalText.Length;
+        return message;
+    }
 
-        public void Purge()
-        {
-            _incomingQueue.Clear();
-            _outgoingQueue.Clear();
-        }
+    public string PopOutgoing()
+    {
+        var message = _outgoingQueue.Dequeue();
+        _outgoingBytes -= message.Length;
+        return message;
+    }
+
+    public void Purge()
+    {
+        _incomingQueue.Clear();
+        _outgoingQueue.Clear();
     }
 }

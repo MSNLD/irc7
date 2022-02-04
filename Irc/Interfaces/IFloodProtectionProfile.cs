@@ -1,5 +1,4 @@
-﻿
-namespace Irc.Interfaces;
+﻿namespace Irc.Interfaces;
 
 public interface IFloodProtectionProfile
 {

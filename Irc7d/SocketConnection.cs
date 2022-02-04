@@ -1,48 +1,63 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Numerics;
-using System.Text;
-using Irc;
 using Irc.ClassExtensions.CSharpTools;
 using Irc.Helpers.CSharpTools;
 
 namespace Irc7d;
 
-public class SocketConnection: IConnection
+public class SocketConnection : IConnection
 {
     private readonly Socket _socket;
+    private readonly string _address;
+    private readonly string _fullAddress;
+
+    private readonly BigInteger _id;
+    private string _received;
+
+    public SocketConnection(Socket socket)
+    {
+        _socket = socket;
+
+        _id = 0;
+        if (_socket.RemoteEndPoint != null)
+        {
+            var remoteAddressBytes = ((IPEndPoint) _socket.RemoteEndPoint).Address.GetAddressBytes();
+
+            _id = remoteAddressBytes.Length > 8
+                ? ((BigInteger) BitConverter.ToUInt64(remoteAddressBytes, 8) << 64) +
+                  BitConverter.ToUInt64(remoteAddressBytes, 8)
+                : BitConverter.ToUInt32(remoteAddressBytes, 0);
+
+            _address = _socket.RemoteEndPoint != null
+                ? ((IPEndPoint) _socket.RemoteEndPoint).Address.ToString()
+                : string.Empty;
+            _fullAddress = _socket.RemoteEndPoint != null
+                ? ((IPEndPoint) _socket.RemoteEndPoint).ToString()
+                : string.Empty;
+        }
+    }
+
     public EventHandler<string> OnSend { get; set; }
     public EventHandler<string> OnReceive { get; set; }
     public EventHandler<BigInteger> OnConnect { get; set; }
     public EventHandler<BigInteger> OnDisconnect { get; set; }
     public EventHandler<Exception> OnError { get; set; }
 
-    private BigInteger _id;
-    private string _received;
-    private string _address;
-    private string _fullAddress;
-
-    public SocketConnection(Socket socket)
+    public string GetAddress()
     {
-        _socket = socket;
-
-        _id = (BigInteger)0;
-        if (_socket.RemoteEndPoint != null)
-        {
-            var remoteAddressBytes = ((IPEndPoint)_socket.RemoteEndPoint).Address.GetAddressBytes();
-
-            _id = remoteAddressBytes.Length > 8
-                ? ((BigInteger)BitConverter.ToUInt64(remoteAddressBytes, 8) << 64) + BitConverter.ToUInt64(remoteAddressBytes, 8)
-                : BitConverter.ToUInt32(remoteAddressBytes, 0);
-
-            _address = _socket.RemoteEndPoint != null ? ((IPEndPoint)_socket.RemoteEndPoint).Address.ToString() : string.Empty;
-            _fullAddress = _socket.RemoteEndPoint != null ? ((IPEndPoint)_socket.RemoteEndPoint).ToString() : string.Empty;
-        }
+        return _address;
     }
 
-    public string GetAddress() => _address;
-    public string GetFullAddress() => _fullAddress;
-    public BigInteger GetId() => _id;
+    public string GetFullAddress()
+    {
+        return _fullAddress;
+    }
+
+    public BigInteger GetId()
+    {
+        return _id;
+    }
 
     public void Send(string message)
     {
@@ -51,12 +66,8 @@ public class SocketConnection: IConnection
         sendAsync.Completed += (sender, args) => { OnSend(this, message); };
 
         if (_socket.Connected)
-        {
             if (!_socket.SendAsync(sendAsync)) // Report data is sent
-            {
                 OnSend?.Invoke(this, message.Substring(sendAsync.Offset, sendAsync.BytesTransferred));
-            }
-        }
     }
 
     public void Disconnect(string message = "")
@@ -84,22 +95,19 @@ public class SocketConnection: IConnection
 
     private void Digest(Memory<byte> bytes)
     {
-        string data = bytes.ToArray().ToAsciiString();
-        data = data.Trim(new[] {'\0', ' '});
+        var data = bytes.ToArray().ToAsciiString();
+        data = data.Trim('\0', ' ');
         if (data.Length > 0)
         {
             _received = $"{_received}{data}";
 
-            bool bNewLinePending = !_received.EndsWith('\r') && !_received.EndsWith('\n');
+            var bNewLinePending = !_received.EndsWith('\r') && !_received.EndsWith('\n');
 
-            string[] lines = data.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            var lines = data.Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
 
-            int totalLines = bNewLinePending ? lines.Length - 1 : lines.Length;
+            var totalLines = bNewLinePending ? lines.Length - 1 : lines.Length;
 
-            for (int i = 0; i < totalLines; i++)
-            {
-                OnReceive?.Invoke(this, lines[i]);
-            }
+            for (var i = 0; i < totalLines; i++) OnReceive?.Invoke(this, lines[i]);
 
             if (bNewLinePending) _received = lines[^1];
         }
@@ -135,12 +143,7 @@ public class SocketConnection: IConnection
         }
         finally
         {
-            if (!_socket.Connected)
-            {
-                OnDisconnect?.Invoke(this, GetId());
-            }
+            if (!_socket.Connected) OnDisconnect?.Invoke(this, GetId());
         }
     }
-
-
 }

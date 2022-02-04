@@ -5,23 +5,13 @@ using System.Numerics;
 
 namespace Irc7d;
 
-public class SocketServer: Socket, ISocketServer
+public class SocketServer : Socket, ISocketServer
 {
     public ConcurrentDictionary<BigInteger, ConcurrentBag<IConnection>> Sockets = new();
-    public EventHandler<IConnection> OnClientConnecting { get; set; }
-    public EventHandler<IConnection> OnClientConnected { get; set; }
-    public EventHandler<IConnection> OnClientDisconnected { get; set; }
-    public EventHandler<ISocketServer> OnListen { get; set; }
-
-    public IPAddress IP { get; }
-    public int Port { get; }
-    public int Backlog { get; }
-    public int MaxConnectionsPerIp { get; }
-    public int BuffSize { get; }
-    public int CurrentConnections { get; }
 
 
-    public SocketServer(IPAddress ip, int port, int backlog, int maxConnectionsPerIP, int buffSize) : base(SocketType.Stream, ProtocolType.Tcp)
+    public SocketServer(IPAddress ip, int port, int backlog, int maxConnectionsPerIP, int buffSize) : base(
+        SocketType.Stream, ProtocolType.Tcp)
     {
         IP = ip;
         Port = port;
@@ -30,6 +20,17 @@ public class SocketServer: Socket, ISocketServer
         BuffSize = buffSize;
         BuffSize = buffSize;
     }
+
+    public IPAddress IP { get; }
+    public EventHandler<IConnection> OnClientConnecting { get; set; }
+    public EventHandler<IConnection> OnClientConnected { get; set; }
+    public EventHandler<IConnection> OnClientDisconnected { get; set; }
+    public EventHandler<ISocketServer> OnListen { get; set; }
+    public int Port { get; }
+    public int Backlog { get; }
+    public int MaxConnectionsPerIp { get; }
+    public int BuffSize { get; }
+    public int CurrentConnections { get; }
 
     public void Listen()
     {
@@ -53,6 +54,11 @@ public class SocketServer: Socket, ISocketServer
 
         // Get first socket
         AcceptAsync(acceptAsync);
+    }
+
+    public void Close()
+    {
+        Close();
     }
 
     public void Accept(IConnection connection)
@@ -79,13 +85,9 @@ public class SocketServer: Socket, ISocketServer
         }
 
         if (connection == null)
-            Console.WriteLine($"{connection.GetFullAddress()} has disconnected but failed to TryTake / total: {Sockets.Count} ");
+            Console.WriteLine(
+                $"{connection.GetFullAddress()} has disconnected but failed to TryTake / total: {Sockets.Count} ");
 
         OnClientDisconnected?.Invoke(this, connection);
-    }
-
-    public void Close()
-    {
-        Close();
     }
 }

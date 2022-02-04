@@ -1,5 +1,4 @@
-﻿using System;
-using Irc.Enumerations;
+﻿using Irc.Enumerations;
 
 public class FloodProtectionLevel
 {

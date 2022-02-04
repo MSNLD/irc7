@@ -1,36 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Irc.Enumerations;
-using Irc.Worker.Ircx;
+﻿using Irc.Enumerations;
 
-namespace Irc.Commands
+namespace Irc.Commands;
+
+public class Command : ICommand
 {
-    public class Command : ICommand
+    protected int _requiredMaximumParameters;
+    protected int _requiredMinimumParameters;
+
+    public string GetName()
     {
-        protected int _requiredMinimumParameters;
-        protected int _requiredMaximumParameters;
-        public string GetName() => this.GetType().Name;
-        public EnumCommandDataType GetDataType()
-        {
-            throw new NotImplementedException();
-        }
+        return GetType().Name;
+    }
 
-        public void Execute(ChatFrame chatFrame)
-        {
-            throw new NotImplementedException();
-        }
+    public EnumCommandDataType GetDataType()
+    {
+        throw new NotImplementedException();
+    }
 
-        public bool CheckParameters(ChatFrame chatFrame)
-        {
-            if (_requiredMinimumParameters < 0) return true;
-            
-            if (chatFrame.Message.Parameters.Count >= _requiredMinimumParameters) return true;
+    public void Execute(ChatFrame chatFrame)
+    {
+        throw new NotImplementedException();
+    }
 
-            return false;
-        }
+    public bool CheckParameters(ChatFrame chatFrame)
+    {
+        if (_requiredMinimumParameters < 0) return true;
+
+        if (chatFrame.Message.Parameters.Count >= _requiredMinimumParameters) return true;
+
+        return false;
     }
 }

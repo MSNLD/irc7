@@ -1,6 +1,5 @@
-﻿using Irc.Enumerations;
-using Irc.Worker.Ircx.Objects;
-using User = Irc.Objects.User;
+﻿using Irc.IO;
+using Irc.Objects;
 
 namespace Irc.Interfaces;
 
@@ -17,4 +16,6 @@ public interface IChannel
     IChannel SendTopic(User user);
     IChannel SendNames(User user);
     bool Allows(User user);
+    IModeCollection GetModes();
+    IDataStore ChannelStore { get; }
 }

@@ -1,8 +1,4 @@
 ﻿using System.Globalization;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using Irc.ClassExtensions.CSharpTools;
-using Irc.Extensions.Apollo.Security.Credentials;
 using Irc.Extensions.Security;
 using Irc.Extensions.Security.Packages;
 using Irc.Security;
@@ -38,7 +34,8 @@ public class GateKeeperPassport : GateKeeper
             ServerSequence = EnumSupportPackageSequence.SSP_CREDENTIALS;
             return EnumSupportPackageSequence.SSP_CREDENTIALS;
         }
-        else if (ServerSequence == EnumSupportPackageSequence.SSP_CREDENTIALS)
+
+        if (ServerSequence == EnumSupportPackageSequence.SSP_CREDENTIALS)
         {
             var ticket = extractCookie(data.Substring(0x10));
             if (ticket == null) return EnumSupportPackageSequence.SSP_FAILED;
@@ -47,10 +44,10 @@ public class GateKeeperPassport : GateKeeper
             if (profile == null) return EnumSupportPackageSequence.SSP_FAILED;
 
             _credentials = _credentialProvider.ValidateTokens(
-                new ()
+                new Dictionary<string, string>
                 {
-                    { "ticket", ticket },
-                    { "profile", profile }
+                    {"ticket", ticket},
+                    {"profile", profile}
                 });
 
             if (_credentials == null) return EnumSupportPackageSequence.SSP_FAILED;
@@ -58,7 +55,8 @@ public class GateKeeperPassport : GateKeeper
             Authenticated = true;
             return EnumSupportPackageSequence.SSP_OK;
         }
-        else return EnumSupportPackageSequence.SSP_FAILED;
+
+        return EnumSupportPackageSequence.SSP_FAILED;
     }
 
     private string extractCookie(string cookie)

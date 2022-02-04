@@ -1,18 +1,16 @@
 using NUnit.Framework;
 
-namespace Irc.Commands.Tests
-{
-    public class Tests
-    {
-        [SetUp]
-        public void Setup()
-        {
-        }
+namespace Irc.Commands.Tests;
 
-        [Test]
-        public void Test1()
-        {
-            
-        }
+public class Tests
+{
+    [SetUp]
+    public void Setup()
+    {
+    }
+
+    [Test]
+    public void Test1()
+    {
     }
 }

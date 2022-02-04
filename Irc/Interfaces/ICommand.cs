@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Irc.Enumerations;
+﻿using Irc.Enumerations;
 
 namespace Irc.Commands;
 

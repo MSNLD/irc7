@@ -1,7 +1,4 @@
-﻿using System.Text;
-using System.Threading.Channels;
-
-namespace Irc.Constants;
+﻿namespace Irc.Constants;
 
 public class Raws
 {

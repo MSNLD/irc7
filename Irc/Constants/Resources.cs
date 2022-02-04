@@ -87,6 +87,9 @@ public static class Resources
     public static string UserAccessGroupSysops = "Chat Sysops";
     public static string UserAccessGroupGuides = "Chat Guides";
 
+    public static string IrcOpNickMask = @"[\x41-\xFF\-0-9]+$";
+    public static int MaxFieldLen = 64;
+
     public static long GetTime()
     {
         return DateTime.UtcNow.Ticks;
@@ -193,51 +196,32 @@ public static class Resources
 
     #region Channel Resources
 
-    public static byte ChannelModeCharAuthOnly = (byte) 'a';
+    public static char ChannelModePrivate = 'p';
+    public static char ChannelModeSecret = 's';
+    public static char ChannelModeModerated = 'm';
+    public static char ChannelModeNoExtern = 'n';
+    public static char ChannelModeTopicOp = 't';
+    public static char ChannelModeInvite = 'i';
+    public static char ChannelModeUserLimit = 'l';
+    public static char ChannelModeBan = 'b';
+    public static char ChannelModeKey = 'k';
 
-    //public static byte ChannelModeCharCloneable = (byte)'d';
-    //public static byte ChannelModeCharClone = (byte)'e';
-    //public static byte ChannelModeCharExpiry = (byte)'e';
-    public static byte ChannelModeCharProfanity = (byte) 'f';
-    public static byte ChannelModeCharOnStage = (byte) 'g';
-    public static byte ChannelModeCharHidden = (byte) 'h';
-    public static byte ChannelModeCharKey = (byte) 'k';
-    public static byte ChannelModeCharInvite = (byte) 'i';
-    public static byte ChannelModeCharUserLimit = (byte) 'l';
-    public static byte ChannelModeCharModerated = (byte) 'm';
-    public static byte ChannelModeCharNoExtern = (byte) 'n';
-    public static byte ChannelModeCharPrivate = (byte) 'p';
-    public static byte ChannelModeCharRegistered = (byte) 'r';
-    public static byte ChannelModeCharSecret = (byte) 's';
-    public static byte ChannelModeCharSubscriber = (byte) 'S';
-    public static byte ChannelModeCharTopicOp = (byte) 't';
-    public static byte ChannelModeCharKnock = (byte) 'u';
-    public static byte ChannelModeCharNoWhisper = (byte) 'w';
-    public static byte ChannelModeCharNoGuestWhisper = (byte) 'W';
-    public static byte ChannelModeCharAuditorium = (byte) 'x';
+    public static char MemberModeHost = 'o';
+    public static char MemberModeVoice = 'v';
 
-    public static byte ChannelUserModeCharOwner = (byte) 'q';
-    public static byte ChannelUserModeCharHost = (byte) 'o';
-    public static byte ChannelUserModeCharVoice = (byte) 'v';
-    public static byte ChannelUserModeCharBan = (byte) 'b';
+    public static char MemberModeFlagHost = '@';
+    public static char MemberModeFlagVoice = '+';
 
-    public static byte ChannelUserFlagOwner = (byte) '.';
-    public static byte ChannelUserFlagHost = (byte) '@';
-    public static byte ChannelUserFlagVoice = (byte) '+';
-    
     #endregion
 
     #region "User Modes"
 
-    public static byte UserModeCharAdmin = (byte) 'a';
-    public static byte UserModeCharOper = (byte) 'o';
-    public static byte UserModeCharInvisible = (byte) 'i';
-    public static byte UserModeCharServerNotice = (byte) 's';
-    public static byte UserModeCharWallops = (byte) 'w';
-    public static byte UserModeCharIrcx = (byte) 'x';
-    public static byte UserModeCharGag = (byte) 'z';
-    public static byte UserModePasskey = (byte) 'h';
-
+    public static char UserModeAdmin = 'a';
+    public static char UserModeOper = 'o';
+    public static char UserModeInvisible = 'i';
+    public static char UserModeServerNotice = 's';
+    public static char UserModeWallops = 'w';
+    
     #endregion
 
     #region "Regular Expressions"
@@ -248,8 +232,6 @@ public static class Resources
     public static string ChannelRegEx = @"%#[\x21-\x2B,\x2D-\xFF]{1,200}";
     public static string GuestNicknameMask = @"^>(?!(Sysop)|(Admin)|(Guide))[\x41-\xFF\-0-9]+$";
     public static string NicknameMask = @"^(?!(Sysop)|(Admin)|(Guide))[\x41-\xFF][\x41-\xFF\-0-9]*$";
-    #endregion
 
-    public static string IrcOpNickMask = @"[\x41-\xFF\-0-9]+$";
-    public static int MaxFieldLen = 64;
+    #endregion
 }

@@ -2,78 +2,70 @@
 using Irc.ClassExtensions.CSharpTools;
 using Irc.Helpers.CSharpTools;
 
-namespace Irc.Extensions.NTLM.Cryptography
+namespace Irc.Extensions.NTLM.Cryptography;
+
+internal class DesEncryptor
 {
-    class DesEncryptor
+    public byte[] CreateKey()
     {
-
-        public DesEncryptor()
+        var key = new byte[8];
+        do
         {
-        }
+            Array.Copy(key, 0, Guid.NewGuid().ToByteArray(), 16, 8);
+        } while (DES.IsWeakKey(key));
 
-        public byte[] CreateKey()
+        return key;
+    }
+
+    public string Encrypt(string data, byte[] key)
+    {
+        SymmetricAlgorithm symmetricAlgorithm;
+
+        symmetricAlgorithm = DES.Create();
+        symmetricAlgorithm.Mode = CipherMode.ECB;
+        symmetricAlgorithm.Padding = PaddingMode.None;
+
+        using (var MS = new MemoryStream())
         {
-            byte[] key = new byte[8];
-            do
+            var bytData = data.ToByteArray();
+            byte[] bytIV = {0, 0, 0, 0, 0, 0, 0, 0};
+            var bytKey = key;
+            symmetricAlgorithm.Key = bytKey;
+            symmetricAlgorithm.IV = bytIV;
+            var ICT = symmetricAlgorithm.CreateEncryptor();
+            using (var CS = new CryptoStream(MS, ICT, CryptoStreamMode.Write))
             {
-                Array.Copy(key, 0, Guid.NewGuid().ToByteArray(), 16, 8);
-            } while (DES.IsWeakKey(key));
-            return key;
-        }
-
-        public string Encrypt(string data, byte[] key)
-        {
-            SymmetricAlgorithm symmetricAlgorithm;
-
-            symmetricAlgorithm = DES.Create();
-            symmetricAlgorithm.Mode = CipherMode.ECB;
-            symmetricAlgorithm.Padding = PaddingMode.None;
-
-            using (MemoryStream MS = new MemoryStream())
-            {
-
-                byte[] bytData = data.ToByteArray();
-                byte[] bytIV = {0, 0, 0, 0, 0, 0, 0, 0};
-                byte[] bytKey = key;
-                symmetricAlgorithm.Key = bytKey;
-                symmetricAlgorithm.IV = bytIV;
-                ICryptoTransform ICT = symmetricAlgorithm.CreateEncryptor();
-                using (CryptoStream CS = new CryptoStream(MS, ICT, CryptoStreamMode.Write))
-                {
-                    CS.Write(bytData, 0, bytData.Length);
-                    CS.FlushFinalBlock();
-                }
-
-                return MS.ToArray().ToAsciiString();
+                CS.Write(bytData, 0, bytData.Length);
+                CS.FlushFinalBlock();
             }
+
+            return MS.ToArray().ToAsciiString();
         }
-        public byte[] Encrypt(byte[] data, byte[] key)
+    }
+
+    public byte[] Encrypt(byte[] data, byte[] key)
+    {
+        SymmetricAlgorithm symmetricAlgorithm;
+
+        symmetricAlgorithm = DES.Create();
+        symmetricAlgorithm.Mode = CipherMode.ECB;
+        symmetricAlgorithm.Padding = PaddingMode.None;
+
+        using (var MS = new MemoryStream())
         {
-            SymmetricAlgorithm symmetricAlgorithm;
-
-            symmetricAlgorithm = DES.Create();
-            symmetricAlgorithm.Mode = CipherMode.ECB;
-            symmetricAlgorithm.Padding = PaddingMode.None;
-
-            using (MemoryStream MS = new MemoryStream())
+            var bytData = data;
+            byte[] bytIV = {0, 0, 0, 0, 0, 0, 0, 0};
+            var bytKey = key;
+            symmetricAlgorithm.Key = bytKey;
+            symmetricAlgorithm.IV = bytIV;
+            var ICT = symmetricAlgorithm.CreateEncryptor();
+            using (var CS = new CryptoStream(MS, ICT, CryptoStreamMode.Write))
             {
-
-                byte[] bytData = data;
-                byte[] bytIV = { 0, 0, 0, 0, 0, 0, 0, 0 };
-                byte[] bytKey = key;
-                symmetricAlgorithm.Key = bytKey;
-                symmetricAlgorithm.IV = bytIV;
-                ICryptoTransform ICT = symmetricAlgorithm.CreateEncryptor();
-                using (CryptoStream CS = new CryptoStream(MS, ICT, CryptoStreamMode.Write))
-                {
-                    CS.Write(bytData, 0, bytData.Length);
-                    CS.FlushFinalBlock();
-                }
-
-                return MS.ToArray();
+                CS.Write(bytData, 0, bytData.Length);
+                CS.FlushFinalBlock();
             }
+
+            return MS.ToArray();
         }
-
-
     }
 }

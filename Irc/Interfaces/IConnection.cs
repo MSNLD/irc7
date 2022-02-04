@@ -1,5 +1,4 @@
 using System.Numerics;
-using Irc;
 
 namespace Irc7d;
 

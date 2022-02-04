@@ -1,36 +1,42 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Irc.Enumerations;
-using Irc.Interfaces;
-using Irc.Worker.Ircx.Objects;
+﻿using Irc.Enumerations;
+using Irc.Objects;
+using Irc.Objects.Server;
 
-namespace Irc.Commands
+namespace Irc.Commands;
+
+internal class Part : Command, ICommand
 {
-    internal class Part: Command, ICommand
+    public Part()
     {
-        public EnumCommandDataType GetDataType() => EnumCommandDataType.None;
+        _requiredMinimumParameters = 1;
+    }
 
-        public Part()
-        {
-            _requiredMinimumParameters = 1;
-        }
+    public EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.None;
+    }
 
-        public void Execute(ChatFrame chatFrame)
-        {
-            var channelNames = chatFrame.Message.Parameters.First().Split(',', StringSplitOptions.RemoveEmptyEntries);
+    public void Execute(ChatFrame chatFrame)
+    {
+        var server = chatFrame.Server;
+        var user = chatFrame.User;
+        var parameters = chatFrame.Message.Parameters;
 
-            chatFrame
-                .Server
-                .GetChannels()
-                .Where(c => channelNames.Contains(c.GetName()))
-                .ToList()
-                .ForEach(
-                    channel =>
-                        channel.Part(chatFrame.User)
-                );
-        }
+        var channelNames = Join.ValidateChannels(server, user, parameters);
+        if (channelNames.Count == 0) return;
+
+        PartChannels(server, user, channelNames);
+    }
+
+    public void PartChannels(Server server, User user, List<string> channelNames)
+    {
+        server
+            .GetChannels()
+            .Where(c => channelNames.Contains(c.GetName()))
+            .ToList()
+            .ForEach(
+                channel =>
+                    channel.Part(user)
+            );
     }
 }

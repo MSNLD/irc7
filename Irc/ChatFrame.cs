@@ -1,26 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Irc.Objects;
-using Irc.Worker.Ircx;
-using Irc.Worker.Ircx.Objects;
-using Irc7d;
+﻿using Irc.Objects;
+using Irc.Objects.Server;
 
-namespace Irc
+namespace Irc;
+
+public class ChatFrame
 {
-    public class ChatFrame
-    {
-        public readonly Server Server;
-        public readonly User User;
-        public readonly Message Message;
+    public readonly Message Message;
+    public readonly Server Server;
+    public readonly User User;
 
-        public ChatFrame(Server server, User user, Message message)
-        {
-            Server = server;
-            User = user;
-            Message = message;
-        }
+    public ChatFrame(Server server, User user, Message message)
+    {
+        Server = server;
+        User = user;
+        Message = message;
     }
 }

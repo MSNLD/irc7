@@ -1,29 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Irc.Enumerations;
+﻿using Irc.Enumerations;
 
-namespace Irc.Commands
+namespace Irc.Commands;
+
+internal class Userhost : Command, ICommand
 {
-    internal class Userhost : Command, ICommand
+    public Userhost()
     {
-        public EnumCommandDataType GetDataType() => EnumCommandDataType.None;
+        _requiredMinimumParameters = 0;
+    }
 
-        public Userhost()
-        {
-            _requiredMinimumParameters = 0;
-        }
+    public EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.None;
+    }
 
-        public void Execute(ChatFrame chatFrame)
-        {
-            if (chatFrame.User.Registered)
-            {
-                chatFrame.User.Send(Raw.IRCX_RPL_USERHOST_302(chatFrame.Server, chatFrame.User));
-            }
-            // TODO: What if not registered?
-        }
+    public void Execute(ChatFrame chatFrame)
+    {
+        if (chatFrame.User.Registered) chatFrame.User.Send(Raw.IRCX_RPL_USERHOST_302(chatFrame.Server, chatFrame.User));
+        // TODO: What if not registered?
     }
 }

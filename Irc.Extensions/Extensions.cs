@@ -1,7 +1,5 @@
-﻿namespace Irc.Extensions
-{
-    public class Extensions
-    {
+﻿namespace Irc.Extensions;
 
-    }
+public class Extensions
+{
 }

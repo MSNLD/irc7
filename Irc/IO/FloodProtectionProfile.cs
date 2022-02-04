@@ -11,10 +11,14 @@ public class FloodProtectionProfile : IFloodProtectionProfile
     {
         _floodProtectionLevel = new FloodProtectionLevel(EnumFloodProtectionLevel.Low);
     }
+
     public void SetFloodProtectionLevel(FloodProtectionLevel floodProtectionLevel)
     {
         _floodProtectionLevel = floodProtectionLevel;
     }
 
-    public FloodProtectionLevel GetFloodProtectionLevel() => _floodProtectionLevel;
+    public FloodProtectionLevel GetFloodProtectionLevel()
+    {
+        return _floodProtectionLevel;
+    }
 }

@@ -1,25 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Irc.Enumerations;
+﻿using Irc.Enumerations;
 
-namespace Irc.Commands
+namespace Irc.Commands;
+
+internal class Ping : Command, ICommand
 {
-    internal class Ping : Command, ICommand
+    public Ping()
     {
-        public EnumCommandDataType GetDataType() => EnumCommandDataType.None;
+        _requiredMinimumParameters = 1;
+    }
 
-        public Ping()
-        {
-            _requiredMinimumParameters = 1;
-        }
+    public EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.None;
+    }
 
-        public void Execute(ChatFrame chatFrame)
-        {
-           chatFrame.User.Send($"PONG :{chatFrame.Message.Parameters.First()}");
-        }
+    public void Execute(ChatFrame chatFrame)
+    {
+        chatFrame.User.Send($"PONG :{chatFrame.Message.Parameters.First()}");
     }
 }

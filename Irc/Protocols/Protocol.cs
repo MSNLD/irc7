@@ -1,25 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Irc.Commands;
-using Irc.Worker.Ircx.Objects;
+﻿using Irc.Commands;
+using Irc.Enumerations;
 
-namespace Irc
+namespace Irc;
+
+public class Protocol : IProtocol
 {
-    public class Protocol : IProtocol
+    protected Dictionary<string, ICommand> Commands = new(StringComparer.InvariantCultureIgnoreCase);
+
+    public ICommand GetCommand(string name)
     {
-        protected Dictionary<string, ICommand> Commands = new(StringComparer.InvariantCultureIgnoreCase);
-
-        public ICommand GetCommand(string name)
-        {
-            throw new NotImplementedException();
-        }
-
-        public EnumProtocolType GetProtocolType()
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
     }
+
+    public EnumProtocolType GetProtocolType()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void AddCommand(ICommand command, string name = null) => Commands.Add(name ?? command.GetName(), command);
 }

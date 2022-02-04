@@ -6,9 +6,9 @@ public class StringBuffer
 {
     private readonly StringBuilder _buffer;
     private readonly int buffSize;
-    private int cursor;
 
     public List<ArraySegment<byte>> bytesOut;
+    private int cursor;
 
     //needs to be converted to a Queue later
     public List<string> DataIn;
