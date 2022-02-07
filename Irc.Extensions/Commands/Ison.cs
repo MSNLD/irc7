@@ -5,7 +5,6 @@ namespace Irc.Extensions.Commands;
 
 internal class Ison : Command, ICommand
 {
-
     // TODO: For Apollo ISON is now a SysOp only command
     // For non-SysOp users an empty list is returned with RPL_ISON.
     public Ison()

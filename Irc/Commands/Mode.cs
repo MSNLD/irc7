@@ -17,7 +17,7 @@ internal class Mode : Command, ICommand
 
     public void Execute(ChatFrame chatFrame)
     {
-        if (!chatFrame.User.Registered)
+        if (!chatFrame.User.IsRegistered())
         {
             if (chatFrame.Message.Parameters.First().ToUpper() == Resources.ISIRCX)
             {
@@ -32,7 +32,8 @@ internal class Mode : Command, ICommand
             // TODO: implement MODE
             var channelName = chatFrame.Message.Parameters.First();
             var channel = chatFrame.Server.GetChannelByName(channelName);
-            chatFrame.User.Send(Raw.IRCX_RPL_MODE_324(chatFrame.Server, chatFrame.User, channel, channel.GetModes().ToString()));
+            chatFrame.User.Send(Raw.IRCX_RPL_MODE_324(chatFrame.Server, chatFrame.User, channel,
+                channel.GetModes().ToString()));
         }
     }
 }

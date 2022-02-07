@@ -20,7 +20,7 @@ public class FloodProtectionManager : IFloodProtectionManager
 {
     public EnumFloodResult FloodCheck(EnumCommandDataType type, User user)
     {
-        return Audit(user.GetFloodProtectionProfile(), type, user.Level);
+        return Audit(user.GetFloodProtectionProfile(), type, user.GetLevel());
     }
 
     public EnumFloodResult Audit(IFloodProtectionProfile protectionProfile, EnumCommandDataType type,

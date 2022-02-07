@@ -6,7 +6,7 @@ internal static class Register
     {
         if (CanRegister(chatFrame))
         {
-            chatFrame.User.Registered = true;
+            chatFrame.User.Register();
             chatFrame.User.Send(Raw.IRCX_RPL_WELCOME_001(chatFrame.Server, chatFrame.User));
             chatFrame.User.Send(Raw.IRCX_RPL_WELCOME_002(chatFrame.Server, chatFrame.User,
                 chatFrame.Server.GetVersion()));
@@ -18,10 +18,10 @@ internal static class Register
 
     public static bool CanRegister(ChatFrame chatFrame)
     {
-        var authenticating = chatFrame.User.Authenticated != true && chatFrame.User.IsAnon() == false;
-        var registered = chatFrame.User.Registered;
-        var hasNickname = !string.IsNullOrWhiteSpace(chatFrame.User.Address.Nickname);
-        var hasAddress = chatFrame.User.Address.IsAddressPopulated();
+        var authenticating = chatFrame.User.IsAuthenticated() != true && chatFrame.User.IsAnon() == false;
+        var registered = chatFrame.User.IsRegistered();
+        var hasNickname = !string.IsNullOrWhiteSpace(chatFrame.User.GetAddress().Nickname);
+        var hasAddress = chatFrame.User.GetAddress().IsAddressPopulated();
 
         return !authenticating && !registered & hasNickname & hasAddress;
     }

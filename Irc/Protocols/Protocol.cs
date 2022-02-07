@@ -1,5 +1,6 @@
 ﻿using Irc.Commands;
 using Irc.Enumerations;
+using Irc.Objects;
 
 namespace Irc;
 
@@ -17,5 +18,13 @@ public class Protocol : IProtocol
         throw new NotImplementedException();
     }
 
-    public void AddCommand(ICommand command, string name = null) => Commands.Add(name ?? command.GetName(), command);
+    public void AddCommand(ICommand command, string name = null)
+    {
+        Commands.Add(name ?? command.GetName(), command);
+    }
+
+    public virtual string FormattedUser(IUser user)
+    {
+        return user.GetAddress().Nickname;
+    }
 }

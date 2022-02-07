@@ -6,10 +6,10 @@ namespace Irc;
 public class ChatFrame
 {
     public readonly Message Message;
-    public readonly Server Server;
-    public readonly User User;
+    public readonly IServer Server;
+    public readonly IUser User;
 
-    public ChatFrame(Server server, User user, Message message)
+    public ChatFrame(IServer server, IUser user, Message message)
     {
         Server = server;
         User = user;

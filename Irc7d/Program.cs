@@ -1,11 +1,10 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using System.Net;
-using Irc.Extensions.Objects.Server;
+using Irc.Extensions.Apollo.Objects.Server;
 using Irc.Interfaces;
 using Irc.IO;
 using Irc.Objects.Collections;
-using Irc.Objects.Server;
 using Irc.Security;
 using Microsoft.Extensions.CommandLineUtils;
 
@@ -84,7 +83,7 @@ internal class Program
                     new PropCollection("TK2CHATCHATA01"),
                     new List<IChannel>(), null);
                 server.RemoteIP = fqdn;
-                
+
 
                 var theLobby = server.CreateChannel("%#The\\bLobby");
                 theLobby.ChannelStore.Set("topic", "Welcome to The Lobby");
@@ -102,7 +101,7 @@ internal class Program
                 var channels = new List<IChannel>();
                 channels.Add(theLobby);
                 channels.Add(test);
-                
+
                 Console.ReadLine();
                 server.Shutdown();
             }

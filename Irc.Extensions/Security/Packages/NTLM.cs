@@ -10,11 +10,10 @@ namespace Irc.Extensions.Security.Packages;
 
 public class NTLM : SupportPackage
 {
+    private readonly NTLMShared.TargetInformation _targetInformation = new();
     private NtlmType1Message _message1;
     private NtlmType2Message _message2;
     private NtlmType3Message _message3;
-
-    private readonly NTLMShared.TargetInformation _targetInformation = new();
 
     public NTLM(ICredentialProvider credentialProvider)
     {

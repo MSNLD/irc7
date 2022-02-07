@@ -221,7 +221,7 @@ public static class Resources
     public static char UserModeInvisible = 'i';
     public static char UserModeServerNotice = 's';
     public static char UserModeWallops = 'w';
-    
+
     #endregion
 
     #region "Regular Expressions"

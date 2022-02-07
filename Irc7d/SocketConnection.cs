@@ -8,11 +8,11 @@ namespace Irc7d;
 
 public class SocketConnection : IConnection
 {
-    private readonly Socket _socket;
     private readonly string _address;
     private readonly string _fullAddress;
 
     private readonly BigInteger _id;
+    private readonly Socket _socket;
     private string _received;
 
     public SocketConnection(Socket socket)

@@ -1,5 +1,7 @@
 ﻿using Irc.Commands;
 using Irc.Enumerations;
+using Irc.Objects;
+using Version = Irc.Commands.Version;
 
 namespace Irc;
 
@@ -15,7 +17,7 @@ public class Irc : Protocol, IProtocol
         AddCommand(new Join());
         AddCommand(new Part());
         AddCommand(new Userhost());
-        AddCommand(new Commands.Version());
+        AddCommand(new Version());
         AddCommand(new Info());
     }
 
@@ -26,8 +28,13 @@ public class Irc : Protocol, IProtocol
         return null;
     }
 
-    public new EnumProtocolType GetProtocolType()
+    public new virtual EnumProtocolType GetProtocolType()
     {
         return EnumProtocolType.IRC;
+    }
+
+    public override string FormattedUser(IUser user)
+    {
+        return user.GetAddress().Nickname;
     }
 }

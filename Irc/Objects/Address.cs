@@ -12,7 +12,9 @@ public class Address
     */
 
     public string Nickname { set; get; }
+
     public string User { set; get; }
+
     // TODO: NOTE: In Apollo, domain names are not supported in the host field; it must be a valid IP address.
     public string Host { set; get; }
     public string Server { set; get; }

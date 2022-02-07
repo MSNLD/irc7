@@ -3,7 +3,7 @@ using Irc.Enumerations;
 
 namespace Irc.Extensions.Commands;
 
-internal class Prop: Command, ICommand
+internal class Prop : Command, ICommand
 {
     public Prop()
     {

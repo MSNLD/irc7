@@ -5,16 +5,16 @@ namespace Irc.Objects.Member;
 
 public class Member : MemberModes, IChannelMember
 {
-    private readonly User _user;
+    private readonly IUser _user;
 
-    public Member(User User)
+    public Member(IUser User)
     {
         _user = User;
     }
 
     public EnumUserAccessLevel GetLevel()
     {
-        if (_user.Level >= EnumUserAccessLevel.ChatGuide) return _user.Level;
+        if (_user.GetLevel() >= EnumUserAccessLevel.ChatGuide) return _user.GetLevel();
 
         //if (IsOwner())
         //    return EnumUserAccessLevel.ChatOwner;
@@ -24,10 +24,10 @@ public class Member : MemberModes, IChannelMember
         if (IsVoice())
             return EnumUserAccessLevel.ChatVoice;
 
-        return _user.Guest ? EnumUserAccessLevel.ChatGuest : EnumUserAccessLevel.ChatMember;
+        return _user.IsGuest() ? EnumUserAccessLevel.ChatGuest : EnumUserAccessLevel.ChatMember;
     }
 
-    public User GetUser()
+    public IUser GetUser()
     {
         return _user;
     }

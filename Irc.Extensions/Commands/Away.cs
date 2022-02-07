@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Irc.Extensions.Apollo.Commands;
 
-namespace Irc.Extensions.Apollo.Commands
+internal class Away
 {
-    internal class Away
-    {
-    }
 }

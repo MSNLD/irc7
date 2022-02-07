@@ -19,11 +19,11 @@ public class Auth : Command, ICommand
 
     public void Execute(ChatFrame chatFrame)
     {
-        if (chatFrame.User.Registered)
+        if (chatFrame.User.IsRegistered())
         {
             chatFrame.User.Send(Raw.IRCX_ERR_ALREADYREGISTERED_462(chatFrame.Server, chatFrame.User));
         }
-        else if (chatFrame.User.Authenticated)
+        else if (chatFrame.User.IsAuthenticated())
         {
             chatFrame.User.Send(Raw.IRCX_ERR_ALREADYAUTHENTICATED_909(chatFrame.Server, chatFrame.User));
         }
@@ -72,7 +72,7 @@ public class Auth : Command, ICommand
                     chatFrame.User.GetSupportPackage().AcceptSecurityContext(token, chatFrame.Server.RemoteIP);
                 if (supportPackageSequence == EnumSupportPackageSequence.SSP_OK)
                 {
-                    chatFrame.User.Authenticated = true;
+                    chatFrame.User.Authenticate();
 
                     var user = chatFrame.User.GetSupportPackage().GetCredentials().GetUsername();
                     var domain = chatFrame.User.GetSupportPackage().GetCredentials().GetDomain();

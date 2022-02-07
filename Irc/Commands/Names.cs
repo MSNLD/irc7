@@ -58,11 +58,11 @@ IRC8 H,A,GO is correct as well as
      
 */
 
-public static void ProcessNamesReply(User user, IChannel channel)
+    public static void ProcessNamesReply(IUser user, IChannel channel)
     {
         // TODO: IRC4 <H|G>,<A|S|G|U>,<G|R>,[.|@|+]<nickname>
         // TODO: 
         user.Send(Raw.IRCX_RPL_NAMEREPLY_353(user.Server, user, channel,
-            string.Join(' ', channel.GetMembers().Select(m => m.GetUser()))));
+            string.Join(' ', channel.GetMembers().Select(m => user.GetProtocol().FormattedUser(m.GetUser())))));
     }
 }

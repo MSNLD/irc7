@@ -1,53 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Irc.Interfaces;
+﻿using Irc.Interfaces;
 using Irc.Objects;
 
-namespace Irc.Extensions.Objects
+namespace Irc.Extensions.Objects;
+
+public class ExtendedMemberModes : MemberModes, IMemberModes
 {
-    public class ExtendedMemberModes: MemberModes, IMemberModes
+    public ExtendedMemberModes()
     {
-        public ExtendedMemberModes()
-        {
-            modes.Add(ExtendedResources.MemberModeOwner, 0);
-        }
+        modes.Add(ExtendedResources.MemberModeOwner, 0);
+    }
 
-        public new char GetListedMode()
-        {
-            if (IsOwner()) return ExtendedResources.MemberModeFlagOwner;
-            
-            return base.GetListedMode();
-        }
+    public new char GetListedMode()
+    {
+        if (IsOwner()) return ExtendedResources.MemberModeFlagOwner;
 
-        public new char GetModeChar()
-        {
-            if (IsOwner()) return ExtendedResources.MemberModeOwner;
+        return base.GetListedMode();
+    }
 
-            return base.GetModeChar();
-        }
+    public new char GetModeChar()
+    {
+        if (IsOwner()) return ExtendedResources.MemberModeOwner;
 
-        public bool IsOwner()
-        {
-            return GetModeChar(ExtendedResources.MemberModeOwner) > 0;
-        }
+        return base.GetModeChar();
+    }
 
-        public bool IsNormal()
-        {
-            return !IsOwner() && base.IsNormal();
-        }
+    public bool IsNormal()
+    {
+        return !IsOwner() && base.IsNormal();
+    }
 
-        public void SetOwner(bool flag)
-        {
-            modes[ExtendedResources.MemberModeOwner] = flag ? 1 : 0;
-        }
+    public new void SetNormal()
+    {
+        SetOwner(false);
+        base.SetNormal();
+    }
 
-        public new void SetNormal()
-        {
-            SetOwner(false);
-            base.SetNormal();
-        }
+    public bool IsOwner()
+    {
+        return GetModeChar(ExtendedResources.MemberModeOwner) > 0;
+    }
+
+    public void SetOwner(bool flag)
+    {
+        modes[ExtendedResources.MemberModeOwner] = flag ? 1 : 0;
     }
 }

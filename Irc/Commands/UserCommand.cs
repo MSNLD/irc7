@@ -21,18 +21,18 @@ internal class UserCommand : Command, ICommand
 
     public void Execute(ChatFrame chatFrame)
     {
-        if (chatFrame.User.Registered)
+        if (chatFrame.User.IsRegistered())
         {
             chatFrame.User.Send(Raw.IRCX_ERR_ALREADYREGISTERED_462(chatFrame.Server, chatFrame.User));
         }
         else
         {
             // Gotta check each param
-            chatFrame.User.Address.User = chatFrame.Message.Parameters[0];
+            chatFrame.User.GetAddress().User = chatFrame.Message.Parameters[0];
             //chatFrame.User.Address.Host = chatFrame.Message.Parameters[1];
-            chatFrame.User.Address.Host = chatFrame.User.Address.RemoteIP;
-            chatFrame.User.Address.Server = chatFrame.Message.Parameters[2];
-            chatFrame.User.Address.RealName = chatFrame.Message.Parameters[3];
+            chatFrame.User.GetAddress().Host = chatFrame.User.GetAddress().RemoteIP;
+            chatFrame.User.GetAddress().Server = chatFrame.Message.Parameters[2];
+            chatFrame.User.GetAddress().RealName = chatFrame.Message.Parameters[3];
         }
     }
 }

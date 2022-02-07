@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Irc.Extensions.Commands;
 
-namespace Irc.Extensions.Commands
+internal class Invite
 {
-    internal class Invite
-    {
-    }
 }

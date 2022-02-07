@@ -15,7 +15,10 @@ public class ModeCollection : IModeCollection
         return value;
     }
 
-    public string GetSupportedModes() => new (modes.Keys.OrderBy(x => x).ToArray());
+    public string GetSupportedModes()
+    {
+        return new(modes.Keys.OrderBy(x => x).ToArray());
+    }
 
     public override string ToString()
     {

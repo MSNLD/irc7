@@ -4,34 +4,36 @@ using Irc.Enumerations;
 using Irc.Extensions.Security.Packages;
 using Irc.Interfaces;
 using Irc.IO;
+using Irc.Objects.Server;
 using Irc7d;
 
 namespace Irc.Objects;
 
-public class User : ChatObject
+public class User : ChatObject, IUser
 {
     //public Access Access;
     private readonly IConnection _connection;
     private readonly IDataRegulator _dataRegulator;
     private readonly IDataStore _dataStore;
     private readonly IFloodProtectionProfile _floodProtectionProfile;
+    private bool _authenticated;
+
+    private bool _guest;
+    private EnumUserAccessLevel _level;
+    private IModeCollection _modes;
     private IProtocol _protocol;
+    private bool _registered;
     private ISupportPackage _supportPackage;
     public Address Address = new();
-    public bool Authenticated;
     public IDictionary<IChannel, IChannelMember> Channels;
     public string Client;
 
-    public bool Guest;
     public long LastIdle;
-    public EnumUserAccessLevel Level;
     public long LoggedOn;
-    public IModeCollection Modes;
-    public bool Registered;
 
     public User(IConnection connection, IProtocol protocol, IDataRegulator dataRegulator,
         IFloodProtectionProfile floodProtectionProfile, IDataStore dataStore, IModeCollection modes,
-        Server.Server server) : base(dataStore)
+        IServer server) : base(dataStore)
     {
         Server = server;
         _connection = connection;
@@ -40,7 +42,7 @@ public class User : ChatObject
         _floodProtectionProfile = floodProtectionProfile;
         _dataStore = dataStore;
         _supportPackage = new ANON();
-        Modes = modes;
+        _modes = modes;
         Channels = new ConcurrentDictionary<IChannel, IChannelMember>();
 
         _connection.OnReceive += (sender, s) =>
@@ -48,9 +50,11 @@ public class User : ChatObject
             var message = new Message(_protocol, s);
             dataRegulator.PushIncoming(message);
         };
+
+        Address.RemoteIP = connection.GetAddress();
     }
 
-    public Server.Server Server { get; }
+    public IServer Server { get; }
     public event EventHandler<string> OnSend;
 
     public void BroadcastToChannels(string data, bool ExcludeUser)
@@ -140,19 +144,34 @@ public class User : ChatObject
         return _protocol;
     }
 
+    public IConnection GetConnection()
+    {
+        return _connection;
+    }
+
+    public EnumUserAccessLevel GetLevel()
+    {
+        return _level;
+    }
+
+    public Address GetAddress()
+    {
+        return Address;
+    }
+
     public bool IsGuest()
     {
-        return Guest;
+        return _guest;
     }
 
     public bool IsRegistered()
     {
-        return Registered;
+        return _registered;
     }
 
     public bool IsAuthenticated()
     {
-        return Authenticated;
+        return _authenticated;
     }
 
     public bool IsAnon()
@@ -183,5 +202,20 @@ public class User : ChatObject
         }
 
         return false;
+    }
+
+    public void Register()
+    {
+        _registered = true;
+    }
+
+    public void Authenticate()
+    {
+        _authenticated = true;
+    }
+
+    public IDataStore GetDataStore()
+    {
+        return _dataStore;
     }
 }

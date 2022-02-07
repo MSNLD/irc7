@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Irc.Enumerations;
 
-namespace Irc.Extensions.Apollo.Protocols
+namespace Irc.Extensions.Apollo.Protocols;
+
+internal class Irc8 : Irc7
 {
-    internal class Irc8: Irc7
+    public override EnumProtocolType GetProtocolType()
     {
+        return EnumProtocolType.IRC8;
     }
 }

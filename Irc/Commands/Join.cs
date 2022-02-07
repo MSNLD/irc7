@@ -30,7 +30,7 @@ internal class Join : Command, ICommand
         JoinChannels(server, user, channelNames);
     }
 
-    public static List<string> ValidateChannels(Server server, User user, List<string> parameters)
+    public static List<string> ValidateChannels(IServer server, IUser user, List<string> parameters)
     {
         var channelNames = parameters.First().Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
 
@@ -51,7 +51,7 @@ internal class Join : Command, ICommand
         return channelNames;
     }
 
-    public void JoinChannels(Server server, User user, List<string> channelNames)
+    public void JoinChannels(IServer server, IUser user, List<string> channelNames)
     {
         server
             .GetChannels()

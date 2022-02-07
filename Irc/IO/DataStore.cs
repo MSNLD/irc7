@@ -4,8 +4,8 @@ namespace Irc.IO;
 
 public class DataStore : IDataStore
 {
-    private readonly string _section;
     private readonly bool _persist;
+    private readonly string _section;
     private readonly Dictionary<string, string> _sets = new(StringComparer.InvariantCultureIgnoreCase);
     private string _id;
 
@@ -61,8 +61,9 @@ public class DataStore : IDataStore
         {
             if (!Directory.Exists("states")) Directory.CreateDirectory("states");
             var origFileName = $"{_section}_{_id}.json";
-            var invalids = System.IO.Path.GetInvalidFileNameChars();
-            var newName = string.Join('_', origFileName.Split(invalids, StringSplitOptions.RemoveEmptyEntries)).TrimEnd('.');
+            var invalids = Path.GetInvalidFileNameChars();
+            var newName = string.Join('_', origFileName.Split(invalids, StringSplitOptions.RemoveEmptyEntries))
+                .TrimEnd('.');
             File.WriteAllText($"states/{newName}", JsonSerializer.Serialize(_sets));
         }
     }

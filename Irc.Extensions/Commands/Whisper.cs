@@ -3,7 +3,7 @@ using Irc.Enumerations;
 
 namespace Irc.Extensions.Commands;
 
-internal class Whisper: Command, ICommand
+internal class Whisper : Command, ICommand
 {
     public Whisper()
     {

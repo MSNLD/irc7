@@ -16,7 +16,8 @@ internal class Userhost : Command, ICommand
 
     public void Execute(ChatFrame chatFrame)
     {
-        if (chatFrame.User.Registered) chatFrame.User.Send(Raw.IRCX_RPL_USERHOST_302(chatFrame.Server, chatFrame.User));
+        if (chatFrame.User.IsRegistered())
+            chatFrame.User.Send(Raw.IRCX_RPL_USERHOST_302(chatFrame.Server, chatFrame.User));
         // TODO: What if not registered?
     }
 }
