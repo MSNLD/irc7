@@ -33,12 +33,12 @@ public class SupportPackage : ISupportPackage
         throw new NotImplementedException();
     }
 
-    public string GetDomain()
+    public virtual string GetDomain()
     {
         return GetPackageName();
     }
 
-    public string GetPackageName()
+    public virtual string GetPackageName()
     {
         return GetType().Name;
     }

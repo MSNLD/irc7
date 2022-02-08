@@ -1,5 +1,6 @@
 ﻿using Irc.Commands;
 using Irc.Enumerations;
+using Irc.Extensions.Apollo.Commands;
 using Irc.Extensions.Apollo.Factories;
 using Irc.Extensions.Apollo.Objects.Channel;
 using Irc.Extensions.Apollo.Objects.User;
@@ -31,6 +32,8 @@ public class ApolloServer : ExtendedServer
         _protocols.Add(EnumProtocolType.IRC8, new Irc8());
 
         // Override by adding command support at base IRC
+        _protocols[EnumProtocolType.IRC].AddCommand(new Finds());
+        _protocols[EnumProtocolType.IRCX].AddCommand(new Finds());
         _protocols[EnumProtocolType.IRC].AddCommand(new Ircvers());
         _protocols[EnumProtocolType.IRCX].AddCommand(new Ircvers());
 

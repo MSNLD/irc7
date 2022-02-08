@@ -36,6 +36,6 @@ public class SecurityManager : ISecurityManager
     {
         _supportedPackages = string.Join(',',
             _supportProviders.Where(provider => provider.Value.Listed)
-                .Select(provider => provider.Value.GetPackageName()));
+                .Select(provider => provider.Value.GetPackageName()).Reverse());
     }
 }

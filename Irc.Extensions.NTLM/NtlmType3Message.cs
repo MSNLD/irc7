@@ -71,7 +71,7 @@ public class NtlmType3Message
                 .Deserialize<NTLMShared.NTLMSSPOSVersion>();
 
             if (SessionKeySecBuf.Length > 0 &&
-                SessionKeySecBuf.Offset + SessionKeySecBuf.Length <= _sessionKeyData.Length)
+                SessionKeySecBuf.Offset + SessionKeySecBuf.Length <= _data.Length)
                 _sessionKeyData = _data.Substring(SessionKeySecBuf.Offset, SessionKeySecBuf.Length);
         }
     }

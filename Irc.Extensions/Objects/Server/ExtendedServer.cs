@@ -5,6 +5,7 @@ using Irc.Extensions.Objects.Channel;
 using Irc.Extensions.Objects.User;
 using Irc.Extensions.Protocols;
 using Irc.Extensions.Security;
+using Irc.Extensions.Security.Credentials;
 using Irc.Factories;
 using Irc.Interfaces;
 using Irc.IO;
@@ -20,6 +21,7 @@ public class ExtendedServer : global::Irc.Objects.Server.Server, IServer
         ICommandCollection commands, IUserFactory userFactory = null) : base(socketServer, securityManager,
         floodProtectionManager, dataStore, channels, commands, userFactory ?? new ExtendedUserFactory())
     {
+        securityManager.AddSupportPackage(new Security.Packages.NTLM(new NtlmProvider()));
         _protocols[EnumProtocolType.IRC].AddCommand(new Auth());
         _protocols[EnumProtocolType.IRC].AddCommand(new Ircx());
         _protocols.Add(EnumProtocolType.IRCX, new IrcX());

@@ -1,6 +1,7 @@
 ﻿using Irc.ClassExtensions.CSharpTools;
 using Irc.Extensions.NTLM;
 using Irc.Helpers.CSharpTools;
+using Irc.Interfaces;
 using Irc.Security;
 
 namespace Irc.Extensions.Security.Packages;
@@ -8,7 +9,7 @@ namespace Irc.Extensions.Security.Packages;
 // Created: Long time ago...
 // NTLM is required for the CAC to work
 
-public class NTLM : SupportPackage
+public class NTLM : SupportPackage, ISupportPackage
 {
     private readonly NTLMShared.TargetInformation _targetInformation = new();
     private NtlmType1Message _message1;
@@ -22,12 +23,12 @@ public class NTLM : SupportPackage
 
     public string ServerDomain { get; set; } = "cg";
 
-    public SupportPackage CreateInstance(ICredentialProvider credentialProvider)
+    public override SupportPackage CreateInstance(ICredentialProvider credentialProvider)
     {
         return new NTLM(credentialProvider);
     }
 
-    public EnumSupportPackageSequence InitializeSecurityContext(string data, string ip)
+    public override EnumSupportPackageSequence InitializeSecurityContext(string data, string ip)
     {
         try
         {
@@ -50,7 +51,7 @@ public class NTLM : SupportPackage
         }
     }
 
-    public string CreateSecurityChallenge(EnumSupportPackageSequence stage)
+    public override string CreateSecurityChallenge()
     {
         try
         {
@@ -63,7 +64,7 @@ public class NTLM : SupportPackage
         }
     }
 
-    public EnumSupportPackageSequence AcceptSecurityContext(string data, string ip)
+    public override EnumSupportPackageSequence AcceptSecurityContext(string data, string ip)
     {
         try
         {
@@ -82,12 +83,12 @@ public class NTLM : SupportPackage
         }
     }
 
-    public new string GetDomain()
+    public override string GetDomain()
     {
         return ServerDomain;
     }
 
-    public new string GetPackageName()
+    public override string GetPackageName()
     {
         return nameof(NTLM);
     }
