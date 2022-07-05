@@ -1,6 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using System.Net;
+using System.Text.Json;
 using Irc.Extensions.Apollo.Objects.Server;
 using Irc.Interfaces;
 using Irc.IO;
@@ -80,27 +81,20 @@ internal class Program
                 var securityManager = new SecurityManager();
 
                 var server = new ApolloServer(socketServer, securityManager, new FloodProtectionManager(),
-                    new PropCollection("TK2CHATCHATA01"),
+                    new DataStore("DefaultServer.json"),
                     new List<IChannel>(), null);
                 server.RemoteIP = fqdn;
 
-
-                var theLobby = server.CreateChannel("%#The\\bLobby");
-                theLobby.ChannelStore.Set("topic", "Welcome to The Lobby");
-                theLobby.GetModes().SetModeChar('n', 1);
-                theLobby.GetModes().SetModeChar('t', 1);
-                server.AddChannel(theLobby);
-
-                var test = server.CreateChannel("%#Test");
-                test.ChannelStore.Set("topic", "Test");
-                test.GetModes().SetModeChar('n', 1);
-                test.GetModes().SetModeChar('t', 1);
-                test.GetModes().SetModeChar('S', 1);
-                server.AddChannel(test);
-
-                var channels = new List<IChannel>();
-                channels.Add(theLobby);
-                channels.Add(test);
+                var defaultChannels = JsonSerializer.Deserialize<List<DefaultChannel>>(File.ReadAllText("DefaultChannels.json"));
+                foreach (var defaultChannel in defaultChannels)
+                {
+                    var channel = server.CreateChannel(defaultChannel.Name);
+                    channel.ChannelStore.Set("topic", defaultChannel.Topic);
+                    foreach (KeyValuePair<char, int> keyValuePair in defaultChannel.Modes) {
+                        channel.GetModes().SetModeChar(keyValuePair.Key, keyValuePair.Value);
+                    }
+                    server.AddChannel(channel);
+                }
 
                 Console.ReadLine();
                 server.Shutdown();

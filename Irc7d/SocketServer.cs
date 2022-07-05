@@ -63,6 +63,14 @@ public class SocketServer : Socket, ISocketServer
 
     public void Accept(IConnection connection)
     {
+        if (Sockets.ContainsKey(connection.GetId()))
+        {
+            connection.Disconnect(
+                "Too many connections"
+            );
+            return;
+        }
+
         connection.OnDisconnect += ClientDisconnected;
 
         var socketCollection = Sockets.GetOrAdd(connection.GetId(), new ConcurrentBag<IConnection>());

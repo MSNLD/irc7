@@ -16,6 +16,14 @@ public class DataStore : IDataStore
         _persist = persist;
     }
 
+    public DataStore(string path)
+    {
+        if (!string.IsNullOrWhiteSpace(path))
+        {
+            _sets = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(path));
+        }
+    }
+
     public void SetId(string id)
     {
         _id = id;

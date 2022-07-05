@@ -1,0 +1,21 @@
+[
+  {
+    "Name": "%#The\\bLobby",
+    "Topic": "Welcome to The Lobby",
+    "Modes": {
+      "n": 1,
+      "t": 1,
+      "l": 50
+    }
+  },
+  {
+    "Name": "%#Test",
+    "Topic": "Test",
+    "Modes": {
+      "n": 1,
+      "t": 1,
+      "l": 50,
+      "k": 1
+    }
+  }
+]

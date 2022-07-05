@@ -23,11 +23,12 @@ public class SocketConnection : IConnection
         if (_socket.RemoteEndPoint != null)
         {
             var remoteAddressBytes = ((IPEndPoint) _socket.RemoteEndPoint).Address.GetAddressBytes();
+            _id = new BigInteger(remoteAddressBytes);
 
-            _id = remoteAddressBytes.Length > 8
-                ? ((BigInteger) BitConverter.ToUInt64(remoteAddressBytes, 8) << 64) +
-                  BitConverter.ToUInt64(remoteAddressBytes, 8)
-                : BitConverter.ToUInt32(remoteAddressBytes, 0);
+            // _id = remoteAddressBytes.Length > 8
+            //     ? ((BigInteger) BitConverter.ToUInt64(remoteAddressBytes, 8) << 64) +
+            //       BitConverter.ToUInt64(remoteAddressBytes, 8)
+            //     : BitConverter.ToUInt32(remoteAddressBytes, 0);
 
             _address = _socket.RemoteEndPoint != null
                 ? ((IPEndPoint) _socket.RemoteEndPoint).Address.ToString()

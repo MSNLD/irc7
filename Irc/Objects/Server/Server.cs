@@ -36,7 +36,6 @@ public class Server : ChatObject, IServer
         ICommandCollection commands,
         IUserFactory userFactory) : base(dataStore)
     {
-        Name = "TK2CHATCHATA01";
         _socketServer = socketServer;
         _securityManager = securityManager;
         _floodProtectionManager = floodProtectionManager;
@@ -44,7 +43,6 @@ public class Server : ChatObject, IServer
         Channels = channels;
         Commands = commands;
         _userFactory = userFactory;
-        Name = Name;
         _processingTask = new Task(Process);
         _processingTask.Start();
 
