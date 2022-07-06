@@ -98,7 +98,7 @@ public class GateKeeper : SupportPackage, ISupportPackage
         ServerToken.Sequence = (int) EnumSupportPackageSequence.SSP_SEC;
         ServerToken.Version = ServerVersion;
         Array.Copy(Guid.NewGuid().ToByteArray(), 0, challenge, 0, 8);
-
+        Array.Copy(new byte[] { 167, 135, 203, 141, 242, 118, 89, 77 }, 0, challenge, 0, 8);
         var message = new StringBuilder(Marshal.SizeOf(ServerToken) + challenge.Length);
         message.Append(ServerToken.Serialize<GateKeeperToken>().ToAsciiString());
         message.Append(challenge);
@@ -112,6 +112,11 @@ public class GateKeeper : SupportPackage, ISupportPackage
         var md5 = new HMACMD5(key.ToByteArray());
         var ctx = $"{challenge}{ip}";
         var h1 = md5.ComputeHash(ctx.ToByteArray(), 0, ctx.Length);
-        return h1.SequenceEqual(context);
+        bool b = h1.SequenceEqual(context);
+        if (!b)
+        {
+            return false;
+        }
+        return b;
     }
 }
