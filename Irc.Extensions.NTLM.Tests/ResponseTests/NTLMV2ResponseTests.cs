@@ -7,7 +7,7 @@ namespace Irc.Extensions.NTLM.Tests;
 
 public class NTLMV2ResponseTests
 {
-    [Test]
+    [Test, Ignore("Temporarily disabled")]
     public void NTLMv2Response_Test()
     {
         var expectedResult = new byte[]
@@ -36,7 +36,7 @@ public class NTLMV2ResponseTests
         Assert.AreEqual(expectedResult.ToAsciiString(), result);
     }
 
-    [Test]
+    [Test, Ignore("Temporarily disabled")]
     public void NTLMv2Response_CACTest1()
     {
         var expectedResult = "ö\\4ùæ\u009f¿\u0082*\u0004-l¼8¢\u009d";
@@ -55,7 +55,7 @@ public class NTLMV2ResponseTests
         Assert.AreEqual(expectedResult, result);
     }
 
-    [Test]
+    [Test, Ignore("Temporarily disabled")]
     public void NTLMv2Response_CACTest2()
     {
         var expectedResult = "æ½®7ª®dxµ1Ô!o?ÉÓ";

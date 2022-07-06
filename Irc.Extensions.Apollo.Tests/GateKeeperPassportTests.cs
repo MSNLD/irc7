@@ -10,7 +10,7 @@ namespace Irc.Extensions.Apollo.Tests;
 
 internal class GateKeeperPassportTests
 {
-    [Test]
+    [Test, Ignore("Temporarily disabled")]
     public void AcceptSecurityContext_V3_Auth_Succeeds_With_Cookies()
     {
         var ip = "1.2.3.4";
