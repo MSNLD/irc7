@@ -1,4 +1,5 @@
 ﻿using Irc.Enumerations;
+using Irc.Extensions.Apollo.Objects.User;
 using Irc.Objects;
 
 namespace Irc.Extensions.Apollo.Protocols;
@@ -14,4 +15,5 @@ internal class Irc4 : Irc3
     {
         return EnumProtocolType.IRC4;
     }
+    public override string GetProfileString(ApolloUser apolloUser) => string.Empty;
 }

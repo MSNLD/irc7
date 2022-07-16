@@ -55,7 +55,7 @@ internal class Join : Command, ICommand
     {
         server
             .GetChannels()
-            .Where(c => channelNames.Contains(c.GetName()))
+            .Where(c => channelNames.Contains(c.GetName(), StringComparer.InvariantCultureIgnoreCase))
             .Where(c => c.Allows(user))
             .ToList()
             .ForEach(

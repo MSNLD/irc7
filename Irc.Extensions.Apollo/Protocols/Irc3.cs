@@ -1,5 +1,6 @@
 ﻿using Irc.Commands;
 using Irc.Enumerations;
+using Irc.Extensions.Apollo.Objects.User;
 using Irc.Extensions.Protocols;
 using Irc.Objects;
 
@@ -21,4 +22,6 @@ public class Irc3 : IrcX
     {
         return user.GetAddress().Nickname;
     }
+
+    public virtual string GetProfileString(ApolloUser apolloUser) => string.Empty;
 }
