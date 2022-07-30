@@ -7,6 +7,12 @@ public class Command : ICommand
     protected int _requiredMaximumParameters;
     protected int _requiredMinimumParameters;
 
+    public Command(int requiredMinimumParameters = 0, int requiredMaximumParameters = 0)
+    {
+        _requiredMinimumParameters = requiredMinimumParameters;
+        _requiredMaximumParameters = requiredMaximumParameters;
+    }
+
     public string GetName()
     {
         return GetType().Name;

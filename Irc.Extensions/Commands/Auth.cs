@@ -7,17 +7,10 @@ namespace Irc.Commands;
 
 public class Auth : Command, ICommand
 {
-    public Auth()
-    {
-        _requiredMinimumParameters = 3;
-    }
+    public Auth() : base(3) { }
+    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
 
-    public EnumCommandDataType GetDataType()
-    {
-        return EnumCommandDataType.None;
-    }
-
-    public void Execute(ChatFrame chatFrame)
+    public new void Execute(ChatFrame chatFrame)
     {
         if (chatFrame.User.IsRegistered())
         {

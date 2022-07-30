@@ -4,22 +4,15 @@ namespace Irc.Commands;
 
 internal class UserCommand : Command, ICommand
 {
-    public UserCommand()
-    {
-        _requiredMinimumParameters = 4;
-    }
-
-    public EnumCommandDataType GetDataType()
-    {
-        return EnumCommandDataType.None;
-    }
+    public UserCommand() : base(4) { }
+    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
 
     public new string GetName()
     {
         return "User";
     }
 
-    public void Execute(ChatFrame chatFrame)
+    public new void Execute(ChatFrame chatFrame)
     {
         if (chatFrame.User.IsRegistered())
         {

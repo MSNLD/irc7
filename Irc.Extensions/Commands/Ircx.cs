@@ -5,17 +5,10 @@ namespace Irc.Commands;
 
 internal class Ircx : Command, ICommand
 {
-    public Ircx()
-    {
-        _requiredMinimumParameters = 0;
-    }
+    public Ircx() : base(0) { }
+    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
 
-    public EnumCommandDataType GetDataType()
-    {
-        return EnumCommandDataType.None;
-    }
-
-    public void Execute(ChatFrame chatFrame)
+    public new void Execute(ChatFrame chatFrame)
     {
         var protocol = chatFrame.User.GetProtocol().GetProtocolType();
         if (protocol < EnumProtocolType.IRC0)

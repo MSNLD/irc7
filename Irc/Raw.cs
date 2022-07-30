@@ -335,6 +335,21 @@ public static class Raw
         return $":{server} 320 {user} %s :from IP %s";
     }
 
+    public static string IRCX_RPL_MODE_321(IServer server, IUser user)
+    {
+        return $":{server} 321 {user} Channel :Users  Name";
+    }
+
+    public static string IRCX_RPL_MODE_322(IServer server, IUser user, IChannel channel)
+    {
+        return $":{server} 322 {user} {channel} {channel.GetMembers().Count} :{(channel.GetModes().GetModeChar('h') == 0 ? channel.ChannelStore.Get("topic") : string.Empty)}";
+    }
+
+    public static string IRCX_RPL_MODE_323(IServer server, IUser user)
+    {
+        return $":{server} 323 {user} :End of /LIST";
+    }
+
     public static string IRCX_RPL_MODE_324(IServer server, IUser user, IChannel channel, string modes)
     {
         return $":{server} 324 {user} {channel} +{modes}";
@@ -363,7 +378,7 @@ public static class Raw
 
     public static string IRCX_RPL_NAMEREPLY_353(IServer server, IUser user, IChannel channel, string names)
     {
-        return $":{server} 353 {user} {channel} :{names}";
+        return $":{server} 353 {user} = {channel} :{names}";
     }
 
     public static string IRCX_RPL_NAMEREPLY_353X(IServer server, IUser user, IChannel channel)

@@ -6,17 +6,10 @@ namespace Irc.Commands;
 
 internal class Names : Command, ICommand
 {
-    public Names()
-    {
-        _requiredMinimumParameters = 1;
-    }
+    public Names() : base(1) { }
+    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
 
-    public EnumCommandDataType GetDataType()
-    {
-        return EnumCommandDataType.None;
-    }
-
-    public void Execute(ChatFrame chatFrame)
+    public new void Execute(ChatFrame chatFrame)
     {
         var channelName = chatFrame.Message.Parameters.First();
 
@@ -62,7 +55,14 @@ IRC8 H,A,GO is correct as well as
     {
         // TODO: IRC4 <H|G>,<A|S|G|U>,<G|R>,[.|@|+]<nickname>
         // TODO: 
-        user.Send(Raw.IRCX_RPL_NAMEREPLY_353(user.Server, user, channel,
-            string.Join(' ', channel.GetMembers().Select(m => user.GetProtocol().FormattedUser(m.GetUser())))));
+        user.Send(
+            Raw.IRCX_RPL_NAMEREPLY_353(user.Server, user, channel,
+                                        string.Join(' ', 
+                                                    channel.GetMembers().Select(m => 
+                                                        $"{user.GetProtocol().FormattedUser(m.GetUser())}"
+                                                    )
+                                              )
+                                        )
+            );
     }
 }

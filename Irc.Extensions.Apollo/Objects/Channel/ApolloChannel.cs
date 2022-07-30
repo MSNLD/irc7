@@ -1,6 +1,9 @@
-﻿using Irc.Extensions.Objects.Channel;
+﻿using Irc.Extensions.Apollo.Objects.User;
+using Irc.Extensions.Objects.Channel;
+using Irc.Interfaces;
 using Irc.IO;
 using Irc.Objects;
+using Irc.Objects.Member;
 
 namespace Irc.Extensions.Apollo.Objects.Channel;
 

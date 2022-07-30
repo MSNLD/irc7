@@ -18,6 +18,7 @@ public interface IUser
     void RemoveChannel(IChannel channel);
     KeyValuePair<IChannel, IChannelMember> GetChannelMemberInfo(IChannel channel);
     KeyValuePair<IChannel, IChannelMember> GetChannelInfo(string Name);
+    IDictionary<IChannel, IChannelMember> GetChannels();
     void Send(string message);
     void Flush();
     void Disconnect(string message);

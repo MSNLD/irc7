@@ -10,22 +10,28 @@ public class Irc : Protocol, IProtocol
     public Irc()
     {
         AddCommand(new Privmsg());
+        AddCommand(new Notice());
         AddCommand(new Ping());
         AddCommand(new Nick());
         AddCommand(new UserCommand(), "User");
+        AddCommand(new List());
         AddCommand(new Mode());
         AddCommand(new Join());
         AddCommand(new Part());
         AddCommand(new Userhost());
         AddCommand(new Version());
         AddCommand(new Info());
+        AddCommand(new Pong());
+        AddCommand(new Pass());
+        AddCommand(new Quit());
+        AddCommand(new Trace());
+        AddCommand(new Ison());
     }
 
     public new ICommand GetCommand(string name)
     {
-        if (Commands.TryGetValue(name, out var command)) return command;
-
-        return null;
+        Commands.TryGetValue(name, out var command);
+        return command;
     }
 
     public new virtual EnumProtocolType GetProtocolType()

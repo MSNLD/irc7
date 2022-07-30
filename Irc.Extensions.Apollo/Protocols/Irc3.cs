@@ -22,6 +22,4 @@ public class Irc3 : IrcX
     {
         return user.GetAddress().Nickname;
     }
-
-    public virtual string GetProfileString(ApolloUser apolloUser) => string.Empty;
 }

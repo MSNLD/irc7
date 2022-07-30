@@ -8,7 +8,7 @@ using Irc7d;
 
 namespace Irc.Extensions.Apollo.Factories;
 
-internal class ApolloUserFactory : IUserFactory
+public class ApolloUserFactory : IUserFactory
 {
     public IUser Create(IServer server, IConnection connection)
     {

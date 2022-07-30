@@ -45,11 +45,25 @@ public class Channel : ChatObject, IChannel
 
     public IChannel Join(IUser user)
     {
-        var member = new Member.Member(user);
-        _members.Add(member);
-        Send(Raw.RPL_JOIN_IRC(user, this));
+        AddMember(user);
+        Send(IrcRaws.RPL_JOIN(user, this));
         return this;
     }
+
+    private IChannelMember AddMember(IUser user)
+    {
+        var member = new Member.Member(user);
+        _members.Add(member);
+        user.AddChannel(this, member);
+        return member;
+    }
+
+    private void RemoveMember(IUser user)
+    {
+        var member = _members.Where(m => m.GetUser() == user).FirstOrDefault();
+        _members.Remove(member);
+    }
+
 
     public IChannel SendTopic(IUser user)
     {
@@ -65,15 +79,25 @@ public class Channel : ChatObject, IChannel
 
     public IChannel Part(IUser user)
     {
-        var member = _members.Where(m => m.GetUser() == user).FirstOrDefault();
-        Send(Raw.RPL_PART_IRC(user, this));
-        _members.Remove(member);
+        RemoveMember(user);
+        Send(IrcRaws.RPL_PART(user, this));
+        return this;
+    }
+
+    public IChannel Quit(IUser user)
+    {
+        RemoveMember(user);
         return this;
     }
 
     public void SendMessage(IUser user, string message)
     {
-        Send(Raw.RPL_PRIVMSG_CHAN(user, this, message), user, true);
+        Send(IrcRaws.RPL_PRIVMSG(user, this, message), user, true);
+    }
+
+    public void SendNotice(IUser user, string message)
+    {
+        Send(IrcRaws.RPL_NOTICE(user, this, message), user, true);
     }
 
     public void Send(string message, IUser u, bool ExcludeSender)
@@ -127,7 +151,7 @@ public class Channel : ChatObject, IChannel
 
     public static bool ValidName(string channel)
     {
-        var regex = new Regex(Resources.ChannelRegEx);
+        var regex = new Regex(Resources.IrcChannelRegex);
         return regex.Match(channel).Success;
     }
 

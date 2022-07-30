@@ -8,12 +8,11 @@ internal class Irc7 : Irc6
 {
     public override string FormattedUser(IUser user)
     {
-        return $"H,U,GPX,{user.GetAddress().Nickname}";
+        return ((ApolloUser)user).GetProfile().Irc7_ToString();
     }
 
     public override EnumProtocolType GetProtocolType()
     {
         return EnumProtocolType.IRC7;
     }
-    public override string GetProfileString(ApolloUser apolloUser) => apolloUser.GetProfile().Irc7_ToString();
 }

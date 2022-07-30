@@ -2,7 +2,8 @@
 
 public static class Resources
 {
-    public static long epoch = 621355968000000000;
+
+public static long epoch = 621355968000000000;
     public static string CommandAccess = "ACCESS";
     public static string CommandAdmin = "ADMIN";
     public static string CommandAway = "AWAY";
@@ -229,7 +230,8 @@ public static class Resources
     public static string StandardIRC = @"[(\x00-\x2C)(\x2E-\x2F)(\x3A-\x40)]{1}|\\N|\\R|\\0|\\T";
     public static string GenericProps = @"[\x00-\x19]{1}";
     public static string JoinPartProp = @"[\x00]{1}";
-    public static string ChannelRegEx = @"%#[\x21-\x2B,\x2D-\xFF]{1,200}";
+    public static string IrcChannelRegex = @"#[\x21-\x2B,\x2D-\xFF]{1,200}";
+    public static string IrcxChannelRegex = @"%#[\x21-\x2B,\x2D-\xFF]{1,200}";
     public static string GuestNicknameMask = @"^>(?!(Sysop)|(Admin)|(Guide))[\x41-\xFF\-0-9]+$";
     public static string NicknameMask = @"^(?!(Sysop)|(Admin)|(Guide))[\x41-\xFF][\x41-\xFF\-0-9]*$";
 

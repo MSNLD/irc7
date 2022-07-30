@@ -4,17 +4,10 @@ namespace Irc.Commands;
 
 internal class Userhost : Command, ICommand
 {
-    public Userhost()
-    {
-        _requiredMinimumParameters = 0;
-    }
+    public Userhost() : base(0) { }
+    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
 
-    public EnumCommandDataType GetDataType()
-    {
-        return EnumCommandDataType.None;
-    }
-
-    public void Execute(ChatFrame chatFrame)
+    public new void Execute(ChatFrame chatFrame)
     {
         if (chatFrame.User.IsRegistered())
             chatFrame.User.Send(Raw.IRCX_RPL_USERHOST_302(chatFrame.Server, chatFrame.User));

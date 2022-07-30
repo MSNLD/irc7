@@ -6,21 +6,14 @@ namespace Irc.Commands;
 
 internal class Part : Command, ICommand
 {
-    public Part()
-    {
-        _requiredMinimumParameters = 1;
-    }
+    public Part() : base(1) { }
+    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
 
-    public EnumCommandDataType GetDataType()
-    {
-        return EnumCommandDataType.None;
-    }
-
-    public void Execute(ChatFrame chatFrame)
+    public new void Execute(ChatFrame chatFrame)
     {
         var server = chatFrame.Server;
         var user = chatFrame.User;
-        var parameters = chatFrame.Message.Parameters;
+        var parameters = chatFrame.Message.Parameters.First();
 
         var channelNames = Join.ValidateChannels(server, user, parameters);
         if (channelNames.Count == 0) return;
@@ -36,7 +29,10 @@ internal class Part : Command, ICommand
             .ToList()
             .ForEach(
                 channel =>
-                    channel.Part(user)
+                {
+                    channel.Part(user);
+                    user.RemoveChannel(channel);
+                }
             );
     }
 }

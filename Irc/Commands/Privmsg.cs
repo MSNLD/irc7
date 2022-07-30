@@ -4,17 +4,15 @@ namespace Irc.Commands;
 
 internal class Privmsg : Command, ICommand
 {
-    public Privmsg()
+    public Privmsg() : base(2) { }
+    public new EnumCommandDataType GetDataType() => EnumCommandDataType.Standard;
+
+    public new void Execute(ChatFrame chatFrame)
     {
-        _requiredMinimumParameters = 2;
+        SendMessage(chatFrame, false);
     }
 
-    public EnumCommandDataType GetDataType()
-    {
-        return EnumCommandDataType.Standard;
-    }
-
-    public void Execute(ChatFrame chatFrame)
+    public static void SendMessage(ChatFrame chatFrame, bool Notice)
     {
         var channelName = chatFrame.Message.Parameters.First();
         var message = chatFrame.Message.Parameters[1];
@@ -22,7 +20,8 @@ internal class Privmsg : Command, ICommand
         var channel = chatFrame.Server.GetChannelByName(channelName);
 
         if (channel != null)
-            channel.SendMessage(chatFrame.User, message);
+            if (Notice) channel.SendNotice(chatFrame.User, message);
+            else channel.SendMessage(chatFrame.User, message);
         else
             // TODO: To make common function for this
             chatFrame.User.Send(Raw.IRCX_ERR_NOSUCHCHANNEL_403(chatFrame.Server, chatFrame.User, channelName));

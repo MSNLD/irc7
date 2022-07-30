@@ -1,4 +1,5 @@
 ﻿using Irc.Constants;
+using Irc.Enumerations;
 using Irc.IO;
 
 namespace Irc.Objects;
@@ -6,6 +7,7 @@ namespace Irc.Objects;
 public class ChatObject
 {
     public readonly IDataStore DataStore;
+    public EnumUserAccessLevel Level = EnumUserAccessLevel.None;
 
     public ChatObject(IDataStore dataStore)
     {

@@ -1,6 +1,116 @@
-﻿namespace Irc.Constants;
+﻿using Irc.Interfaces;
+using Irc.Objects;
+using Irc.Objects.Server;
 
-public class Raws
+namespace Irc.Constants;
+
+public static class IrcRaws
+{
+    public static string IRC_RAW_001 = ":%h 001 %a :Welcome to the Microsoft Internet Chat Server %a";
+    public static string IRC_RAW_002 = ":%h 002 %a :Your host is %h, running version %v ";
+    public static string IRC_RAW_003 = ":%h 003 %a :This server was created %s at %s PDT";
+    public static string IRC_RAW_004 = ":%h 004 %a %h %v aioxz abcdefhiklmnoprstuvxyz   ";
+    public static string IRC_RAW_219 = ":%h 219 %a %s :End of /STATS report ";
+    public static string IRC_RAW_221 = ":%h 221 %n %s   ";
+    public static string IRC_RAW_251 = ":%h 251 %a :There are %d users and %d invisible on %d servers   ";
+    public static string IRC_RAW_252 = ":%h 252 %a %d :operator(s) online   ";
+    public static string IRC_RAW_253 = ":%h 253 %a %d :unknown connection(s)";
+    public static string IRC_RAW_254 = ":%h 254 %a %d :channels formed  ";
+    public static string IRC_RAW_255 = ":%h 255 %a :I have %d clients and %d servers";
+    public static string IRC_RAW_256 = ":%h 256 %a :Administrative info about %h";
+    public static string IRC_RAW_257 = ":%h 257 %a :%q  ";
+    public static string IRC_RAW_258 = ":%h 258 %a :%q  ";
+    public static string IRC_RAW_259 = ":%h 259 %a :%q  ";
+    public static string IRC_RAW_301 = ":%h 301 %a %s :%s   ";
+    public static string IRC_RAW_303(IServer server, IUser user, string names) => $":{server} 303 {user} :{names}";
+    public static string IRC_RAW_305 = ":%h 305 %a :You are no longer marked as being away  ";
+    public static string IRC_RAW_306 = ":%h 306 %a :You have been marked as being away  ";
+    public static string IRC_RAW_311 = ":%h 311 %a %s %z * :%s  ";
+    public static string IRC_RAW_312 = ":%h 312 %a %s %s :%s";
+    public static string IRC_RAW_313 = ":%h 313 %a %s :is an IRC operator   ";
+    public static string IRC_RAW_315 = ":%h 315 %a %s :End of /WHO list ";
+    public static string IRC_RAW_317 = ":%h 317 %a %s %d %d :seconds idle, signon time  ";
+    public static string IRC_RAW_318 = ":%h 318 %a %s :End of /WHOIS list   ";
+    public static string IRC_RAW_319 = ":%h 319 %a %a :%s   ";
+    public static string IRC_RAW_321 = ":%h 321 %a Channel :Users  Name ";
+    public static string IRC_RAW_322 = ":%h 322 %a %s %d :%s";
+    public static string IRC_RAW_323 = ":%h 323 %a :End of /LIST";
+    public static string IRC_RAW_324 = ":%h 324 %a %c %s";
+    public static string IRC_RAW_331 = ":%h 331 %a %c :No topic is set  ";
+    public static string IRC_RAW_332 = ":%h 332 %a %c :%s   ";
+    public static string IRC_RAW_341 = ":%h 341 %a %s %s";
+    public static string IRC_RAW_351 = ":%h 351 %a %d.%d.%d %h :Microsoft Exchange Chat Service %d.%d   ";
+    public static string IRC_RAW_352 = ":%h 352 %a %s %s %s %s %s %s%s :%d %s   ";
+    public static string IRC_RAW_353(IServer server, IUser user, IChannel channel, string names) => $":{server} 353 {user} = {channel} :{names}";
+    public static string IRC_RAW_364 = ":%h 364 %a %s %s :%d P0 %s  ";
+    public static string IRC_RAW_365 = ":%h 365 %a %s :End of /LINKS list.  ";
+    public static string IRC_RAW_366_STR = ":%h 366 %a %s :End of /NAMES list.  ";
+    public static string IRC_RAW_366_ANY = ":%h 366 %a * :End of /NAMES list.   ";
+    public static string IRC_RAW_366 = ":%h 366 %a %c :End of /NAMES list.  ";
+    public static string IRC_RAW_367 = ":%h 367 %a %c %p";
+    public static string IRC_RAW_368 = ":%h 368 %a %c :End of Channel Ban List  ";
+    public static string IRC_RAW_371 = ":%h 371 %a :On-line since %s";
+    public static string IRC_RAW_371_DATE = ":%h 371 %a :%s %d.%d";
+    public static string IRC_RAW_372 = ":%h 372 %a :- %q";
+    public static string IRC_RAW_374 = ":%h 374 %a :End of /INFO list   ";
+    public static string IRC_RAW_375 = ":%h 375 %a :- %h Message of the Day -   ";
+    public static string IRC_RAW_376 = ":%h 376 %a :End of /MOTD command";
+    public static string IRC_RAW_381 = ":%h 381 %a :You are now an IRC operator ";
+    public static string IRC_RAW_386 = ":%h 386 %a :You are now an IRC administrator";
+    public static string IRC_RAW_391 = ":%h 391 %a %s :%s   ";
+    public static string IRC_RAW_401 = ":%h 401 %a %s :No such nick/channel ";
+    public static string IRC_RAW_402 = ":%h 402 %a %s :No such server   ";
+    public static string IRC_RAW_403 = ":%h 403 %a %s :No such channel  ";
+    public static string IRC_RAW_404 = ":%h 404 %a %s :Cannot send to channel   ";
+    public static string IRC_RAW_405 = ":%h 405 %a %s :You have joined too many channels";
+    public static string IRC_RAW_411 = ":%h 411 %a :No recipient given (%s) ";
+    public static string IRC_RAW_412 = ":%h 412 %a :No text to send (%s)";
+    public static string IRC_RAW_421 = ":%h 421 %a %s :Unknown command";
+    public static string IRC_RAW_422 = ":%h 422 %a :MOTD File is missing";
+    public static string IRC_RAW_423 = ":%h 423 %a %h :No administrative info available ";
+    public static string IRC_RAW_431 = ":%h 431 :No nickname given  ";
+    public static string IRC_RAW_432 = ":%h 432 %s :Erroneous nickname  ";
+    public static string IRC_RAW_433 = ":%h 433 * %s :Nickname is already in use";
+    public static string IRC_RAW_442 = ":%h 442 %a %s :You're not on that channel   ";
+    public static string IRC_RAW_443 = ":%h 443 %a %s %s :is already on channel ";
+    public static string IRC_RAW_446 = ":%h 446 %a :USERS has been disabled ";
+    public static string IRC_RAW_451 = ":%h 451 %a :You have not registered ";
+    public static string IRC_RAW_461 = ":%h 461 %a %s :Not enough parameters";
+    public static string IRC_RAW_462(IServer server, IUser user) => $":{server} 462 {user} :You may not reregister";
+    public static string IRC_RAW_467 = ":%h 467 %a %c :Channel key already set  ";
+    public static string IRC_RAW_471 = ":%h 471 %a %s :Cannot join channel (+l) ";
+    public static string IRC_RAW_472 = ":%h 472 %a %l :is unknown mode char to me   ";
+    public static string IRC_RAW_473 = ":%h 473 %a %s :Cannot join channel (+i) ";
+    public static string IRC_RAW_474 = ":%h 474 %a %s :Cannot join channel (+b) ";
+    public static string IRC_RAW_475 = ":%h 475 %a %s :Cannot join channel (+k) ";
+    public static string IRC_RAW_481 = ":%h 481 %a :Permission Denied - You're not an IRC operator  ";
+    public static string IRC_RAW_482 = ":%h 482 %a %s :You're not channel operator  ";
+    public static string IRC_RAW_485 = ":%h 485 %a %s :You're not channel owner ";
+    public static string IRC_RAW_491 = ":%h 491 %a :No O-lines for your host";
+    public static string IRC_RAW_501 = ":%h 501 %a :Unknown MODE flag   ";
+    public static string IRC_RAW_502 = ":%h 502 %a :Cant change mode for other users";
+    public static string IRC_RAW_554 = ":%h 554 %a %s :Command not supported.   ";
+    public static string IRC_RAW_555 = ":%h 555 %a %s :Server option for this command is not supported. ";
+    public static string IRC_RAW_557 = ":%h 557 %a :Command aborted to prevent output buffer overflow.  ";
+    public static string IRC_RAW_900 = ":%h 900 %a %s :Cannot join MIC only channel with IRC client ";
+    public static string IRC_RAW_901_ARG = ":%h 901 %a %s :Too many arguments";
+    public static string IRC_RAW_901_REMOTE = ":%h 901 %a %s :Cannot join channel from remote server (+r)";
+    public static string IRC_RAW_902 = ":%h 902 %a %s :Cannot create dynamic channels (admin)";
+    public static string IRC_RAW_904 = ":%h 904 %a %s :Only authenticated users may join channel";
+    public static string IRC_RAW_905 = ":%h 905 %a :Nick changes are not permitted at this time, try again later";
+    public static string IRC_RAW_906 = ":%h 906 %a %s :Cannot make host due to admin restriction";
+    public static string IRC_RAW_908 = ":%h 908 %a :No permissions to perform command";
+    public static string IRC_RAW_998 = ":%h 998 %a %s :Already on channel   ";
+    public static string IRC_RAW_999 = ":%h 999 %a :Unknown error code %d";
+
+    public static string RPL_JOIN(IUser user, IChannel channel) => $":{user.GetAddress()} JOIN :{channel}";
+    public static string RPL_PART(IUser user, IChannel channel) => $":{user.GetAddress()} PART {channel}";
+    public static string RPL_PRIVMSG(IUser user, IChannel channel, string message) => $":{user.GetAddress()} PRIVMSG {channel} :{message}";
+    public static string RPL_NOTICE(IUser user, IChannel channel, string message) => $":{user.GetAddress()} NOTICE {channel} :{message}";
+    public static string RPL_QUIT(IUser user, string message) => $":{user.GetAddress()} QUIT :{message}";
+}
+
+public class IrcxRaws
 {
     public static string IRCX_CLOSINGLINK = "ERROR :Closing Link: %n[%s] (%s)";
 
@@ -17,7 +127,7 @@ public class Raws
     public static string RPL_JOIN_IRC = ":%u JOIN :%c";
     public static string RPL_JOIN_MSN = ":%u JOIN %S :%c";
     public static string RPL_PART_IRC = ":%u PART %c";
-    public static string RPL_QUIT_IRC = ":%u QUIT :%s";
+
     public static string RPL_MODE_IRC = ":%u MODE %s %s";
     public static string RPL_TOPIC_IRC = ":%u TOPIC %c :%s";
     public static string RPL_PROP_IRCX = ":%u PROP %c %s :%s";

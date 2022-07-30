@@ -2,10 +2,15 @@
 
 using System.Net;
 using System.Text.Json;
+using Irc.Extensions.Apollo.Factories;
 using Irc.Extensions.Apollo.Objects.Server;
+using Irc.Extensions.Factories;
+using Irc.Extensions.Objects.Server;
+using Irc.Factories;
 using Irc.Interfaces;
 using Irc.IO;
 using Irc.Objects.Collections;
+using Irc.Objects.Server;
 using Irc.Security;
 using Microsoft.Extensions.CommandLineUtils;
 
@@ -22,6 +27,7 @@ namespace Irc7d;
 
 internal class Program
 {
+    private enum IrcType { IRC, IRCX, MSN };
     private static void Main(string[] args)
     {
         var app = new CommandLineApplication();
@@ -80,15 +86,43 @@ internal class Program
 
                 var securityManager = new SecurityManager();
 
-                var server = new ApolloServer(socketServer, securityManager, new FloodProtectionManager(),
-                    new DataStore("DefaultServer.json"),
-                    new List<IChannel>(), null);
+                var type = IrcType.IRC;
+
+                IServer server = null;
+
+                switch (type)
+                {
+                    case IrcType.IRC:
+                        {
+                            server = new Server(socketServer, securityManager, new FloodProtectionManager(),
+                            new DataStore("DefaultServer.json"),
+                            new List<IChannel>(), null, new UserFactory());
+                            break;
+                        }
+                    case IrcType.IRCX:
+                        {
+                            server = new ExtendedServer(socketServer, securityManager, new FloodProtectionManager(),
+                            new DataStore("DefaultServer.json"),
+                            new List<IChannel>(), null, new ExtendedUserFactory());
+                            break;
+                        }
+                    default:
+                        {
+                            server = new ApolloServer(socketServer, securityManager, new FloodProtectionManager(),
+                            new DataStore("DefaultServer.json"),
+                            new List<IChannel>(), null, new ApolloUserFactory());
+                            break;
+                        }
+                } 
+
+
                 server.RemoteIP = fqdn;
 
                 var defaultChannels = JsonSerializer.Deserialize<List<DefaultChannel>>(File.ReadAllText("DefaultChannels.json"));
                 foreach (var defaultChannel in defaultChannels)
                 {
-                    var channel = server.CreateChannel(defaultChannel.Name);
+                    var name = type == IrcType.IRC ? $"#{defaultChannel.Name}" : $"%#{defaultChannel.Name}";
+                    var channel = server.CreateChannel(name);
                     channel.ChannelStore.Set("topic", defaultChannel.Topic);
                     foreach (KeyValuePair<char, int> keyValuePair in defaultChannel.Modes) {
                         channel.GetModes().SetModeChar(keyValuePair.Key, keyValuePair.Value);

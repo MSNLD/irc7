@@ -17,7 +17,7 @@ internal class Ircvers : Command, ICommand
 
     public void Execute(ChatFrame chatFrame)
     {
-        return;
+        //return;
         if (chatFrame.User.IsRegistered())
         {
             chatFrame.User.Send(Raw.IRCX_ERR_ALREADYREGISTERED_462(chatFrame.Server, chatFrame.User));

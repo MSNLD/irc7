@@ -1,6 +1,6 @@
 [
   {
-    "Name": "%#The\\bLobby",
+    "Name": "The\\bLobby",
     "Topic": "Welcome to The Lobby",
     "Modes": {
       "n": 1,
@@ -9,7 +9,7 @@
     }
   },
   {
-    "Name": "%#Test",
+    "Name": "Test",
     "Topic": "Test",
     "Modes": {
       "n": 1,

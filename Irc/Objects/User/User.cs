@@ -82,6 +82,8 @@ public class User : ChatObject, IUser
         return Channels.FirstOrDefault(c => c.Key.GetName() == Name);
     }
 
+    public IDictionary<IChannel, IChannelMember> GetChannels() => Channels;
+
     public void Send(string message)
     {
         _dataRegulator.PushOutgoing(message);

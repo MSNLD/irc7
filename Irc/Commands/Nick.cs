@@ -4,17 +4,10 @@ namespace Irc.Commands;
 
 internal class Nick : Command, ICommand
 {
-    public Nick()
-    {
-        _requiredMinimumParameters = 1;
-    }
+    public Nick() : base(1) { }
+    public new EnumCommandDataType GetDataType() => EnumCommandDataType.Standard;
 
-    public EnumCommandDataType GetDataType()
-    {
-        return EnumCommandDataType.Standard;
-    }
-
-    public void Execute(ChatFrame chatFrame)
+    public new void Execute(ChatFrame chatFrame)
     {
         // Is user not registered?
         // Set nickname according to regulations (should be available in user object and changes based on what they authenticated as)

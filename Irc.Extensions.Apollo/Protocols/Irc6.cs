@@ -9,5 +9,4 @@ internal class Irc6 : Irc5
     {
         return EnumProtocolType.IRC6;
     }
-    public override string GetProfileString(ApolloUser apolloUser) => apolloUser.GetProfile().Irc5_ToString();
 }

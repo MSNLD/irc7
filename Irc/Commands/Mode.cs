@@ -5,17 +5,10 @@ namespace Irc.Commands;
 
 internal class Mode : Command, ICommand
 {
-    public Mode()
-    {
-        _requiredMinimumParameters = 1;
-    }
+    public Mode() : base(1) { }
+    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
 
-    public EnumCommandDataType GetDataType()
-    {
-        return EnumCommandDataType.None;
-    }
-
-    public void Execute(ChatFrame chatFrame)
+    public new void Execute(ChatFrame chatFrame)
     {
         if (!chatFrame.User.IsRegistered())
         {
@@ -32,8 +25,12 @@ internal class Mode : Command, ICommand
             // TODO: implement MODE
             var channelName = chatFrame.Message.Parameters.First();
             var channel = chatFrame.Server.GetChannelByName(channelName);
-            chatFrame.User.Send(Raw.IRCX_RPL_MODE_324(chatFrame.Server, chatFrame.User, channel,
+
+            if (channel != null)
+            {
+                chatFrame.User.Send(Raw.IRCX_RPL_MODE_324(chatFrame.Server, chatFrame.User, channel,
                 channel.GetModes().ToString()));
+            }
         }
     }
 }

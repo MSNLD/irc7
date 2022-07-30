@@ -5,17 +5,10 @@ namespace Irc.Extensions.Commands;
 
 internal class Create : Command, ICommand
 {
-    public Create()
-    {
-        _requiredMinimumParameters = 0;
-    }
+    public Create() : base(0) { }
+    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
 
-    public EnumCommandDataType GetDataType()
-    {
-        return EnumCommandDataType.None;
-    }
-
-    public void Execute(ChatFrame chatFrame)
+    public new void Execute(ChatFrame chatFrame)
     {
         chatFrame.User.Send(Raw.IRCX_ERR_NOTIMPLEMENTED(chatFrame.Server, chatFrame.User, nameof(Access)));
     }

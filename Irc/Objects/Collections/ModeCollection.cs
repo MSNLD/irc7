@@ -22,6 +22,11 @@ public class ModeCollection : IModeCollection
         return new(modes.Keys.OrderBy(x => x).ToArray());
     }
 
+    public bool HasMode(char mode)
+    {
+        return modes.Keys.Contains(mode);
+    }
+
     public override string ToString()
     {
         // TODO: <MODESTRING> Fix the below for Limit and Key on mode string
