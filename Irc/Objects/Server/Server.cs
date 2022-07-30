@@ -34,7 +34,7 @@ public class Server : ChatObject, IServer
         IDataStore dataStore,
         IList<IChannel> channels,
         ICommandCollection commands,
-        IUserFactory userFactory) : base(dataStore)
+        IUserFactory userFactory) : base(new ModeCollection(), dataStore)
     {
         _socketServer = socketServer;
         _securityManager = securityManager;

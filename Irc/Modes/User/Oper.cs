@@ -8,11 +8,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Irc.Modes.Channel
+namespace Irc.Modes.User
 {
-    public class BanList : ModeRule, IModeRule
+    public class Oper : ModeRule, IModeRule
     {
-        public BanList() : base(Resources.ChannelModeBan)
+        public Oper() : base(Resources.UserModeOper)
         {
         }
 

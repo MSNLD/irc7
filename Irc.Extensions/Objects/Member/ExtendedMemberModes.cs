@@ -7,7 +7,7 @@ public class ExtendedMemberModes : MemberModes, IMemberModes
 {
     public ExtendedMemberModes()
     {
-        modes.Add(ExtendedResources.MemberModeOwner, 0);
+        //modes.Add(ExtendedResources.MemberModeOwner, 0);
     }
 
     public new char GetListedMode()
@@ -42,6 +42,6 @@ public class ExtendedMemberModes : MemberModes, IMemberModes
 
     public void SetOwner(bool flag)
     {
-        modes[ExtendedResources.MemberModeOwner] = flag ? 1 : 0;
+        modes[ExtendedResources.MemberModeOwner].Set(flag ? 1 : 0);
     }
 }

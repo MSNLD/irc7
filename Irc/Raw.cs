@@ -205,9 +205,9 @@ public static class Raw
             $":{server} 004 {user} {server} {version.Major}.{version.Minor}.{version.Build} {server.GetSupportedUserModes()} {server.GetSupportedChannelModes()}";
     }
 
-    public static string IRCX_RPL_UMODEIS_221(IServer server, IUser user)
+    public static string IRCX_RPL_UMODEIS_221(IServer server, IUser user, string modes)
     {
-        return $":{server} 221 {user} %s";
+        return $":{server} 221 {user} {modes}";
     }
 
     public static string IRCX_RPL_LUSERCLIENT_251(IServer server, IUser user)
@@ -342,7 +342,7 @@ public static class Raw
 
     public static string IRCX_RPL_MODE_322(IServer server, IUser user, IChannel channel)
     {
-        return $":{server} 322 {user} {channel} {channel.GetMembers().Count} :{(channel.GetModes().GetModeChar('h') == 0 ? channel.ChannelStore.Get("topic") : string.Empty)}";
+        return $":{server} 322 {user} {channel} {channel.GetMembers().Count} :{channel.ChannelStore.Get("topic")}";
     }
 
     public static string IRCX_RPL_MODE_323(IServer server, IUser user)

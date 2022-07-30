@@ -101,21 +101,21 @@ namespace Irc.Extensions.Apollo.Tests
         {
             ApolloProfile admin = new ApolloProfile()
             {
-                Level = Enumerations.EnumUserAccessLevel.ChatAdministrator
+                Level = Enumerations.EnumUserAccessLevel.Administrator
             };
 
             Assert.AreEqual("A", admin.GetModeString());
 
             ApolloProfile sysop = new ApolloProfile()
             {
-                Level = Enumerations.EnumUserAccessLevel.ChatSysop
+                Level = Enumerations.EnumUserAccessLevel.Sysop
             };
 
             Assert.AreEqual("S", sysop.GetModeString());
 
             ApolloProfile sysop_manager = new ApolloProfile()
             {
-                Level = Enumerations.EnumUserAccessLevel.ChatSysopManager
+                Level = Enumerations.EnumUserAccessLevel.SysopManager
             };
 
             Assert.AreEqual("S", sysop_manager.GetModeString());
@@ -150,7 +150,7 @@ namespace Irc.Extensions.Apollo.Tests
             ApolloProfile here_admin_guest = new ApolloProfile()
             {
                 Away = false,
-                Level = Enumerations.EnumUserAccessLevel.ChatAdministrator,
+                Level = Enumerations.EnumUserAccessLevel.Administrator,
                 Guest = true
             };
             Assert.AreEqual("H,A,GO", here_admin_guest.ToString());
@@ -194,7 +194,7 @@ namespace Irc.Extensions.Apollo.Tests
             ApolloProfile here_admin_guest = new ApolloProfile()
             {
                 Away = false,
-                Level = Enumerations.EnumUserAccessLevel.ChatAdministrator,
+                Level = Enumerations.EnumUserAccessLevel.Administrator,
                 Guest = true
             };
             Assert.AreEqual("H,A,G", here_admin_guest.Irc5_ToString());
@@ -225,7 +225,7 @@ namespace Irc.Extensions.Apollo.Tests
             ApolloProfile here_admin_guest = new ApolloProfile()
             {
                 Away = false,
-                Level = Enumerations.EnumUserAccessLevel.ChatAdministrator,
+                Level = Enumerations.EnumUserAccessLevel.Administrator,
                 Guest = true
             };
             Assert.AreEqual("H,A,G", here_admin_guest.Irc7_ToString());

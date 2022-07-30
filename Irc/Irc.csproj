@@ -10,12 +10,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Operations\**" />
+    <EmbeddedResource Remove="Operations\**" />
+    <None Remove="Operations\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Irc.ClassExtensions\Irc.Helpers.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Modes\Server\" />
-    <Folder Include="Operations\" />
   </ItemGroup>
 
 </Project>

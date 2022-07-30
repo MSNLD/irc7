@@ -10,9 +10,10 @@ public enum EnumUserAccessLevel
     ChatVoice = 4,
     ChatHost = 5,
     ChatOwner = 6,
-    ChatGuide = 7,
-    ChatSysop = 8,
-    ChatSysopManager = 9,
-    ChatAdministrator = 10,
-    ChatService = 11
+    Host = 7,
+    Guide = 8,
+    Sysop = 9,
+    SysopManager = 10,
+    Administrator = 11,
+    Service = 12
 }

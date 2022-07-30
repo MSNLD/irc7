@@ -20,7 +20,6 @@ public class User : ChatObject, IUser
 
     private bool _guest;
     private EnumUserAccessLevel _level;
-    private IModeCollection _modes;
     private IProtocol _protocol;
     private bool _registered;
     private ISupportPackage _supportPackage;
@@ -33,7 +32,7 @@ public class User : ChatObject, IUser
 
     public User(IConnection connection, IProtocol protocol, IDataRegulator dataRegulator,
         IFloodProtectionProfile floodProtectionProfile, IDataStore dataStore, IModeCollection modes,
-        IServer server) : base(dataStore)
+        IServer server) : base(modes, dataStore)
     {
         Server = server;
         _connection = connection;
@@ -42,7 +41,6 @@ public class User : ChatObject, IUser
         _floodProtectionProfile = floodProtectionProfile;
         _dataStore = dataStore;
         _supportPackage = new ANON();
-        _modes = modes;
         Channels = new ConcurrentDictionary<IChannel, IChannelMember>();
 
         _connection.OnReceive += (sender, s) =>

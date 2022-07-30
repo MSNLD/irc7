@@ -7,8 +7,8 @@ public class MemberModes : ModeCollection, IMemberModes
 {
     public MemberModes()
     {
-        modes.Add(Resources.MemberModeHost, 0);
-        modes.Add(Resources.MemberModeVoice, 0);
+        modes.Add(Resources.MemberModeHost, new Modes.Channel.Member.Operator());
+        modes.Add(Resources.MemberModeVoice, new Modes.Channel.Member.Voice());
     }
 
     public string GetModeString()
@@ -49,12 +49,12 @@ public class MemberModes : ModeCollection, IMemberModes
 
     public void SetHost(bool flag)
     {
-        modes[Resources.MemberModeHost] = flag ? 1 : 0;
+        modes[Resources.MemberModeHost].Set(flag ? 1 : 0);
     }
 
     public void SetVoice(bool flag)
     {
-        modes[Resources.MemberModeVoice] = flag ? 1 : 0;
+        modes[Resources.MemberModeVoice].Set(flag ? 1 : 0);
     }
 
     public void SetNormal()

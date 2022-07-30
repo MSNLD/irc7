@@ -9,13 +9,11 @@ namespace Irc.Objects.Channel;
 public class Channel : ChatObject, IChannel
 {
     private readonly IList<IChannelMember> _members = new List<IChannelMember>();
-    private readonly IModeCollection _modes;
     public IList<Address> BanList = new List<Address>();
     public IList<User> InviteList = new List<User>();
 
-    public Channel(string name, IModeCollection modes, IDataStore dataStore) : base(dataStore)
+    public Channel(string name, IModeCollection modes, IDataStore dataStore) : base(modes, dataStore)
     {
-        _modes = modes;
         SetName(name);
         DataStore.SetId(Name);
     }

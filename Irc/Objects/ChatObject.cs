@@ -8,12 +8,16 @@ public class ChatObject
 {
     public readonly IDataStore DataStore;
     public EnumUserAccessLevel Level = EnumUserAccessLevel.None;
+    protected readonly IModeCollection _modes;
 
-    public ChatObject(IDataStore dataStore)
+    public ChatObject(IModeCollection modes, IDataStore dataStore)
     {
+        _modes = modes;
         DataStore = dataStore;
         DataStore.SetId(Id.ToString());
     }
+
+    public IModeCollection GetModes() => _modes;
 
     public Guid Id { get; } = Guid.NewGuid();
 

@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Irc.Constants;
+using Irc.Enumerations;
+using Irc.Interfaces;
+using Irc.Objects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +10,15 @@ using System.Threading.Tasks;
 
 namespace Irc.Modes.Channel
 {
-    internal class Secret
+    public class Secret : ModeRule, IModeRule
     {
+        public Secret() : base(Resources.ChannelModeSecret)
+        {
+        }
+
+        EnumModeResult Evaluate(ChatObject chatObject, string modeValue)
+        {
+            return EnumModeResult.OK;
+        }
     }
 }

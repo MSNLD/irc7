@@ -82,16 +82,16 @@ namespace Irc.Extensions.Apollo.Objects.User
         {
             switch (Level)
             {
-                case EnumUserAccessLevel.ChatAdministrator:
+                case EnumUserAccessLevel.Administrator:
                     {
                         return "A";
                     }
-                case EnumUserAccessLevel.ChatSysop:
-                case EnumUserAccessLevel.ChatSysopManager:
+                case EnumUserAccessLevel.Sysop:
+                case EnumUserAccessLevel.SysopManager:
                     {
                         return "S";
                     }
-                case EnumUserAccessLevel.ChatGuide:
+                case EnumUserAccessLevel.Guide:
                     {
                         return "G";
                     }

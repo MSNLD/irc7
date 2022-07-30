@@ -9,33 +9,6 @@ using System.Threading.Tasks;
 
 namespace Irc.Modes
 {
-
-    public class ModeFrame
-    {
-        public ModeFrame()
-        {
-
-        }
-        public ModeFrame(char mode, int modeValue, ModeResult modeResult)
-        {
-            Mode = mode;
-            ModeValue = modeValue;
-            ModeResult = modeResult;
-        }
-
-        public char Mode { get; set; }
-        public int ModeValue { get; set; }
-        public ModeResult ModeResult { get; set; }
-    }
-
-    public enum ModeResult
-    {
-        OK,
-        NOTFOUND,
-        NOACCESS
-    }
-
-
     public class ModeEngine
     {
         private readonly IModeCollection modeCollection;
@@ -51,15 +24,8 @@ namespace Irc.Modes
             modeRules[modeChar] = modeRule;
         }
 
-        public void Evaluate(ChatObject source, string modeString)
+        public static void Breakdown(ChatObject source, ChatObject target, string modeString, Queue<string> modeParameters)
         {
-
-        }
-
-        public List<ModeFrame> Breakdown(ChatObject source, string modeString)
-        {
-            List<ModeFrame> modeFrames = new List<ModeFrame>();
-
             bool modeFlag = true;
 
             foreach (var c in modeString)
@@ -74,24 +40,40 @@ namespace Irc.Modes
                         }
                     default:
                         {
+                            var modeCollection = target.GetModes();
                             bool exists = modeCollection.HasMode(c);
                             int modeValue = exists ? modeCollection.GetModeChar(c) : -1;
-                            modeRules.TryGetValue(c, out var modeRule);
 
-                            var modeResult = exists ? ModeResult.NOACCESS : ModeResult.NOTFOUND;
-                            if (modeRule != null)
+                            var modeRule = modeCollection.GetMode(c);
+
+                            string parameter = null;
+                            if (modeRule.RequiresParameter)
                             {
-                                if (modeRule.Evaluate(source, "") == EnumModeResult.OK) modeResult = ModeResult.OK;
+                                if (modeParameters.Count > 0) { parameter = modeParameters.Dequeue(); }
+                                else
+                                {
+                                    // Not enough parameters
+                                    //:sky-8a15b323126 461 Sky MODE +q :Not enough parameters
+                                    continue;
+                                }
                             }
 
-                            var frame = new ModeFrame(c, modeValue, modeResult);
-                            modeFrames.Add(frame);
+                            var result = modeRule.Evaluate(source, target, parameter);
+
+                            switch (result)
+                            {
+                                case EnumModeResult.BADVALUE:
+                                    {
+                                        // -> sky-8a15b323126 MODE #test +l hello
+                                        // < - :sky - 8a15b323126 461 Sky MODE +l :Not enough parameters
+                                        break;
+                                    }
+                            }
+                            
                             break;
                         }
                 }
             }
-
-            return modeFrames;
         }
     }
 }
