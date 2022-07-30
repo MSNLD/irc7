@@ -7,24 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Irc.Logic
+namespace Irc.Modes
 {
-    public class ModeRule
-    {
-        private readonly char modeChar;
-        private readonly EnumUserAccessLevel requiredLevel;
-
-        public ModeRule(char modeChar, EnumUserAccessLevel accessLevel)
-        {
-            this.modeChar = modeChar;
-            this.requiredLevel = accessLevel;
-        }
-
-        public bool Evaluate(EnumUserAccessLevel accessLevel)
-        {
-            return (accessLevel >= requiredLevel);
-        }
-    }
 
     public class ModeFrame
     {
@@ -85,7 +69,7 @@ namespace Irc.Logic
                     case '+':
                     case '-':
                         {
-                            modeFlag = (c == '+' ? true : false);
+                            modeFlag = c == '+' ? true : false;
                             break;
                         }
                     default:
@@ -97,7 +81,7 @@ namespace Irc.Logic
                             var modeResult = exists ? ModeResult.NOACCESS : ModeResult.NOTFOUND;
                             if (modeRule != null)
                             {
-                                if (modeRule.Evaluate(source.Level)) modeResult = ModeResult.OK;
+                                if (modeRule.Evaluate(source, "") == EnumModeResult.OK) modeResult = ModeResult.OK;
                             }
 
                             var frame = new ModeFrame(c, modeValue, modeResult);

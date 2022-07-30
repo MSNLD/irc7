@@ -1,5 +1,4 @@
-﻿using Irc.Logic;
-using Irc.Objects;
+﻿using Irc.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +7,7 @@ using System.Threading.Tasks;
 using Moq;
 using Irc.IO;
 using Shouldly;
+using Irc.Modes;
 
 namespace Irc.Tests.Logic
 {
