@@ -1,6 +1,7 @@
 ﻿using Irc.Interfaces;
 using Irc.Objects;
 using Irc.Objects.Server;
+using System.Globalization;
 
 namespace Irc;
 
@@ -451,7 +452,8 @@ public static class Raw
 
     public static string IRCX_RPL_TIME_391(IServer server, IUser user)
     {
-        return $":{server} 391 {user} {server} :%S";
+        //<- :sky-8a15b323126 391 Sky sky-8a15b323126 :Wed Aug 10 18:27:41 2022
+        return $":{server} 391 {user} {server} :{DateTime.Now.ToString("ddd MMM dd HH:mm:ss yyyy", CultureInfo.CreateSpecificCulture("en-us"))}";
     }
 
     public static string IRCX_ERR_NOSUCHNICK_401_N(IServer server, IUser user)
@@ -564,9 +566,9 @@ public static class Raw
         return $":{server} 471 {user} {channel} :Cannot join channel (+l)";
     }
 
-    public static string IRCX_ERR_UNKNOWNMODE_472(IServer server, IUser user)
+    public static string IRCX_ERR_UNKNOWNMODE_472(IServer server, IUser user, char mode)
     {
-        return $":{server} 472 {user} %l :is unknown mode char to me";
+        return $":{server} 472 {user} {mode} :is unknown mode char to me";
     }
 
     public static string IRCX_ERR_INVITEONLYCHAN_473(IServer server, IUser user, IChannel channel)

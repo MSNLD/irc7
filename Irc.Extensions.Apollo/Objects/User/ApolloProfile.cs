@@ -87,7 +87,6 @@ namespace Irc.Extensions.Apollo.Objects.User
                         return "A";
                     }
                 case EnumUserAccessLevel.Sysop:
-                case EnumUserAccessLevel.SysopManager:
                     {
                         return "S";
                     }

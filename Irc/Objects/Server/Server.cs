@@ -248,6 +248,7 @@ public class Server : ChatObject, IServer
     private void ProcessNextCommand(IUser user)
     {
         var message = user.GetDataRegulator().PeekIncoming();
+        Console.WriteLine($"Processing: " + message.OriginalText);
         var command = message.GetCommand();
         if (command != null)
         {
@@ -256,7 +257,7 @@ public class Server : ChatObject, IServer
             if (floodResult == EnumFloodResult.Ok)
             {
                 user.GetDataRegulator().PopIncoming();
-                Console.WriteLine($"Processing: {message.OriginalText}");
+                //Console.WriteLine($"Processing: {message.OriginalText}");
 
                 var chatFrame = new ChatFrame(this, user, message);
                 if (command.CheckParameters(chatFrame)) command.Execute(chatFrame);

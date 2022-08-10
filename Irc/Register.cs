@@ -1,6 +1,6 @@
 ﻿namespace Irc;
 
-internal static class Register
+public static class Register
 {
     public static void Execute(ChatFrame chatFrame)
     {

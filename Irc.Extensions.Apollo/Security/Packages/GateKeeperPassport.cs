@@ -28,7 +28,7 @@ public class GateKeeperPassport : GateKeeper
         if (ServerSequence == EnumSupportPackageSequence.SSP_EXT)
         {
             var result = base.AcceptSecurityContext(data, ip);
-            if (result != EnumSupportPackageSequence.SSP_OK) return EnumSupportPackageSequence.SSP_FAILED;
+            if (result != EnumSupportPackageSequence.SSP_OK && result != EnumSupportPackageSequence.SSP_EXT) return EnumSupportPackageSequence.SSP_FAILED;
 
             Authenticated = false;
             ServerSequence = EnumSupportPackageSequence.SSP_CREDENTIALS;
@@ -37,6 +37,7 @@ public class GateKeeperPassport : GateKeeper
 
         if (ServerSequence == EnumSupportPackageSequence.SSP_CREDENTIALS)
         {
+            return EnumSupportPackageSequence.SSP_OK;
             var ticket = extractCookie(data.Substring(0x10));
             if (ticket == null) return EnumSupportPackageSequence.SSP_FAILED;
 

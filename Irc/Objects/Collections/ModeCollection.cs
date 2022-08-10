@@ -36,6 +36,6 @@ public class ModeCollection : IModeCollection
 
     public override string ToString()
     {
-        return $"{new string(modes.Where(mode => mode.Value.Get() > 0).Select(mode => mode.Key).ToArray())}";
+        return $"+{new string(modes.Where(mode => mode.Value.Get() > 0).Select(mode => mode.Key).ToArray())}";
     }
 }

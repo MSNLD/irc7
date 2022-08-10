@@ -56,7 +56,7 @@ internal class Mode : Command, ICommand
                 {
                     modeParameters = new Queue<string>(chatFrame.Message.Parameters.Skip(2).ToArray());
                 }
-                ModeEngine.Breakdown((ChatObject)chatFrame.User, chatObject, chatFrame.Message.Parameters[1], modeParameters);
+                ModeEngine.Breakdown(chatFrame.User, chatObject, chatFrame.Message.Parameters[1], modeParameters);
             }
             else
             {

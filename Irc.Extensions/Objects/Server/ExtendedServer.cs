@@ -1,5 +1,6 @@
 ﻿using Irc.Commands;
 using Irc.Enumerations;
+using Irc.Extensions.Commands;
 using Irc.Extensions.Factories;
 using Irc.Extensions.Objects.Channel;
 using Irc.Extensions.Objects.User;
@@ -25,6 +26,8 @@ public class ExtendedServer : global::Irc.Objects.Server.Server, IServer
         _protocols[EnumProtocolType.IRC].AddCommand(new Auth());
         _protocols[EnumProtocolType.IRC].AddCommand(new Ircx());
         _protocols.Add(EnumProtocolType.IRCX, new IrcX());
+        _protocols[EnumProtocolType.IRC].AddCommand(new Prop());
+        _protocols[EnumProtocolType.IRCX].AddCommand(new Prop());
 
         var modes = new ExtendedChannelModes().GetSupportedModes() +
                     new ExtendedMemberModes().GetSupportedModes();

@@ -74,6 +74,11 @@ public class Auth : Command, ICommand
                     // Send reply
                     return;
                 }
+                else if (supportPackageSequence == EnumSupportPackageSequence.SSP_CREDENTIALS)
+                {
+                    chatFrame.User.Send(Raw.RPL_AUTH_SEC_REPLY(packageName, "OK"));
+                    return;
+                }
             }
 
             // auth failed
