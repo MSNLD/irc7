@@ -76,6 +76,12 @@ namespace Irc.Modes
                                         // < - :sky - 8a15b323126 461 Sky MODE +l :Not enough parameters
                                         break;
                                     }
+                                case EnumModeResult.NOTOPER:
+                                    {
+                                        //:sky-8a15b323126 482 Sky3k #test :You're not channel operator
+                                        source.Send(Raw.IRCX_ERR_CHANOPRIVSNEEDED_482(source.Server, source, target));
+                                        break;
+                                    }
                             }
                             
                             break;

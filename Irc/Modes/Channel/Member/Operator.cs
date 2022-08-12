@@ -27,7 +27,7 @@ namespace Irc.Modes.Channel.Member
         {
         }
 
-        EnumModeResult Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
+        public EnumModeResult Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
         {
             if (source is IUser && target is IChannel)
             {
@@ -42,15 +42,16 @@ namespace Irc.Modes.Channel.Member
                 }
                 else
                 {
-                    targetMember.SetHost(flag);
-                    //channel.Send(
-                    //    Raw.RPL_MODE_IRC(
-                    //            sourceMember.GetUser(),
-                    //            (ChatObject)channel,
-                    //            $""
-                    //        )
-                    //    );
-                    return EnumModeResult.OK;
+                    if (sourceMember.IsHost())
+                    {
+                        targetMember.SetHost(flag);
+                        DispatchChannelModeChange(source, target, flag, parameter);
+                        return EnumModeResult.OK;
+                    }
+                    else
+                    {
+                        return EnumModeResult.NOTOPER;
+                    }
                 }
             }
             else

@@ -67,9 +67,9 @@ public static class Raw
         return $":{user.GetAddress()} QUIT :%s";
     }
 
-    public static string RPL_MODE_IRC(IUser user, ChatObject target, string modeString)
+    public static string RPL_MODE_IRC(ChatObject user, ChatObject target, string modeString)
     {
-        return $":{user.GetAddress()} MODE {target} {modeString}";
+        return $":{user.Address} MODE {target} {modeString}";
     }
 
     public static string RPL_TOPIC_IRC(IServer server, IUser user, IChannel channel)
@@ -591,7 +591,7 @@ public static class Raw
         return $":{server} 481 {user} :Permission Denied - You're not an IRC operator";
     }
 
-    public static string IRCX_ERR_CHANOPRIVSNEEDED_482(IServer server, IUser user, IChannel channel)
+    public static string IRCX_ERR_CHANOPRIVSNEEDED_482(IServer server, IUser user, ChatObject channel)
     {
         return $":{server} 482 {user} {channel} :You're not channel operator";
     }

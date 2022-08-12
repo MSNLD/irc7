@@ -29,6 +29,18 @@ public class ChatObject
         set => DataStore.Set("Name", value);
     }
 
+    public virtual void Send(string message)
+    {
+        throw new NotImplementedException();
+    }
+
+    public virtual void Send(string message, ChatObject except = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public string Address => Name;
+
     public override string ToString()
     {
         return Name;

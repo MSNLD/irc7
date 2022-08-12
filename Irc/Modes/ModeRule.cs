@@ -12,7 +12,7 @@ namespace Irc.Modes
 {
     public class ModeRule : IModeRule
     {
-        private char ModeChar { get; }
+        protected char ModeChar { get; }
         private int ModeValue { get; set; }
         public bool RequiresParameter { get; }
 
@@ -28,6 +28,17 @@ namespace Irc.Modes
         public EnumModeResult Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
         {
             throw new NotSupportedException();
+        }
+
+        public void DispatchChannelModeChange(ChatObject source, ChatObject target, bool flag, string parameter)
+        {
+            target.Send(
+                Raw.RPL_MODE_IRC(
+                        source,
+                        target,
+                        $"{(flag ? "+" : "-")}{ModeChar}{(parameter != null ? $" {parameter}" : string.Empty)}"
+                    )
+                );
         }
 
         public void Set(int value) => ModeValue = value;

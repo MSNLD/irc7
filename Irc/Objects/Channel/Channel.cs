@@ -92,24 +92,12 @@ public class Channel : ChatObject, IChannel
 
     public void SendMessage(IUser user, string message)
     {
-        Send(IrcRaws.RPL_PRIVMSG(user, this, message), user, true);
+        Send(IrcRaws.RPL_PRIVMSG(user, this, message), (ChatObject)user);
     }
 
     public void SendNotice(IUser user, string message)
     {
-        Send(IrcRaws.RPL_NOTICE(user, this, message), user, true);
-    }
-
-    public void Send(string message, IUser u, bool ExcludeSender)
-    {
-        foreach (var channelMember in _members)
-            if (channelMember.GetUser() != u || !ExcludeSender)
-                channelMember.GetUser().Send(message);
-    }
-
-    public void Send(string message, IUser u)
-    {
-        throw new NotImplementedException();
+        Send(IrcRaws.RPL_NOTICE(user, this, message), (ChatObject)user);
     }
 
     public IList<IChannelMember> GetMembers()
@@ -155,8 +143,15 @@ public class Channel : ChatObject, IChannel
         return regex.Match(channel).Success;
     }
 
-    public void Send(string message)
+    public override void Send(string message)
     {
-        Send(message, null, false);
+        Send(message, null);
+    }
+
+    public override void Send(string message, ChatObject u = null)
+    {
+        foreach (var channelMember in _members)
+            if (channelMember.GetUser() != u)
+                channelMember.GetUser().Send(message);
     }
 }

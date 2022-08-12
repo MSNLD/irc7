@@ -57,7 +57,7 @@ public class User : ChatObject, IUser
 
     public void BroadcastToChannels(string data, bool ExcludeUser)
     {
-        foreach (var channel in Channels.Keys) channel.Send(data, this, ExcludeUser);
+        foreach (var channel in Channels.Keys) channel.Send(data, this);
     }
 
     public void AddChannel(IChannel channel, IChannelMember member)
@@ -82,7 +82,7 @@ public class User : ChatObject, IUser
 
     public IDictionary<IChannel, IChannelMember> GetChannels() => Channels;
 
-    public void Send(string message)
+    public override void Send(string message)
     {
         _dataRegulator.PushOutgoing(message);
     }
