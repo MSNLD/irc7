@@ -8,6 +8,7 @@ public interface IChannel
     IDataStore ChannelStore { get; }
     string GetName();
     IChannelMember GetMember(IUser User);
+    IChannelMember GetMemberByNickname(string nickname);
     void Send(string message, IUser u, bool ExcludeSender);
     void Send(string message, IUser u);
     IChannel Join(IUser user);

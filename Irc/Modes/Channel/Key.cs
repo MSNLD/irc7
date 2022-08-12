@@ -16,7 +16,7 @@ namespace Irc.Modes.Channel
         {
         }
 
-        public new EnumModeResult Evaluate(ChatObject source, ChatObject target, string modeValue)
+        public new EnumModeResult Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
         {
             IChannelMember member = (IChannelMember)source;
             IUser user = member.GetUser();

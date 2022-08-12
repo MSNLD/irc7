@@ -53,7 +53,7 @@ namespace Irc.Modes
                                 continue;
                             }
 
-                            string parameter = null;
+                            string parameter = string.Empty;
                             if (modeRule.RequiresParameter)
                             {
                                 if (modeParameters.Count > 0) { parameter = modeParameters.Dequeue(); }
@@ -66,7 +66,7 @@ namespace Irc.Modes
                                 }
                             }
 
-                            var result = modeRule.Evaluate((ChatObject)source, target, parameter);
+                            var result = modeRule.Evaluate((ChatObject)source, target, modeFlag, parameter);
 
                             switch (result)
                             {

@@ -12,11 +12,11 @@ namespace Irc.Modes.Channel.Member
 {
     public class Voice : ModeRule, IModeRule
     {
-        public Voice() : base(Resources.MemberModeVoice)
+        public Voice() : base(Resources.MemberModeVoice, true)
         {
         }
 
-        EnumModeResult Evaluate(ChatObject chatObject, string modeValue)
+        EnumModeResult Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
         {
             return EnumModeResult.OK;
         }

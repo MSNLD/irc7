@@ -19,6 +19,8 @@ public class ChannelModes : ModeCollection, IModeCollection
     */
     public ChannelModes()
     {
+        modes.Add(Resources.MemberModeHost, new Modes.Channel.Member.Operator());
+        modes.Add(Resources.MemberModeVoice, new Modes.Channel.Member.Voice());
         modes.Add(Resources.ChannelModePrivate, new Modes.Channel.Private());
         modes.Add(Resources.ChannelModeSecret, new Modes.Channel.Secret());
         modes.Add(Resources.ChannelModeInvite, new Modes.Channel.InviteOnly());

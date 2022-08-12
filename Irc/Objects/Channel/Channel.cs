@@ -35,6 +35,8 @@ public class Channel : ChatObject, IChannel
         return null;
     }
 
+    public IChannelMember GetMemberByNickname(string nickname) => _members.FirstOrDefault(member => string.Compare(member.GetUser().GetAddress().Nickname, nickname, true) == 0);
+
     public bool Allows(IUser user)
     {
         if (IsOnChannel(user)) return false;

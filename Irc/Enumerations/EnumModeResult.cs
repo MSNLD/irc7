@@ -10,6 +10,7 @@ namespace Irc.Enumerations
     {
         OK,
         NOTOPER,
-        BADVALUE
+        BADVALUE,
+        NOSUCH
     }
 }

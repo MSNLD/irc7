@@ -67,9 +67,9 @@ public static class Raw
         return $":{user.GetAddress()} QUIT :%s";
     }
 
-    public static string RPL_MODE_IRC(IServer server, IUser user)
+    public static string RPL_MODE_IRC(IUser user, ChatObject target, string modeString)
     {
-        return $":{user.GetAddress()} MODE %s %s";
+        return $":{user.GetAddress()} MODE {target} {modeString}";
     }
 
     public static string RPL_TOPIC_IRC(IServer server, IUser user, IChannel channel)

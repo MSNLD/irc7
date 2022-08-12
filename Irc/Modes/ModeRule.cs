@@ -1,6 +1,7 @@
 ﻿using Irc.Enumerations;
 using Irc.Interfaces;
 using Irc.Objects;
+using Irc.Objects.Server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,7 @@ namespace Irc.Modes
 
         // Although the below is a string we are to evaluate and cast to integer
         // We can also throw bad value here if it is not the desired type
-        public EnumModeResult Evaluate(ChatObject source, ChatObject target, string modeValue)
+        public EnumModeResult Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
         {
             throw new NotSupportedException();
         }
