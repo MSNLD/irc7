@@ -34,6 +34,9 @@ public interface IServer
     IChannel CreateChannel(string name);
     IUser CreateUser(IConnection connection);
     IList<IUser> GetUsers();
+    IUser GetUserByNickname(string nickname);
+    IList<IUser> GetUsersByList(string nicknames, char separator);
+    IList<IUser> GetUsersByList(List<string> nicknames, char separator);
     IList<IChannel> GetChannels();
     string GetSupportedChannelModes();
     string GetSupportedUserModes();

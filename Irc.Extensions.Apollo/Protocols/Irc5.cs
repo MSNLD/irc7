@@ -6,6 +6,10 @@ namespace Irc.Extensions.Apollo.Protocols;
 
 internal class Irc5 : Irc4
 {
+    public Irc5() : base()
+    {
+
+    }
     public override string FormattedUser(IUser user)
     {
         return ((ApolloUser)user).GetProfile().Irc5_ToString();

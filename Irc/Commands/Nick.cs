@@ -9,6 +9,9 @@ internal class Nick : Command, ICommand
 
     public new void Execute(ChatFrame chatFrame)
     {
+        var hopcount = string.Empty;
+        if (chatFrame.Message.Parameters.Count > 1) { hopcount = chatFrame.Message.Parameters[1]; }
+
         // Is user not registered?
         // Set nickname according to regulations (should be available in user object and changes based on what they authenticated as)
         if (!chatFrame.User.IsRegistered()) HandleUnregisteredNicknameChange(chatFrame);

@@ -29,7 +29,7 @@ public static class IrcRaws
     public static string IRC_RAW_312(IServer server, IUser user, IUser targetUser) => $":{server} 312 {user} {targetUser} {server} :{server.Info}";
     public static string IRC_RAW_313(IServer server, IUser user, IUser targetUser) => $":{server} 313 {user} {targetUser} :is an IRC operator";
     public static string IRC_RAW_315 = ":%h 315 %a %s :End of /WHO list ";
-    public static string IRC_RAW_317(IServer server, IUser user, IUser targetUser, int seconds, int epoch) => $":{server} 317 {user} {targetUser} {seconds} {epoch} :seconds idle, signon time";
+    public static string IRC_RAW_317(IServer server, IUser user, IUser targetUser, int seconds, long epoch) => $":{server} 317 {user} {targetUser} {seconds} {epoch} :seconds idle, signon time";
     public static string IRC_RAW_318(IServer server, IUser user, IUser targetUser) => $":{server} 318 {user} {targetUser} :End of /WHOIS list";
     public static string IRC_RAW_319(IServer server, IUser user, IUser targetUser, string channelList) => $":{server} 319 {user} {targetUser} :{channelList}";
     public static string IRC_RAW_321 = ":%h 321 %a Channel :Users  Name ";
@@ -73,7 +73,7 @@ public static class IrcRaws
     public static string IRC_RAW_433 = ":%h 433 * %s :Nickname is already in use";
     public static string IRC_RAW_442 = ":%h 442 %a %s :You're not on that channel   ";
     public static string IRC_RAW_443 = ":%h 443 %a %s %s :is already on channel ";
-    public static string IRC_RAW_446 = ":%h 446 %a :USERS has been disabled ";
+    public static string IRC_RAW_446(IServer server, IUser user) => $":{server} 446 {user} :USERS has been disabled";
     public static string IRC_RAW_451 = ":%h 451 %a :You have not registered ";
     public static string IRC_RAW_461 = ":%h 461 %a %s :Not enough parameters";
     public static string IRC_RAW_462(IServer server, IUser user) => $":{server} 462 {user} :You may not reregister";
@@ -319,4 +319,19 @@ public class IrcxRaws
 
     public static string IRCX_ERR_EXCEPTION =
         ":%h 999 %n :%s Oops! Looks like you've hit a snag here, please can you kindly report this.";
+
+    // DIRECTORY SERVER SPECIFIC
+    public static string MSN_FOUND_CHAN = ":%h 613 %n :%s %s";
+    public static string MSN_FOUND_USER_HEAD = ":%h 641 %n :%s";
+    public static string MSN_FOUND_USER = ":%h 642 %n %s %s %s"; //cid + nick + room
+    public static string MSN_FOUND_USER_END = ":%h 643 %n :%s";
+
+
+
+    public static string MSN_CAT_NOTFOUND = ":%h 701 %n :Category not found";
+    public static string MSN_NOTFOUND_CHAN = ":%h 702 %n :%s";
+    public static string MSN_DUPLICATE_CHAN = ":%h 705 %n :%s";
+    public static string MSN_NOTVALID_CHAN = ":%h 706 %n :%s";
+    public static string MSN_INPUTFLOOD = ":%h 708 %n :%s";
+    public static string MSN_NOTFOUND_USER = ":%h 709 %n :%s";
 }

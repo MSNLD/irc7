@@ -34,10 +34,11 @@ public class Whois : Command, ICommand
             chatFrame.User.Send(IrcRaws.IRC_RAW_313(chatFrame.Server, chatFrame.User, targetUser));
         }
 
-        var idleSeconds = 0;
+        var idleSeconds = 1;
+        var idleEpoch = (long)DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds;
         if (idleSeconds > 0)
         {
-            chatFrame.User.Send(IrcRaws.IRC_RAW_317(chatFrame.Server, chatFrame.User, targetUser, idleSeconds, 0));
+            chatFrame.User.Send(IrcRaws.IRC_RAW_317(chatFrame.Server, chatFrame.User, targetUser, idleSeconds, idleEpoch));
         }
 
         chatFrame.User.Send(IrcRaws.IRC_RAW_318(chatFrame.Server, chatFrame.User, targetUser));

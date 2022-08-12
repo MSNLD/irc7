@@ -32,6 +32,7 @@ internal class Mode : Command, ICommand
 
             ChatObject chatObject = null;
 
+            // Lookup object
             if (Channel.ValidName(objectName))
             {
                 chatObject = (ChatObject)chatFrame.Server.GetChannelByName(objectName);
@@ -41,6 +42,7 @@ internal class Mode : Command, ICommand
                 chatObject = (ChatObject)chatFrame.Server.GetUsers().FirstOrDefault(user => user.Name.ToUpperInvariant() == objectName.ToUpperInvariant());
             }
 
+            // Execute / List
             if (chatObject == null)
             {
                 // :sky-8a15b323126 403 Sky aaa :No such channel
@@ -50,35 +52,41 @@ internal class Mode : Command, ICommand
 
             if (chatFrame.Message.Parameters.Count > 1)
             {
-                // Perform mode operation
-                Queue<string> modeParameters = null;
-                if (chatFrame.Message.Parameters.Count > 2)
-                {
-                    modeParameters = new Queue<string>(chatFrame.Message.Parameters.Skip(2).ToArray());
-                }
-                ModeEngine.Breakdown(chatFrame.User, chatObject, chatFrame.Message.Parameters[1], modeParameters);
+                ExecuteModes(chatFrame, chatObject);
             }
             else
             {
-                if (chatObject != null)
-                {
-                    /*-> sky-8a15b323126 MODE Sky
-                        <- :sky-8a15b323126 221 Sky +ix
-                        -> sky-8a15b323126 MODE #test
-                        <- :sky-8a15b323126 324 Sky #test +tnl 50*/
-                    if (chatObject is IChannel)
-                    {
-                        chatFrame.User.Send(Raw.IRCX_RPL_MODE_324(chatFrame.Server, chatFrame.User, ((IChannel)chatObject),
-                            ((IChannel)chatObject).GetModes().ToString()));
-
-                    }
-                    else if (chatObject is IUser)
-                    {
-                        chatFrame.User.Send(Raw.IRCX_RPL_UMODEIS_221(chatFrame.Server, chatFrame.User, chatObject.GetModes().ToString()));
-                    }
-
-                }
+                ListModes(chatFrame, chatObject);
             }
+        }
+    }
+
+    public void ExecuteModes(ChatFrame chatFrame, ChatObject chatObject)
+    {
+        // Perform mode operation
+        Queue<string> modeParameters = null;
+        if (chatFrame.Message.Parameters.Count > 2)
+        {
+            modeParameters = new Queue<string>(chatFrame.Message.Parameters.Skip(2).ToArray());
+        }
+        ModeEngine.Breakdown(chatFrame.User, chatObject, chatFrame.Message.Parameters[1], modeParameters);
+    }
+
+    public void ListModes(ChatFrame chatFrame, ChatObject chatObject)
+    {
+        /*-> sky-8a15b323126 MODE Sky
+        <- :sky-8a15b323126 221 Sky +ix
+        -> sky-8a15b323126 MODE #test
+        <- :sky-8a15b323126 324 Sky #test +tnl 50*/
+        if (chatObject is IChannel)
+        {
+            chatFrame.User.Send(Raw.IRCX_RPL_MODE_324(chatFrame.Server, chatFrame.User, ((IChannel)chatObject),
+                ((IChannel)chatObject).GetModes().ToString()));
+
+        }
+        else if (chatObject is IUser)
+        {
+            chatFrame.User.Send(Raw.IRCX_RPL_UMODEIS_221(chatFrame.Server, chatFrame.User, chatObject.GetModes().ToString()));
         }
     }
 }

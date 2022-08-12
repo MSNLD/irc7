@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Linq;
 using System.Reflection;
 using Irc.Enumerations;
 using Irc.Extensions.Security;
@@ -122,6 +123,20 @@ public class Server : ChatObject, IServer
     public IList<IUser> GetUsers()
     {
         return Users;
+    }
+
+    public IUser GetUserByNickname(string nickname) => Users.FirstOrDefault(user => string.Compare(user.GetAddress().Nickname.Trim(), nickname, true) == 0);
+
+    public IList<IUser> GetUsersByList(string nicknames, char separator)
+    {
+        var list = nicknames.Split(separator, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+        return GetUsersByList(list, separator);
+    }
+
+    public IList<IUser> GetUsersByList(List<string> nicknames, char separator)
+    {
+        return Users.Where(user => nicknames.Contains(user.GetAddress().Nickname, StringComparer.InvariantCultureIgnoreCase)).ToList();
     }
 
     public IList<IChannel> GetChannels()

@@ -113,13 +113,6 @@ namespace Irc.Extensions.Apollo.Tests
 
             Assert.AreEqual("S", sysop.GetModeString());
 
-            ApolloProfile sysop_manager = new ApolloProfile()
-            {
-                Level = Enumerations.EnumUserAccessLevel.SysopManager
-            };
-
-            Assert.AreEqual("S", sysop_manager.GetModeString());
-
             ApolloProfile user = new ApolloProfile()
             {
                 Level = Enumerations.EnumUserAccessLevel.ChatUser

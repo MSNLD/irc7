@@ -8,7 +8,7 @@ namespace Irc.Extensions.Apollo.Protocols;
 
 public class Irc3 : IrcX
 {
-    public Irc3()
+    public Irc3() : base()
     {
         AddCommand(new Ircvers());
     }
