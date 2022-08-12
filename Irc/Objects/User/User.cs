@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Text;
+using Irc.Constants;
 using Irc.Enumerations;
 using Irc.Extensions.Security.Packages;
 using Irc.Interfaces;
@@ -178,6 +179,9 @@ public class User : ChatObject, IUser
     {
         return _supportPackage is ANON;
     }
+
+    public bool IsIrcOperator() => GetModes().GetModeChar(Resources.UserModeOper) == 1;
+    public bool IsAdministrator() => GetModes().HasMode('a') && GetModes().GetModeChar(Resources.UserModeAdmin) == 1;
 
     public bool DisconnectIfOutgoingThresholdExceeded()
     {

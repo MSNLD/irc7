@@ -1,4 +1,5 @@
-﻿using Irc.Enumerations;
+﻿using Irc.Constants;
+using Irc.Enumerations;
 using Irc.Interfaces;
 using Irc.Objects;
 using System;
@@ -83,11 +84,35 @@ namespace Irc.Modes
                                         break;
                                     }
                             }
-                            
+
                             break;
                         }
                 }
             }
+        }
+
+        public static bool IrcOpCheck(ChatObject source, ChatObject target)
+        {
+            if (source is IUser && target is IUser)
+            {
+                IUser user1 = (IUser)source;
+                IUser user2 = (IUser)target;
+
+                if (!user1.IsAdministrator() && user2.IsAdministrator())
+                {
+                    // You are not Administrator
+                    user1.Send(IrcRaws.IRC_RAW_908(user1.Server, user1));
+                    return false;
+                }
+                else if (!user1.IsIrcOperator() && user2.IsIrcOperator())
+                {
+                    // You are not IRC Operator
+                    user1.Send(IrcRaws.IRC_RAW_481(user1.Server, user1));
+                    return false;
+                }
+                else return true;
+            }
+            else return false;
         }
     }
 }

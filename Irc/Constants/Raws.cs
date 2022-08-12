@@ -83,7 +83,7 @@ public static class IrcRaws
     public static string IRC_RAW_473 = ":%h 473 %a %s :Cannot join channel (+i) ";
     public static string IRC_RAW_474 = ":%h 474 %a %s :Cannot join channel (+b) ";
     public static string IRC_RAW_475 = ":%h 475 %a %s :Cannot join channel (+k) ";
-    public static string IRC_RAW_481 = ":%h 481 %a :Permission Denied - You're not an IRC operator  ";
+    public static string IRC_RAW_481(IServer server, IUser user) => $":{server} 481 {user} :Permission Denied - You're not an IRC operator";
     public static string IRC_RAW_482 = ":%h 482 %a %s :You're not channel operator  ";
     public static string IRC_RAW_485 = ":%h 485 %a %s :You're not channel owner ";
     public static string IRC_RAW_491 = ":%h 491 %a :No O-lines for your host";
@@ -99,7 +99,7 @@ public static class IrcRaws
     public static string IRC_RAW_904 = ":%h 904 %a %s :Only authenticated users may join channel";
     public static string IRC_RAW_905 = ":%h 905 %a :Nick changes are not permitted at this time, try again later";
     public static string IRC_RAW_906 = ":%h 906 %a %s :Cannot make host due to admin restriction";
-    public static string IRC_RAW_908 = ":%h 908 %a :No permissions to perform command";
+    public static string IRC_RAW_908(IServer server, IUser user) => $":{server} 908 {user} :No permissions to perform command";
     public static string IRC_RAW_998 = ":%h 998 %a %s :Already on channel   ";
     public static string IRC_RAW_999 = ":%h 999 %a :Unknown error code %d";
 

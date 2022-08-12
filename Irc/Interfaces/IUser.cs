@@ -19,6 +19,7 @@ public interface IUser
     KeyValuePair<IChannel, IChannelMember> GetChannelMemberInfo(IChannel channel);
     KeyValuePair<IChannel, IChannelMember> GetChannelInfo(string Name);
     IDictionary<IChannel, IChannelMember> GetChannels();
+    IModeCollection GetModes();
     void Send(string message);
     void Flush();
     void Disconnect(string message);
@@ -35,6 +36,8 @@ public interface IUser
     bool IsRegistered();
     bool IsAuthenticated();
     bool IsAnon();
+    bool IsIrcOperator();
+    bool IsAdministrator();
     bool DisconnectIfOutgoingThresholdExceeded();
     bool DisconnectIfIncomingThresholdExceeded();
     string ToString();

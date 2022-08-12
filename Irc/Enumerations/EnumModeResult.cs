@@ -9,6 +9,7 @@ namespace Irc.Enumerations
     public enum EnumModeResult
     {
         OK,
+        NOIRCOP,
         NOTOPER,
         NOTOWNER,
         BADVALUE,

@@ -14,10 +14,6 @@ public class Member : MemberModes, IChannelMember
 
     public EnumUserAccessLevel GetLevel()
     {
-        if (_user.GetLevel() >= EnumUserAccessLevel.ChatOwner) return _user.GetLevel();
-
-        //if (IsOwner())
-        //    return EnumUserAccessLevel.ChatOwner;
         if (IsHost())
             return EnumUserAccessLevel.ChatHost;
 
