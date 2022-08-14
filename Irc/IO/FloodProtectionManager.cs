@@ -26,7 +26,7 @@ public class FloodProtectionManager : IFloodProtectionManager
     public EnumFloodResult Audit(IFloodProtectionProfile protectionProfile, EnumCommandDataType type,
         EnumUserAccessLevel level)
     {
-        if (level >= EnumUserAccessLevel.ChatHost) return EnumFloodResult.Ok;
+        if (level >= EnumUserAccessLevel.Guide) return EnumFloodResult.Ok;
 
         switch (type)
         {

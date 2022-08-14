@@ -5,6 +5,7 @@ namespace Irc.Interfaces;
 
 public interface IChannelMember : IMemberModes
 {
-    EnumUserAccessLevel GetLevel();
+    EnumChannelAccessLevel GetLevel();
     IUser GetUser();
+    EnumIrcError CanModify(IChannelMember target, EnumChannelAccessLevel requiredLevel);
 }

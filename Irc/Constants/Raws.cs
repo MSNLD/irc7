@@ -101,7 +101,7 @@ public static class IrcRaws
     public static string IRC_RAW_906 = ":%h 906 %a %s :Cannot make host due to admin restriction";
     public static string IRC_RAW_908(IServer server, IUser user) => $":{server} 908 {user} :No permissions to perform command";
     public static string IRC_RAW_998 = ":%h 998 %a %s :Already on channel   ";
-    public static string IRC_RAW_999 = ":%h 999 %a :Unknown error code %d";
+    public static string IRC_RAW_999(IServer server, IUser user, Exception e) => $":{server} 999 {user} :Oops! We've hit a snag: {e.ToString()}";
 
     public static string RPL_JOIN(IUser user, IChannel channel) => $":{user.GetAddress()} JOIN :{channel}";
     public static string RPL_PART(IUser user, IChannel channel) => $":{user.GetAddress()} PART {channel}";

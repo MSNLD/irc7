@@ -16,19 +16,18 @@ namespace Irc.Modes.Channel
         {
         }
 
-        public new EnumModeResult Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
+        public new EnumIrcError Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
         {
             IChannelMember member = (IChannelMember)source;
-            IUser user = member.GetUser();
-            if (source.Level >= EnumUserAccessLevel.ChatHost || user.GetLevel() > EnumUserAccessLevel.ChatHost)
+            if (member.IsHost())
             {
-                return EnumModeResult.OK;
+                return EnumIrcError.OK;
             }
             else
             {
                 /* -> sky-8a15b323126 MODE #test +t
                 <- :sky-8a15b323126 482 Sky2k #test :You're not channel operator */
-                return EnumModeResult.NOTOPER;
+                return EnumIrcError.ERR_NOCHANOP;
             }
         }
     }

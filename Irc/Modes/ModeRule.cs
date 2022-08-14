@@ -25,7 +25,7 @@ namespace Irc.Modes
 
         // Although the below is a string we are to evaluate and cast to integer
         // We can also throw bad value here if it is not the desired type
-        public EnumModeResult Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
+        public EnumIrcError Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
         {
             throw new NotSupportedException();
         }

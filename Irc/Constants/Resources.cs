@@ -207,9 +207,11 @@ public static long epoch = 621355968000000000;
     public static char ChannelModeBan = 'b';
     public static char ChannelModeKey = 'k';
 
+    public static char MemberModeOwner = 'q';
     public static char MemberModeHost = 'o';
     public static char MemberModeVoice = 'v';
 
+    public static char MemberModeFlagOwner = '.';
     public static char MemberModeFlagHost = '@';
     public static char MemberModeFlagVoice = '+';
 
@@ -219,6 +221,7 @@ public static long epoch = 621355968000000000;
 
     public static char UserModeAdmin = 'a';
     public static char UserModeOper = 'o';
+    public static char UserModeOwner = 'q';
     public static char UserModeInvisible = 'i';
     public static char UserModeServerNotice = 's';
     public static char UserModeWallops = 'w';

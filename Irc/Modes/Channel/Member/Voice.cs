@@ -16,9 +16,9 @@ namespace Irc.Modes.Channel.Member
         {
         }
 
-        EnumModeResult Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
+        EnumIrcError Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
         {
-            return EnumModeResult.OK;
+            return EnumIrcError.OK;
         }
     }
 }

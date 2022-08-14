@@ -14,7 +14,7 @@ public class ExtendedUserFactory : IUserFactory
     {
         return new ExtendedUser(connection, server.GetProtocol(EnumProtocolType.IRC),
             new DataRegulator(server.MaxInputBytes, server.MaxOutputBytes),
-            new FloodProtectionProfile(), new DataStore(connection.GetId().ToString(), "store"), new UserModes(),
+            new FloodProtectionProfile(), new DataStore(connection.GetId().ToString(), "store"), new ExtendedUserModes(),
             server);
     }
 }

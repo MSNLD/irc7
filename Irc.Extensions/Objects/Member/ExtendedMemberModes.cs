@@ -3,11 +3,15 @@ using Irc.Objects;
 
 namespace Irc.Extensions.Objects;
 
-public class ExtendedMemberModes : MemberModes, IMemberModes
+public class ExtendedMemberModes : global::Irc.Objects.Member.Member, IMemberModes
 {
-    public ExtendedMemberModes()
+    public ExtendedMemberModes(): base(null)
     {
-        //modes.Add(ExtendedResources.MemberModeOwner, 0);
+
+    }
+    public ExtendedMemberModes(IUser User): base(User)
+    {
+        modes.Add(ExtendedResources.MemberModeOwner, new Modes.Channel.Member.Owner());
     }
 
     public new char GetListedMode()

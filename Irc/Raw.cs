@@ -461,9 +461,9 @@ public static class Raw
         return $":{server} 401 {user} %s :No such nick";
     }
 
-    public static string IRCX_ERR_NOSUCHNICK_401(IServer server, IUser user)
+    public static string IRCX_ERR_NOSUCHNICK_401(IServer server, IUser user, string target)
     {
-        return $":{server} 401 {user} %s :No such nick/channel";
+        return $":{server} 401 {user} {target} :No such nick/channel";
     }
 
     public static string IRCX_ERR_NOSUCHCHANNEL_403(IServer server, IUser user, string channel)
@@ -531,7 +531,7 @@ public static class Raw
         return $":{server} 439 {user} %s :Nick name changes not permitted.";
     }
 
-    public static string IRCX_ERR_NOTONCHANNEL_442(IServer server, IUser user, IChannel channel)
+    public static string IRCX_ERR_NOTONCHANNEL_442(IServer server, IUser user, ChatObject channel)
     {
         return $":{server} 442 {user} {channel} :You're not on that channel";
     }
@@ -586,7 +586,7 @@ public static class Raw
         return $":{server} 475 {user} {channel} :Cannot join channel (+k)";
     }
 
-    public static string IRCX_ERR_NOPRIVILEGES_481(IServer server, IUser user, IChannel channel)
+    public static string IRCX_ERR_NOPRIVILEGES_481(IServer server, IUser user)
     {
         return $":{server} 481 {user} :Permission Denied - You're not an IRC operator";
     }
@@ -596,7 +596,7 @@ public static class Raw
         return $":{server} 482 {user} {channel} :You're not channel operator";
     }
 
-    public static string IRCX_ERR_CHANQPRIVSNEEDED_485(IServer server, IUser user, IChannel channel)
+    public static string IRCX_ERR_CHANQPRIVSNEEDED_485(IServer server, IUser user, ChatObject channel)
     {
         return $":{server} 485 {user} {channel} :You're not channel owner";
     }

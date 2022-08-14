@@ -18,6 +18,7 @@ public class MemberModes : ModeCollection, IMemberModes
 
     public char GetListedMode()
     {
+        if (IsOwner()) return Resources.MemberModeFlagOwner;
         if (IsHost()) return Resources.MemberModeFlagHost;
         if (IsVoice()) return Resources.MemberModeFlagVoice;
 
@@ -26,10 +27,17 @@ public class MemberModes : ModeCollection, IMemberModes
 
     public char GetModeChar()
     {
+        if (IsOwner()) return Resources.MemberModeOwner;
         if (IsHost()) return Resources.MemberModeHost;
         if (IsVoice()) return Resources.MemberModeVoice;
 
         return (char) 0;
+    }
+
+    public bool IsOwner()
+    {
+        // TODO: Need to think about a better way of handling the below
+        return modes.ContainsKey(Resources.MemberModeOwner) && GetModeChar(Resources.MemberModeOwner) > 0;
     }
 
     public bool IsHost()
@@ -61,5 +69,10 @@ public class MemberModes : ModeCollection, IMemberModes
     {
         SetHost(false);
         SetVoice(false);
+    }
+
+    public void SetOwner(bool flag)
+    {
+        throw new NotImplementedException();
     }
 }

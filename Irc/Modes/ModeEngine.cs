@@ -57,12 +57,12 @@ namespace Irc.Modes
                             string parameter = string.Empty;
                             if (modeRule.RequiresParameter)
                             {
-                                if (modeParameters.Count > 0) { parameter = modeParameters.Dequeue(); }
+                                if (modeParameters != null && modeParameters.Count > 0) { parameter = modeParameters.Dequeue(); }
                                 else
                                 {
                                     // Not enough parameters
                                     //:sky-8a15b323126 461 Sky MODE +q :Not enough parameters
-                                    //source.Send(Raw.IRCX_ERR_NEEDMOREPARAMS_461(source.Server, source, ))
+                                    source.Send(Raw.IRCX_ERR_NEEDMOREPARAMS_461(source.Server, source, $"{Resources.CommandMode} {c}"));
                                     continue;
                                 }
                             }
@@ -71,16 +71,44 @@ namespace Irc.Modes
 
                             switch (result)
                             {
-                                case EnumModeResult.BADVALUE:
+                                case EnumIrcError.ERR_NEEDMOREPARAMS:
                                     {
                                         // -> sky-8a15b323126 MODE #test +l hello
                                         // < - :sky - 8a15b323126 461 Sky MODE +l :Not enough parameters
+                                        source.Send(Raw.IRCX_ERR_NEEDMOREPARAMS_461(source.Server, source, $"{Resources.CommandMode} {c}"));
                                         break;
                                     }
-                                case EnumModeResult.NOTOPER:
+                                case EnumIrcError.ERR_NOCHANOP:
                                     {
                                         //:sky-8a15b323126 482 Sky3k #test :You're not channel operator
                                         source.Send(Raw.IRCX_ERR_CHANOPRIVSNEEDED_482(source.Server, source, target));
+                                        break;
+                                    }
+                                case EnumIrcError.ERR_NOCHANOWNER:
+                                    {
+                                        //:sky-8a15b323126 482 Sky3k #test :You're not channel operator
+                                        source.Send(Raw.IRCX_ERR_CHANQPRIVSNEEDED_485(source.Server, source, target));
+                                        break;
+                                    }
+                                case EnumIrcError.ERR_NOIRCOP:
+                                    {
+                                        source.Send(Raw.IRCX_ERR_NOPRIVILEGES_481(source.Server, source));
+                                        break;
+                                    }
+                                case EnumIrcError.ERR_NOTONCHANNEL:
+                                    {
+                                        source.Send(Raw.IRCX_ERR_NOTONCHANNEL_442(source.Server, source, target));
+                                        break;
+                                    }
+                                    // TODO: The below should not happen
+                                case EnumIrcError.ERR_NOSUCHNICK:
+                                    {
+                                        source.Send(Raw.IRCX_ERR_NOSUCHNICK_401(source.Server, source, target.Name));
+                                        break;
+                                    }
+                                case EnumIrcError.ERR_NOSUCHCHANNEL:
+                                    {
+                                        source.Send(Raw.IRCX_ERR_NOSUCHCHANNEL_403(source.Server, source, target.Name));
                                         break;
                                     }
                             }
@@ -89,30 +117,6 @@ namespace Irc.Modes
                         }
                 }
             }
-        }
-
-        public static bool IrcOpCheck(ChatObject source, ChatObject target)
-        {
-            if (source is IUser && target is IUser)
-            {
-                IUser user1 = (IUser)source;
-                IUser user2 = (IUser)target;
-
-                if (!user1.IsAdministrator() && user2.IsAdministrator())
-                {
-                    // You are not Administrator
-                    user1.Send(IrcRaws.IRC_RAW_908(user1.Server, user1));
-                    return false;
-                }
-                else if (!user1.IsIrcOperator() && user2.IsIrcOperator())
-                {
-                    // You are not IRC Operator
-                    user1.Send(IrcRaws.IRC_RAW_481(user1.Server, user1));
-                    return false;
-                }
-                else return true;
-            }
-            else return false;
         }
     }
 }

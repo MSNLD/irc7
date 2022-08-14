@@ -81,7 +81,7 @@ public class GateKeeper : SupportPackage, ISupportPackage
 
                     _credentials = new Credential
                     {
-                        Level = Guest ? EnumUserAccessLevel.ChatGuest : EnumUserAccessLevel.ChatUser,
+                        Level = Guest ? EnumUserAccessLevel.Guest : EnumUserAccessLevel.Member,
                         Domain = GetType().Name,
                         Username = guid.ToUnformattedString().ToUpper()
                     };

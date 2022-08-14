@@ -4,7 +4,7 @@ namespace Irc.Extensions.Objects.Channel;
 
 public class ExtendedChannelModes : ChannelModes
 {
-    public ExtendedChannelModes()
+    public ExtendedChannelModes(): base()
     {
         //modes.Add(ExtendedResources.ChannelModeAuthOnly, 0);
         //modes.Add(ExtendedResources.ChannelModeProfanity, 0);
@@ -16,5 +16,6 @@ public class ExtendedChannelModes : ChannelModes
         //modes.Add(ExtendedResources.ChannelModeCloneable, 0);
         //modes.Add(ExtendedResources.ChannelModeClone, 0);
         //modes.Add(ExtendedResources.ChannelModeService, 0);
+        modes.Add(ExtendedResources.MemberModeOwner, new Modes.Channel.Member.Owner());
     }
 }

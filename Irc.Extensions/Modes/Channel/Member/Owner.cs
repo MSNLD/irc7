@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Irc.Modes.Channel.Member
 {
-    public class Operator : ModeRule, IModeRule
+    public class Owner : ModeRule, IModeRule
     {
         /*
          -> sky-8a15b323126 MODE #test +q Sky2k
@@ -24,7 +24,7 @@ namespace Irc.Modes.Channel.Member
         -> sky-8a15b323126 MODE #test +o Sky2k
         <- :sky-8a15b323126 485 Sky3k #test :You're not channel owner
          */
-        public Operator() : base(Resources.UserModeOper, true)
+        public Owner() : base(Resources.UserModeOwner, true)
         {
         }
 
@@ -46,10 +46,10 @@ namespace Irc.Modes.Channel.Member
                 return EnumIrcError.ERR_NOSUCHNICK;
             }
 
-            EnumIrcError result = sourceMember.CanModify(targetMember, EnumChannelAccessLevel.ChatHost);
+            EnumIrcError result = sourceMember.CanModify(targetMember, EnumChannelAccessLevel.ChatOwner);
             if (result == EnumIrcError.OK)
             {
-                targetMember.SetHost(flag);
+                targetMember.SetOwner(flag);
                 DispatchChannelModeChange(source, target, flag, parameter);
             }
 

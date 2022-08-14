@@ -10,6 +10,6 @@ namespace Irc.Interfaces
         char GetModeChar();
         bool RequiresParameter { get; }
 
-        EnumModeResult Evaluate(ChatObject source, ChatObject target, bool flag, string parameter);
+        EnumIrcError Evaluate(ChatObject source, ChatObject target, bool flag, string parameter);
     }
 }

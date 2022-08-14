@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
+using Irc.Constants;
 using Irc.Enumerations;
 using Irc.Extensions.Security;
 using Irc.Factories;
@@ -275,7 +276,17 @@ public class Server : ChatObject, IServer
                 //Console.WriteLine($"Processing: {message.OriginalText}");
 
                 var chatFrame = new ChatFrame(this, user, message);
-                if (command.CheckParameters(chatFrame)) command.Execute(chatFrame);
+                if (command.CheckParameters(chatFrame))
+                {
+                    try
+                    {
+                        command.Execute(chatFrame);
+                    }
+                    catch (Exception e)
+                    {
+                        chatFrame.User.Send(IrcRaws.IRC_RAW_999(chatFrame.Server, chatFrame.User, e));
+                    }
+                }
                 else user.Send(Raw.IRCX_ERR_NEEDMOREPARAMS_461(this, user, command.GetName()));
 
                 // Check if user can register

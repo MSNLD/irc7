@@ -38,6 +38,6 @@ public class ExtendedServer : global::Irc.Objects.Server.Server, IServer
 
     public new IChannel CreateChannel(string name)
     {
-        return new global::Irc.Objects.Channel.Channel(name, new ExtendedChannelModes(), new DataStore(name, "store"));
+        return new global::Irc.Extensions.Objects.Channel.ExtendedChannel(name, new ExtendedChannelModes(), new DataStore(name, "store"));
     }
 }

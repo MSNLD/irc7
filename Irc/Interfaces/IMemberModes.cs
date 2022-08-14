@@ -7,13 +7,13 @@ public interface IMemberModes
 
     char GetModeChar();
 
-    // bool IsOwner();
+    bool IsOwner();
     bool IsHost();
     bool IsVoice();
 
     bool IsNormal();
 
-    //void SetOwner(bool flag);
+    void SetOwner(bool flag);
     void SetHost(bool flag);
     void SetVoice(bool flag);
     void SetNormal();

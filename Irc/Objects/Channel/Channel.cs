@@ -8,7 +8,7 @@ namespace Irc.Objects.Channel;
 
 public class Channel : ChatObject, IChannel
 {
-    private readonly IList<IChannelMember> _members = new List<IChannelMember>();
+    protected readonly IList<IChannelMember> _members = new List<IChannelMember>();
     public IList<Address> BanList = new List<Address>();
     public IList<User> InviteList = new List<User>();
 
@@ -50,9 +50,10 @@ public class Channel : ChatObject, IChannel
         return this;
     }
 
-    private IChannelMember AddMember(IUser user)
+    protected virtual IChannelMember AddMember(IUser user)
     {
         var member = new Member.Member(user);
+        member.SetHost(true);
         _members.Add(member);
         user.AddChannel(this, member);
         return member;

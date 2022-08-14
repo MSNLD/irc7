@@ -115,7 +115,7 @@ namespace Irc.Extensions.Apollo.Tests
 
             ApolloProfile user = new ApolloProfile()
             {
-                Level = Enumerations.EnumUserAccessLevel.ChatUser
+                Level = Enumerations.EnumUserAccessLevel.Member
             };
 
             Assert.AreEqual("U", user.GetModeString());
@@ -151,7 +151,7 @@ namespace Irc.Extensions.Apollo.Tests
             ApolloProfile here_user_guest = new ApolloProfile()
             {
                 Away = false,
-                Level = Enumerations.EnumUserAccessLevel.ChatUser,
+                Level = Enumerations.EnumUserAccessLevel.Member,
                 Guest = true
             };
             Assert.AreEqual("H,U,GO", here_user_guest.ToString());
@@ -159,7 +159,7 @@ namespace Irc.Extensions.Apollo.Tests
             ApolloProfile away_user_male_prof_registered = new ApolloProfile()
             {
                 Away = true,
-                Level = Enumerations.EnumUserAccessLevel.ChatUser,
+                Level = Enumerations.EnumUserAccessLevel.Member,
                 Guest = false,
                 HasProfile = true,
                 IsMale = true,
@@ -170,7 +170,7 @@ namespace Irc.Extensions.Apollo.Tests
             ApolloProfile away_user_female_prof_pic_registered = new ApolloProfile()
             {
                 Away = true,
-                Level = Enumerations.EnumUserAccessLevel.ChatUser,
+                Level = Enumerations.EnumUserAccessLevel.Member,
                 Guest = false,
                 HasProfile = true,
                 IsMale = false,
@@ -195,7 +195,7 @@ namespace Irc.Extensions.Apollo.Tests
             ApolloProfile here_user_guest = new ApolloProfile()
             {
                 Away = false,
-                Level = Enumerations.EnumUserAccessLevel.ChatUser,
+                Level = Enumerations.EnumUserAccessLevel.Member,
                 Guest = true
             };
             Assert.AreEqual("H,U,G", here_user_guest.Irc5_ToString());
@@ -203,7 +203,7 @@ namespace Irc.Extensions.Apollo.Tests
             ApolloProfile away_user_male_prof_registered = new ApolloProfile()
             {
                 Away = true,
-                Level = Enumerations.EnumUserAccessLevel.ChatUser,
+                Level = Enumerations.EnumUserAccessLevel.Member,
                 Guest = false,
                 HasProfile = true,
                 IsMale = true,
@@ -226,7 +226,7 @@ namespace Irc.Extensions.Apollo.Tests
             ApolloProfile here_user_guest = new ApolloProfile()
             {
                 Away = false,
-                Level = Enumerations.EnumUserAccessLevel.ChatUser,
+                Level = Enumerations.EnumUserAccessLevel.Member,
                 Guest = true
             };
             Assert.AreEqual("H,U,G", here_user_guest.Irc7_ToString());
@@ -234,7 +234,7 @@ namespace Irc.Extensions.Apollo.Tests
             ApolloProfile away_user_male_prof_registered = new ApolloProfile()
             {
                 Away = true,
-                Level = Enumerations.EnumUserAccessLevel.ChatUser,
+                Level = Enumerations.EnumUserAccessLevel.Member,
                 Guest = false,
                 HasProfile = true,
                 IsMale = true,
