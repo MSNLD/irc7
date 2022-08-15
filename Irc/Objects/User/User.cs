@@ -182,6 +182,11 @@ public class User : ChatObject, IUser
         return _authenticated;
     }
 
+    public bool IsOn(IChannel channel)
+    {
+        return Channels.ContainsKey(channel);
+    }
+
     public bool IsAnon()
     {
         return _supportPackage is ANON;

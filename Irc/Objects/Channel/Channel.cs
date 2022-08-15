@@ -1,8 +1,10 @@
 ﻿using System.Text.RegularExpressions;
 using Irc.Commands;
 using Irc.Constants;
+using Irc.Enumerations;
 using Irc.Interfaces;
 using Irc.IO;
+using Irc.Objects.Server;
 
 namespace Irc.Objects.Channel;
 
@@ -53,7 +55,6 @@ public class Channel : ChatObject, IChannel
     protected virtual IChannelMember AddMember(IUser user)
     {
         var member = new Member.Member(user);
-        member.SetHost(true);
         _members.Add(member);
         user.AddChannel(this, member);
         return member;
@@ -63,6 +64,7 @@ public class Channel : ChatObject, IChannel
     {
         var member = _members.Where(m => m.GetUser() == user).FirstOrDefault();
         _members.Remove(member);
+        user.RemoveChannel(this);
     }
 
 
@@ -88,6 +90,13 @@ public class Channel : ChatObject, IChannel
     public IChannel Quit(IUser user)
     {
         RemoveMember(user);
+        return this;
+    }
+
+    public IChannel Kick(IUser source, IUser target, string reason)
+    {
+        Send(Raw.RPL_KICK_IRC(source, this, target, reason));
+        RemoveMember(target);
         return this;
     }
 
@@ -125,6 +134,88 @@ public class Channel : ChatObject, IChannel
                 return true;
 
         return false;
+    }
+    public bool CanBeModifiedBy(ChatObject source)
+    {
+        return (source is IServer || ((IUser)source).GetChannels().Keys.Contains(this));
+    }
+
+    public EnumIrcError CanModifyMember(IChannelMember source, IChannelMember target, EnumChannelAccessLevel requiredLevel)
+    {
+        // Oper check
+        if (target.GetUser().GetLevel() >= EnumUserAccessLevel.Guide)
+        {
+            if (source.GetUser().GetLevel() < EnumUserAccessLevel.Guide) return EnumIrcError.ERR_NOIRCOP;
+            // TODO: Maybe there is better raws for below
+            else if (source.GetUser().GetLevel() < EnumUserAccessLevel.Sysop && source.GetUser().GetLevel() < target.GetUser().GetLevel()) return EnumIrcError.ERR_NOPERMS;
+            else if (source.GetUser().GetLevel() < EnumUserAccessLevel.Administrator && source.GetUser().GetLevel() < target.GetUser().GetLevel()) return EnumIrcError.ERR_NOPERMS;
+        }
+
+        if (!source.IsOwner() && (requiredLevel >= EnumChannelAccessLevel.ChatOwner || target.IsOwner())) return EnumIrcError.ERR_NOCHANOWNER;
+        else if (!source.IsHost() && requiredLevel >= EnumChannelAccessLevel.ChatVoice) return EnumIrcError.ERR_NOCHANOP;
+        else return EnumIrcError.OK;
+    }
+
+    public void ProcessChannelError(EnumIrcError error, IServer server, IUser source, ChatObject target = null, string data = null)
+    {
+        switch (error)
+        {
+            case EnumIrcError.ERR_NEEDMOREPARAMS:
+                {
+                    // -> sky-8a15b323126 MODE #test +l hello
+                    // < - :sky - 8a15b323126 461 Sky MODE +l :Not enough parameters
+                    source.Send(Raw.IRCX_ERR_NEEDMOREPARAMS_461(server, source, data));
+                    break;
+                }
+            case EnumIrcError.ERR_NOCHANOP:
+                {
+                    //:sky-8a15b323126 482 Sky3k #test :You're not channel operator
+                    source.Send(Raw.IRCX_ERR_CHANOPRIVSNEEDED_482(server, source, this));
+                    break;
+                }
+            case EnumIrcError.ERR_NOCHANOWNER:
+                {
+                    //:sky-8a15b323126 482 Sky3k #test :You're not channel operator
+                    source.Send(Raw.IRCX_ERR_CHANQPRIVSNEEDED_485(server, source, this));
+                    break;
+                }
+            case EnumIrcError.ERR_NOIRCOP:
+                {
+                    source.Send(Raw.IRCX_ERR_NOPRIVILEGES_481(server, source));
+                    break;
+                }
+            case EnumIrcError.ERR_NOTONCHANNEL:
+                {
+                    source.Send(Raw.IRCX_ERR_NOTONCHANNEL_442(server, source, this));
+                    break;
+                }
+            // TODO: The below should not happen
+            case EnumIrcError.ERR_NOSUCHNICK:
+                {
+                    source.Send(Raw.IRCX_ERR_NOSUCHNICK_401(server, source, target.Name));
+                    break;
+                }
+            case EnumIrcError.ERR_NOSUCHCHANNEL:
+                {
+                    source.Send(Raw.IRCX_ERR_NOSUCHCHANNEL_403(server, source, Name));
+                    break;
+                }
+            case EnumIrcError.ERR_CANNOTSETFOROTHER:
+                {
+                    source.Send(Raw.IRCX_ERR_USERSDONTMATCH_502(server, source));
+                    break;
+                }
+            case EnumIrcError.ERR_UNKNOWNMODEFLAG:
+                {
+                    source.Send(IrcRaws.IRC_RAW_501(server, source));
+                    break;
+                }
+            case EnumIrcError.ERR_NOPERMS:
+                {
+                    source.Send(Raw.IRCX_ERR_SECURITY_908(server, source));
+                    break;
+                }
+        }
     }
 
     private static bool CompareUserAddress(IUser user, IUser otherUser)

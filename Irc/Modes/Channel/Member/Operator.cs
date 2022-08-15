@@ -31,28 +31,18 @@ namespace Irc.Modes.Channel.Member
         public EnumIrcError Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
         {
             var channel = (IChannel)target;
+            if (!channel.CanBeModifiedBy(source)) return EnumIrcError.ERR_NOTONCHANNEL;
 
-            // Allowed to modify channel (server OR user is on channel?)
-            // Is allowed to modify user
-            var allowedToModify = (source is IServer || ((IUser)source).GetChannels().Keys.Contains(channel));
-            if (!allowedToModify) return EnumIrcError.ERR_NOTONCHANNEL;
+            IChannelMember targetMember = channel.GetMemberByNickname(parameter);
+            if (targetMember == null) return EnumIrcError.ERR_NOSUCHNICK;
 
             IChannelMember sourceMember = channel.GetMember((IUser)source);
-            IChannelMember targetMember = channel.GetMemberByNickname(parameter);
 
-            if (targetMember == null)
-            {
-                // No such nickname?
-                return EnumIrcError.ERR_NOSUCHNICK;
-            }
+            EnumIrcError result = channel.CanModifyMember(sourceMember, targetMember, EnumChannelAccessLevel.ChatHost);
+            if (result != EnumIrcError.OK) return result;
 
-            EnumIrcError result = sourceMember.CanModify(targetMember, EnumChannelAccessLevel.ChatHost);
-            if (result == EnumIrcError.OK)
-            {
-                targetMember.SetHost(flag);
-                DispatchModeChange(source, target, flag, parameter);
-            }
-
+            targetMember.SetHost(flag);
+            DispatchModeChange(source, target, flag, parameter);
             return result;
         }
     }

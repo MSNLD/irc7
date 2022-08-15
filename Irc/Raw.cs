@@ -82,9 +82,9 @@ public static class Raw
         return $":{user.GetAddress()} PROP {channel} %s :%s";
     }
 
-    public static string RPL_KICK_IRC(IServer server, IUser user, IChannel channel)
+    public static string RPL_KICK_IRC(IUser user, IChannel channel, IUser target, string reason)
     {
-        return $":{user.GetAddress()} KICK {channel} %s :%s";
+        return $":{user.GetAddress()} KICK {channel} {target} :{reason}";
     }
 
     public static string RPL_KILL_IRC(IServer server, IUser user)

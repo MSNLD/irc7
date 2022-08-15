@@ -13,6 +13,21 @@ public static class Register
             chatFrame.User.Send(Raw.IRCX_RPL_WELCOME_003(chatFrame.Server, chatFrame.User));
             chatFrame.User.Send(Raw.IRCX_RPL_WELCOME_004(chatFrame.Server, chatFrame.User,
                 chatFrame.Server.GetVersion()));
+
+            var pass = chatFrame.User.GetDataStore().Get("pass");
+
+            if (pass == "guide")
+            {
+                chatFrame.User.PromoteToGuide();
+            }
+            else if (pass == "sysop")
+            {
+                chatFrame.User.PromoteToSysop();
+            }
+            else if (pass == "admin")
+            {
+                chatFrame.User.PromoteToAdministrator();
+            }
         }
     }
 

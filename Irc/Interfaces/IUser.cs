@@ -38,6 +38,7 @@ public interface IUser
     bool IsAnon();
     bool IsSysop();
     bool IsAdministrator();
+    bool IsOn(IChannel channel);
     void PromoteToAdministrator();
     void PromoteToSysop();
     void PromoteToGuide();
