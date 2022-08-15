@@ -9,21 +9,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Irc.Modes.User
+namespace Irc.Extensions.Modes.User
 {
-    public class Oper : ModeRule, IModeRule
+    public class Admin : ModeRule, IModeRule
     {
 
-        public Oper() : base(Resources.UserModeOper)
+        public Admin() : base(ExtendedResources.UserModeAdmin)
         {
         }
 
         public new EnumIrcError Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
         {
             // :sky-8a15b323126 908 Sky :No permissions to perform command
-            if (source is IUser && ((IUser)source).IsSysop() && flag == false)
+            if (source is IUser && ((IUser)source).IsAdministrator() && flag == false)
             {
-                target.Modes[Resources.UserModeOper].Set(flag);
+                target.Modes[ExtendedResources.UserModeAdmin].Set(flag);
                 DispatchModeChange(source, target, flag, parameter);
                 return EnumIrcError.OK;
             }

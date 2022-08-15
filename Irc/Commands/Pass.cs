@@ -1,4 +1,6 @@
 ﻿using Irc.Enumerations;
+using Irc.Modes;
+using Irc.Objects;
 
 namespace Irc.Commands;
 
@@ -13,6 +15,8 @@ internal class Pass : Command, ICommand
         {
             // TODO: Encrypt below pass
             chatFrame.User.GetDataStore().Set("pass", chatFrame.Message.Parameters.First());
+
+            chatFrame.User.PromoteToGuide();
         }
         else
         {

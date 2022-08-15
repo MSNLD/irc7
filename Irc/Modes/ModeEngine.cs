@@ -111,6 +111,21 @@ namespace Irc.Modes
                                         source.Send(Raw.IRCX_ERR_NOSUCHCHANNEL_403(source.Server, source, target.Name));
                                         break;
                                     }
+                                case EnumIrcError.ERR_CANNOTSETFOROTHER:
+                                    {
+                                        source.Send(Raw.IRCX_ERR_USERSDONTMATCH_502(source.Server, source));
+                                        break;
+                                    }
+                                case EnumIrcError.ERR_UNKNOWNMODEFLAG:
+                                    {
+                                        source.Send(IrcRaws.IRC_RAW_501(source.Server, source));
+                                        break;
+                                    }
+                                case EnumIrcError.ERR_NOPERMS:
+                                    {
+                                        source.Send(Raw.IRCX_ERR_SECURITY_908(source.Server, source));
+                                        break;
+                                    }
                             }
 
                             break;

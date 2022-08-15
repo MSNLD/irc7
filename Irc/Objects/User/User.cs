@@ -154,6 +154,13 @@ public class User : ChatObject, IUser
     {
         return _level;
     }
+    public override EnumUserAccessLevel Level {
+        get
+        {
+            return GetLevel();
+        }
+    
+    }
 
     public Address GetAddress()
     {
@@ -180,8 +187,35 @@ public class User : ChatObject, IUser
         return _supportPackage is ANON;
     }
 
-    public bool IsIrcOperator() => GetModes().GetModeChar(Resources.UserModeOper) == 1;
+    public bool IsSysop() => GetModes().GetModeChar(Resources.UserModeOper) == 1;
     public bool IsAdministrator() => GetModes().HasMode('a') && GetModes().GetModeChar(Resources.UserModeAdmin) == 1;
+
+    public void PromoteToAdministrator()
+    {
+        var mode = Modes[Resources.UserModeAdmin];
+        mode.Set(true);
+        mode.DispatchModeChange(this, this, true);
+        _level = EnumUserAccessLevel.Administrator;
+        Send(Raw.IRCX_RPL_YOUREADMIN_386(Server, this));
+    }
+
+    public void PromoteToSysop()
+    {
+        var mode = Modes[Resources.UserModeOper];
+        mode.Set(true);
+        mode.DispatchModeChange(this, this, true);
+        _level = EnumUserAccessLevel.Sysop;
+        Send(Raw.IRCX_RPL_YOUREOPER_381(Server, this));
+    }
+
+    public void PromoteToGuide()
+    {
+        var mode = Modes[Resources.UserModeOper];
+        mode.Set(true);
+        mode.DispatchModeChange(this, this, true);
+        _level = EnumUserAccessLevel.Guide;
+        Send(Raw.IRCX_RPL_YOUREGUIDE_629(Server, this));
+    }
 
     public bool DisconnectIfOutgoingThresholdExceeded()
     {

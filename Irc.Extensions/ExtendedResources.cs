@@ -16,6 +16,7 @@ public static class ExtendedResources
     public static char MemberModeOwner = 'q';
     public static char MemberModeFlagOwner = '.';
 
+    public static char UserModeAdmin = 'a';
     public static char UserModePasskey = 'h';
     public static char UserModeIrcx = 'x';
     public static char UserModeGag = 'z';

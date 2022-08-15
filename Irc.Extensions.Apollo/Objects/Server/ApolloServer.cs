@@ -35,11 +35,8 @@ public class ApolloServer : ExtendedServer
         _protocols.Add(EnumProtocolType.IRC8, new Irc8());
 
         // Override by adding command support at base IRC
-        _protocols[EnumProtocolType.IRC].AddCommand(new Finds());
-        _protocols[EnumProtocolType.IRCX].AddCommand(new Finds());
-        _protocols[EnumProtocolType.IRC].AddCommand(new Ircvers());
-        _protocols[EnumProtocolType.IRCX].AddCommand(new Ircvers());
-        _protocols[EnumProtocolType.IRC5].AddCommand(new Prop());
+        AddCommand(new Finds());
+        AddCommand(new Ircvers());
 
         var modes = new ApolloChannelModes().GetSupportedModes() +
                     new ExtendedMemberModes().GetSupportedModes();

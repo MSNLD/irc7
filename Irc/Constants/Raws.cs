@@ -87,7 +87,7 @@ public static class IrcRaws
     public static string IRC_RAW_482 = ":%h 482 %a %s :You're not channel operator  ";
     public static string IRC_RAW_485 = ":%h 485 %a %s :You're not channel owner ";
     public static string IRC_RAW_491 = ":%h 491 %a :No O-lines for your host";
-    public static string IRC_RAW_501 = ":%h 501 %a :Unknown MODE flag   ";
+    public static string IRC_RAW_501(IServer server, IUser user) => $":{server} 501 {user} :Unknown MODE flag";
     public static string IRC_RAW_502 = ":%h 502 %a :Cant change mode for other users";
     public static string IRC_RAW_554 = ":%h 554 %a %s :Command not supported.   ";
     public static string IRC_RAW_555 = ":%h 555 %a %s :Server option for this command is not supported. ";

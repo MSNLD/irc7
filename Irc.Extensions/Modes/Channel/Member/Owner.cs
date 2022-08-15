@@ -50,7 +50,7 @@ namespace Irc.Modes.Channel.Member
             if (result == EnumIrcError.OK)
             {
                 targetMember.SetOwner(flag);
-                DispatchChannelModeChange(source, target, flag, parameter);
+                DispatchModeChange(source, target, flag, parameter);
             }
 
             return result;

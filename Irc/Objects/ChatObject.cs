@@ -7,8 +7,20 @@ namespace Irc.Objects;
 public class ChatObject
 {
     public readonly IDataStore DataStore;
-    public EnumUserAccessLevel Level = EnumUserAccessLevel.None;
+    public virtual EnumUserAccessLevel Level {
+        get
+        {
+            return EnumUserAccessLevel.None;
+        }
+    }
     protected readonly IModeCollection _modes;
+    public IModeCollection Modes
+    {
+        get
+        {
+            return _modes;
+        }
+    }
 
     public ChatObject(IModeCollection modes, IDataStore dataStore)
     {

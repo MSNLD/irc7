@@ -2,8 +2,7 @@
 
 public enum EnumProtocolType
 {
-    IRC = -1,
-    IRC0 = 0,
+    IRC = 0,
     IRCX = 1,
     IRC2 = 2,
     IRC3 = 3,
@@ -12,5 +11,5 @@ public enum EnumProtocolType
     IRC6 = 6,
     IRC7 = 7,
     IRC8 = 8,
-    IRC9 = 9
+    //IRC9 = 9
 }

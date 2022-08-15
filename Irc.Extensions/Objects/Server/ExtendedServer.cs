@@ -23,14 +23,13 @@ public class ExtendedServer : global::Irc.Objects.Server.Server, IServer
         floodProtectionManager, dataStore, channels, commands, userFactory ?? new ExtendedUserFactory())
     {
         securityManager.AddSupportPackage(new Security.Packages.NTLM(new NtlmProvider()));
-        _protocols[EnumProtocolType.IRC].AddCommand(new Auth());
-        _protocols[EnumProtocolType.IRC].AddCommand(new Ircx());
-        _protocols.Add(EnumProtocolType.IRCX, new IrcX());
-        _protocols[EnumProtocolType.IRC].AddCommand(new Prop());
-        _protocols[EnumProtocolType.IRCX].AddCommand(new Prop());
 
-        var modes = new ExtendedChannelModes().GetSupportedModes() +
-                    new ExtendedMemberModes().GetSupportedModes();
+        _protocols.Add(EnumProtocolType.IRCX, new IrcX());
+        AddCommand(new Auth());
+        AddCommand(new Ircx());
+        AddCommand(new Prop());
+
+        var modes = new ExtendedChannelModes().GetSupportedModes();
         modes = new string(modes.OrderBy(c => c).ToArray());
         _dataStore.Set("supported.channel.modes", modes);
         _dataStore.Set("supported.user.modes", new ExtendedUserModes().GetSupportedModes());

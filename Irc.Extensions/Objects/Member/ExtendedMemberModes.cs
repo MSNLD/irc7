@@ -11,7 +11,7 @@ public class ExtendedMemberModes : global::Irc.Objects.Member.Member, IMemberMod
     }
     public ExtendedMemberModes(IUser User): base(User)
     {
-        modes.Add(ExtendedResources.MemberModeOwner, new Modes.Channel.Member.Owner());
+        modes.Add(ExtendedResources.MemberModeOwner, new global::Irc.Modes.Channel.Member.Owner());
     }
 
     public new char GetListedMode()

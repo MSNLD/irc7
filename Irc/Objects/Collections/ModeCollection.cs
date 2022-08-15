@@ -13,6 +13,11 @@ public class ModeCollection : IModeCollection
         if (modes.ContainsKey(mode)) modes[mode].Set(value);
     }
 
+    public void ToggleModeChar(char mode, bool flag)
+    {
+        SetModeChar(mode, flag ? 1 : 0);
+    }
+
     public int GetModeChar(char mode)
     {
         modes.TryGetValue(mode, out var value);
@@ -22,6 +27,14 @@ public class ModeCollection : IModeCollection
     {
         modes.TryGetValue(mode, out var value);
         return value;
+    }
+    public IModeRule this[char mode]
+    {
+        get
+        {
+            modes.TryGetValue(mode, out var modeRule);
+            return modeRule;
+        }
     }
 
     public string GetSupportedModes()

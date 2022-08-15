@@ -20,8 +20,8 @@ namespace Irc.Modes.User
         {
             if (source == target)
             {
-                target.GetModes().SetModeChar(Resources.UserModeInvisible, flag ? 1 : 0);
-                DispatchChannelModeChange(source, target, flag, parameter);
+                target.Modes[Resources.UserModeInvisible].Set(flag);
+                DispatchModeChange(source, target, flag, parameter);
                 return EnumIrcError.OK;
             }
             else return EnumIrcError.ERR_NOSUCHCHANNEL;

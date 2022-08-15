@@ -30,7 +30,7 @@ namespace Irc.Modes
             throw new NotSupportedException();
         }
 
-        public void DispatchChannelModeChange(ChatObject source, ChatObject target, bool flag, string parameter)
+        public void DispatchModeChange(ChatObject source, ChatObject target, bool flag, string parameter)
         {
             target.Send(
                 Raw.RPL_MODE_IRC(
@@ -42,6 +42,7 @@ namespace Irc.Modes
         }
 
         public void Set(int value) => ModeValue = value;
+        public void Set(bool value) => ModeValue = (value == true ? 1 : 0);
         public int Get() => ModeValue;
         public char GetModeChar() => ModeChar;
     }

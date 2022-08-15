@@ -36,8 +36,11 @@ public interface IUser
     bool IsRegistered();
     bool IsAuthenticated();
     bool IsAnon();
-    bool IsIrcOperator();
+    bool IsSysop();
     bool IsAdministrator();
+    void PromoteToAdministrator();
+    void PromoteToSysop();
+    void PromoteToGuide();
     bool DisconnectIfOutgoingThresholdExceeded();
     bool DisconnectIfIncomingThresholdExceeded();
     string ToString();

@@ -6,16 +6,16 @@ public class ExtendedChannelModes : ChannelModes
 {
     public ExtendedChannelModes(): base()
     {
-        //modes.Add(ExtendedResources.ChannelModeAuthOnly, 0);
-        //modes.Add(ExtendedResources.ChannelModeProfanity, 0);
-        //modes.Add(ExtendedResources.ChannelModeHidden, 0);
-        //modes.Add(ExtendedResources.ChannelModeRegistered, 0);
-        //modes.Add(ExtendedResources.ChannelModeKnock, 0);
-        //modes.Add(ExtendedResources.ChannelModeNoWhisper, 0);
-        //modes.Add(ExtendedResources.ChannelModeAuditorium, 0);
-        //modes.Add(ExtendedResources.ChannelModeCloneable, 0);
-        //modes.Add(ExtendedResources.ChannelModeClone, 0);
-        //modes.Add(ExtendedResources.ChannelModeService, 0);
-        modes.Add(ExtendedResources.MemberModeOwner, new Modes.Channel.Member.Owner());
+        modes.Add(ExtendedResources.ChannelModeAuthOnly, new Modes.Channel.AuthOnly());
+        modes.Add(ExtendedResources.ChannelModeProfanity, new Modes.Channel.NoFormat());
+        modes.Add(ExtendedResources.ChannelModeHidden, new Modes.Channel.Hidden());
+        modes.Add(ExtendedResources.ChannelModeRegistered, new Modes.Channel.Registered());
+        modes.Add(ExtendedResources.ChannelModeKnock, new Modes.Channel.Knock());
+        modes.Add(ExtendedResources.ChannelModeNoWhisper, new Modes.Channel.NoWhisper());
+        modes.Add(ExtendedResources.ChannelModeAuditorium, new Modes.Channel.Auditorium());
+        modes.Add(ExtendedResources.ChannelModeCloneable, new Modes.Channel.Cloneable());
+        modes.Add(ExtendedResources.ChannelModeClone, new Modes.Channel.Clone());
+        modes.Add(ExtendedResources.ChannelModeService, new Modes.Channel.Service());
+        modes.Add(ExtendedResources.MemberModeOwner, new global::Irc.Modes.Channel.Member.Owner());
     }
 }

@@ -14,6 +14,9 @@ public class Member : MemberModes, IChannelMember
 
     public EnumChannelAccessLevel GetLevel()
     {
+        if (IsOwner()) 
+            return EnumChannelAccessLevel.ChatOwner;
+
         if (IsHost())
             return EnumChannelAccessLevel.ChatHost;
 
@@ -34,8 +37,8 @@ public class Member : MemberModes, IChannelMember
             else if (_user.GetLevel() < EnumUserAccessLevel.Administrator && _user.GetLevel() < target.GetUser().GetLevel()) return EnumIrcError.ERR_NOPERMS;
         }
 
-        if (!IsOwner() && requiredLevel >= EnumChannelAccessLevel.ChatOwner) return EnumIrcError.ERR_NOCHANOWNER;
-        else if (!IsHost() && requiredLevel >= EnumChannelAccessLevel.ChatHost) return EnumIrcError.ERR_NOCHANOP;
+        if (!IsOwner() && (requiredLevel >= EnumChannelAccessLevel.ChatOwner || target.IsOwner())) return EnumIrcError.ERR_NOCHANOWNER;
+        else if (!IsHost() && requiredLevel >= EnumChannelAccessLevel.ChatVoice) return EnumIrcError.ERR_NOCHANOP;
         else return EnumIrcError.OK;
     }
 

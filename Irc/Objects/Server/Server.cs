@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
+using Irc.Commands;
 using Irc.Constants;
 using Irc.Enumerations;
 using Irc.Extensions.Security;
@@ -50,7 +51,7 @@ public class Server : ChatObject, IServer
 
         _dataStore.SetAs("creation", DateTime.UtcNow);
         _dataStore.Set("supported.channel.modes",
-            new ChannelModes().GetSupportedModes() + new MemberModes().GetSupportedModes());
+            new ChannelModes().GetSupportedModes());
         _dataStore.Set("supported.user.modes", new UserModes().GetSupportedModes());
 
         _protocols.Add(EnumProtocolType.IRC, new Irc());
@@ -160,7 +161,7 @@ public class Server : ChatObject, IServer
         return _protocols;
     }
 
-    public Version GetVersion()
+    public System.Version GetVersion()
     {
         return Assembly.GetExecutingAssembly().GetName().Version;
     }
@@ -258,6 +259,14 @@ public class Server : ChatObject, IServer
 
             Console.WriteLine($"Removed {PendingRemoveUserQueue.Count} users. Total Users = {Users.Count}");
             PendingRemoveUserQueue.Clear();
+        }
+    }
+
+    protected void AddCommand(ICommand command, EnumProtocolType fromProtocol = EnumProtocolType.IRC, string name = null)
+    {
+        foreach (var protocol in _protocols)
+        {
+            if (protocol.Key >= fromProtocol) protocol.Value.AddCommand(command, name);
         }
     }
 
