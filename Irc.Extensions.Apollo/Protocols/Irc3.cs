@@ -10,7 +10,7 @@ public class Irc3 : IrcX
 {
     public Irc3() : base()
     {
-        AddCommand(new Ircvers());
+        //AddCommand(new Ircvers());
     }
 
     public override EnumProtocolType GetProtocolType()

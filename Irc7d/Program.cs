@@ -86,7 +86,7 @@ internal class Program
 
                 var securityManager = new SecurityManager();
 
-                var type = IrcType.IRCX;
+                var type = IrcType.MSN;
 
                 IServer server = null;
 
