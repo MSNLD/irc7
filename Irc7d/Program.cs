@@ -2,10 +2,12 @@
 
 using System.Net;
 using System.Text.Json;
+using Irc.Extensions.Apollo.Directory;
 using Irc.Extensions.Apollo.Factories;
 using Irc.Extensions.Apollo.Objects.Server;
 using Irc.Extensions.Factories;
 using Irc.Extensions.Objects.Server;
+using Irc.Extensions.Security.Packages;
 using Irc.Factories;
 using Irc.Interfaces;
 using Irc.IO;
@@ -27,7 +29,7 @@ namespace Irc7d;
 
 internal class Program
 {
-    private enum IrcType { IRC, IRCX, MSN };
+    private enum IrcType { IRC, IRCX, MSN, DIR };
     private static void Main(string[] args)
     {
         var app = new CommandLineApplication();
@@ -77,16 +79,17 @@ internal class Program
                 var fqdn = "localhost";
                 if (fqdnOption.HasValue()) fqdn = fqdnOption.Value();
 
+                var type = IrcType.MSN;
+
                 var socketServer = new SocketServer(ip, port, backlog, maxConnections, bufferSize);
                 socketServer.OnListen += (sender, server1) =>
                 {
                     Console.WriteLine(
-                        $"Listening on {ip}:{port} backlog={backlog} buffer={bufferSize} maxconn={maxConnections} fqdn={fqdn}");
+                        $"Listening on {ip}:{port} backlog={backlog} buffer={bufferSize} maxconn={maxConnections} fqdn={fqdn} type={type}");
                 };
 
                 var securityManager = new SecurityManager();
-
-                var type = IrcType.MSN;
+                securityManager.AddSupportPackage(new NTLM(new NTLMCredentials()));
 
                 IServer server = null;
 
@@ -106,6 +109,13 @@ internal class Program
                             new List<IChannel>(), null, new ExtendedUserFactory());
                             break;
                         }
+                    case IrcType.DIR:
+                        {
+                            server = new DirectoryServer(socketServer, securityManager, new FloodProtectionManager(),
+                            new DataStore("DefaultServer.json"),
+                            new List<IChannel>(), null, new ApolloUserFactory());
+                            break;
+                        }
                     default:
                         {
                             server = new ApolloServer(socketServer, securityManager, new FloodProtectionManager(),
@@ -113,8 +123,7 @@ internal class Program
                             new List<IChannel>(), null, new ApolloUserFactory());
                             break;
                         }
-                } 
-
+                }
 
                 server.RemoteIP = fqdn;
 

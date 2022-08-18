@@ -2,7 +2,7 @@
 
 namespace Irc.Commands;
 
-internal class Nick : Command, ICommand
+public class Nick : Command, ICommand
 {
     public Nick() : base(1) { }
     public new EnumCommandDataType GetDataType() => EnumCommandDataType.Standard;

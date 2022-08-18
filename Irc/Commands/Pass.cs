@@ -4,7 +4,7 @@ using Irc.Objects;
 
 namespace Irc.Commands;
 
-internal class Pass : Command, ICommand
+public class Pass : Command, ICommand
 {
     public Pass() : base(1) { }
     public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 public enum EnumChannelAccessLevel
 {
+    None = 0,
     ChatGuest = 1,
     ChatUser = 2,
     ChatMember = 3,

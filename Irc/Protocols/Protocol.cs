@@ -22,6 +22,10 @@ public class Protocol : IProtocol
     {
         Commands.Add(name ?? command.GetName(), command);
     }
+    public void FlushCommands()
+    {
+        Commands.Clear();
+    }
 
     public virtual string FormattedUser(IUser user)
     {

@@ -14,6 +14,7 @@ using Irc.Extensions.Security.Packages;
 using Irc.Factories;
 using Irc.Interfaces;
 using Irc.IO;
+using Irc.Security;
 using Irc7d;
 
 namespace Irc.Extensions.Apollo.Objects.Server;
@@ -35,11 +36,9 @@ public class ApolloServer : ExtendedServer
         _protocols.Add(EnumProtocolType.IRC8, new Irc8());
 
         // Override by adding command support at base IRC
-        AddCommand(new Finds());
         AddCommand(new Ircvers());
 
-        var modes = new ApolloChannelModes().GetSupportedModes() +
-                    new ExtendedMemberModes().GetSupportedModes();
+        var modes = new ApolloChannelModes().GetSupportedModes();
         modes = new string(modes.OrderBy(c => c).ToArray());
 
         _dataStore.Set("supported.channel.modes", modes);

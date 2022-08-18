@@ -14,7 +14,7 @@ public class ApolloUserFactory : IUserFactory
     {
         return new ApolloUser(connection, server.GetProtocol(EnumProtocolType.IRC),
             new DataRegulator(server.MaxInputBytes, server.MaxOutputBytes),
-            new FloodProtectionProfile(), new DataStore(connection.GetId().ToString(), "store"), new UserModes(),
+            new FloodProtectionProfile(), new DataStore(connection.GetId().ToString(), "store"), new ApolloUserModes(),
             server);
     }
 }

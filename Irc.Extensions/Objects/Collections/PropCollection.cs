@@ -1,10 +1,14 @@
-﻿using Irc.IO;
+﻿using Irc.Extensions.Props;
+using Irc.IO;
 
 namespace Irc.Objects.Collections;
 
-public class PropCollection : DataStore, IDataStore
+public class PropCollection
 {
-    public PropCollection(string id) : base(id, "properties")
+    protected Dictionary<string, PropRule> properties = new Dictionary<string, PropRule>();
+
+    public PropCollection()
     {
+
     }
 }

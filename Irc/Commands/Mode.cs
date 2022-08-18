@@ -27,7 +27,6 @@ internal class Mode : Command, ICommand
         }
         else
         {
-            // TODO: implement MODE
             var objectName = chatFrame.Message.Parameters.First();
 
             ChatObject chatObject = null;

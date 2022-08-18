@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using System.Text;
 using Irc.ClassExtensions.CSharpTools;
 using Irc.Extensions.NTLM;
 using Irc.Helpers.CSharpTools;
@@ -17,6 +18,11 @@ public class NtlmType3Message
     private string _targetNameData;
     private string _userNameData;
     private string _workstationNameData;
+
+    public string TargetName => ASCIIEncoding.Unicode.GetString(_targetNameData.ToByteArray());
+    public string UserName => ASCIIEncoding.Unicode.GetString(_userNameData.ToByteArray());
+    public string Workstation => ASCIIEncoding.Unicode.GetString(_workstationNameData.ToByteArray());
+    
     public uint Flags;
     private NTLMShared.NTLMSSPOSVersion OSVersionInfo;
 
