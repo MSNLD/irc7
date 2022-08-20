@@ -17,7 +17,7 @@ public class Whois : Command, ICommand
          <- :sky-8a15b323126 312 Sky Sky sky-8a15b323126 :Microsoft Exchange Chat Service
          <- :sky-8a15b323126 318 Sky Sky :End of /WHOIS list
         */
-        IUser targetUser = chatFrame.User;
+        IUser targetUser = chatFrame.Server.GetUserByNickname(chatFrame.Message.Parameters.First());
 
         chatFrame.User.Send(IrcRaws.IRC_RAW_311(chatFrame.Server, chatFrame.User, targetUser));
 

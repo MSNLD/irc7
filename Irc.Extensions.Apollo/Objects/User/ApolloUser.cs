@@ -15,6 +15,7 @@ public class ApolloUser : ExtendedUser
         IFloodProtectionProfile floodProtectionProfile, IDataStore dataStore, IModeCollection modes, IServer server) :
         base(connection, protocol, dataRegulator, floodProtectionProfile, dataStore, modes, server)
     {
+
     }
 
     public ApolloProfile GetProfile() => Profile;

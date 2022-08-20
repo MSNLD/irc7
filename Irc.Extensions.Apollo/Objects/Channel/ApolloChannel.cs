@@ -13,4 +13,15 @@ public class ApolloChannel : ExtendedChannel
         dataStore)
     {
     }
+
+    public override IChannel Join(IUser user)
+    {
+        AddMember(user);
+        foreach (var member in GetMembers())
+        {
+            member.GetUser().Send(ApolloRaws.RPL_JOIN_MSN(member.GetUser().GetProtocol(), (ApolloUser)user, this));
+        }
+        
+        return this;
+    }
 }

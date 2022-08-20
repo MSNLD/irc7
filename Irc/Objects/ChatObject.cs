@@ -1,13 +1,15 @@
 ﻿using Irc.Constants;
 using Irc.Enumerations;
+using Irc.Interfaces;
 using Irc.IO;
 
 namespace Irc.Objects;
 
-public class ChatObject
+public class ChatObject : IChatObject
 {
     public readonly IDataStore DataStore;
-    public virtual EnumUserAccessLevel Level {
+    public virtual EnumUserAccessLevel Level
+    {
         get
         {
             return EnumUserAccessLevel.None;
@@ -50,8 +52,6 @@ public class ChatObject
     {
         throw new NotImplementedException();
     }
-
-    public string Address => Name;
 
     public override string ToString()
     {

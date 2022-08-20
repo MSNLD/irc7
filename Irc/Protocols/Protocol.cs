@@ -13,6 +13,8 @@ public class Protocol : IProtocol
         throw new NotImplementedException();
     }
 
+    public Dictionary<string, ICommand> GetCommands() => Commands;
+
     public EnumProtocolType GetProtocolType()
     {
         throw new NotImplementedException();
@@ -20,7 +22,7 @@ public class Protocol : IProtocol
 
     public void AddCommand(ICommand command, string name = null)
     {
-        Commands.Add(name ?? command.GetName(), command);
+        if (!Commands.ContainsKey(name == null ? command.GetName() : name)) Commands.Add(name ?? command.GetName(), command);
     }
     public void FlushCommands()
     {
@@ -30,5 +32,10 @@ public class Protocol : IProtocol
     public virtual string FormattedUser(IUser user)
     {
         return user.GetAddress().Nickname;
+    }
+
+    public virtual string GetFormat(IUser user)
+    {
+        throw new NotImplementedException();
     }
 }

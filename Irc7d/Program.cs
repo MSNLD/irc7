@@ -4,8 +4,10 @@ using System.Net;
 using System.Text.Json;
 using Irc.Extensions.Apollo.Directory;
 using Irc.Extensions.Apollo.Factories;
+using Irc.Extensions.Apollo.Objects.Channel;
 using Irc.Extensions.Apollo.Objects.Server;
 using Irc.Extensions.Factories;
+using Irc.Extensions.Objects.Channel;
 using Irc.Extensions.Objects.Server;
 using Irc.Extensions.Security.Packages;
 using Irc.Factories;
@@ -51,6 +53,8 @@ internal class Program
             "The maximum connections per IP that can connect (default 128)", CommandOptionType.SingleValue);
         var fqdnOption = app.Option("-f|--fqdn <fqdn>", "The FQDN of the machine (default localhost)",
             CommandOptionType.SingleValue);
+        var serverType = app.Option("-t|--type <type>",
+            "Type of server e.g. IRC, IRCX, MSN, DIR", CommandOptionType.SingleValue);
 
         app.OnExecute(() =>
         {
@@ -79,7 +83,7 @@ internal class Program
                 var fqdn = "localhost";
                 if (fqdnOption.HasValue()) fqdn = fqdnOption.Value();
 
-                var type = IrcType.MSN;
+                Enum.TryParse<IrcType>(serverType.Value(), true, out var type);
 
                 var socketServer = new SocketServer(ip, port, backlog, maxConnections, bufferSize);
                 socketServer.OnListen += (sender, server1) =>
@@ -114,6 +118,11 @@ internal class Program
                             server = new DirectoryServer(socketServer, securityManager, new FloodProtectionManager(),
                             new DataStore("DefaultServer.json"),
                             new List<IChannel>(), null, new ApolloUserFactory());
+
+                            string motd = "\r\n** Welcome to the MSN.com Chat Service Network **\r\n";
+
+                            server.SetMOTD(motd);
+
                             break;
                         }
                     default:
@@ -136,6 +145,15 @@ internal class Program
                     foreach (KeyValuePair<char, int> keyValuePair in defaultChannel.Modes) {
                         channel.GetModes().SetModeChar(keyValuePair.Key, keyValuePair.Value);
                     }
+
+                    if (channel is ExtendedChannel || channel is ApolloChannel)
+                    {
+                        foreach (KeyValuePair<string, string> keyValuePair in defaultChannel.Props)
+                        {
+                            ((ExtendedChannel)channel).PropCollection.GetProp(keyValuePair.Key).SetValue(keyValuePair.Value);
+                        }
+                    }
+
                     server.AddChannel(channel);
                 }
 

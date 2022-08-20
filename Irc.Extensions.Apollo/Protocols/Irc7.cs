@@ -12,11 +12,16 @@ internal class Irc7 : Irc6
     }
     public override string FormattedUser(IUser user)
     {
-        return ((ApolloUser)user).GetProfile().Irc7_ToString();
+        return ((ApolloUser)user).GetProfile().Irc7_ToString() + $",{user}";
     }
 
     public override EnumProtocolType GetProtocolType()
     {
         return EnumProtocolType.IRC7;
+    }
+
+    public override string GetFormat(IUser user)
+    {
+        return ((ApolloUser)user).GetProfile().Irc7_ToString();
     }
 }

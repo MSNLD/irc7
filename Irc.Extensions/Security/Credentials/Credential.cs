@@ -10,6 +10,7 @@ public class Credential : ICredential
     public string Nickname { get; set; }
     public string UserGroup { get; set; }
     public string Modes { get; set; }
+    public long IssuedAt { get; set; }
     public EnumUserAccessLevel Level { get; set; }
 
     public string GetDomain()
@@ -45,5 +46,10 @@ public class Credential : ICredential
     public EnumUserAccessLevel GetLevel()
     {
         return Level;
+    }
+
+    public long GetIssuedAt()
+    {
+        return IssuedAt;
     }
 }

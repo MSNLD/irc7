@@ -2,6 +2,10 @@
 
 namespace Irc.Extensions.Apollo.Objects.User;
 
-internal class ApolloUserModes : ExtendedUserModes
+public class ApolloUserModes : ExtendedUserModes
 {
+    public ApolloUserModes()
+    {
+        modes.Add(ApolloResources.UserModeHost, new Modes.User.Host());
+    }
 }

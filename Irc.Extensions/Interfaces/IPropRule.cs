@@ -8,6 +8,7 @@ namespace Irc.Extensions.Interfaces
         EnumChannelAccessLevel WriteLevel { get; }
         string Name { get; }
         bool ReadOnly { get; }
-        string Value { get; set; }
+        string GetValue();
+        void SetValue(string value);
     }
 }

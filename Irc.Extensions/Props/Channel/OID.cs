@@ -8,7 +8,7 @@ namespace Irc.Extensions.Props.Channel
 {
     internal class OID : PropRule
     {
-        public OID() : base(ExtendedResources.ChannelPropOID, EnumChannelAccessLevel.ChatGuest, EnumChannelAccessLevel.ChatGuest, string.Empty, true)
+        public OID() : base(ExtendedResources.ChannelPropOID, EnumChannelAccessLevel.ChatGuest, EnumChannelAccessLevel.ChatGuest, "0", true)
         {
 
         }

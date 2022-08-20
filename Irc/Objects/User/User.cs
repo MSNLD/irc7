@@ -24,7 +24,7 @@ public class User : ChatObject, IUser
     private IProtocol _protocol;
     private bool _registered;
     private ISupportPackage _supportPackage;
-    public Address Address = new();
+    private Address address = new();
     public IDictionary<IChannel, IChannelMember> Channels;
     public string Client;
 
@@ -105,7 +105,7 @@ public class User : ChatObject, IUser
                 stringBuilder.Append("\r\n");
             }
 
-            Console.WriteLine($"Sending: {stringBuilder}");
+            Console.WriteLine($"Sending[{_protocol.GetType().Name}]: {stringBuilder}");
             _connection?.Send(stringBuilder.ToString());
         }
     }
@@ -161,6 +161,8 @@ public class User : ChatObject, IUser
         }
     
     }
+
+    public Address Address { get => address; set => address = value; }
 
     public Address GetAddress()
     {

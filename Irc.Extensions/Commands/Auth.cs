@@ -67,17 +67,27 @@ public class Auth : Command, ICommand
                 {
                     chatFrame.User.Authenticate();
 
-                    var user = chatFrame.User.GetSupportPackage().GetCredentials().GetUsername();
-                    var domain = chatFrame.User.GetSupportPackage().GetCredentials().GetDomain();
+                    var credentials = chatFrame.User.GetSupportPackage().GetCredentials();
+                    if (credentials == null)
+                    {
+                        // Invalid credentials handle
+                    }
+                    else
+                    {
+                        var user = chatFrame.User.GetSupportPackage().GetCredentials().GetUsername();
+                        var domain = chatFrame.User.GetSupportPackage().GetCredentials().GetDomain();
 
-                    var userAddress = chatFrame.User.GetAddress();
-                    userAddress.RealName = string.Empty;
-                    userAddress.User = user;
-                    userAddress.Host = domain;
-                    userAddress.Server = chatFrame.Server.RemoteIP;
+                        var userAddress = chatFrame.User.GetAddress();
+                        chatFrame.User.Name = credentials.GetNickname();
+                        userAddress.User = credentials.GetUsername();
+                        userAddress.Host = credentials.GetDomain();
+                        userAddress.Server = chatFrame.Server.RemoteIP;
+                        userAddress.RealName = string.Empty;
 
-                    chatFrame.User.Send(Raw.RPL_AUTH_SUCCESS(packageName, $"{user}@{domain}", 0));
-                    // Send reply
+                        // Send reply
+                        chatFrame.User.Send(Raw.RPL_AUTH_SUCCESS(packageName, $"{user}@{domain}", 0));
+
+                    }
                     return;
                 }
                 else if (supportPackageSequence == EnumSupportPackageSequence.SSP_CREDENTIALS)

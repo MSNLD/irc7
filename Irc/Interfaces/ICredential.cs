@@ -10,5 +10,6 @@ public interface ICredential
     string GetNickname();
     string GetUserGroup();
     string GetModes();
+    long GetIssuedAt();
     EnumUserAccessLevel GetLevel();
 }

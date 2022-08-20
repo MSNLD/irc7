@@ -49,4 +49,6 @@ public interface IServer
     ICredentialProvider GetCredentialManager();
     void Shutdown();
     string ToString();
+    string[] GetMOTD();
+    void SetMOTD(string motd);
 }

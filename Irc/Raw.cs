@@ -67,9 +67,9 @@ public static class Raw
         return $":{user.GetAddress()} QUIT :%s";
     }
 
-    public static string RPL_MODE_IRC(ChatObject user, ChatObject target, string modeString)
+    public static string RPL_MODE_IRC(IUser user, ChatObject target, string modeString)
     {
-        return $":{user.Address} MODE {target} {modeString}";
+        return $":{user.GetAddress()} MODE {target} {modeString}";
     }
 
     public static string RPL_TOPIC_IRC(IServer server, IUser user, IChannel channel)
@@ -186,7 +186,7 @@ public static class Raw
 
     public static string IRCX_RPL_WELCOME_001(IServer server, IUser user)
     {
-        return $":{server} 001 {user} :Welcome to the {server.Name} server {user}";
+        return $":{server} 001 {user} :Welcome to the {server.Name} server, {user}";
     }
 
     public static string IRCX_RPL_WELCOME_002(IServer server, IUser user, Version version)
@@ -211,29 +211,29 @@ public static class Raw
         return $":{server} 221 {user} {modes}";
     }
 
-    public static string IRCX_RPL_LUSERCLIENT_251(IServer server, IUser user)
+    public static string IRCX_RPL_LUSERCLIENT_251(IServer server, IUser user, int users, int invisible, int servers)
     {
-        return $":{server} 251 {user} :There are %d users and %d invisible on %d servers";
+        return $":{server} 251 {user} :There are {users} users and {invisible} invisible on {servers} servers";
     }
 
-    public static string IRCX_RPL_LUSEROP_252(IServer server, IUser user)
+    public static string IRCX_RPL_LUSEROP_252(IServer server, IUser user, int operators)
     {
-        return $":{server} 252 {user} %d :operator(s) online";
+        return $":{server} 252 {user} {operators} :operator(s) online";
     }
 
-    public static string IRCX_RPL_LUSERUNKNOWN_253(IServer server, IUser user)
+    public static string IRCX_RPL_LUSERUNKNOWN_253(IServer server, IUser user, int unknown)
     {
-        return $":{server} 253 {user} %d :unknown connection(s)";
+        return $":{server} 253 {user} {unknown} :unknown connection(s)";
     }
 
     public static string IRCX_RPL_LUSERCHANNELS_254(IServer server, IUser user)
     {
-        return $":{server} 254 {user} %d :channels formed";
+        return $":{server} 254 {user} {server.GetChannels().Count} :channels formed";
     }
 
-    public static string IRCX_RPL_LUSERME_255(IServer server, IUser user)
+    public static string IRCX_RPL_LUSERME_255(IServer server, IUser user, int clients, int servers)
     {
-        return $":{server} 255 {user} :I have %d clients and %d servers";
+        return $":{server} 255 {user} :I have {clients} clients and {servers} servers";
     }
 
     public static string IRCX_RPL_ADMINME_256(IServer server, IUser user)
@@ -256,14 +256,14 @@ public static class Raw
         return $":{server} 259 {user} :%s";
     }
 
-    public static string IRCX_RPL_LUSERS_265(IServer server, IUser user)
+    public static string IRCX_RPL_LUSERS_265(IServer server, IUser user, int localUsers, int localMax)
     {
-        return $":{server} 265 {user} :Current local users: %d Max: %d";
+        return $":{server} 265 {user} :Current local users: {localUsers} Max: {localMax}";
     }
 
-    public static string IRCX_RPL_GUSERS_266(IServer server, IUser user)
+    public static string IRCX_RPL_GUSERS_266(IServer server, IUser user, int globalUsers, int globalMax)
     {
-        return $":{server} 266 {user} :Current global users: %d Max: %d";
+        return $":{server} 266 {user} :Current global users: {globalUsers} Max: {globalMax}";
     }
 
     public static string IRCX_RPL_AWAY_301(IServer server, IUser user)
@@ -389,7 +389,7 @@ public static class Raw
 
     public static string IRCX_RPL_ENDOFNAMES_366(IServer server, IUser user, IChannel channel)
     {
-        return $":{server} 366 {user} %s :End of /NAMES list.";
+        return $":{server} 366 {user} {channel} :End of /NAMES list.";
     }
 
     public static string IRCX_RPL_BANLIST_367(IServer server, IUser user, IChannel channel)
@@ -420,9 +420,9 @@ public static class Raw
         return $":{server} 371 {user} :This server is running as an IRC.{server.GetType().Name}";
     }
 
-    public static string IRCX_RPL_RPL_MOTD_372(IServer server, IUser user)
+    public static string IRCX_RPL_RPL_MOTD_372(IServer server, IUser user, string message)
     {
-        return $":{server} 372 {user} :- %s";
+        return $":{server} 372 {user} :- {message}";
     }
 
     public static string IRCX_RPL_RPL_ENDOFINFO_374(IServer server, IUser user)
@@ -629,7 +629,7 @@ public static class Raw
     public static string IRCX_RPL_FINDS_613(IServer server, IUser user)
     {
         //return $":{server} 613 {user} :%s %s";
-        return $":{server} 613 {user} :irc.irc7.com 6667";
+        return $":{server} 613 {user} :192.168.1.13 6667";
     }
 
     public static string IRCX_RPL_LISTRSTART_614(IServer server, IUser user)
@@ -763,15 +763,7 @@ public static class Raw
         return $":{server} 817 {user} :End of ListX";
     }
 
-    public static string IRCX_RPL_PROPLIST_818(IServer server, IUser user)
-    {
-        return $":{server} 818 {user} %s %s :%s";
-    }
 
-    public static string IRCX_RPL_PROPEND_819(IServer server, IUser user)
-    {
-        return $":{server} 819 {user} %s :End of properties";
-    }
 
     public static string IRCX_RPL_ACCESSCLEAR_820(IServer server, IUser user)
     {

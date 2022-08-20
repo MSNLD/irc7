@@ -2,9 +2,9 @@
 
 public enum EnumProtocolType
 {
-    IRC = 0,
-    IRCX = 1,
-    IRC2 = 2,
+    IRC = 0, // Original IRC
+    IRC2 = 1, // Created 1996
+    IRCX = 2, // Created 2000
     IRC3 = 3,
     IRC4 = 4,
     IRC5 = 5,

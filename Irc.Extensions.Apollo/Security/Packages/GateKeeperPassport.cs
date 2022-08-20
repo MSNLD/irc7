@@ -8,6 +8,7 @@ namespace Irc.Extensions.Apollo.Security.Packages;
 public class GateKeeperPassport : GateKeeper
 {
     private readonly ICredentialProvider _credentialProvider;
+    
     public string Puid;
 
     public GateKeeperPassport(ICredentialProvider credentialProvider)
@@ -20,7 +21,7 @@ public class GateKeeperPassport : GateKeeper
 
     public override SupportPackage CreateInstance(ICredentialProvider credentialProvider)
     {
-        return new GateKeeperPassport(credentialProvider);
+        return new GateKeeperPassport(_credentialProvider);
     }
 
     public override EnumSupportPackageSequence AcceptSecurityContext(string data, string ip)
@@ -37,11 +38,10 @@ public class GateKeeperPassport : GateKeeper
 
         if (ServerSequence == EnumSupportPackageSequence.SSP_CREDENTIALS)
         {
-            return EnumSupportPackageSequence.SSP_OK;
-            var ticket = extractCookie(data.Substring(0x10));
+            var ticket = extractCookie(data);
             if (ticket == null) return EnumSupportPackageSequence.SSP_FAILED;
 
-            var profile = extractCookie(data.Substring(0x10 + 8 + ticket.Length));
+            var profile = extractCookie(data.Substring(8 + ticket.Length));
             if (profile == null) return EnumSupportPackageSequence.SSP_FAILED;
 
             _credentials = _credentialProvider.ValidateTokens(

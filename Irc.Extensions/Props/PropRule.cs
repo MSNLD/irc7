@@ -16,19 +16,26 @@ namespace Irc.Extensions.Props
             Name = name;
             ReadAccessLevel = readAccessLevel;
             WriteLevel = writeAccessLevel;
-            Value = initialValue;
+            _value = initialValue;
             ReadOnly = readOnly;
         }
 
         public string Name { get; }
         public EnumChannelAccessLevel ReadAccessLevel { get; }
         public EnumChannelAccessLevel WriteLevel { get; }
-        public string Value { get; set; }
+        private string _value { get; set; }
         public bool ReadOnly { get; }
 
         public EnumIrcError SetValue(ChatObject source, string value)
         {
             throw new NotImplementedException();
         }
+
+        public void SetValue(string value)
+        {
+            _value = value;
+        }
+
+        public virtual string GetValue() => _value;
     }
 }

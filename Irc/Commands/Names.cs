@@ -64,5 +64,6 @@ IRC8 H,A,GO is correct as well as
                                               )
                                         )
             );
+        user.Send(Raw.IRCX_RPL_ENDOFNAMES_366(user.Server, user, channel));
     }
 }

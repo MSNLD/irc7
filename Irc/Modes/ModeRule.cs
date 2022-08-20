@@ -34,7 +34,7 @@ namespace Irc.Modes
         {
             target.Send(
                 Raw.RPL_MODE_IRC(
-                        source,
+                        (IUser)source,
                         target,
                         $"{(flag ? "+" : "-")}{ModeChar}{(parameter != null ? $" {parameter}" : string.Empty)}"
                     )

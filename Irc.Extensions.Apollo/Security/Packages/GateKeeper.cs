@@ -100,7 +100,7 @@ public class GateKeeper : SupportPackage, ISupportPackage
         ServerToken.Version = ServerVersion;
         Array.Copy(Guid.NewGuid().ToByteArray(), 0, challenge, 0, 8);
         //Array.Copy(new byte[] { 167, 135, 203, 141, 242, 118, 89, 77 }, 0, challenge, 0, 8);
-        Array.Copy(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 }, 0, challenge, 0, 8);
+        //Array.Copy(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 }, 0, challenge, 0, 8);
         var message = new StringBuilder(Marshal.SizeOf(ServerToken) + challenge.Length);
         message.Append(ServerToken.Serialize<GateKeeperToken>().ToAsciiString());
         message.Append(challenge);

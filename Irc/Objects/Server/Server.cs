@@ -92,6 +92,17 @@ public class Server : ChatObject, IServer
     public int UnknownConnectionCount => _socketServer.CurrentConnections - NetUserCount;
     public string RemoteIP { set; get; }
 
+    public void SetMOTD(string motd)
+    {
+        string[] lines = motd.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        _dataStore.SetAs<string[]>("motd", lines);
+    }
+
+    public string[] GetMOTD()
+    {
+        return _dataStore.GetAs<string[]>("motd");
+    }
+
     public void AddUser(IUser user)
     {
         PendingNewUserQueue.Enqueue(user);
@@ -112,7 +123,7 @@ public class Server : ChatObject, IServer
         Channels.Remove(channel);
     }
 
-    public IChannel CreateChannel(string name)
+    public virtual IChannel CreateChannel(string name)
     {
         return new Channel.Channel(name, new ChannelModes(), new DataStore(name, "store"));
     }
@@ -255,7 +266,13 @@ public class Server : ChatObject, IServer
         if (PendingRemoveUserQueue.Count > 0)
         {
             // remove pending to be removed users
-            foreach (var user in PendingRemoveUserQueue) Users.Remove(user);
+
+            foreach (var user in PendingRemoveUserQueue)
+            {
+                Quit.QuitChannels(user, "Connection reset by peer");
+                user.Disconnect("Connection reset by peer");
+                Users.Remove(user);
+            }
 
             Console.WriteLine($"Removed {PendingRemoveUserQueue.Count} users. Total Users = {Users.Count}");
             PendingRemoveUserQueue.Clear();
@@ -268,6 +285,24 @@ public class Server : ChatObject, IServer
         {
             if (protocol.Key >= fromProtocol) protocol.Value.AddCommand(command, name);
         }
+    }
+
+    protected void AddProtocol(EnumProtocolType protocolType, IProtocol protocol, bool inheritCommands = true)
+    {
+        if (inheritCommands)
+        {
+            for (var protocolIndex = 0; protocolIndex < (int)protocolType; protocolIndex++)
+            {
+                if (_protocols.ContainsKey((EnumProtocolType)protocolIndex))
+                {
+                    foreach (KeyValuePair<string, ICommand> command in _protocols[(EnumProtocolType)protocolIndex].GetCommands())
+                    {
+                        protocol.AddCommand(command.Value, command.Key);
+                    }
+                }
+            }
+        }
+        _protocols.Add(protocolType, protocol);
     }
 
     protected void FlushCommands()

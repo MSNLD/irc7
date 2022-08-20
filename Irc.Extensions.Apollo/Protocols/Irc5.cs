@@ -12,10 +12,15 @@ internal class Irc5 : Irc4
     }
     public override string FormattedUser(IUser user)
     {
-        return ((ApolloUser)user).GetProfile().Irc5_ToString();
+        return ((ApolloUser)user).GetProfile().Irc5_ToString() + $",{user}";
     }
     public override EnumProtocolType GetProtocolType()
     {
         return EnumProtocolType.IRC5;
+    }
+
+    public override string GetFormat(IUser user)
+    {
+        return ((ApolloUser)user).GetProfile().Irc5_ToString();
     }
 }

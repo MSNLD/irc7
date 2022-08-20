@@ -21,7 +21,7 @@ internal class Quit : Command, ICommand
         QuitChannels(user, quitMessage);
     }
 
-    public void QuitChannels(IUser user, string message)
+    public static void QuitChannels(IUser user, string message)
     {
         HashSet<IUser> users = new HashSet<IUser>();
 

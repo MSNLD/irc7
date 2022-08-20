@@ -6,6 +6,10 @@
       "n": 1,
       "t": 1,
       "l": 50
+    },
+    "Props": {
+      "OWNERKEY": "OWNERKEY",
+      "HOSTKEY": "HOSTKEY"
     }
   },
   {

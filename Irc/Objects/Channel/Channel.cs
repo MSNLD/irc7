@@ -45,7 +45,7 @@ public class Channel : ChatObject, IChannel
         return true;
     }
 
-    public IChannel Join(IUser user)
+    public virtual IChannel Join(IUser user)
     {
         AddMember(user);
         Send(IrcRaws.RPL_JOIN(user, this));

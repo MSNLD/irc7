@@ -50,6 +50,7 @@ public class DataStore : IDataStore
     public T GetAs<T>(string key)
     {
         var json = Get(key);
+        if (json == null) return default(T);
         return JsonSerializer.Deserialize<T>(json) ?? default(T);
     }
 
