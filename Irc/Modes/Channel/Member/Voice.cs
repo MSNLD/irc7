@@ -34,7 +34,7 @@ namespace Irc.Modes.Channel.Member
                 return EnumIrcError.ERR_NOSUCHNICK;
             }
 
-            EnumIrcError result = sourceMember.CanModify(targetMember, EnumChannelAccessLevel.ChatVoice);
+            EnumIrcError result = sourceMember.CanModify(targetMember, EnumChannelAccessLevel.ChatVoice, false);
             if (result == EnumIrcError.OK)
             {
                 targetMember.SetVoice(flag);

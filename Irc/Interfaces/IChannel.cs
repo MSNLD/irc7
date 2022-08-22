@@ -27,4 +27,5 @@ public interface IChannel
     IChannel SendNames(IUser user);
     bool Allows(IUser user);
     IModeCollection GetModes();
+    EnumChannelAccessResult GetAccess(IUser user, string key, bool IsGoto = false);
 }

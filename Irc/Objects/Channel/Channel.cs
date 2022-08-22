@@ -246,4 +246,55 @@ public class Channel : ChatObject, IChannel
             if (channelMember.GetUser() != u)
                 channelMember.GetUser().Send(message);
     }
+
+    public EnumChannelAccessResult GetAccess(IUser user, string key, bool IsGoto = false)
+    {
+        var operCheck = CheckOper(user);
+        var keyCheck = CheckMemberKey(user, key);
+        var inviteOnlyCheck = CheckInviteOnly();
+        var userLimitCheck = CheckUserLimit(IsGoto);
+
+        return (EnumChannelAccessResult)(new int[] {
+            (int)operCheck
+        }).Max();
+    }
+
+    protected EnumChannelAccessResult CheckOper(IUser user)
+    {
+        if (user.GetLevel() >= EnumUserAccessLevel.Guide) return EnumChannelAccessResult.SUCCESS_OWNER;
+        else return EnumChannelAccessResult.NONE;
+    }
+
+    protected EnumChannelAccessResult CheckMemberKey(IUser user, string key)
+    {
+        if (Modes.GetModeChar(Resources.ChannelModeKey) == 1)
+        {
+            if (ChannelStore.Get("MEMBERKEY") == key)
+            {
+                return EnumChannelAccessResult.SUCCESS_MEMBER;
+            }
+            else
+            {
+                return EnumChannelAccessResult.ERR_BADCHANNELKEY;
+            }
+        }
+        return EnumChannelAccessResult.NONE;
+    }
+    protected EnumChannelAccessResult CheckInviteOnly()
+    {
+        if (Modes.GetModeChar(Resources.ChannelModeInvite) == 1) return EnumChannelAccessResult.ERR_INVITEONLYCHAN;
+        return EnumChannelAccessResult.NONE;
+    }
+
+    protected EnumChannelAccessResult CheckUserLimit(bool IsGoto)
+    {
+        var userLimit = int.MaxValue;
+
+        if (Modes.GetModeChar(Resources.ChannelModeInvite) > 0) userLimit = Modes.GetModeChar(Resources.ChannelModeInvite);
+
+        if (IsGoto) userLimit = (int)(userLimit * 1.2);
+
+        if (GetMembers().Count >= userLimit) return EnumChannelAccessResult.ERR_CHANNELISFULL;
+        else return EnumChannelAccessResult.NONE;
+    }
 }

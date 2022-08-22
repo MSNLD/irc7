@@ -45,4 +45,17 @@ public class ExtendedServer : global::Irc.Objects.Server.Server, IServer, IExten
     {
 
     }
+
+    // Ircx
+    protected EnumChannelAccessResult CheckAuthOnly()
+    {
+        if (Modes.GetModeChar(ExtendedResources.ChannelModeAuthOnly) == 1) return EnumChannelAccessResult.ERR_AUTHONLYCHAN;
+        return EnumChannelAccessResult.NONE;
+    }
+
+    protected EnumChannelAccessResult CheckSecureOnly()
+    {
+        // TODO: Whatever this is...
+        return EnumChannelAccessResult.ERR_SECUREONLYCHAN;
+    }
 }

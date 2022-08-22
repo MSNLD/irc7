@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 public enum EnumChannelAccessLevel
 {
     None = 0,
-    ChatGuest = 1,
-    ChatUser = 2,
-    ChatMember = 3,
-    ChatVoice = 4,
-    ChatHost = 5,
-    ChatOwner = 6
+    ChatMember = 1,
+    ChatVoice = 2,
+    ChatHost = 3,
+    ChatOwner = 4
  }

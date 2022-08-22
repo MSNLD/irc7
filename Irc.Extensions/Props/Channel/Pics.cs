@@ -12,7 +12,7 @@ namespace Irc.Extensions.Props.Channel
         // Chat clients that are PICS enabled can use this property to determine if the channel is appropriate for the user.
         // The PICS property is limited to 255 characters.
         // This property may be set by sysop managers and read by all. It may not be read by ordinary users if the channel is SECRET.
-        public Pics() : base(ExtendedResources.ChannelPropPICS, EnumChannelAccessLevel.ChatGuest, EnumChannelAccessLevel.None, string.Empty, true)
+        public Pics() : base(ExtendedResources.ChannelPropPICS, EnumChannelAccessLevel.ChatMember, EnumChannelAccessLevel.None, string.Empty, true)
         {
 
         }

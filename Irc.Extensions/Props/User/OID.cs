@@ -11,7 +11,7 @@ namespace Irc.Extensions.Props.User
     {
         private readonly IDataStore dataStore;
 
-        public OID(IDataStore dataStore) : base(ExtendedResources.UserPropOid, EnumChannelAccessLevel.ChatGuest, EnumChannelAccessLevel.ChatGuest, "0", true)
+        public OID(IDataStore dataStore) : base(ExtendedResources.UserPropOid, EnumChannelAccessLevel.ChatMember, EnumChannelAccessLevel.ChatMember, "0", true)
         {
             this.dataStore = dataStore;
         }

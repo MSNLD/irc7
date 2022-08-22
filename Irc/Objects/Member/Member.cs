@@ -23,18 +23,21 @@ public class Member : MemberModes, IChannelMember
         if (IsVoice())
             return EnumChannelAccessLevel.ChatVoice;
 
-        return _user.IsGuest() ? EnumChannelAccessLevel.ChatGuest : EnumChannelAccessLevel.ChatMember;
+        return EnumChannelAccessLevel.ChatMember;
     }
 
-    public EnumIrcError CanModify(IChannelMember target, EnumChannelAccessLevel requiredLevel)
+    public EnumIrcError CanModify(IChannelMember target, EnumChannelAccessLevel requiredLevel, bool operCheck = true)
     {
-        // Oper check
-        if (target.GetUser().GetLevel() >= EnumUserAccessLevel.Guide)
+        if (operCheck)
         {
-            if (_user.GetLevel() < EnumUserAccessLevel.Guide) return EnumIrcError.ERR_NOIRCOP;
-            // TODO: Maybe there is better raws for below
-            else if (_user.GetLevel() < EnumUserAccessLevel.Sysop && _user.GetLevel() < target.GetUser().GetLevel()) return EnumIrcError.ERR_NOPERMS;
-            else if (_user.GetLevel() < EnumUserAccessLevel.Administrator && _user.GetLevel() < target.GetUser().GetLevel()) return EnumIrcError.ERR_NOPERMS;
+            // Oper check
+            if (target.GetUser().GetLevel() >= EnumUserAccessLevel.Guide)
+            {
+                if (_user.GetLevel() < EnumUserAccessLevel.Guide) return EnumIrcError.ERR_NOIRCOP;
+                // TODO: Maybe there is better raws for below
+                else if (_user.GetLevel() < EnumUserAccessLevel.Sysop && _user.GetLevel() < target.GetUser().GetLevel()) return EnumIrcError.ERR_NOPERMS;
+                else if (_user.GetLevel() < EnumUserAccessLevel.Administrator && _user.GetLevel() < target.GetUser().GetLevel()) return EnumIrcError.ERR_NOPERMS;
+            }
         }
 
         if (!IsOwner() && (requiredLevel >= EnumChannelAccessLevel.ChatOwner || target.IsOwner())) return EnumIrcError.ERR_NOCHANOWNER;

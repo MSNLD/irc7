@@ -24,7 +24,7 @@ namespace Irc.Modes.Channel.Member
         -> sky-8a15b323126 MODE #test +o Sky2k
         <- :sky-8a15b323126 485 Sky3k #test :You're not channel owner
          */
-        public Owner() : base(Resources.UserModeOwner, true)
+        public Owner() : base(Resources.MemberModeOwner, true)
         {
         }
 
@@ -49,6 +49,11 @@ namespace Irc.Modes.Channel.Member
             EnumIrcError result = sourceMember.CanModify(targetMember, EnumChannelAccessLevel.ChatOwner);
             if (result == EnumIrcError.OK)
             {
+                if (flag == true && targetMember.IsHost())
+                {
+                    targetMember.SetHost(false);
+                    ModeRule.DispatchModeChange(Resources.MemberModeHost, source, target, false, parameter);
+                }
                 targetMember.SetOwner(flag);
                 DispatchModeChange(source, target, flag, parameter);
             }

@@ -13,7 +13,7 @@ namespace Irc.Extensions.Props.User
         private readonly IDataStore dataStore;
 
         // limited to 200 bytes including 1 or 2 characters for channel prefix
-        public Nick(IDataStore dataStore) : base(ExtendedResources.UserPropNickname, EnumChannelAccessLevel.ChatGuest, EnumChannelAccessLevel.ChatGuest, string.Empty, true)
+        public Nick(IDataStore dataStore) : base(ExtendedResources.UserPropNickname, EnumChannelAccessLevel.ChatMember, EnumChannelAccessLevel.ChatMember, string.Empty, true)
         {
             this.dataStore = dataStore;
         }
