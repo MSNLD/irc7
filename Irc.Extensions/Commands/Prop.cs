@@ -1,6 +1,7 @@
 ﻿using Irc.Commands;
 using Irc.Enumerations;
 using Irc.Extensions.Interfaces;
+using Irc.Extensions.Objects.Channel;
 using Irc.Objects;
 using Irc.Objects.Channel;
 using Irc.Objects.Server;
@@ -9,7 +10,7 @@ namespace Irc.Extensions.Commands;
 
 public class Prop : Command, ICommand
 {
-    public Prop() : base(1) { }
+    public Prop() : base(2) { }
     public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
 
     public new void Execute(ChatFrame chatFrame)
@@ -65,46 +66,72 @@ public class Prop : Command, ICommand
         }
         else
         {
-            ChatObject chatObject = null;
+            IExtendedChatObject chatObject = null;
 
             // Lookup object
             if (Channel.ValidName(objectName))
             {
-                chatObject = (ChatObject)chatFrame.Server.GetChannelByName(objectName);
+                chatObject = (IExtendedChatObject)chatFrame.Server.GetChannelByName(objectName);
             }
             else if (objectName.Equals(chatFrame.User.Name, StringComparison.InvariantCultureIgnoreCase))
             {
-                chatObject = (ChatObject)chatFrame.User;
+                chatObject = (IExtendedChatObject)chatFrame.User;
             }
             // <$> The $ value is used to indicate the user that originated the request.
             else if (objectName == "$")
             {
-                chatObject = (ChatObject)chatFrame.User;
+                chatObject = (IExtendedChatObject)chatFrame.User;
             }
 
             if (chatObject == null)
             {
                 // No such object
             }
+            else
+            {
+                var props = chatFrame.Message.Parameters[1] == "*" ? chatObject.PropCollection.GetProps() : new List<IPropRule>() { chatObject.PropCollection.GetProp(chatFrame.Message.Parameters[1]) };
+                SendProps(chatFrame.Server, chatFrame.User, chatObject, props.Select(x => x.Name).ToArray<string>());
+            }
         }
     }
 
-
+    // TODO: Rewrite this code
     public void SendProps(IServer server, IUser user, IExtendedChatObject targetObject, string[] propNames)
     {
+        var propsSent = 0;
         foreach (var propName in propNames)
         {
             var prop = targetObject.PropCollection.GetProp(propName);
             if (prop != null)
             {
-                SendProp(server, user, targetObject, prop.Name, prop.GetValue());
+                if (prop.ReadAccessLevel == EnumChannelAccessLevel.None)
+                {
+                    if (propNames.Length == 1) user.Send(Raw.IRCX_ERR_SECURITY_908(server, user));
+                    continue;
+                }
+
+                if (targetObject is Channel)
+                {
+                    var kvp = user.GetChannels().FirstOrDefault(x => x.Key == targetObject);
+                    if (kvp.Value != null)
+                    {
+                        var member = kvp.Value;
+                        var propValue = prop.GetValue();
+                        if (member.GetLevel() >= prop.ReadAccessLevel && !string.IsNullOrEmpty(propValue))
+                        {
+                            SendProp(server, user, targetObject, prop.Name, propValue);
+                            propsSent++;
+                        }
+                    }
+                }
+                else SendProp(server, user, targetObject, prop.Name, prop.GetValue()); propsSent++;
             }
             else
             {
                 // No such prop
             }
         }
-        user.Send(IrcxRaws.IRCX_RPL_PROPEND_819(server, user, targetObject));
+        if (propsSent > 0) user.Send(IrcxRaws.IRCX_RPL_PROPEND_819(server, user, targetObject));
     }
 
     public void SendProp(IServer server, IUser user, IExtendedChatObject targetObject, string propName, string propValue)

@@ -15,13 +15,14 @@ public class ExtendedChannel : global::Irc.Objects.Channel.Channel, IExtendedCha
     public ExtendedChannel(string name, IModeCollection modeCollection, IDataStore dataStore) : base(name,
         modeCollection, dataStore)
     {
+        _properties.SetProp("NAME", name);
     }
 
     protected override IChannelMember AddMember(IUser user)
     {
         var member = new Member.ExtendedMember(user);
-        member.SetHost(true);
-        member.SetOwner(true);
+        //member.SetHost(true);
+        //member.SetOwner(true);
         _members.Add(member);
         user.AddChannel(this, member);
         return member;

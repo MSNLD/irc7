@@ -6,14 +6,14 @@ namespace Irc.Objects.Collections;
 
 public class PropCollection : IPropCollection
 {
-    protected Dictionary<string, PropRule> properties = new Dictionary<string, PropRule>();
+    protected Dictionary<string, IPropRule> properties = new Dictionary<string, IPropRule>();
 
     public PropCollection()
     {
 
     }
 
-    public void AddProp(PropRule prop)
+    public void AddProp(IPropRule prop)
     {
         properties[prop.Name.ToUpper()] = prop;
     }
@@ -28,4 +28,5 @@ public class PropCollection : IPropCollection
     {
         properties[name].SetValue(value);
     }
+    public List<IPropRule> GetProps() => properties.Values.ToList();
 }
