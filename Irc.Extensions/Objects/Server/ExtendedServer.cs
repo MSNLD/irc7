@@ -43,7 +43,7 @@ public class ExtendedServer : global::Irc.Objects.Server.Server, IServer, IExten
 
     public virtual void ProcessCookie(IUser user, string name, string value)
     {
-
+        // IRCX Does not use this
     }
 
     // Ircx

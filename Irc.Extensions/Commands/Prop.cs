@@ -25,6 +25,9 @@ public class Prop : Command, ICommand
         //chatFrame.User.GetAddress().Server = "SERVER";
         //chatFrame.User.Register();
         // Register.Execute(chatFrame);
+
+        // TODO: Resolve object first, e.g. IChatServer.GetObject(string)
+
         var objectName = chatFrame.Message.Parameters.First();
         if (!chatFrame.User.IsRegistered())
         {
@@ -35,6 +38,7 @@ public class Prop : Command, ICommand
                 {
                     if (chatFrame.Message.Parameters.Count >= 2)
                     {
+                        // TODO: This needs rewriting
                         if (string.Compare("NICK", chatFrame.Message.Parameters[1], true) == 0)
                         {
                             chatFrame.User.GetAddress().Nickname = chatFrame.User.Name;
@@ -53,6 +57,13 @@ public class Prop : Command, ICommand
                             var subscriberinfo = chatFrame.Message.Parameters[2];
                             ((IExtendedServerObject)chatFrame.Server).ProcessCookie(chatFrame.User, "SUBSCRIBERINFO", subscriberinfo);
                         }
+                        else if (string.Compare("MSNPROFILE", chatFrame.Message.Parameters[1], true) == 0)
+                        {
+                            // TODO: Hook up to actual prop
+                            var msnprofile = chatFrame.Message.Parameters[2];
+                            ((IExtendedServerObject)chatFrame.Server).ProcessCookie(chatFrame.User, "MSNPROFILE", msnprofile);
+                        }
+                        else chatFrame.User.Send(Raw.IRCX_ERR_BADPROPERTY_905(chatFrame.Server, chatFrame.User));
                     }
                 }
                 // PROP $ MSNREGCOOKIE
@@ -90,7 +101,8 @@ public class Prop : Command, ICommand
             else
             {
                 var props = chatFrame.Message.Parameters[1] == "*" ? chatObject.PropCollection.GetProps() : new List<IPropRule>() { chatObject.PropCollection.GetProp(chatFrame.Message.Parameters[1]) };
-                SendProps(chatFrame.Server, chatFrame.User, chatObject, props.Select(x => x.Name).ToArray<string>());
+                // TODO: Workout null path props[0] == null
+                SendProps(chatFrame.Server, chatFrame.User, chatObject, props.Where(x => x != null).Select(x => x.Name).ToArray<string>());
             }
         }
     }
@@ -129,6 +141,7 @@ public class Prop : Command, ICommand
             else
             {
                 // No such prop
+                user.Send(Raw.IRCX_ERR_BADPROPERTY_905(server, user));
             }
         }
         if (propsSent > 0) user.Send(IrcxRaws.IRCX_RPL_PROPEND_819(server, user, targetObject));

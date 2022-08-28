@@ -31,7 +31,7 @@ namespace Irc.Extensions.Props
             throw new NotImplementedException();
         }
 
-        public void SetValue(string value)
+        public virtual void SetValue(string value)
         {
             _value = value;
         }

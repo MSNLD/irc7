@@ -127,14 +127,14 @@ public static class Raw
         return $":{user.GetAddress()} EPRIVMSG {channel} :%s";
     }
 
-    public static string RPL_NOTICE_USER(IServer server, IUser user)
+    public static string RPL_NOTICE_USER(IServer server, IUser user, IChatObject target, string message)
     {
-        return $":{user.GetAddress()} NOTICE %s :%s";
+        return $":{user.GetAddress()} NOTICE {target} :{message}";
     }
 
-    public static string RPL_PRIVMSG_USER(IServer server, IUser user)
+    public static string RPL_PRIVMSG_USER(IServer server, IUser user, IChatObject target, string message)
     {
-        return $":{user.GetAddress()} PRIVMSG %s :%s";
+        return $":{user.GetAddress()} PRIVMSG {target} :{message}";
     }
 
     public static string RPL_NOTICE_CHAN(IServer server, IUser user, IChannel channel)

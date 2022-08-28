@@ -14,16 +14,50 @@ internal class Privmsg : Command, ICommand
 
     public static void SendMessage(ChatFrame chatFrame, bool Notice)
     {
-        var channelName = chatFrame.Message.Parameters.First();
+        var targetName = chatFrame.Message.Parameters.First();
         var message = chatFrame.Message.Parameters[1];
 
-        var channel = chatFrame.Server.GetChannelByName(channelName);
+        string[] targets = targetName.Split(',', StringSplitOptions.RemoveEmptyEntries);
+        foreach (var target in targets)
+        {
+            Interfaces.IChatObject chatObject = null;
+            if (Objects.Channel.Channel.ValidName(target))
+            {
+                chatObject = (Interfaces.IChatObject)chatFrame.Server.GetChannelByName(target);
+            }
+            else
+            {
+                chatObject = (Interfaces.IChatObject)chatFrame.Server.GetUserByNickname(target);
+            }
 
-        if (channel != null)
-            if (Notice) channel.SendNotice(chatFrame.User, message);
-            else channel.SendMessage(chatFrame.User, message);
-        else
-            // TODO: To make common function for this
-            chatFrame.User.Send(Raw.IRCX_ERR_NOSUCHCHANNEL_403(chatFrame.Server, chatFrame.User, channelName));
+            if (chatObject == null)
+            {
+                // TODO: To make common function for this
+                chatFrame.User.Send(Raw.IRCX_ERR_NOSUCHCHANNEL_403(chatFrame.Server, chatFrame.User, target));
+                return;
+            }
+
+            if (chatObject is Objects.Channel.Channel)
+            {
+                if (Notice) ((Objects.Channel.Channel)chatObject).SendNotice(chatFrame.User, message);
+                else ((Objects.Channel.Channel)chatObject).SendMessage(chatFrame.User, message);
+            }
+            else if (chatObject is Objects.User)
+            {
+                if (Notice)
+                {
+                    ((Objects.User)chatObject).Send(
+                            Raw.RPL_NOTICE_USER(chatFrame.Server, chatFrame.User, chatObject, message)
+                        );
+                }
+                else
+                {
+                    ((Objects.User)chatObject).Send(
+                            Raw.RPL_PRIVMSG_USER(chatFrame.Server, chatFrame.User, chatObject, message)
+                        );
+                }
+
+            }
+        }
     }
 }

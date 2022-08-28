@@ -76,5 +76,10 @@ public class ApolloServer : ExtendedServer
             int.TryParse(subscribedString, out var subscribed);
             if ((subscribed & 1) == 1) ((ApolloUser)user).GetProfile().Registered = true;
         }
+        else if (name == "MSNPROFILE" && user.IsAuthenticated() && !user.IsRegistered())
+        {
+            int.TryParse(value, out var profileCode);
+            ((ApolloUser)user).GetProfile().SetProfileCode(profileCode);
+        }
     }
 }
