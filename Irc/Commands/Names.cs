@@ -59,7 +59,7 @@ IRC8 H,A,GO is correct as well as
             Raw.IRCX_RPL_NAMEREPLY_353(user.Server, user, channel,
                                         string.Join(' ', 
                                                     channel.GetMembers().Select(m => 
-                                                        $"{user.GetProtocol().FormattedUser(m.GetUser())}"
+                                                        $"{user.GetProtocol().FormattedUser(m)}"
                                                     )
                                               )
                                         )

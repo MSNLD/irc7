@@ -13,7 +13,7 @@ public interface IChannel
     IChannelMember GetMemberByNickname(string nickname);
     void Send(string message, ChatObject u = null);
     void Send(string message);
-    IChannel Join(IUser user);
+    IChannel Join(IUser user, EnumChannelAccessResult accessResult = EnumChannelAccessResult.NONE);
     IChannel Part(IUser user);
     IChannel Quit(IUser user);
     IChannel Kick(IUser source, IUser target, string reason);

@@ -45,16 +45,21 @@ public class Channel : ChatObject, IChannel
         return true;
     }
 
-    public virtual IChannel Join(IUser user)
+    public virtual IChannel Join(IUser user, EnumChannelAccessResult accessResult = EnumChannelAccessResult.NONE)
     {
         AddMember(user);
         Send(IrcRaws.RPL_JOIN(user, this));
         return this;
     }
 
-    protected virtual IChannelMember AddMember(IUser user)
+    protected virtual IChannelMember AddMember(IUser user, EnumChannelAccessResult accessResult = EnumChannelAccessResult.NONE)
     {
         var member = new Member.Member(user);
+        
+        if (accessResult == EnumChannelAccessResult.SUCCESS_OWNER) member.SetHost(true);
+        else if (accessResult == EnumChannelAccessResult.SUCCESS_HOST) member.SetHost(true);
+        else if (accessResult == EnumChannelAccessResult.SUCCESS_VOICE) member.SetVoice(true);
+
         _members.Add(member);
         user.AddChannel(this, member);
         return member;
@@ -247,7 +252,7 @@ public class Channel : ChatObject, IChannel
                 channelMember.GetUser().Send(message);
     }
 
-    public EnumChannelAccessResult GetAccess(IUser user, string key, bool IsGoto = false)
+    public virtual EnumChannelAccessResult GetAccess(IUser user, string key, bool IsGoto = false)
     {
         var operCheck = CheckOper(user);
         var keyCheck = CheckMemberKey(user, key);
@@ -255,7 +260,10 @@ public class Channel : ChatObject, IChannel
         var userLimitCheck = CheckUserLimit(IsGoto);
 
         return (EnumChannelAccessResult)(new int[] {
-            (int)operCheck
+            (int)operCheck,
+            (int)keyCheck,
+            (int)inviteOnlyCheck,
+            (int)userLimitCheck
         }).Max();
     }
 
@@ -280,10 +288,11 @@ public class Channel : ChatObject, IChannel
         }
         return EnumChannelAccessResult.NONE;
     }
+
     protected EnumChannelAccessResult CheckInviteOnly()
     {
-        if (Modes.GetModeChar(Resources.ChannelModeInvite) == 1) return EnumChannelAccessResult.ERR_INVITEONLYCHAN;
         return EnumChannelAccessResult.NONE;
+        return EnumChannelAccessResult.ERR_INVITEONLYCHAN;
     }
 
     protected EnumChannelAccessResult CheckUserLimit(bool IsGoto)

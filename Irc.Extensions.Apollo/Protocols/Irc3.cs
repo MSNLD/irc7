@@ -2,6 +2,7 @@
 using Irc.Enumerations;
 using Irc.Extensions.Apollo.Objects.User;
 using Irc.Extensions.Protocols;
+using Irc.Interfaces;
 using Irc.Objects;
 
 namespace Irc.Extensions.Apollo.Protocols;
@@ -18,8 +19,10 @@ public class Irc3 : IrcX
         return EnumProtocolType.IRC3;
     }
 
-    public override string FormattedUser(IUser user)
+    public override string FormattedUser(IChannelMember member)
     {
-        return user.GetAddress().Nickname;
+        var modeChar = string.Empty;
+        if (!member.IsNormal()) modeChar += member.IsOwner() ? '.' : (member.IsHost() ? '@' : '+');
+        return $"{modeChar}{member.GetUser().GetAddress().Nickname}";
     }
 }

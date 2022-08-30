@@ -1,5 +1,6 @@
 ﻿using Irc.Commands;
 using Irc.Enumerations;
+using Irc.Interfaces;
 using Irc.Objects;
 
 namespace Irc;
@@ -29,9 +30,11 @@ public class Protocol : IProtocol
         Commands.Clear();
     }
 
-    public virtual string FormattedUser(IUser user)
+    public virtual string FormattedUser(IChannelMember member)
     {
-        return user.GetAddress().Nickname;
+        var modeChar = string.Empty;
+        if (!member.IsNormal()) modeChar += member.IsOwner() ? '.' : (member.IsHost() ? '@' : '+');
+        return $"{modeChar}{member.GetUser().GetAddress().Nickname}";
     }
 
     public virtual string GetFormat(IUser user)

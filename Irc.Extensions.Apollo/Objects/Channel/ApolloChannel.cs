@@ -1,4 +1,6 @@
-﻿using Irc.Extensions.Apollo.Objects.User;
+﻿using Irc.Constants;
+using Irc.Enumerations;
+using Irc.Extensions.Apollo.Objects.User;
 using Irc.Extensions.Objects.Channel;
 using Irc.Interfaces;
 using Irc.IO;
@@ -14,12 +16,23 @@ public class ApolloChannel : ExtendedChannel
     {
     }
 
-    public override IChannel Join(IUser user)
+    public override IChannel Join(IUser user, EnumChannelAccessResult accessResult = EnumChannelAccessResult.NONE)
     {
-        AddMember(user);
+        var sourceMember = AddMember(user, accessResult);
         foreach (var member in GetMembers())
         {
-            member.GetUser().Send(ApolloRaws.RPL_JOIN_MSN(member.GetUser().GetProtocol(), (ApolloUser)user, this));
+            var targetUser = member.GetUser();
+            if (targetUser.GetProtocol().GetProtocolType() <= Enumerations.EnumProtocolType.IRC3) {
+                member.GetUser().Send(IrcRaws.RPL_JOIN(user, this));
+
+                if (!sourceMember.IsNormal()) {
+                    char modeChar = sourceMember.IsOwner() ? 'q' : (sourceMember.IsHost() ? 'o' : 'v');
+                    Modes.GetMode(modeChar).DispatchModeChange((ChatObject)user, this, true, user.ToString());
+                }
+            }
+            else {
+                member.GetUser().Send(ApolloRaws.RPL_JOIN_MSN(member.GetUser().GetProtocol(), (ApolloUser)user, this));
+            }
         }
         
         return this;

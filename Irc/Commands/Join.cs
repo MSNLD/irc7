@@ -55,14 +55,18 @@ internal class Join : Command, ICommand
                             .GetChannels()
                                 .FirstOrDefault(c => c.GetName().ToUpper() == channelName.ToUpper());
 
+
+
             if (channel == null) channel = Create(server, user, channelName, key);
-            else if (!channel.Allows(user))
-            {
+
+            EnumChannelAccessResult channelAccessResult = channel.GetAccess(user, key, false);
+
+            if (!channel.Allows(user) || channelAccessResult < EnumChannelAccessResult.NONE) {
                 user.Send("CANNOT JOIN CHANNEL");
                 continue;
             }
 
-            channel.Join(user)
+            channel.Join(user, channelAccessResult)
             .SendTopic(user)
             .SendNames(user);
         }

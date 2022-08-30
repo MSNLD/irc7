@@ -1,5 +1,6 @@
 ﻿using Irc.Commands;
 using Irc.Enumerations;
+using Irc.Interfaces;
 using Irc.Objects;
 using Version = Irc.Commands.Version;
 
@@ -45,8 +46,10 @@ public class Irc : Protocol, IProtocol
         return EnumProtocolType.IRC;
     }
 
-    public override string FormattedUser(IUser user)
+    public override string FormattedUser(IChannelMember member)
     {
-        return user.GetAddress().Nickname;
+        var modeChar = string.Empty;
+        if (!member.IsNormal()) modeChar += member.IsOwner() ? '.' : (member.IsHost() ? '@' : '+');
+        return $"{modeChar}{member.GetUser().GetAddress().Nickname}";
     }
 }

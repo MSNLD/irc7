@@ -19,6 +19,7 @@ namespace Irc.Extensions.Apollo.Modes.User
 
         public new EnumIrcError Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
         {
+            // TODO: Write this better
             if (target == source && flag)
             {
                 IUser user = (IUser)source;
@@ -31,6 +32,10 @@ namespace Irc.Extensions.Apollo.Modes.User
                 }
                 else if (channel.PropCollection.GetProp("HOSTKEY").GetValue() == parameter)
                 {
+                    if (member.IsOwner()) {
+                        member.SetOwner(false);
+                        channel.Modes.GetMode('q').DispatchModeChange(source, channel, false, target.ToString());
+                    }
                     member.SetHost(true);
                     channel.Modes.GetMode('o').DispatchModeChange(source, channel, true, target.ToString());
                 }
