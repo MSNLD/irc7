@@ -117,9 +117,9 @@ public static class Raw
         return ":%s %s %s :%s";
     }
 
-    public static string RPL_CHAN_WHISPER(IServer server, IUser user, IChannel channel)
+    public static string RPL_CHAN_WHISPER(IServer server, IUser user, IChannel channel, ChatObject target, string message)
     {
-        return $":{user.GetAddress()} WHISPER {channel} %s :%s";
+        return $":{user.GetAddress()} WHISPER {channel} {target} :{message}";
     }
 
     public static string RPL_EPRIVMSG_CHAN(IServer server, IUser user, IChannel channel)

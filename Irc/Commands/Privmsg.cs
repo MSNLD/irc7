@@ -2,7 +2,7 @@
 
 namespace Irc.Commands;
 
-internal class Privmsg : Command, ICommand
+public class Privmsg : Command, ICommand
 {
     public Privmsg() : base(2) { }
     public new EnumCommandDataType GetDataType() => EnumCommandDataType.Standard;
