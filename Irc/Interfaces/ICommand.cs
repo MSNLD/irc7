@@ -8,4 +8,5 @@ public interface ICommand
     string GetName();
     void Execute(ChatFrame chatFrame);
     bool CheckParameters(ChatFrame chatFrame);
+    bool CheckRegister(ChatFrame chatFrame);
 }

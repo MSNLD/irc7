@@ -7,7 +7,7 @@ namespace Irc.Commands;
 
 public class Auth : Command, ICommand
 {
-    public Auth() : base(3) { }
+    public Auth() : base(3, false) { }
     public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
 
     public new void Execute(ChatFrame chatFrame)

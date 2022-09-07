@@ -328,7 +328,7 @@ public class Server : ChatObject, IServer
                 Console.WriteLine($"Processing: {message.OriginalText}");
 
                 var chatFrame = new ChatFrame(this, user, message);
-                if (command.CheckParameters(chatFrame))
+                if (command.CheckRegister(chatFrame) && command.CheckParameters(chatFrame))
                 {
                     try
                     {
@@ -339,7 +339,6 @@ public class Server : ChatObject, IServer
                         chatFrame.User.Send(IrcRaws.IRC_RAW_999(chatFrame.Server, chatFrame.User, e));
                     }
                 }
-                else user.Send(Raw.IRCX_ERR_NEEDMOREPARAMS_461(this, user, command.GetName()));
 
                 // Check if user can register
                 if (!chatFrame.User.IsRegistered()) Register.Execute(chatFrame);

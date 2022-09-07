@@ -10,7 +10,7 @@ namespace Irc.Commands;
 
 internal class Mode : Command, ICommand
 {
-    public Mode() : base(1) { }
+    public Mode() : base(1, false) { }
     public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
 
     public new void Execute(ChatFrame chatFrame)

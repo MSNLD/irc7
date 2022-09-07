@@ -6,7 +6,7 @@ namespace Irc.Commands;
 
 public class Pass : Command, ICommand
 {
-    public Pass() : base(1) { }
+    public Pass() : base(1, false) { }
     public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
 
     public new void Execute(ChatFrame chatFrame)

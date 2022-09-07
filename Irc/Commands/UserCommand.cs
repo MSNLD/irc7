@@ -4,7 +4,7 @@ namespace Irc.Commands;
 
 public class UserCommand : Command, ICommand
 {
-    public UserCommand() : base(4) { }
+    public UserCommand() : base(4, false) { }
     public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
 
     public new string GetName()

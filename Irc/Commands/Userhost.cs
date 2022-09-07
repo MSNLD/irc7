@@ -10,24 +10,18 @@ internal class Userhost : Command, ICommand
     public new void Execute(ChatFrame chatFrame)
     {
         var maxUsers = 30;
-
-        if (chatFrame.User.IsRegistered())
+        var users = chatFrame.Server.GetUsersByList(chatFrame.Message.GetParameters(), ' ');
+        if (users.Count < maxUsers)
         {
-            var users = chatFrame.Server.GetUsersByList(chatFrame.Message.GetParameters(), ' ');
-            if (users.Count < maxUsers)
+            foreach (var user in users)
             {
-                foreach (var user in users)
-                {
-                    chatFrame.User.Send(Raw.IRCX_RPL_USERHOST_302(chatFrame.Server, user));
-                }
-            }
-            else
-            {
-                chatFrame.User.Send(Raw.IRCX_ERR_TOOMANYARGUMENTS_901(chatFrame.Server, chatFrame.User));
-                // :sky-8a15b323126 901 Sky2k USERHOST :Too many arguments
+                chatFrame.User.Send(Raw.IRCX_RPL_USERHOST_302(chatFrame.Server, user));
             }
         }
-
-        // TODO: What if not registered?
+        else
+        {
+            chatFrame.User.Send(Raw.IRCX_ERR_TOOMANYARGUMENTS_901(chatFrame.Server, chatFrame.User));
+            // :sky-8a15b323126 901 Sky2k USERHOST :Too many arguments
+        }
     }
 }

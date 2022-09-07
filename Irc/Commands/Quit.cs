@@ -7,7 +7,7 @@ namespace Irc.Commands;
 
 internal class Quit : Command, ICommand
 {
-    public Quit() : base(0) { }
+    public Quit() : base(0, false) { }
     public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
 
     public new void Execute(ChatFrame chatFrame)

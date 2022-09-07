@@ -5,7 +5,7 @@ namespace Irc.Extensions.Commands;
 
 internal class Isircx : Command, ICommand
 {
-    public Isircx() : base(0) { }
+    public Isircx() : base(0, false) { }
     public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
 
     public new void Execute(ChatFrame chatFrame)

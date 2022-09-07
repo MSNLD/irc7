@@ -10,7 +10,7 @@ namespace Irc.Extensions.Commands;
 
 public class Prop : Command, ICommand
 {
-    public Prop() : base(2) { }
+    public Prop() : base(2, false) { }
     public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
 
     public new void Execute(ChatFrame chatFrame)

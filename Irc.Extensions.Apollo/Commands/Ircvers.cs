@@ -5,9 +5,8 @@ namespace Irc.Commands;
 
 internal class Ircvers : Command, ICommand
 {
-    public Ircvers()
+    public Ircvers(): base(2, false)
     {
-        _requiredMinimumParameters = 2;
     }
 
     public EnumCommandDataType GetDataType()

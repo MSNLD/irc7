@@ -4,7 +4,7 @@ namespace Irc.Commands;
 
 public class Nick : Command, ICommand
 {
-    public Nick() : base(1) { }
+    public Nick() : base(1, false) { }
     public new EnumCommandDataType GetDataType() => EnumCommandDataType.Standard;
 
     public new void Execute(ChatFrame chatFrame)
