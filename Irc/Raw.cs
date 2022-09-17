@@ -1,4 +1,5 @@
-﻿using Irc.Interfaces;
+﻿using Irc.Enumerations;
+using Irc.Interfaces;
 using Irc.Objects;
 using Irc.Objects.Server;
 using System.Globalization;
@@ -688,29 +689,29 @@ public static class Raw
         return $":{server} 800 {user} {isircx} {ircxversion} {server.SecurityPackages} {buffsize} {options}";
     }
 
-    public static string IRCX_RPL_ACCESSADD_801(IServer server, IUser user)
+    public static string IRCX_RPL_ACCESSADD_801(IServer server, IUser user, IChatObject targetObject, string accessLevel, string mask, int duration, string address, string reason)
     {
-        return $":{server} 801 {user} %s %s %s %d %s :%s";
+        return $":{server} 801 {user} {targetObject} {accessLevel} {mask} {duration} {address} :{reason}";
     }
 
-    public static string IRCX_RPL_ACCESSDELETE_802(IServer server, IUser user)
+    public static string IRCX_RPL_ACCESSDELETE_802(IServer server, IUser user, IChatObject targetObject, string accessLevel, string mask, int duration, string address, string reason)
     {
-        return $":{server} 802 {user} %s %s %s %d %s :%s";
+        return $":{server} 802 {user} {targetObject} {accessLevel} {mask} {duration} {address} :{reason}";
     }
 
-    public static string IRCX_RPL_ACCESSSTART_803(IServer server, IUser user)
+    public static string IRCX_RPL_ACCESSSTART_803(IServer server, IUser user, IChatObject targetObject)
     {
-        return $":{server} 803 {user} %s :Start of access entries";
+        return $":{server} 803 {user} {targetObject} :Start of access entries";
     }
 
-    public static string IRCX_RPL_ACCESSLIST_804(IServer server, IUser user)
+    public static string IRCX_RPL_ACCESSLIST_804(IServer server, IUser user, IChatObject targetObject, string accessLevel, string mask, int duration, string address, string reason)
     {
-        return $":{server} 804 {user} %s %s %s %d %s :%s";
+        return $":{server} 804 {user} {targetObject} {accessLevel} {mask} {duration} {address} :{reason}";
     }
 
-    public static string IRCX_RPL_ACCESSEND_805(IServer server, IUser user)
+    public static string IRCX_RPL_ACCESSEND_805(IServer server, IUser user, IChatObject targetObject)
     {
-        return $":{server} 805 {user} %s :End of access entries";
+        return $":{server} 805 {user} {targetObject} :End of access entries";
     }
 
     public static string IRCX_RPL_EVENTADD_806(IServer server, IUser user)
@@ -765,9 +766,10 @@ public static class Raw
 
 
 
-    public static string IRCX_RPL_ACCESSCLEAR_820(IServer server, IUser user)
+    public static string IRCX_RPL_ACCESSCLEAR_820(IServer server, IUser user, IChatObject targetObject, EnumAccessLevel accessLevel)
     {
-        return $":{server} 820 {user} %s %s :Clear";
+        var level = accessLevel == EnumAccessLevel.All ? "*" : accessLevel.ToString();
+        return $":{server} 820 {user} {targetObject} {level} :Clear";
     }
 
     public static string IRCX_RPL_USERUNAWAY_821(IServer server, IUser user)
@@ -790,9 +792,9 @@ public static class Raw
         return $":{server} 852 {user} :End of ListX";
     }
 
-    public static string IRCX_ERR_BADCOMMAND_900(IServer server, IUser user)
+    public static string IRCX_ERR_BADCOMMAND_900(IServer server, IUser user, string command)
     {
-        return $":{server} 900 {user} %s :Bad command";
+        return $":{server} 900 {user} {command} :Bad command";
     }
 
     public static string IRCX_ERR_TOOMANYARGUMENTS_901(IServer server, IUser user)
@@ -805,14 +807,14 @@ public static class Raw
         return $":{server} 902 {user} :Badly formed parameters";
     }
 
-    public static string IRCX_ERR_BADLEVEL_903(IServer server, IUser user)
+    public static string IRCX_ERR_BADLEVEL_903(IServer server, IUser user, string level)
     {
         return $":{server} 903 {user} %s :Bad level";
     }
 
-    public static string IRCX_ERR_BADPROPERTY_905(IServer server, IUser user)
+    public static string IRCX_ERR_BADPROPERTY_905(IServer server, IUser user, string property)
     {
-        return $":{server} 905 {user} %s :Bad property specified";
+        return $":{server} 905 {user} {property} :Bad property specified";
     }
 
     public static string IRCX_ERR_BADVALUE_906(IServer server, IUser user, string value)
@@ -900,9 +902,9 @@ public static class Raw
         return $":{server} 923 {user} {channel} :Does not permit whispers";
     }
 
-    public static string IRCX_ERR_NOSUCHOBJECT_924(IServer server, IUser user)
+    public static string IRCX_ERR_NOSUCHOBJECT_924(IServer server, IUser user, string objectName)
     {
-        return $":{server} 924 {user} %s :No such object found";
+        return $":{server} 924 {user} {objectName} :No such object found";
     }
 
     public static string IRCX_ERR_ALREADYONCHANNEL_927(IServer server, IUser user, IChannel channel)

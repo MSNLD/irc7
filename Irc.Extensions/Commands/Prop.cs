@@ -2,6 +2,7 @@
 using Irc.Enumerations;
 using Irc.Extensions.Interfaces;
 using Irc.Extensions.Objects.Channel;
+using Irc.Extensions.Objects.User;
 using Irc.Objects;
 using Irc.Objects.Channel;
 using Irc.Objects.Server;
@@ -42,7 +43,7 @@ public class Prop : Command, ICommand
                         if (string.Compare("NICK", chatFrame.Message.Parameters[1], true) == 0)
                         {
                             chatFrame.User.GetAddress().Nickname = chatFrame.User.Name;
-                            SendProps(chatFrame.Server, chatFrame.User, (IExtendedChatObject)chatFrame.User, new string[] { "NICK" });
+                            SendProp(chatFrame.Server, chatFrame.User, (IExtendedChatObject)chatFrame.User, "NICK", chatFrame.User.Name);
                         }
                         else if (string.Compare("MSNREGCOOKIE", chatFrame.Message.Parameters[1], true) == 0)
                         {
@@ -63,7 +64,7 @@ public class Prop : Command, ICommand
                             var msnprofile = chatFrame.Message.Parameters[2];
                             ((IExtendedServerObject)chatFrame.Server).ProcessCookie(chatFrame.User, "MSNPROFILE", msnprofile);
                         }
-                        else chatFrame.User.Send(Raw.IRCX_ERR_BADPROPERTY_905(chatFrame.Server, chatFrame.User));
+                        else chatFrame.User.Send(Raw.IRCX_ERR_BADPROPERTY_905(chatFrame.Server, chatFrame.User, chatFrame.Message.Parameters[1]));
                     }
                 }
                 // PROP $ MSNREGCOOKIE
@@ -79,72 +80,82 @@ public class Prop : Command, ICommand
         {
             IExtendedChatObject chatObject = null;
 
-            // Lookup object
-            if (Channel.ValidName(objectName))
-            {
-                chatObject = (IExtendedChatObject)chatFrame.Server.GetChannelByName(objectName);
-            }
-            else if (objectName.Equals(chatFrame.User.Name, StringComparison.InvariantCultureIgnoreCase))
-            {
-                chatObject = (IExtendedChatObject)chatFrame.User;
-            }
             // <$> The $ value is used to indicate the user that originated the request.
-            else if (objectName == "$")
+            if (objectName == "$")
             {
                 chatObject = (IExtendedChatObject)chatFrame.User;
+            }
+            else
+            {
+                chatObject = (IExtendedChatObject)chatFrame.Server.GetChatObject(objectName);
             }
 
             if (chatObject == null)
             {
                 // No such object
+                chatFrame.User.Send(Raw.IRCX_ERR_NOSUCHOBJECT_924(chatFrame.Server, chatFrame.User, objectName));
             }
             else
             {
-                var props = chatFrame.Message.Parameters[1] == "*" ? chatObject.PropCollection.GetProps() : new List<IPropRule>() { chatObject.PropCollection.GetProp(chatFrame.Message.Parameters[1]) };
-                // TODO: Workout null path props[0] == null
-                SendProps(chatFrame.Server, chatFrame.User, chatObject, props.Where(x => x != null).Select(x => x.Name).ToArray<string>());
+                var props = new List<IPropRule>();
+                if (chatFrame.Message.Parameters[1] == "*")
+                {
+                    props.AddRange(chatObject.PropCollection.GetProps());
+                }
+                else
+                {
+                    var prop = chatObject.PropCollection.GetProp(chatFrame.Message.Parameters[1]);
+                    if (prop != null)
+                    {
+                        props.Add(prop);
+                    }
+                    else
+                    {
+                        // Bad prop
+                        chatFrame.User.Send(Raw.IRCX_ERR_BADPROPERTY_905(chatFrame.Server, chatFrame.User, objectName));
+                    }
+                }
+
+                if (props.Count > 0)
+                {
+                    SendProps(chatFrame.Server, chatFrame.User, chatObject, props);
+                }
             }
         }
     }
 
     // TODO: Rewrite this code
-    public void SendProps(IServer server, IUser user, IExtendedChatObject targetObject, string[] propNames)
+    public void SendProps(IServer server, IUser user, IExtendedChatObject targetObject, List<IPropRule> props)
     {
         var propsSent = 0;
-        foreach (var propName in propNames)
+        foreach (var prop in props)
         {
-            var prop = targetObject.PropCollection.GetProp(propName);
-            if (prop != null)
+            if (prop.ReadAccessLevel == EnumChannelAccessLevel.None)
             {
-                if (prop.ReadAccessLevel == EnumChannelAccessLevel.None)
-                {
-                    if (propNames.Length == 1) user.Send(Raw.IRCX_ERR_SECURITY_908(server, user));
-                    continue;
-                }
+                if (props.Count == 1) user.Send(Raw.IRCX_ERR_SECURITY_908(server, user));
+                continue;
+            }
 
-                if (targetObject is Channel)
+            if (targetObject is Channel)
+            {
+                var kvp = user.GetChannels().FirstOrDefault(x => x.Key == targetObject);
+                if (kvp.Value != null)
                 {
-                    var kvp = user.GetChannels().FirstOrDefault(x => x.Key == targetObject);
-                    if (kvp.Value != null)
+                    var member = kvp.Value;
+                    var propValue = prop.GetValue();
+                    if (member.GetLevel() >= prop.ReadAccessLevel && !string.IsNullOrEmpty(propValue))
                     {
-                        var member = kvp.Value;
-                        var propValue = prop.GetValue();
-                        if (member.GetLevel() >= prop.ReadAccessLevel && !string.IsNullOrEmpty(propValue))
-                        {
-                            SendProp(server, user, targetObject, prop.Name, propValue);
-                            propsSent++;
-                        }
+                        SendProp(server, user, targetObject, prop.Name, propValue);
+                        propsSent++;
                     }
                 }
-                else SendProp(server, user, targetObject, prop.Name, prop.GetValue()); propsSent++;
             }
-            else
-            {
-                // No such prop
-                user.Send(Raw.IRCX_ERR_BADPROPERTY_905(server, user));
-            }
+            else SendProp(server, user, targetObject, prop.Name, prop.GetValue()); propsSent++;
         }
-        if (propsSent > 0) user.Send(IrcxRaws.IRCX_RPL_PROPEND_819(server, user, targetObject));
+        if (propsSent > 0)
+        {
+            user.Send(IrcxRaws.IRCX_RPL_PROPEND_819(server, user, targetObject));
+        }
     }
 
     public void SendProp(IServer server, IUser user, IExtendedChatObject targetObject, string propName, string propValue)

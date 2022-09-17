@@ -188,6 +188,11 @@ public class Server : ChatObject, IServer
             string.Equals(c.GetName(), name, StringComparison.InvariantCultureIgnoreCase));
     }
 
+    public ChatObject GetChatObject(string name)
+    {
+        return Channel.Channel.ValidName(name) ? (ChatObject)GetChannelByName(name) : (ChatObject)GetUserByNickname(name);
+    }
+
     public IProtocol GetProtocol(EnumProtocolType protocolType)
     {
         if (_protocols.TryGetValue(protocolType, out var protocol)) return protocol;

@@ -44,6 +44,7 @@ public interface IServer
     Version GetVersion();
     IDataStore GetDataStore();
     IChannel GetChannelByName(string name);
+    ChatObject GetChatObject(string name);
     IProtocol GetProtocol(EnumProtocolType protocolType);
     ISecurityManager GetSecurityManager();
     ICredentialProvider GetCredentialManager();

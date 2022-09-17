@@ -10,13 +10,14 @@ using System.Threading.Tasks;
 
 namespace Irc.Extensions.Objects
 {
-    public class ExtendedChatObject : ChatObject, IExtendedChatObject
+    public class xxExtendedChatObject : ChatObject, IExtendedChatObject
     {
-        public ExtendedChatObject(IModeCollection modes, IDataStore dataStore, IPropCollection propCollection) : base(modes, dataStore)
+        public xxExtendedChatObject(IModeCollection modes, IDataStore dataStore, IPropCollection propCollection) : base(modes, dataStore)
         {
             PropCollection = propCollection;
         }
 
         public IPropCollection PropCollection { get; }
+        public IAccessList AccessList { get; }
     }
 }

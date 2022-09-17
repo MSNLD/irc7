@@ -1,5 +1,7 @@
 ﻿using Irc.Constants;
 using Irc.Enumerations;
+using Irc.Extensions.Access;
+using Irc.Extensions.Access.Channel;
 using Irc.Extensions.Interfaces;
 using Irc.Interfaces;
 using Irc.IO;
@@ -11,7 +13,10 @@ namespace Irc.Extensions.Objects.Channel;
 public class ExtendedChannel : global::Irc.Objects.Channel.Channel, IExtendedChatObject
 {
     private ChannelPropCollection _properties = new();
+    private ChannelAccess _accessList = new();
     public IPropCollection PropCollection => _properties;
+
+    public IAccessList AccessList => _accessList;
 
     public ExtendedChannel(string name, IModeCollection modeCollection, IDataStore dataStore) : base(name,
         modeCollection, dataStore)
