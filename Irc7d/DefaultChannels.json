@@ -1,0 +1,25 @@
+[
+  {
+    "Name": "The\\bLobby",
+    "Topic": "Welcome to The Lobby",
+    "Modes": {
+      "n": 1,
+      "t": 1,
+      "l": 50
+    },
+    "Props": {
+      "OWNERKEY": "OWNERKEY",
+      "HOSTKEY": "HOSTKEY"
+    }
+  },
+  {
+    "Name": "Test",
+    "Topic": "Test",
+    "Modes": {
+      "n": 1,
+      "t": 1,
+      "l": 50,
+      "k": 1
+    }
+  }
+]

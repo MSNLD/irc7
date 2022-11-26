@@ -30,3 +30,6 @@ msbuild.wrn
 
 # Visual Studio
 .vs/
+
+# Config specific files
+DefaultServer.json
