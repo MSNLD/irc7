@@ -135,7 +135,7 @@ public class Channel : ChatObject, IChannel
         foreach (var member in _members)
             // TODO: Re-enable below
             //if (CompareUserAddress(user, member.GetUser())) return true;
-            if (CompareUserNickname(member.GetUser(), user))
+            if (CompareUserNickname(member.GetUser(), user) || (CompareUserAddress(user, member.GetUser())))
                 return true;
 
         return false;
@@ -225,7 +225,7 @@ public class Channel : ChatObject, IChannel
 
     private static bool CompareUserAddress(IUser user, IUser otherUser)
     {
-        if (otherUser == user || otherUser.GetAddress().GetUserHost() == user.GetAddress().GetUserHost()) return true;
+        if (otherUser == user || otherUser.GetAddress().UserHost == user.GetAddress().UserHost) return true;
         return false;
     }
 

@@ -11,12 +11,25 @@ public class Address
           connected to.
     */
 
+    public record UserHostPair
+    {
+        public string User { get; set; }
+        public string Host { get; set; }
+
+        public override string ToString()
+        {
+            return $"{User}@{Host}";
+        }
+    }
+
+    public UserHostPair UserHost = new();
+
     public string Nickname { set; get; }
 
-    public string User { set; get; }
+    public string User { set => UserHost.User = value; get => UserHost.User; }
 
     // TODO: NOTE: In Apollo, domain names are not supported in the host field; it must be a valid IP address.
-    public string Host { set; get; }
+    public string Host { set => UserHost.Host = value; get => UserHost.Host; }
     public string Server { set; get; }
 
     public string RealName { set; get; }
@@ -24,7 +37,7 @@ public class Address
 
     public string GetUserHost()
     {
-        return $"{User}@{Host}";
+        return UserHost.ToString();
     }
 
     public string GetAddress()
