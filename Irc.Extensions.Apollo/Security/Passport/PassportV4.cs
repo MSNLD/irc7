@@ -101,6 +101,7 @@ namespace Irc.Extensions.Apollo.Security.Passport
         {
             cookie = DecodeToken(cookie, cryptKey);
             cookie = ValidateToken(cookie, signKey);
+            if (cookie == null) return new();
             var nvc = HttpUtility.ParseQueryString(cookie);
             return nvc.AllKeys.ToDictionary(k => k, v => nvc[v]);
         }
