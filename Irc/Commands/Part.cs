@@ -6,8 +6,14 @@ namespace Irc.Commands;
 
 internal class Part : Command, ICommand
 {
-    public Part() : base(1) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
+    public Part() : base(1)
+    {
+    }
+
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.None;
+    }
 
     public new void Execute(ChatFrame chatFrame)
     {

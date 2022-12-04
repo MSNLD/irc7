@@ -1,12 +1,11 @@
 ﻿using Irc.Enumerations;
 using Irc.Extensions.Interfaces;
-using System.Threading.Tasks;
 
 namespace Irc.Extensions.Access;
 
 public class AccessList : IAccessList
 {
-    protected Dictionary<EnumAccessLevel, List<AccessEntry>> accessEntries = new Dictionary<EnumAccessLevel, List<AccessEntry>>();
+    protected Dictionary<EnumAccessLevel, List<AccessEntry>> accessEntries = new();
 
     public EnumAccessError Add(AccessEntry accessEntry)
     {
@@ -31,11 +30,13 @@ public class AccessList : IAccessList
         accessList.Remove(entry);
         return EnumAccessError.SUCCESS;
     }
+
     public List<AccessEntry> Get(EnumAccessLevel accessLevel)
     {
         accessEntries.TryGetValue(accessLevel, out var list);
         return list;
     }
+
     public AccessEntry Get(EnumAccessLevel accessLevel, string mask)
     {
         var accessList = Get(accessLevel);
@@ -43,28 +44,28 @@ public class AccessList : IAccessList
 
         return accessList.FirstOrDefault(entry => entry.Mask == mask);
     }
-    public Dictionary<EnumAccessLevel, List<AccessEntry>> GetEntries() => accessEntries;
+
+    public Dictionary<EnumAccessLevel, List<AccessEntry>> GetEntries()
+    {
+        return accessEntries;
+    }
+
     public EnumAccessError Clear(EnumUserAccessLevel userAccessLevel, EnumAccessLevel accessLevel)
     {
-        bool hasRemaining = false;
+        var hasRemaining = false;
         accessEntries
-            .Where((kvp) => (accessLevel == EnumAccessLevel.All || kvp.Key == accessLevel))
+            .Where(kvp => accessLevel == EnumAccessLevel.All || kvp.Key == accessLevel)
             .ToList()
             .ForEach(
                 kvp =>
                 {
-                    accessEntries[kvp.Key] = kvp.Value.Where(accessEntry => (accessEntry.EntryLevel > userAccessLevel)).ToList();
-                    if (accessEntries[kvp.Key].Count > 0)
-                    {
-                        hasRemaining = true;
-                    }
+                    accessEntries[kvp.Key] = kvp.Value.Where(accessEntry => accessEntry.EntryLevel > userAccessLevel)
+                        .ToList();
+                    if (accessEntries[kvp.Key].Count > 0) hasRemaining = true;
                 }
             );
 
-        if (hasRemaining)
-        {
-            return EnumAccessError.IRCERR_INCOMPLETE;
-        }
+        if (hasRemaining) return EnumAccessError.IRCERR_INCOMPLETE;
         return EnumAccessError.SUCCESS;
     }
 }

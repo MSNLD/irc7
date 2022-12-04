@@ -28,7 +28,7 @@ internal class DesEncryptor
         using (var MS = new MemoryStream())
         {
             var bytData = data.ToByteArray();
-            byte[] bytIV = {0, 0, 0, 0, 0, 0, 0, 0};
+            byte[] bytIV = { 0, 0, 0, 0, 0, 0, 0, 0 };
             var bytKey = key;
             symmetricAlgorithm.Key = bytKey;
             symmetricAlgorithm.IV = bytIV;
@@ -54,7 +54,7 @@ internal class DesEncryptor
         using (var MS = new MemoryStream())
         {
             var bytData = data;
-            byte[] bytIV = {0, 0, 0, 0, 0, 0, 0, 0};
+            byte[] bytIV = { 0, 0, 0, 0, 0, 0, 0, 0 };
             var bytKey = key;
             symmetricAlgorithm.Key = bytKey;
             symmetricAlgorithm.IV = bytIV;

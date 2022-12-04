@@ -22,7 +22,7 @@ public class SocketConnection : IConnection
         _id = 0;
         if (_socket.RemoteEndPoint != null)
         {
-            var remoteAddressBytes = ((IPEndPoint) _socket.RemoteEndPoint).Address.GetAddressBytes();
+            var remoteAddressBytes = ((IPEndPoint)_socket.RemoteEndPoint).Address.GetAddressBytes();
             _id = new BigInteger(remoteAddressBytes);
 
             // _id = remoteAddressBytes.Length > 8
@@ -31,10 +31,10 @@ public class SocketConnection : IConnection
             //     : BitConverter.ToUInt32(remoteAddressBytes, 0);
 
             _address = _socket.RemoteEndPoint != null
-                ? ((IPEndPoint) _socket.RemoteEndPoint).Address.ToString()
+                ? ((IPEndPoint)_socket.RemoteEndPoint).Address.ToString()
                 : string.Empty;
             _fullAddress = _socket.RemoteEndPoint != null
-                ? ((IPEndPoint) _socket.RemoteEndPoint).ToString()
+                ? ((IPEndPoint)_socket.RemoteEndPoint).ToString()
                 : string.Empty;
         }
     }
@@ -104,7 +104,7 @@ public class SocketConnection : IConnection
 
             var bNewLinePending = !_received.EndsWith('\r') && !_received.EndsWith('\n');
 
-            var lines = data.Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
+            var lines = data.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
             var totalLines = bNewLinePending ? lines.Length - 1 : lines.Length;
 

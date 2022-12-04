@@ -11,12 +11,12 @@ namespace Irc.Extensions.Security.Packages;
 
 public class NTLM : SupportPackage, ISupportPackage
 {
-    private readonly NTLMShared.TargetInformation _targetInformation = new();
     private readonly ICredentialProvider _credentialProvider;
+    private readonly NTLMShared.TargetInformation _targetInformation = new();
+    private ICredential _credential;
     private NtlmType1Message _message1;
     private NtlmType2Message _message2;
     private NtlmType3Message _message3;
-    private ICredential _credential = null;
 
     public NTLM(ICredentialProvider credentialProvider)
     {
@@ -81,13 +81,12 @@ public class NTLM : SupportPackage, ISupportPackage
             _credential = _credentialProvider.GetUserCredentials(_message3.TargetName, _message3.UserName);
 
             if (_credential != null)
-            {
                 if (_message3.VerifySecurityContext(_message2.Challenge.ToAsciiString(), _credential.GetPassword()))
                 {
                     Authenticated = true;
                     return EnumSupportPackageSequence.SSP_OK;
                 }
-            }
+
             return EnumSupportPackageSequence.SSP_FAILED;
         }
         catch (Exception)

@@ -8,7 +8,7 @@ using Irc.IO;
 using Irc.Objects.Server;
 using Irc7d;
 
-namespace Irc.Objects;
+namespace Irc.Objects.User;
 
 public class User : ChatObject, IUser
 {
@@ -24,7 +24,6 @@ public class User : ChatObject, IUser
     private IProtocol _protocol;
     private bool _registered;
     private ISupportPackage _supportPackage;
-    private Address address = new();
     public IDictionary<IChannel, IChannelMember> Channels;
     public string Client;
 
@@ -52,6 +51,10 @@ public class User : ChatObject, IUser
 
         Address.RemoteIP = connection.GetAddress();
     }
+
+    public override EnumUserAccessLevel Level => GetLevel();
+
+    public Address Address { get; set; } = new();
 
     public IServer Server { get; }
     public event EventHandler<string> OnSend;
@@ -81,7 +84,10 @@ public class User : ChatObject, IUser
         return Channels.FirstOrDefault(c => c.Key.GetName() == Name);
     }
 
-    public IDictionary<IChannel, IChannelMember> GetChannels() => Channels;
+    public IDictionary<IChannel, IChannelMember> GetChannels()
+    {
+        return Channels;
+    }
 
     public override void Send(string message)
     {
@@ -154,15 +160,6 @@ public class User : ChatObject, IUser
     {
         return _level;
     }
-    public override EnumUserAccessLevel Level {
-        get
-        {
-            return GetLevel();
-        }
-    
-    }
-
-    public Address Address { get => address; set => address = value; }
 
     public Address GetAddress()
     {
@@ -194,8 +191,15 @@ public class User : ChatObject, IUser
         return _supportPackage is ANON;
     }
 
-    public bool IsSysop() => GetModes().GetModeChar(Resources.UserModeOper) == 1;
-    public bool IsAdministrator() => GetModes().HasMode('a') && GetModes().GetModeChar(Resources.UserModeAdmin) == 1;
+    public bool IsSysop()
+    {
+        return GetModes().GetModeChar(Resources.UserModeOper) == 1;
+    }
+
+    public bool IsAdministrator()
+    {
+        return GetModes().HasMode('a') && GetModes().GetModeChar(Resources.UserModeAdmin) == 1;
+    }
 
     public void PromoteToAdministrator()
     {

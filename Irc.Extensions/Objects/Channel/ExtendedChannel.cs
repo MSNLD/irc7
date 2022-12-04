@@ -1,22 +1,19 @@
-﻿using Irc.Constants;
+﻿using System.Text.RegularExpressions;
+using Irc.Constants;
 using Irc.Enumerations;
-using Irc.Extensions.Access;
 using Irc.Extensions.Access.Channel;
 using Irc.Extensions.Interfaces;
+using Irc.Extensions.Objects.Member;
 using Irc.Interfaces;
 using Irc.IO;
 using Irc.Objects;
-using System.Text.RegularExpressions;
 
 namespace Irc.Extensions.Objects.Channel;
 
 public class ExtendedChannel : global::Irc.Objects.Channel.Channel, IExtendedChatObject
 {
-    private ChannelPropCollection _properties = new();
-    private ChannelAccess _accessList = new();
-    public IPropCollection PropCollection => _properties;
-
-    public IAccessList AccessList => _accessList;
+    private readonly ChannelAccess _accessList = new();
+    private readonly ChannelPropCollection _properties = new();
 
     public ExtendedChannel(string name, IModeCollection modeCollection, IDataStore dataStore) : base(name,
         modeCollection, dataStore)
@@ -24,9 +21,14 @@ public class ExtendedChannel : global::Irc.Objects.Channel.Channel, IExtendedCha
         _properties.SetProp("NAME", name);
     }
 
-    protected override IChannelMember AddMember(IUser user, EnumChannelAccessResult accessResult = EnumChannelAccessResult.NONE)
+    public IPropCollection PropCollection => _properties;
+
+    public IAccessList AccessList => _accessList;
+
+    protected override IChannelMember AddMember(IUser user,
+        EnumChannelAccessResult accessResult = EnumChannelAccessResult.NONE)
     {
-        var member = new Member.ExtendedMember(user);
+        var member = new ExtendedMember(user);
 
         if (accessResult == EnumChannelAccessResult.SUCCESS_OWNER) member.SetOwner(true);
         else if (accessResult == EnumChannelAccessResult.SUCCESS_HOST) member.SetHost(true);
@@ -45,28 +47,26 @@ public class ExtendedChannel : global::Irc.Objects.Channel.Channel, IExtendedCha
         var inviteOnlyCheck = CheckInviteOnly();
         var userLimitCheck = CheckUserLimit(IsGoto);
 
-        return (EnumChannelAccessResult)(new int[] {
+        return (EnumChannelAccessResult)new[]
+        {
             (int)operCheck,
             (int)keyCheck,
             (int)hostKeyCheck,
             (int)inviteOnlyCheck,
             (int)userLimitCheck
-        }).Max();
+        }.Max();
     }
 
 
     protected EnumChannelAccessResult CheckHostKey(IUser user, string key)
     {
-        if (PropCollection.GetProp("OWNERKEY").GetValue() == key) {
+        if (PropCollection.GetProp("OWNERKEY").GetValue() == key)
             return EnumChannelAccessResult.SUCCESS_OWNER;
-        }
-        else if (PropCollection.GetProp("HOSTKEY").GetValue() == key) {
-            return EnumChannelAccessResult.SUCCESS_HOST;
-        }
+        if (PropCollection.GetProp("HOSTKEY").GetValue() == key) return EnumChannelAccessResult.SUCCESS_HOST;
         return EnumChannelAccessResult.NONE;
     }
 
-    public static new bool ValidName(string channel)
+    public new static bool ValidName(string channel)
     {
         var regex = new Regex(Resources.IrcChannelRegex);
         return regex.Match(channel).Success;

@@ -39,7 +39,7 @@ public class GateKeeper : SupportPackage, ISupportPackage
             if (token.StartsWith(_signature))
             {
                 var clientToken = GateKeeperTokenHelper.InitializeFromBytes(token.ToByteArray());
-                if ((EnumSupportPackageSequence) clientToken.Sequence == EnumSupportPackageSequence.SSP_INIT &&
+                if ((EnumSupportPackageSequence)clientToken.Sequence == EnumSupportPackageSequence.SSP_INIT &&
                     clientToken.Version is >= 1 and <= 3)
                 {
                     ServerSequence = EnumSupportPackageSequence.SSP_EXT;
@@ -59,7 +59,7 @@ public class GateKeeper : SupportPackage, ISupportPackage
             {
                 var clientToken = GateKeeperTokenHelper.InitializeFromBytes(token.ToByteArray());
                 var clientVersion = clientToken.Version;
-                var clientStage = (EnumSupportPackageSequence) clientToken.Sequence;
+                var clientStage = (EnumSupportPackageSequence)clientToken.Sequence;
 
                 if (clientStage != ServerSequence || clientVersion != ServerVersion)
                     return EnumSupportPackageSequence.SSP_FAILED;
@@ -87,7 +87,7 @@ public class GateKeeper : SupportPackage, ISupportPackage
                     };
 
                     if (this is GateKeeperPassport) return EnumSupportPackageSequence.SSP_EXT;
-                    else return EnumSupportPackageSequence.SSP_OK;
+                    return EnumSupportPackageSequence.SSP_OK;
                 }
             }
 
@@ -96,7 +96,7 @@ public class GateKeeper : SupportPackage, ISupportPackage
 
     public override string CreateSecurityChallenge()
     {
-        ServerToken.Sequence = (int) EnumSupportPackageSequence.SSP_SEC;
+        ServerToken.Sequence = (int)EnumSupportPackageSequence.SSP_SEC;
         ServerToken.Version = ServerVersion;
         Array.Copy(Guid.NewGuid().ToByteArray(), 0, challenge, 0, 8);
         //Array.Copy(new byte[] { 167, 135, 203, 141, 242, 118, 89, 77 }, 0, challenge, 0, 8);
@@ -114,11 +114,8 @@ public class GateKeeper : SupportPackage, ISupportPackage
         var md5 = new HMACMD5(key.ToByteArray());
         var ctx = $"{challenge}{ip}";
         var h1 = md5.ComputeHash(ctx.ToByteArray(), 0, ctx.Length);
-        bool b = h1.SequenceEqual(context);
-        if (!b)
-        {
-            return false;
-        }
+        var b = h1.SequenceEqual(context);
+        if (!b) return false;
         return b;
     }
 }

@@ -7,8 +7,14 @@ namespace Irc.Commands;
 
 public class Auth : Command, ICommand
 {
-    public Auth() : base(3, false) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
+    public Auth() : base(3, false)
+    {
+    }
+
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.None;
+    }
 
     public new void Execute(ChatFrame chatFrame)
     {
@@ -86,11 +92,12 @@ public class Auth : Command, ICommand
 
                         // Send reply
                         chatFrame.User.Send(Raw.RPL_AUTH_SUCCESS(packageName, $"{user}@{domain}", 0));
-
                     }
+
                     return;
                 }
-                else if (supportPackageSequence == EnumSupportPackageSequence.SSP_CREDENTIALS)
+
+                if (supportPackageSequence == EnumSupportPackageSequence.SSP_CREDENTIALS)
                 {
                     chatFrame.User.Send(Raw.RPL_AUTH_SEC_REPLY(packageName, "OK"));
                     return;

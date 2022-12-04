@@ -1,8 +1,8 @@
-﻿using Irc.Enumerations;
+﻿using System.Globalization;
+using Irc.Enumerations;
 using Irc.Interfaces;
 using Irc.Objects;
 using Irc.Objects.Server;
-using System.Globalization;
 
 namespace Irc;
 
@@ -118,7 +118,8 @@ public static class Raw
         return ":%s %s %s :%s";
     }
 
-    public static string RPL_CHAN_WHISPER(IServer server, IUser user, IChannel channel, ChatObject target, string message)
+    public static string RPL_CHAN_WHISPER(IServer server, IUser user, IChannel channel, ChatObject target,
+        string message)
     {
         return $":{user.GetAddress()} WHISPER {channel} {target} :{message}";
     }
@@ -454,7 +455,8 @@ public static class Raw
     public static string IRCX_RPL_TIME_391(IServer server, IUser user)
     {
         //<- :sky-8a15b323126 391 Sky sky-8a15b323126 :Wed Aug 10 18:27:41 2022
-        return $":{server} 391 {user} {server} :{DateTime.Now.ToString("ddd MMM dd HH:mm:ss yyyy", CultureInfo.CreateSpecificCulture("en-us"))}";
+        return
+            $":{server} 391 {user} {server} :{DateTime.Now.ToString("ddd MMM dd HH:mm:ss yyyy", CultureInfo.CreateSpecificCulture("en-us"))}";
     }
 
     public static string IRCX_ERR_NOSUCHNICK_401_N(IServer server, IUser user)
@@ -689,12 +691,14 @@ public static class Raw
         return $":{server} 800 {user} {isircx} {ircxversion} {server.SecurityPackages} {buffsize} {options}";
     }
 
-    public static string IRCX_RPL_ACCESSADD_801(IServer server, IUser user, IChatObject targetObject, string accessLevel, string mask, int duration, string address, string reason)
+    public static string IRCX_RPL_ACCESSADD_801(IServer server, IUser user, IChatObject targetObject,
+        string accessLevel, string mask, int duration, string address, string reason)
     {
         return $":{server} 801 {user} {targetObject} {accessLevel} {mask} {duration} {address} :{reason}";
     }
 
-    public static string IRCX_RPL_ACCESSDELETE_802(IServer server, IUser user, IChatObject targetObject, string accessLevel, string mask, int duration, string address, string reason)
+    public static string IRCX_RPL_ACCESSDELETE_802(IServer server, IUser user, IChatObject targetObject,
+        string accessLevel, string mask, int duration, string address, string reason)
     {
         return $":{server} 802 {user} {targetObject} {accessLevel} {mask} {duration} {address} :{reason}";
     }
@@ -704,7 +708,8 @@ public static class Raw
         return $":{server} 803 {user} {targetObject} :Start of access entries";
     }
 
-    public static string IRCX_RPL_ACCESSLIST_804(IServer server, IUser user, IChatObject targetObject, string accessLevel, string mask, int duration, string address, string reason)
+    public static string IRCX_RPL_ACCESSLIST_804(IServer server, IUser user, IChatObject targetObject,
+        string accessLevel, string mask, int duration, string address, string reason)
     {
         return $":{server} 804 {user} {targetObject} {accessLevel} {mask} {duration} {address} :{reason}";
     }
@@ -765,8 +770,8 @@ public static class Raw
     }
 
 
-
-    public static string IRCX_RPL_ACCESSCLEAR_820(IServer server, IUser user, IChatObject targetObject, EnumAccessLevel accessLevel)
+    public static string IRCX_RPL_ACCESSCLEAR_820(IServer server, IUser user, IChatObject targetObject,
+        EnumAccessLevel accessLevel)
     {
         var level = accessLevel == EnumAccessLevel.All ? "*" : accessLevel.ToString();
         return $":{server} 820 {user} {targetObject} {level} :Clear";

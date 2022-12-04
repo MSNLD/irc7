@@ -1,11 +1,20 @@
 ﻿using Irc.Enumerations;
+using Irc.Interfaces;
+using Irc.Objects.Channel;
+using Irc.Objects.User;
 
 namespace Irc.Commands;
 
 public class Privmsg : Command, ICommand
 {
-    public Privmsg() : base(2) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.Standard;
+    public Privmsg() : base(2)
+    {
+    }
+
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.Standard;
+    }
 
     public new void Execute(ChatFrame chatFrame)
     {
@@ -17,18 +26,14 @@ public class Privmsg : Command, ICommand
         var targetName = chatFrame.Message.Parameters.First();
         var message = chatFrame.Message.Parameters[1];
 
-        string[] targets = targetName.Split(',', StringSplitOptions.RemoveEmptyEntries);
+        var targets = targetName.Split(',', StringSplitOptions.RemoveEmptyEntries);
         foreach (var target in targets)
         {
-            Interfaces.IChatObject chatObject = null;
-            if (Objects.Channel.Channel.ValidName(target))
-            {
-                chatObject = (Interfaces.IChatObject)chatFrame.Server.GetChannelByName(target);
-            }
+            IChatObject chatObject = null;
+            if (Channel.ValidName(target))
+                chatObject = (IChatObject)chatFrame.Server.GetChannelByName(target);
             else
-            {
-                chatObject = (Interfaces.IChatObject)chatFrame.Server.GetUserByNickname(target);
-            }
+                chatObject = (IChatObject)chatFrame.Server.GetUserByNickname(target);
 
             if (chatObject == null)
             {
@@ -37,26 +42,21 @@ public class Privmsg : Command, ICommand
                 return;
             }
 
-            if (chatObject is Objects.Channel.Channel)
+            if (chatObject is Channel)
             {
-                if (Notice) ((Objects.Channel.Channel)chatObject).SendNotice(chatFrame.User, message);
-                else ((Objects.Channel.Channel)chatObject).SendMessage(chatFrame.User, message);
+                if (Notice) ((Channel)chatObject).SendNotice(chatFrame.User, message);
+                else ((Channel)chatObject).SendMessage(chatFrame.User, message);
             }
-            else if (chatObject is Objects.User)
+            else if (chatObject is User)
             {
                 if (Notice)
-                {
-                    ((Objects.User)chatObject).Send(
-                            Raw.RPL_NOTICE_USER(chatFrame.Server, chatFrame.User, chatObject, message)
-                        );
-                }
+                    ((User)chatObject).Send(
+                        Raw.RPL_NOTICE_USER(chatFrame.Server, chatFrame.User, chatObject, message)
+                    );
                 else
-                {
-                    ((Objects.User)chatObject).Send(
-                            Raw.RPL_PRIVMSG_USER(chatFrame.Server, chatFrame.User, chatObject, message)
-                        );
-                }
-
+                    ((User)chatObject).Send(
+                        Raw.RPL_PRIVMSG_USER(chatFrame.Server, chatFrame.User, chatObject, message)
+                    );
             }
         }
     }

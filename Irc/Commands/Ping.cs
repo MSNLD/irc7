@@ -4,8 +4,14 @@ namespace Irc.Commands;
 
 internal class Ping : Command, ICommand
 {
-    public Ping() : base(1, false) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
+    public Ping() : base(1, false)
+    {
+    }
+
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.None;
+    }
 
     public new void Execute(ChatFrame chatFrame)
     {

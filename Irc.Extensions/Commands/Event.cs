@@ -5,8 +5,14 @@ namespace Irc.Extensions.Commands;
 
 internal class Event : Command, ICommand
 {
-    public Event() : base(0) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
+    public Event() : base()
+    {
+    }
+
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.None;
+    }
 
     public new void Execute(ChatFrame chatFrame)
     {

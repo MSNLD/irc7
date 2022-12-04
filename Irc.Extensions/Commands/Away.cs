@@ -5,8 +5,14 @@ namespace Irc.Extensions.Commands;
 
 internal class Away : Command, ICommand
 {
-    public Away() : base(0) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
+    public Away() : base()
+    {
+    }
+
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.None;
+    }
 
     public new void Execute(ChatFrame chatFrame)
     {

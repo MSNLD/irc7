@@ -58,6 +58,6 @@ public class NtlmType1Message
     private void EnumerateFlags()
     {
         foreach (var flag in Enum.GetValues<NtlmFlag>())
-            EnumeratedFlags.Add(flag, ((uint) flag & _messageType1.Flags) != 0);
+            EnumeratedFlags.Add(flag, ((uint)flag & _messageType1.Flags) != 0);
     }
 }

@@ -84,12 +84,12 @@ internal class MD4
     public void HashCore(byte[] array, int ibStart, int cbSize)
     {
         /* Compute number of bytes mod 64 */
-        var index = (int) ((count[0] >> 3) & 0x3F);
+        var index = (int)((count[0] >> 3) & 0x3F);
         /* Update number of bits */
-        count[0] += (uint) (cbSize << 3);
+        count[0] += (uint)(cbSize << 3);
         if (count[0] < cbSize << 3)
             count[1]++;
-        count[1] += (uint) (cbSize >> 29);
+        count[1] += (uint)(cbSize >> 29);
 
         var partLen = 64 - index;
         var i = 0;
@@ -120,7 +120,7 @@ internal class MD4
 
         /* Pad out to 56 mod 64. */
         var index = (count[0] >> 3) & 0x3f;
-        var padLen = (int) (index < 56 ? 56 - index : 120 - index);
+        var padLen = (int)(index < 56 ? 56 - index : 120 - index);
         HashCore(Padding(padLen), 0, padLen);
 
         /* Append Length (before padding) */
@@ -195,17 +195,17 @@ internal class MD4
     {
         for (int i = 0, j = 0; j < output.Length; i++, j += 4)
         {
-            output[j] = (byte) input[i];
-            output[j + 1] = (byte) (input[i] >> 8);
-            output[j + 2] = (byte) (input[i] >> 16);
-            output[j + 3] = (byte) (input[i] >> 24);
+            output[j] = (byte)input[i];
+            output[j + 1] = (byte)(input[i] >> 8);
+            output[j + 2] = (byte)(input[i] >> 16);
+            output[j + 3] = (byte)(input[i] >> 24);
         }
     }
 
     private void Decode(uint[] output, byte[] input, int index)
     {
         for (int i = 0, j = index; i < output.Length; i++, j += 4)
-            output[i] = (uint) (input[j] | (input[j + 1] << 8) | (input[j + 2] << 16) | (input[j + 3] << 24));
+            output[i] = (uint)(input[j] | (input[j + 1] << 8) | (input[j + 2] << 16) | (input[j + 3] << 24));
     }
 
     private void MD4Transform(uint[] EnumSupportPackageSequence, byte[] block, int index)

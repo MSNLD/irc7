@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Irc.Enumerations;
 
-namespace Irc.Extensions.Access.User
+namespace Irc.Extensions.Access.User;
+
+public class UserAccess : AccessList
 {
-    public class UserAccess: AccessList
+    public UserAccess()
     {
-        public UserAccess()
+        accessEntries = new Dictionary<EnumAccessLevel, List<AccessEntry>>
         {
-            accessEntries = new Dictionary<Enumerations.EnumAccessLevel, List<AccessEntry>>()
-            {
-                { Enumerations.EnumAccessLevel.VOICE, new List<AccessEntry>() },
-                { Enumerations.EnumAccessLevel.DENY, new List<AccessEntry>() },
-            };
-        }
+            { EnumAccessLevel.VOICE, new List<AccessEntry>() },
+            { EnumAccessLevel.DENY, new List<AccessEntry>() }
+        };
     }
 }

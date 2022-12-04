@@ -8,13 +8,10 @@ using Irc7d;
 
 namespace Irc.Extensions.Objects.User;
 
-public class ExtendedUser : global::Irc.Objects.User, IExtendedChatObject
+public class ExtendedUser : global::Irc.Objects.User.User, IExtendedChatObject
 {
-    private UserPropCollection _properties;
-    private UserAccess _accessList = new();
-    public IPropCollection PropCollection => _properties;
-
-    public IAccessList AccessList => _accessList;
+    private readonly UserAccess _accessList = new();
+    private readonly UserPropCollection _properties;
 
     public ExtendedUser(IConnection connection, IProtocol protocol, IDataRegulator dataRegulator,
         IFloodProtectionProfile floodProtectionProfile, IDataStore dataStore, IModeCollection modes, IServer server) :
@@ -22,4 +19,8 @@ public class ExtendedUser : global::Irc.Objects.User, IExtendedChatObject
     {
         _properties = new UserPropCollection(dataStore);
     }
+
+    public IPropCollection PropCollection => _properties;
+
+    public IAccessList AccessList => _accessList;
 }

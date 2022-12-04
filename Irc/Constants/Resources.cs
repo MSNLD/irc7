@@ -2,8 +2,7 @@
 
 public static class Resources
 {
-
-public static long epoch = 621355968000000000;
+    public static long epoch = 621355968000000000;
     public static string CommandAccess = "ACCESS";
     public static string CommandAdmin = "ADMIN";
     public static string CommandAway = "AWAY";

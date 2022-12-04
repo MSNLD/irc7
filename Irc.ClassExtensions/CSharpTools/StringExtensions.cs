@@ -8,7 +8,7 @@ public static class StringExtensions
     public static byte[] ToByteArray(this string text, int offset, int count)
     {
         var b = new byte[count];
-        for (var i = 0; i < count; i++) b[i] = (byte) text[i];
+        for (var i = 0; i < count; i++) b[i] = (byte)text[i];
         return b;
     }
 
@@ -20,7 +20,7 @@ public static class StringExtensions
     public static byte[] GetBytes(this StringBuilder text)
     {
         var b = new byte[text.Length];
-        for (var i = 0; i < text.Length; i++) b[i] = (byte) text[i];
+        for (var i = 0; i < text.Length; i++) b[i] = (byte)text[i];
 
         return b;
     }
@@ -113,43 +113,43 @@ public static class StringExtensions
         for (var i = 0; i < data.Length; i++)
             switch (data[i])
             {
-                case (char) 0x0:
+                case (char)0x0:
                 {
                     escape.Append('\\');
                     escape.Append('0');
                     break;
                 }
-                case (char) 0x9:
+                case (char)0x9:
                 {
                     escape.Append('\\');
                     escape.Append('t');
                     break;
                 }
-                case (char) 0xD:
+                case (char)0xD:
                 {
                     escape.Append('\\');
                     escape.Append('r');
                     break;
                 }
-                case (char) 0xA:
+                case (char)0xA:
                 {
                     escape.Append('\\');
                     escape.Append('n');
                     break;
                 }
-                case (char) 0x20:
+                case (char)0x20:
                 {
                     escape.Append('\\');
                     escape.Append('b');
                     break;
                 }
-                case (char) 0x2C:
+                case (char)0x2C:
                 {
                     escape.Append('\\');
                     escape.Append('c');
                     break;
                 }
-                case (char) 0x5C:
+                case (char)0x5C:
                 {
                     escape.Append('\\');
                     escape.Append('\\');
@@ -168,21 +168,21 @@ public static class StringExtensions
     public static StringBuilder FromBytes(byte[] bytes)
     {
         var stringBuilder = new StringBuilder(bytes.Length);
-        for (var i = 0; i < bytes.Length; i++) stringBuilder.Append((char) bytes[i]);
+        for (var i = 0; i < bytes.Length; i++) stringBuilder.Append((char)bytes[i]);
         return stringBuilder;
     }
 
     public static StringBuilder FromBytes(byte[] bytes, int start, int count)
     {
         var stringBuilder = new StringBuilder(count);
-        for (var i = start; i < count; i++) stringBuilder.Append((char) bytes[i]);
+        for (var i = start; i < count; i++) stringBuilder.Append((char)bytes[i]);
         return stringBuilder;
     }
 
     public static char[] BytesToChars(byte[] bytes, int offset, int count)
     {
         var c = new char[count];
-        for (var i = 0; i < count; i++) c[i] = (char) bytes[offset + i];
+        for (var i = 0; i < count; i++) c[i] = (char)bytes[offset + i];
         return c;
     }
 

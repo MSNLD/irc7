@@ -7,14 +7,10 @@ namespace Irc.Extensions.Apollo.Protocols;
 
 internal class Irc7 : Irc6
 {
-    public Irc7() : base()
-    {
-
-    }
     public override string FormattedUser(IChannelMember member)
     {
         var modeChar = string.Empty;
-        if (!member.IsNormal()) modeChar += member.IsOwner() ? '.' : (member.IsHost() ? '@' : '+');
+        if (!member.IsNormal()) modeChar += member.IsOwner() ? '.' : member.IsHost() ? '@' : '+';
 
         var profile = ((ApolloUser)member.GetUser()).GetProfile().Irc7_ToString();
         return $"{profile},{modeChar}{member.GetUser().GetAddress().Nickname}";

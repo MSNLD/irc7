@@ -19,10 +19,12 @@ public static class Register
             chatFrame.User.Send(Raw.IRCX_RPL_LUSERUNKNOWN_253(chatFrame.Server, chatFrame.User, 0));
             chatFrame.User.Send(Raw.IRCX_RPL_LUSERCHANNELS_254(chatFrame.Server, chatFrame.User));
             chatFrame.User.Send(Raw.IRCX_RPL_LUSERME_255(chatFrame.Server, chatFrame.User, 0, 1));
-            chatFrame.User.Send(Raw.IRCX_RPL_LUSERS_265(chatFrame.Server, chatFrame.User, chatFrame.Server.GetUsers().Count, 10000));
-            chatFrame.User.Send(Raw.IRCX_RPL_GUSERS_266(chatFrame.Server, chatFrame.User, chatFrame.Server.GetUsers().Count, 10000));
+            chatFrame.User.Send(Raw.IRCX_RPL_LUSERS_265(chatFrame.Server, chatFrame.User,
+                chatFrame.Server.GetUsers().Count, 10000));
+            chatFrame.User.Send(Raw.IRCX_RPL_GUSERS_266(chatFrame.Server, chatFrame.User,
+                chatFrame.Server.GetUsers().Count, 10000));
 
-            string[] motd = chatFrame.Server.GetMOTD();
+            var motd = chatFrame.Server.GetMOTD();
             if (motd == null)
             {
                 chatFrame.User.Send(Raw.IRCX_ERR_NOMOTD_422(chatFrame.Server, chatFrame.User));
@@ -31,10 +33,8 @@ public static class Register
             {
                 chatFrame.User.Send(Raw.IRCX_RPL_RPL_MOTDSTART_375(chatFrame.Server, chatFrame.User));
 
-                foreach (string line in motd)
-                {
+                foreach (var line in motd)
                     chatFrame.User.Send(Raw.IRCX_RPL_RPL_MOTD_372(chatFrame.Server, chatFrame.User, line));
-                }
 
                 chatFrame.User.Send(Raw.IRCX_RPL_RPL_ENDOFMOTD_376(chatFrame.Server, chatFrame.User));
             }
@@ -42,17 +42,10 @@ public static class Register
             var pass = chatFrame.User.GetDataStore().Get("pass");
 
             if (pass == "guide")
-            {
                 chatFrame.User.PromoteToGuide();
-            }
             else if (pass == "sysop")
-            {
                 chatFrame.User.PromoteToSysop();
-            }
-            else if (pass == "admin")
-            {
-                chatFrame.User.PromoteToAdministrator();
-            }
+            else if (pass == "admin") chatFrame.User.PromoteToAdministrator();
         }
     }
 

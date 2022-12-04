@@ -16,7 +16,7 @@ public class NTLM2SessionResponseTests
         };
 
         var password = "SecREt01".ToUnicodeString();
-        var challenge = new byte[] {0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef};
+        var challenge = new byte[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
 
         var lmResponse = new byte[]
         {

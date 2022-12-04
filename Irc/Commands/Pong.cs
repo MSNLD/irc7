@@ -4,8 +4,16 @@ namespace Irc.Commands;
 
 internal class Pong : Command, ICommand
 {
-    public Pong() : base(0, false) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
+    public Pong() : base(0, false)
+    {
+    }
 
-    public new void Execute(ChatFrame chatFrame) { }
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.None;
+    }
+
+    public new void Execute(ChatFrame chatFrame)
+    {
+    }
 }

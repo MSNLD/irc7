@@ -205,13 +205,13 @@ public class NtlmResponses
     {
         var material = new byte[8];
         material[0] = keyBytes[0];
-        material[1] = (byte) ((keyBytes[0] << 7) | ((keyBytes[1] & 0xff) >> 1));
-        material[2] = (byte) ((keyBytes[1] << 6) | ((keyBytes[2] & 0xff) >> 2));
-        material[3] = (byte) ((keyBytes[2] << 5) | ((keyBytes[3] & 0xff) >> 3));
-        material[4] = (byte) ((keyBytes[3] << 4) | ((keyBytes[4] & 0xff) >> 4));
-        material[5] = (byte) ((keyBytes[4] << 3) | ((keyBytes[5] & 0xff) >> 5));
-        material[6] = (byte) ((keyBytes[5] << 2) | ((keyBytes[6] & 0xff) >> 6));
-        material[7] = (byte) (keyBytes[6] << 1);
+        material[1] = (byte)((keyBytes[0] << 7) | ((keyBytes[1] & 0xff) >> 1));
+        material[2] = (byte)((keyBytes[1] << 6) | ((keyBytes[2] & 0xff) >> 2));
+        material[3] = (byte)((keyBytes[2] << 5) | ((keyBytes[3] & 0xff) >> 3));
+        material[4] = (byte)((keyBytes[3] << 4) | ((keyBytes[4] & 0xff) >> 4));
+        material[5] = (byte)((keyBytes[4] << 3) | ((keyBytes[5] & 0xff) >> 5));
+        material[6] = (byte)((keyBytes[5] << 2) | ((keyBytes[6] & 0xff) >> 6));
+        material[7] = (byte)(keyBytes[6] << 1);
         return OddParity(material);
     }
 

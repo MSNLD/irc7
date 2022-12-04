@@ -1,12 +1,4 @@
-﻿using System;
-using Irc.ClassExtensions.CSharpTools;
-using Irc.Extensions.Apollo.Security.Credentials;
-using Irc.Extensions.Apollo.Security.Packages;
-using Irc.Extensions.Security;
-using Irc.Helpers.CSharpTools;
-using NUnit.Framework;
-
-namespace Irc.Extensions.Apollo.Tests;
+﻿namespace Irc.Extensions.Apollo.Tests;
 
 internal class GateKeeperPassportTests
 {

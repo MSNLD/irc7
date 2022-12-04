@@ -1,17 +1,18 @@
 ﻿using Irc.Interfaces;
+using Irc.Modes.Channel.Member;
 using Irc.Objects;
 
 namespace Irc.Extensions.Objects;
 
 public class ExtendedMemberModes : global::Irc.Objects.Member.Member, IMemberModes
 {
-    public ExtendedMemberModes(): base(null)
+    public ExtendedMemberModes() : base(null)
     {
-
     }
-    public ExtendedMemberModes(IUser User): base(User)
+
+    public ExtendedMemberModes(IUser User) : base(User)
     {
-        modes.Add(ExtendedResources.MemberModeOwner, new global::Irc.Modes.Channel.Member.Owner());
+        modes.Add(ExtendedResources.MemberModeOwner, new Owner());
     }
 
     public new char GetListedMode()

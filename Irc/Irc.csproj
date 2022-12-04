@@ -1,26 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <AssemblyVersion>6.0.0.0</AssemblyVersion>
-    <FileVersion>6.0.0.0</FileVersion>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyVersion>6.0.0.0</AssemblyVersion>
+        <FileVersion>6.0.0.0</FileVersion>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Operations\**" />
-    <EmbeddedResource Remove="Operations\**" />
-    <None Remove="Operations\**" />
-  </ItemGroup>
+    <ItemGroup>
+        <Compile Remove="Operations\**"/>
+        <EmbeddedResource Remove="Operations\**"/>
+        <None Remove="Operations\**"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Irc.ClassExtensions\Irc.Helpers.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Irc.ClassExtensions\Irc.Helpers.csproj"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Modes\Server\" />
-  </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Modes\Server\"/>
+    </ItemGroup>
 
 </Project>

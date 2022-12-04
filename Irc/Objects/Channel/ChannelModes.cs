@@ -1,4 +1,6 @@
 ﻿using Irc.Constants;
+using Irc.Modes.Channel;
+using Irc.Modes.Channel.Member;
 
 namespace Irc.Objects;
 
@@ -19,17 +21,17 @@ public class ChannelModes : ModeCollection, IModeCollection
     */
     public ChannelModes()
     {
-        modes.Add(Resources.MemberModeHost, new Modes.Channel.Member.Operator());
-        modes.Add(Resources.MemberModeVoice, new Modes.Channel.Member.Voice());
-        modes.Add(Resources.ChannelModePrivate, new Modes.Channel.Private());
-        modes.Add(Resources.ChannelModeSecret, new Modes.Channel.Secret());
-        modes.Add(Resources.ChannelModeInvite, new Modes.Channel.InviteOnly());
-        modes.Add(Resources.ChannelModeTopicOp, new Modes.Channel.TopicOp());
-        modes.Add(Resources.ChannelModeNoExtern, new Modes.Channel.NoExtern());
-        modes.Add(Resources.ChannelModeModerated, new Modes.Channel.Moderated());
-        modes.Add(Resources.ChannelModeUserLimit, new Modes.Channel.UserLimit());
-        modes.Add(Resources.ChannelModeBan, new Modes.Channel.BanList());
-        modes.Add(Resources.ChannelModeKey, new Modes.Channel.Key());
+        modes.Add(Resources.MemberModeHost, new Operator());
+        modes.Add(Resources.MemberModeVoice, new Voice());
+        modes.Add(Resources.ChannelModePrivate, new Private());
+        modes.Add(Resources.ChannelModeSecret, new Secret());
+        modes.Add(Resources.ChannelModeInvite, new InviteOnly());
+        modes.Add(Resources.ChannelModeTopicOp, new TopicOp());
+        modes.Add(Resources.ChannelModeNoExtern, new NoExtern());
+        modes.Add(Resources.ChannelModeModerated, new Moderated());
+        modes.Add(Resources.ChannelModeUserLimit, new UserLimit());
+        modes.Add(Resources.ChannelModeBan, new BanList());
+        modes.Add(Resources.ChannelModeKey, new Key());
 
         //modes.Add(Resources.ChannelModeKey, 0);
         //modes.Add(Resources.ChannelModeInvite, 0);
@@ -48,6 +50,7 @@ public class ChannelModes : ModeCollection, IModeCollection
         var limit = modes['l'].Get() > 0 ? $" {modes['l'].Get()}" : string.Empty;
         var key = modes['k'].Get() != 0 ? $" {keypass}" : string.Empty;
 
-        return $"{new string(modes.Where(mode => mode.Value.Get() > 0).Select(mode => mode.Key).ToArray())}{limit}{key}";
+        return
+            $"{new string(modes.Where(mode => mode.Value.Get() > 0).Select(mode => mode.Key).ToArray())}{limit}{key}";
     }
 }

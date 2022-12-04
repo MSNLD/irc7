@@ -1,7 +1,6 @@
 ﻿using Irc.Commands;
 using Irc.Enumerations;
 using Irc.Interfaces;
-using Irc.Objects;
 using Version = Irc.Commands.Version;
 
 namespace Irc;
@@ -49,7 +48,7 @@ public class Irc : Protocol, IProtocol
     public override string FormattedUser(IChannelMember member)
     {
         var modeChar = string.Empty;
-        if (!member.IsNormal()) modeChar += member.IsOwner() ? '.' : (member.IsHost() ? '@' : '+');
+        if (!member.IsNormal()) modeChar += member.IsOwner() ? '.' : member.IsHost() ? '@' : '+';
         return $"{modeChar}{member.GetUser().GetAddress().Nickname}";
     }
 }

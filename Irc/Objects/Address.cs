@@ -4,32 +4,23 @@ namespace Irc.Objects;
 
 public class Address
 {
-    /* <nick> [ '!' <user> ] [ '@' <host> ]
-       $       The  '$' prefix identifies a server on the network.
-          The '$' character followed by a space or comma  may
-          be used to represent the local server the client is
-          connected to.
-    */
-
-    public record UserHostPair
-    {
-        public string User { get; set; }
-        public string Host { get; set; }
-
-        public override string ToString()
-        {
-            return $"{User}@{Host}";
-        }
-    }
-
     public UserHostPair UserHost = new();
 
     public string Nickname { set; get; }
 
-    public string User { set => UserHost.User = value; get => UserHost.User; }
+    public string User
+    {
+        set => UserHost.User = value;
+        get => UserHost.User;
+    }
 
     // TODO: NOTE: In Apollo, domain names are not supported in the host field; it must be a valid IP address.
-    public string Host { set => UserHost.Host = value; get => UserHost.Host; }
+    public string Host
+    {
+        set => UserHost.Host = value;
+        get => UserHost.Host;
+    }
+
     public string Server { set; get; }
 
     public string RealName { set; get; }
@@ -81,5 +72,22 @@ public class Address
     public override string ToString()
     {
         return GetAddress();
+    }
+    /* <nick> [ '!' <user> ] [ '@' <host> ]
+       $       The  '$' prefix identifies a server on the network.
+          The '$' character followed by a space or comma  may
+          be used to represent the local server the client is
+          connected to.
+    */
+
+    public record UserHostPair
+    {
+        public string User { get; set; }
+        public string Host { get; set; }
+
+        public override string ToString()
+        {
+            return $"{User}@{Host}";
+        }
     }
 }

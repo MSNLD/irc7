@@ -7,18 +7,15 @@ namespace Irc.Extensions.Apollo.Protocols;
 
 internal class Irc8 : Irc7
 {
-    public Irc8() : base()
-    {
-
-    }
     public override string FormattedUser(IChannelMember member)
     {
         var modeChar = string.Empty;
-        if (!member.IsNormal()) modeChar += member.IsOwner() ? '.' : (member.IsHost() ? '@' : '+');
+        if (!member.IsNormal()) modeChar += member.IsOwner() ? '.' : member.IsHost() ? '@' : '+';
 
         var profile = ((ApolloUser)member.GetUser()).GetProfile().ToString();
         return $"{profile},{modeChar}{member.GetUser().GetAddress().Nickname}";
     }
+
     public override EnumProtocolType GetProtocolType()
     {
         return EnumProtocolType.IRC8;

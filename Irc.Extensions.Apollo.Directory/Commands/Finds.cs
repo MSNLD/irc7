@@ -7,7 +7,7 @@ internal class Finds : Command, ICommand
 {
     public Finds()
     {
-        _requiredMinimumParameters = 1;
+        _minParams = 1;
     }
 
     public EnumCommandDataType GetDataType()

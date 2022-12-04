@@ -5,7 +5,7 @@ namespace Irc.Commands;
 
 internal class Ircvers : Command, ICommand
 {
-    public Ircvers(): base(2, false)
+    public Ircvers() : base(2, false)
     {
     }
 

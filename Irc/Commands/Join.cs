@@ -1,6 +1,5 @@
 ﻿using Irc.Enumerations;
 using Irc.Interfaces;
-using Irc.IO;
 using Irc.Objects;
 using Irc.Objects.Channel;
 using Irc.Objects.Server;
@@ -9,8 +8,14 @@ namespace Irc.Commands;
 
 internal class Join : Command, ICommand
 {
-    public Join() : base(1) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
+    public Join() : base(1)
+    {
+    }
+
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.None;
+    }
 
     public new void Execute(ChatFrame chatFrame)
     {
@@ -52,23 +57,23 @@ internal class Join : Command, ICommand
         foreach (var channelName in channelNames)
         {
             var channel = server
-                            .GetChannels()
-                                .FirstOrDefault(c => c.GetName().ToUpper() == channelName.ToUpper());
-
+                .GetChannels()
+                .FirstOrDefault(c => c.GetName().ToUpper() == channelName.ToUpper());
 
 
             if (channel == null) channel = Create(server, user, channelName, key);
 
-            EnumChannelAccessResult channelAccessResult = channel.GetAccess(user, key, false);
+            var channelAccessResult = channel.GetAccess(user, key);
 
-            if (!channel.Allows(user) || channelAccessResult < EnumChannelAccessResult.NONE) {
+            if (!channel.Allows(user) || channelAccessResult < EnumChannelAccessResult.NONE)
+            {
                 user.Send("CANNOT JOIN CHANNEL");
                 continue;
             }
 
             channel.Join(user, channelAccessResult)
-            .SendTopic(user)
-            .SendNames(user);
+                .SendTopic(user)
+                .SendNames(user);
         }
     }
 

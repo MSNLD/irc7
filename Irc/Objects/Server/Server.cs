@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Linq;
 using System.Reflection;
 using Irc.Commands;
 using Irc.Constants;
@@ -8,8 +7,10 @@ using Irc.Extensions.Security;
 using Irc.Factories;
 using Irc.Interfaces;
 using Irc.IO;
+using Irc.Objects.User;
 using Irc.Security;
 using Irc7d;
+using Version = System.Version;
 
 namespace Irc.Objects.Server;
 
@@ -23,10 +24,10 @@ public class Server : ChatObject, IServer
     private readonly ISocketServer _socketServer;
     private readonly IUserFactory _userFactory;
     public readonly ICommandCollection Commands;
-    public IDictionary<EnumProtocolType, IProtocol> _protocols = new Dictionary<EnumProtocolType, IProtocol>();
-    public IList<IChannel> Channels;
     private readonly ConcurrentQueue<IUser> PendingNewUserQueue = new();
     private readonly ConcurrentQueue<IUser> PendingRemoveUserQueue = new();
+    public IDictionary<EnumProtocolType, IProtocol> _protocols = new Dictionary<EnumProtocolType, IProtocol>();
+    public IList<IChannel> Channels;
 
     public IList<IUser> Users = new List<IUser>();
 
@@ -94,8 +95,8 @@ public class Server : ChatObject, IServer
 
     public void SetMOTD(string motd)
     {
-        string[] lines = motd.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-        _dataStore.SetAs<string[]>("motd", lines);
+        var lines = motd.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        _dataStore.SetAs("motd", lines);
     }
 
     public string[] GetMOTD()
@@ -138,7 +139,10 @@ public class Server : ChatObject, IServer
         return Users;
     }
 
-    public IUser GetUserByNickname(string nickname) => Users.FirstOrDefault(user => string.Compare(user.GetAddress().Nickname.Trim(), nickname, true) == 0);
+    public IUser GetUserByNickname(string nickname)
+    {
+        return Users.FirstOrDefault(user => string.Compare(user.GetAddress().Nickname.Trim(), nickname, true) == 0);
+    }
 
     public IList<IUser> GetUsersByList(string nicknames, char separator)
     {
@@ -149,7 +153,8 @@ public class Server : ChatObject, IServer
 
     public IList<IUser> GetUsersByList(List<string> nicknames, char separator)
     {
-        return Users.Where(user => nicknames.Contains(user.GetAddress().Nickname, StringComparer.InvariantCultureIgnoreCase)).ToList();
+        return Users.Where(user =>
+            nicknames.Contains(user.GetAddress().Nickname, StringComparer.InvariantCultureIgnoreCase)).ToList();
     }
 
     public IList<IChannel> GetChannels()
@@ -172,7 +177,7 @@ public class Server : ChatObject, IServer
         return _protocols;
     }
 
-    public System.Version GetVersion()
+    public Version GetVersion()
     {
         return Assembly.GetExecutingAssembly().GetName().Version;
     }
@@ -190,7 +195,9 @@ public class Server : ChatObject, IServer
 
     public ChatObject GetChatObject(string name)
     {
-        return Channel.Channel.ValidName(name) ? (ChatObject)GetChannelByName(name) : (ChatObject)GetUserByNickname(name);
+        return Channel.Channel.ValidName(name)
+            ? (ChatObject)GetChannelByName(name)
+            : (ChatObject)GetUserByNickname(name);
     }
 
     public IProtocol GetProtocol(EnumProtocolType protocolType)
@@ -284,38 +291,27 @@ public class Server : ChatObject, IServer
         }
     }
 
-    protected void AddCommand(ICommand command, EnumProtocolType fromProtocol = EnumProtocolType.IRC, string name = null)
+    protected void AddCommand(ICommand command, EnumProtocolType fromProtocol = EnumProtocolType.IRC,
+        string name = null)
     {
         foreach (var protocol in _protocols)
-        {
-            if (protocol.Key >= fromProtocol) protocol.Value.AddCommand(command, name);
-        }
+            if (protocol.Key >= fromProtocol)
+                protocol.Value.AddCommand(command, name);
     }
 
     protected void AddProtocol(EnumProtocolType protocolType, IProtocol protocol, bool inheritCommands = true)
     {
         if (inheritCommands)
-        {
             for (var protocolIndex = 0; protocolIndex < (int)protocolType; protocolIndex++)
-            {
                 if (_protocols.ContainsKey((EnumProtocolType)protocolIndex))
-                {
-                    foreach (KeyValuePair<string, ICommand> command in _protocols[(EnumProtocolType)protocolIndex].GetCommands())
-                    {
+                    foreach (var command in _protocols[(EnumProtocolType)protocolIndex].GetCommands())
                         protocol.AddCommand(command.Value, command.Key);
-                    }
-                }
-            }
-        }
         _protocols.Add(protocolType, protocol);
     }
 
     protected void FlushCommands()
     {
-        foreach (var protocol in _protocols)
-        {
-            protocol.Value.FlushCommands();
-        }
+        foreach (var protocol in _protocols) protocol.Value.FlushCommands();
     }
 
     private void ProcessNextCommand(IUser user)
@@ -334,7 +330,6 @@ public class Server : ChatObject, IServer
 
                 var chatFrame = new ChatFrame(this, user, message);
                 if (command.CheckRegister(chatFrame) && command.CheckParameters(chatFrame))
-                {
                     try
                     {
                         command.Execute(chatFrame);
@@ -343,7 +338,6 @@ public class Server : ChatObject, IServer
                     {
                         chatFrame.User.Send(IrcRaws.IRC_RAW_999(chatFrame.Server, chatFrame.User, e));
                     }
-                }
 
                 // Check if user can register
                 if (!chatFrame.User.IsRegistered()) Register.Execute(chatFrame);

@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Irc.Extensions.Props.Channel;
 
-namespace Irc.Extensions.Props.Channel
+internal class Creation : PropRule
 {
-    internal class Creation : PropRule
+    // The CREATION channel property is the time that the channel was created, in number of seconds elapsed since midnight (00:00:00), January 1, 1970, (coordinated universal time)
+    public Creation() : base(ExtendedResources.ChannelPropCreation, EnumChannelAccessLevel.ChatMember,
+        EnumChannelAccessLevel.ChatMember, string.Empty, true)
     {
-        // The CREATION channel property is the time that the channel was created, in number of seconds elapsed since midnight (00:00:00), January 1, 1970, (coordinated universal time)
-        public Creation() : base(ExtendedResources.ChannelPropCreation, EnumChannelAccessLevel.ChatMember, EnumChannelAccessLevel.ChatMember, string.Empty, true)
-        {
-
-        }
     }
 }

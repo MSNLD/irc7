@@ -1,14 +1,11 @@
-﻿using Irc.Enumerations;
+﻿namespace Irc.Extensions.Interfaces;
 
-namespace Irc.Extensions.Interfaces
+public interface IPropRule
 {
-    public interface IPropRule
-    {
-        EnumChannelAccessLevel ReadAccessLevel { get; }
-        EnumChannelAccessLevel WriteLevel { get; }
-        string Name { get; }
-        bool ReadOnly { get; }
-        string GetValue();
-        void SetValue(string value);
-    }
+    EnumChannelAccessLevel ReadAccessLevel { get; }
+    EnumChannelAccessLevel WriteLevel { get; }
+    string Name { get; }
+    bool ReadOnly { get; }
+    string GetValue();
+    void SetValue(string value);
 }

@@ -13,7 +13,6 @@ using Irc.Extensions.Security.Packages;
 using Irc.Factories;
 using Irc.Interfaces;
 using Irc.IO;
-using Irc.Objects.Collections;
 using Irc.Objects.Server;
 using Irc.Security;
 using Microsoft.Extensions.CommandLineUtils;
@@ -31,7 +30,6 @@ namespace Irc7d;
 
 internal class Program
 {
-    private enum IrcType { IRC, IRCX, MSN, DIR };
     private static void Main(string[] args)
     {
         var app = new CommandLineApplication();
@@ -100,59 +98,56 @@ internal class Program
                 switch (type)
                 {
                     case IrcType.IRC:
-                        {
-                            server = new Server(socketServer, securityManager, new FloodProtectionManager(),
+                    {
+                        server = new Server(socketServer, securityManager, new FloodProtectionManager(),
                             new DataStore("DefaultServer.json"),
                             new List<IChannel>(), null, new UserFactory());
-                            break;
-                        }
+                        break;
+                    }
                     case IrcType.IRCX:
-                        {
-                            server = new ExtendedServer(socketServer, securityManager, new FloodProtectionManager(),
+                    {
+                        server = new ExtendedServer(socketServer, securityManager, new FloodProtectionManager(),
                             new DataStore("DefaultServer.json"),
                             new List<IChannel>(), null, new ExtendedUserFactory());
-                            break;
-                        }
+                        break;
+                    }
                     case IrcType.DIR:
-                        {
-                            server = new DirectoryServer(socketServer, securityManager, new FloodProtectionManager(),
+                    {
+                        server = new DirectoryServer(socketServer, securityManager, new FloodProtectionManager(),
                             new DataStore("DefaultServer.json"),
                             new List<IChannel>(), null, new ApolloUserFactory());
 
-                            string motd = "\r\n** Welcome to the MSN.com Chat Service Network **\r\n";
+                        var motd = "\r\n** Welcome to the MSN.com Chat Service Network **\r\n";
 
-                            server.SetMOTD(motd);
+                        server.SetMOTD(motd);
 
-                            break;
-                        }
+                        break;
+                    }
                     default:
-                        {
-                            server = new ApolloServer(socketServer, securityManager, new FloodProtectionManager(),
+                    {
+                        server = new ApolloServer(socketServer, securityManager, new FloodProtectionManager(),
                             new DataStore("DefaultServer.json"),
                             new List<IChannel>(), null, new ApolloUserFactory());
-                            break;
-                        }
+                        break;
+                    }
                 }
 
                 server.RemoteIP = fqdn;
 
-                var defaultChannels = JsonSerializer.Deserialize<List<DefaultChannel>>(File.ReadAllText("DefaultChannels.json"));
+                var defaultChannels =
+                    JsonSerializer.Deserialize<List<DefaultChannel>>(File.ReadAllText("DefaultChannels.json"));
                 foreach (var defaultChannel in defaultChannels)
                 {
                     var name = type == IrcType.IRC ? $"#{defaultChannel.Name}" : $"%#{defaultChannel.Name}";
                     var channel = server.CreateChannel(name);
                     channel.ChannelStore.Set("topic", defaultChannel.Topic);
-                    foreach (KeyValuePair<char, int> keyValuePair in defaultChannel.Modes) {
+                    foreach (var keyValuePair in defaultChannel.Modes)
                         channel.GetModes().SetModeChar(keyValuePair.Key, keyValuePair.Value);
-                    }
 
                     if (channel is ExtendedChannel || channel is ApolloChannel)
-                    {
-                        foreach (KeyValuePair<string, string> keyValuePair in defaultChannel.Props)
-                        {
-                            ((ExtendedChannel)channel).PropCollection.GetProp(keyValuePair.Key).SetValue(keyValuePair.Value);
-                        }
-                    }
+                        foreach (var keyValuePair in defaultChannel.Props)
+                            ((ExtendedChannel)channel).PropCollection.GetProp(keyValuePair.Key)
+                                .SetValue(keyValuePair.Value);
 
                     server.AddChannel(channel);
                 }
@@ -165,5 +160,13 @@ internal class Program
         });
 
         app.Execute(args);
+    }
+
+    private enum IrcType
+    {
+        IRC,
+        IRCX,
+        MSN,
+        DIR
     }
 }

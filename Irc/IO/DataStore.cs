@@ -19,9 +19,7 @@ public class DataStore : IDataStore
     public DataStore(string path)
     {
         if (!string.IsNullOrWhiteSpace(path))
-        {
             _sets = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(path));
-        }
     }
 
     public void SetId(string id)
@@ -50,7 +48,7 @@ public class DataStore : IDataStore
     public T GetAs<T>(string key)
     {
         var json = Get(key);
-        if (json == null) return default(T);
+        if (json == null) return default;
         return JsonSerializer.Deserialize<T>(json) ?? default(T);
     }
 

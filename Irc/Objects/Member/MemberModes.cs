@@ -1,5 +1,6 @@
 ﻿using Irc.Constants;
 using Irc.Interfaces;
+using Irc.Modes.Channel.Member;
 
 namespace Irc.Objects;
 
@@ -7,8 +8,8 @@ public class MemberModes : ModeCollection, IMemberModes
 {
     public MemberModes()
     {
-        modes.Add(Resources.MemberModeHost, new Modes.Channel.Member.Operator());
-        modes.Add(Resources.MemberModeVoice, new Modes.Channel.Member.Voice());
+        modes.Add(Resources.MemberModeHost, new Operator());
+        modes.Add(Resources.MemberModeVoice, new Voice());
     }
 
     public string GetModeString()
@@ -22,7 +23,7 @@ public class MemberModes : ModeCollection, IMemberModes
         if (IsHost()) return Resources.MemberModeFlagHost;
         if (IsVoice()) return Resources.MemberModeFlagVoice;
 
-        return (char) 0;
+        return (char)0;
     }
 
     public char GetModeChar()
@@ -31,7 +32,7 @@ public class MemberModes : ModeCollection, IMemberModes
         if (IsHost()) return Resources.MemberModeHost;
         if (IsVoice()) return Resources.MemberModeVoice;
 
-        return (char) 0;
+        return (char)0;
     }
 
     public bool IsOwner()

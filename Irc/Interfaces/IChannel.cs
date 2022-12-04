@@ -22,7 +22,10 @@ public interface IChannel
     IList<IChannelMember> GetMembers();
     bool CanBeModifiedBy(ChatObject source);
     EnumIrcError CanModifyMember(IChannelMember source, IChannelMember target, EnumChannelAccessLevel requiredLevel);
-    void ProcessChannelError(EnumIrcError error, IServer server, IUser source, ChatObject target = null, string data = null);
+
+    void ProcessChannelError(EnumIrcError error, IServer server, IUser source, ChatObject target = null,
+        string data = null);
+
     IChannel SendTopic(IUser user);
     IChannel SendNames(IUser user);
     bool Allows(IUser user);

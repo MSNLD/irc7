@@ -1,12 +1,17 @@
-﻿using Irc.Commands;
-using Irc.Enumerations;
+﻿using Irc.Enumerations;
 
 namespace Irc.Commands;
 
 internal class Trace : Command, ICommand
 {
-    public Trace() : base(0) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
+    public Trace() : base()
+    {
+    }
+
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.None;
+    }
 
     public new void Execute(ChatFrame chatFrame)
     {

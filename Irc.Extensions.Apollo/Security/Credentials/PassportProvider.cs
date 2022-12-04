@@ -1,28 +1,19 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using Irc.ClassExtensions.CSharpTools;
-using Irc.Extensions.Apollo.Security.Passport;
-using Irc.Extensions.NTLM.Cryptography;
+﻿using Irc.Extensions.Apollo.Security.Passport;
 using Irc.Extensions.Security;
-using Irc.Helpers.CSharpTools;
 using Irc.Security;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Irc.Extensions.Apollo.Security.Credentials;
-
-
 
 public class PassportProvider : ICredentialProvider
 {
     private readonly string appid;
-    private readonly string secret;
     private readonly PassportV4 passportV4;
+    private readonly string secret;
 
     public PassportProvider(PassportV4 passportV4)
     {
-        this.appid = appid;
-        this.secret = secret;
+        appid = appid;
+        secret = secret;
         this.passportV4 = passportV4;
     }
 

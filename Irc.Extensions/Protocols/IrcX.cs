@@ -1,12 +1,11 @@
-﻿using Irc.Commands;
-using Irc.Enumerations;
+﻿using Irc.Enumerations;
 using Irc.Extensions.Commands;
 
 namespace Irc.Extensions.Protocols;
 
 public class IrcX : Irc
 {
-    public IrcX(): base()
+    public IrcX()
     {
         AddCommand(new Commands.Access());
         AddCommand(new Away());
@@ -19,7 +18,6 @@ public class IrcX : Irc
         AddCommand(new Reply());
         AddCommand(new Request());
         AddCommand(new Whisper());
-
     }
 
     public override EnumProtocolType GetProtocolType()

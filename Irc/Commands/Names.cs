@@ -6,8 +6,14 @@ namespace Irc.Commands;
 
 internal class Names : Command, ICommand
 {
-    public Names() : base(1) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
+    public Names() : base(1)
+    {
+    }
+
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.None;
+    }
 
     public new void Execute(ChatFrame chatFrame)
     {
@@ -57,13 +63,13 @@ IRC8 H,A,GO is correct as well as
         // TODO: 
         user.Send(
             Raw.IRCX_RPL_NAMEREPLY_353(user.Server, user, channel,
-                                        string.Join(' ', 
-                                                    channel.GetMembers().Select(m => 
-                                                        $"{user.GetProtocol().FormattedUser(m)}"
-                                                    )
-                                              )
-                                        )
-            );
+                string.Join(' ',
+                    channel.GetMembers().Select(m =>
+                        $"{user.GetProtocol().FormattedUser(m)}"
+                    )
+                )
+            )
+        );
         user.Send(Raw.IRCX_RPL_ENDOFNAMES_366(user.Server, user, channel));
     }
 }

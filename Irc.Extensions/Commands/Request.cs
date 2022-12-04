@@ -5,8 +5,14 @@ namespace Irc.Extensions.Commands;
 
 internal class Request : Command, ICommand
 {
-    public Request() : base(0) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
+    public Request() : base()
+    {
+    }
+
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.None;
+    }
 
     public new void Execute(ChatFrame chatFrame)
     {

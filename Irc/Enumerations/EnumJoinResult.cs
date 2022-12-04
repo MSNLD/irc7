@@ -1,6 +1,6 @@
 ﻿namespace Irc.Commands;
 
-public enum EnumJoinReply
+public enum EnumJoinResult
 {
     ERR_NEEDMOREPARAMS,
     ERR_BANNEDFROMCHAN,

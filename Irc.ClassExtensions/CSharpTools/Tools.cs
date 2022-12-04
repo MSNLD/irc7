@@ -9,7 +9,7 @@ public static class Tools
         var result = 0;
         for (var i = 0; i < Data.Length; i++)
             if (Data[i] >= 48 && Data[i] <= 57)
-                result += (Data[i] - 48) * (int) Math.Pow(10, Data.Length - i - 1);
+                result += (Data[i] - 48) * (int)Math.Pow(10, Data.Length - i - 1);
             else
                 return -1;
         return result;
@@ -73,7 +73,7 @@ public static class Tools
         var HexStr = Hex;
 
         for (var c = 0; c < OutputString.Length; c++)
-            OutputString[c] = (char) Convert.ToByte(HexStr.Substring(c * 2, 2));
+            OutputString[c] = (char)Convert.ToByte(HexStr.Substring(c * 2, 2));
 
         return OutputString.ToString();
     }

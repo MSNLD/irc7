@@ -40,10 +40,10 @@ public class NtlmType2Message
         _messageType2.Challenge = "AAAAAAAA".ToByteArray();
 
         if (Flags == 0)
-            Flags = (uint) (NtlmFlag.NTLMSSP_NEGOTIATE_UNICODE |
-                            NtlmFlag.NTLMSSP_REQUEST_TARGET |
-                            NtlmFlag.NTLMSSP_NEGOTIATE_NTLM2 |
-                            NtlmFlag.NTLMSSP_NEGOTIATE_128);
+            Flags = (uint)(NtlmFlag.NTLMSSP_NEGOTIATE_UNICODE |
+                           NtlmFlag.NTLMSSP_REQUEST_TARGET |
+                           NtlmFlag.NTLMSSP_NEGOTIATE_NTLM2 |
+                           NtlmFlag.NTLMSSP_NEGOTIATE_128);
 
         // If the choice has been given select NTLM2
         if (_flags[NtlmFlag.NTLMSSP_NEGOTIATE_NTLM] && _flags[NtlmFlag.NTLMSSP_NEGOTIATE_NTLM2])
@@ -66,8 +66,8 @@ public class NtlmType2Message
             targetOffset = payloadOffset;
 
             _messageType2.TargetName.Offset = payloadOffset;
-            _messageType2.TargetName.AllocatedSpace = (short) _targetName.Length;
-            _messageType2.TargetName.Length = (short) _targetName.Length;
+            _messageType2.TargetName.AllocatedSpace = (short)_targetName.Length;
+            _messageType2.TargetName.Length = (short)_targetName.Length;
         }
 
         if (requestTargetInformation)
@@ -75,31 +75,31 @@ public class NtlmType2Message
             var targetInformationOffset = targetOffset > 0 ? targetOffset : payloadOffset;
 
             _messageType2.TargetInformation.Offset = targetInformationOffset;
-            _messageType2.Flags |= (uint) NtlmFlag.NTLMSSP_NEGOTIATE_TARGET_INFO;
+            _messageType2.Flags |= (uint)NtlmFlag.NTLMSSP_NEGOTIATE_TARGET_INFO;
 
-            var domainNameSubBlock = new NTLMShared.NTLMSSPSubBlock(2, (short) _targetInformation.DomainName.Length);
+            var domainNameSubBlock = new NTLMShared.NTLMSSPSubBlock(2, (short)_targetInformation.DomainName.Length);
             targetPayload.Append(domainNameSubBlock.Serialize<NTLMShared.NTLMSSPSubBlock>().ToAsciiString());
             targetPayload.Append(_targetInformation.DomainName);
 
-            var serverNameSubBlock = new NTLMShared.NTLMSSPSubBlock(1, (short) _targetInformation.ServerName.Length);
+            var serverNameSubBlock = new NTLMShared.NTLMSSPSubBlock(1, (short)_targetInformation.ServerName.Length);
             targetPayload.Append(serverNameSubBlock.Serialize<NTLMShared.NTLMSSPSubBlock>().ToAsciiString());
             targetPayload.Append(_targetInformation.ServerName);
 
             var dnsDomainNameSubBlock =
-                new NTLMShared.NTLMSSPSubBlock(4, (short) _targetInformation.DNSDomainName.Length);
+                new NTLMShared.NTLMSSPSubBlock(4, (short)_targetInformation.DNSDomainName.Length);
             targetPayload.Append(dnsDomainNameSubBlock.Serialize<NTLMShared.NTLMSSPSubBlock>().ToAsciiString());
             targetPayload.Append(_targetInformation.DNSDomainName);
 
             var dnsServerNameSubBlock =
-                new NTLMShared.NTLMSSPSubBlock(3, (short) _targetInformation.DNSServerName.Length);
+                new NTLMShared.NTLMSSPSubBlock(3, (short)_targetInformation.DNSServerName.Length);
             targetPayload.Append(dnsServerNameSubBlock.Serialize<NTLMShared.NTLMSSPSubBlock>().ToAsciiString());
             targetPayload.Append(_targetInformation.DNSServerName);
 
             var terminatorSubBlock = new NTLMShared.NTLMSSPSubBlock(0, 0);
             targetPayload.Append(terminatorSubBlock.Serialize<NTLMShared.NTLMSSPSubBlock>().ToAsciiString());
 
-            _messageType2.TargetInformation.Length = (short) targetPayload.Length;
-            _messageType2.TargetInformation.AllocatedSpace = (short) targetPayload.Length;
+            _messageType2.TargetInformation.Length = (short)targetPayload.Length;
+            _messageType2.TargetInformation.AllocatedSpace = (short)targetPayload.Length;
         }
 
         payload.Append(_messageType2.Serialize<NTLMShared.NTLMSSPMessageType2>().ToAsciiString());
@@ -112,7 +112,7 @@ public class NtlmType2Message
     private void EnumerateFlags(uint flags)
     {
         _flags = new Dictionary<NtlmFlag, bool>();
-        foreach (var flag in Enum.GetValues<NtlmFlag>()) _flags.Add(flag, ((uint) flag & flags) != 0);
+        foreach (var flag in Enum.GetValues<NtlmFlag>()) _flags.Add(flag, ((uint)flag & flags) != 0);
     }
 
     public override string ToString()

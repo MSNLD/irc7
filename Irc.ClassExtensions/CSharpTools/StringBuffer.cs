@@ -37,7 +37,7 @@ public class StringBuffer
             {
                 if (data[dataPos] != '\r' && data[dataPos] != '\n')
                 {
-                    _buffer[cursor++] = (char) data[dataPos]; //copy in
+                    _buffer[cursor++] = (char)data[dataPos]; //copy in
                 }
                 else
                 {

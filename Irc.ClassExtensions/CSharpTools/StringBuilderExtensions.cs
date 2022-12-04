@@ -8,7 +8,7 @@ public static class StringBuilderExtensions
     public static byte[] ToByteArray(this StringBuilder stringBuilder, int offset, int count)
     {
         var b = new byte[count];
-        for (var i = 0; i < count; i++) b[i] = (byte) stringBuilder[i];
+        for (var i = 0; i < count; i++) b[i] = (byte)stringBuilder[i];
         return b;
     }
 
@@ -19,7 +19,7 @@ public static class StringBuilderExtensions
 
     public static int AppendByteAsChar(this StringBuilder stringBuilder, byte b)
     {
-        var c = (char) b;
+        var c = (char)b;
         stringBuilder.Append(c);
         return 1;
     }
@@ -42,44 +42,44 @@ public static class StringBuilderExtensions
         for (var i = 0; i < data.Length; i++)
             switch (data.ToByteArray()[i])
             {
-                case (byte) '\\':
+                case (byte)'\\':
                 {
                     i++;
                     if (i < data.Length)
                         switch (data.ToByteArray()[i])
                         {
-                            case (byte) 'b':
+                            case (byte)'b':
                             {
                                 literal.Append(' ');
                                 break;
                             }
-                            case (byte) '0':
+                            case (byte)'0':
                             {
                                 literal.Append('\0');
                                 ;
                                 break;
                             }
-                            case (byte) 't':
+                            case (byte)'t':
                             {
                                 literal.Append('\t');
                                 break;
                             }
-                            case (byte) 'c':
+                            case (byte)'c':
                             {
                                 literal.Append(',');
                                 break;
                             }
-                            case (byte) '\\':
+                            case (byte)'\\':
                             {
                                 literal.Append('\\');
                                 break;
                             }
-                            case (byte) 'r':
+                            case (byte)'r':
                             {
                                 literal.Append('\r');
                                 break;
                             }
-                            case (byte) 'n':
+                            case (byte)'n':
                             {
                                 literal.Append('\n');
                                 break;
@@ -170,21 +170,21 @@ public static class StringBuilderExtensions
     public static StringBuilder FromBytes(byte[] bytes)
     {
         var stringBuilder = new StringBuilder(bytes.Length);
-        for (var i = 0; i < bytes.Length; i++) stringBuilder.Append((char) bytes[i]);
+        for (var i = 0; i < bytes.Length; i++) stringBuilder.Append((char)bytes[i]);
         return stringBuilder;
     }
 
     public static StringBuilder FromBytes(byte[] bytes, int start, int count)
     {
         var stringBuilder = new StringBuilder(count);
-        for (var i = start; i < count; i++) stringBuilder.Append((char) bytes[i]);
+        for (var i = start; i < count; i++) stringBuilder.Append((char)bytes[i]);
         return stringBuilder;
     }
 
     public static char[] BytesToChars(byte[] bytes, int offset, int count)
     {
         var c = new char[count];
-        for (var i = 0; i < count; i++) c[i] = (char) bytes[offset + i];
+        for (var i = 0; i < count; i++) c[i] = (char)bytes[offset + i];
         return c;
     }
 

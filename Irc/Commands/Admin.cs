@@ -5,8 +5,14 @@ namespace Irc.Commands;
 
 public class Admin : Command, ICommand
 {
-    public Admin() : base(0) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
+    public Admin() : base()
+    {
+    }
+
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.None;
+    }
 
     public new void Execute(ChatFrame chatFrame)
     {
@@ -16,7 +22,7 @@ public class Admin : Command, ICommand
          <- :sky-8a15b323126 258 Sky :This is the second line about Admin
          <- :sky-8a15b323126 259 Sky :
         */
-        bool hasAdminInfo = false;
+        var hasAdminInfo = false;
         var adminInfo1 = "Your Admin is X";
         var adminInfo2 = "Y and Z";
         var adminInfo3 = "admin@aol.com";
