@@ -6,7 +6,7 @@ using Irc7d;
 
 namespace Irc.Objects;
 
-public interface IUser
+public interface IUser: IChatObject
 {
     IServer Server { get; }
     Guid Id { get; }

@@ -68,14 +68,14 @@ public static class Raw
         return $":{user.GetAddress()} QUIT :%s";
     }
 
-    public static string RPL_MODE_IRC(IUser user, ChatObject target, string modeString)
+    public static string RPL_MODE_IRC(IUser user, IChatObject target, string modeString)
     {
         return $":{user.GetAddress()} MODE {target} {modeString}";
     }
 
-    public static string RPL_TOPIC_IRC(IServer server, IUser user, IChannel channel)
+    public static string RPL_TOPIC_IRC(IServer server, IUser user, IChannel channel, string topic)
     {
-        return $":{user.GetAddress()} TOPIC {channel} :%s";
+        return $":{user.GetAddress()} TOPIC {channel} :{topic}";
     }
 
     public static string RPL_PROP_IRCX(IServer server, IUser user, IChannel channel)
@@ -118,7 +118,7 @@ public static class Raw
         return ":%s %s %s :%s";
     }
 
-    public static string RPL_CHAN_WHISPER(IServer server, IUser user, IChannel channel, ChatObject target,
+    public static string RPL_CHAN_WHISPER(IServer server, IUser user, IChannel channel, IUser target,
         string message)
     {
         return $":{user.GetAddress()} WHISPER {channel} {target} :{message}";
@@ -534,12 +534,12 @@ public static class Raw
         return $":{server} 439 {user} %s :Nick name changes not permitted.";
     }
 
-    public static string IRCX_ERR_NOTONCHANNEL_442(IServer server, IUser user, ChatObject channel)
+    public static string IRCX_ERR_NOTONCHANNEL_442(IServer server, IUser user, IChatObject channel)
     {
         return $":{server} 442 {user} {channel} :You're not on that channel";
     }
 
-    public static string IRCX_ERR_USERONCHANNEL_443(IServer server, IUser user, IChannel channel)
+    public static string IRCX_ERR_USERONCHANNEL_443(IServer server, IUser user, IChatObject channel)
     {
         return $":{server} 443 {user} {channel} {user} :is already on channel";
     }
@@ -594,12 +594,12 @@ public static class Raw
         return $":{server} 481 {user} :Permission Denied - You're not an IRC operator";
     }
 
-    public static string IRCX_ERR_CHANOPRIVSNEEDED_482(IServer server, IUser user, ChatObject channel)
+    public static string IRCX_ERR_CHANOPRIVSNEEDED_482(IServer server, IUser user, IChatObject channel)
     {
         return $":{server} 482 {user} {channel} :You're not channel operator";
     }
 
-    public static string IRCX_ERR_CHANQPRIVSNEEDED_485(IServer server, IUser user, ChatObject channel)
+    public static string IRCX_ERR_CHANQPRIVSNEEDED_485(IServer server, IUser user, IChatObject channel)
     {
         return $":{server} 485 {user} {channel} :You're not channel owner";
     }

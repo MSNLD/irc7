@@ -55,8 +55,7 @@ public class Channel : ChatObject, IChannel
         Send(IrcRaws.RPL_JOIN(user, this));
         return this;
     }
-
-
+    
     public IChannel SendTopic(IUser user)
     {
         user.Send(Raw.IRCX_RPL_TOPIC_332(user.Server, user, this, DataStore.Get("topic")));

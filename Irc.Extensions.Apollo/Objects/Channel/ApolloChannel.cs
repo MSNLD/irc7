@@ -8,7 +8,7 @@ using Irc.Objects;
 
 namespace Irc.Extensions.Apollo.Objects.Channel;
 
-public class ApolloChannel : ExtendedChannel
+public class ApolloChannel : ExtendedChannel, IApolloChannel
 {
     public ApolloChannel(string name, IModeCollection modeCollection, IDataStore dataStore) : base(name, modeCollection,
         dataStore)

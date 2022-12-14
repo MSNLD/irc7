@@ -19,12 +19,12 @@ public class ModeRule : IModeRule
 
     // Although the below is a string we are to evaluate and cast to integer
     // We can also throw bad value here if it is not the desired type
-    public EnumIrcError Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
+    public EnumIrcError Evaluate(IChatObject source, IChatObject target, bool flag, string parameter)
     {
         throw new NotSupportedException();
     }
 
-    public void DispatchModeChange(ChatObject source, ChatObject target, bool flag, string parameter)
+    public void DispatchModeChange(IChatObject source, IChatObject target, bool flag, string parameter)
     {
         DispatchModeChange(ModeChar, source, target, flag, parameter);
     }
@@ -49,7 +49,7 @@ public class ModeRule : IModeRule
         return ModeChar;
     }
 
-    public static void DispatchModeChange(char modeChar, ChatObject source, ChatObject target, bool flag,
+    public static void DispatchModeChange(char modeChar, IChatObject source, IChatObject target, bool flag,
         string parameter)
     {
         target.Send(

@@ -34,7 +34,7 @@ internal class Kick : Command, ICommand
         {
             if (!channel.CanBeModifiedBy((ChatObject)source))
             {
-                chatFrame.User.Send(Raw.IRCX_ERR_NOTONCHANNEL_442(chatFrame.Server, source, (ChatObject)channel));
+                chatFrame.User.Send(Raw.IRCX_ERR_NOTONCHANNEL_442(chatFrame.Server, source, channel));
                 return;
             }
 

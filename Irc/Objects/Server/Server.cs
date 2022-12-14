@@ -24,8 +24,8 @@ public class Server : ChatObject, IServer
     private readonly ISocketServer _socketServer;
     private readonly IUserFactory _userFactory;
     public readonly ICommandCollection Commands;
-    private readonly ConcurrentQueue<IUser> PendingNewUserQueue = new();
-    private readonly ConcurrentQueue<IUser> PendingRemoveUserQueue = new();
+    private readonly ConcurrentQueue<IUser> _pendingNewUserQueue = new();
+    private readonly ConcurrentQueue<IUser> _pendingRemoveUserQueue = new();
     public IDictionary<EnumProtocolType, IProtocol> _protocols = new Dictionary<EnumProtocolType, IProtocol>();
     public IList<IChannel> Channels;
 
@@ -106,12 +106,12 @@ public class Server : ChatObject, IServer
 
     public void AddUser(IUser user)
     {
-        PendingNewUserQueue.Enqueue(user);
+        _pendingNewUserQueue.Enqueue(user);
     }
 
     public void RemoveUser(IUser user)
     {
-        PendingRemoveUserQueue.Enqueue(user);
+        _pendingRemoveUserQueue.Enqueue(user);
     }
 
     public void AddChannel(IChannel channel)
@@ -263,31 +263,31 @@ public class Server : ChatObject, IServer
 
     private void AddPendingUsers()
     {
-        if (PendingNewUserQueue.Count > 0)
+        if (_pendingNewUserQueue.Count > 0)
         {
             // add new pending users
-            foreach (var user in PendingNewUserQueue) Users.Add(user);
+            foreach (var user in _pendingNewUserQueue) Users.Add(user);
 
-            Console.WriteLine($"Added {PendingNewUserQueue.Count} users. Total Users = {Users.Count}");
-            PendingNewUserQueue.Clear();
+            Console.WriteLine($"Added {_pendingNewUserQueue.Count} users. Total Users = {Users.Count}");
+            _pendingNewUserQueue.Clear();
         }
     }
 
     private void RemovePendingUsers()
     {
-        if (PendingRemoveUserQueue.Count > 0)
+        if (_pendingRemoveUserQueue.Count > 0)
         {
             // remove pending to be removed users
 
-            foreach (var user in PendingRemoveUserQueue)
+            foreach (var user in _pendingRemoveUserQueue)
             {
                 Quit.QuitChannels(user, "Connection reset by peer");
                 user.Disconnect("Connection reset by peer");
                 Users.Remove(user);
             }
 
-            Console.WriteLine($"Removed {PendingRemoveUserQueue.Count} users. Total Users = {Users.Count}");
-            PendingRemoveUserQueue.Clear();
+            Console.WriteLine($"Removed {_pendingRemoveUserQueue.Count} users. Total Users = {Users.Count}");
+            _pendingRemoveUserQueue.Clear();
         }
     }
 

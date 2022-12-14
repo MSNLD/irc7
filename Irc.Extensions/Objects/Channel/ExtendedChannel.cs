@@ -10,7 +10,7 @@ using Irc.Objects;
 
 namespace Irc.Extensions.Objects.Channel;
 
-public class ExtendedChannel : global::Irc.Objects.Channel.Channel, IExtendedChatObject
+public class ExtendedChannel : global::Irc.Objects.Channel.Channel, IExtendedChatObject, IExtendedChannel
 {
     private readonly ChannelAccess _accessList = new();
     private readonly ChannelPropCollection _properties = new();

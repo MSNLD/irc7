@@ -5,14 +5,14 @@ namespace Irc.Interfaces;
 
 public interface IChatObject
 {
-    Guid Id { get; }
-    EnumUserAccessLevel Level { get; }
-    IModeCollection Modes { get; }
-    string Name { get; set; }
-    string ShortId { get; }
+    public Guid Id { get; }
+    public EnumUserAccessLevel Level { get; }
+    public IModeCollection Modes { get; }
+    public string Name { get; set; }
+    public string ShortId { get; }
 
     IModeCollection GetModes();
-    void Send(string message);
-    void Send(string message, ChatObject except = null);
-    string ToString();
+    public void Send(string message);
+    public void Send(string message, ChatObject except = null);
+    public string ToString();
 }

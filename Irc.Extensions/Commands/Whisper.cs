@@ -1,5 +1,6 @@
 ﻿using Irc.Commands;
 using Irc.Enumerations;
+using Irc.Interfaces;
 using Irc.Objects;
 
 namespace Irc.Extensions.Commands;
@@ -31,11 +32,11 @@ internal class Whisper : Command, ICommand
                 if (target.GetUser().GetProtocol().GetProtocolType() < EnumProtocolType.IRCX)
                     // PRIVMSG
                     target.GetUser().Send(
-                        Raw.RPL_PRIVMSG_USER(chatFrame.Server, chatFrame.User, (ChatObject)target.GetUser(), message)
+                        Raw.RPL_PRIVMSG_USER(chatFrame.Server, chatFrame.User, target.GetUser(), message)
                     );
                 else
                     target.GetUser().Send(
-                        Raw.RPL_CHAN_WHISPER(chatFrame.Server, chatFrame.User, channel, (ChatObject)target.GetUser(),
+                        Raw.RPL_CHAN_WHISPER(chatFrame.Server, chatFrame.User, channel, target.GetUser(),
                             message)
                     );
             }

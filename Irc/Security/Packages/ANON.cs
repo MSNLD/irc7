@@ -11,33 +11,33 @@ public class ANON : SupportPackage
         Listed = false;
     }
 
-    public EnumSupportPackageSequence InitializeSecurityContext(string data, string ip)
+    public override EnumSupportPackageSequence InitializeSecurityContext(string data, string ip)
     {
         return EnumSupportPackageSequence.SSP_AUTHENTICATED;
     }
 
-    public EnumSupportPackageSequence AcceptSecurityContext(string data, string ip)
+    public override EnumSupportPackageSequence AcceptSecurityContext(string data, string ip)
     {
         return EnumSupportPackageSequence.SSP_AUTHENTICATED;
     }
 
-    public string GetDomain()
+    public override string GetDomain()
     {
         return nameof(ANON);
     }
 
-    public string GetPackageName()
+    public override string GetPackageName()
     {
         return nameof(ANON);
     }
 
-    public SupportPackage CreateInstance(ICredentialProvider credentialProvider)
+    public override SupportPackage CreateInstance(ICredentialProvider credentialProvider)
     {
         return new ANON();
     }
 
     public string CreateSecurityChallenge(EnumSupportPackageSequence stage)
     {
-        return null;
+        return string.Empty;
     }
 }

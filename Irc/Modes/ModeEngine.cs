@@ -1,5 +1,6 @@
 ﻿using Irc.Constants;
 using Irc.Enumerations;
+using Irc.Interfaces;
 using Irc.Objects;
 
 namespace Irc.Modes;
@@ -19,7 +20,7 @@ public class ModeEngine
         modeRules[modeChar] = modeRule;
     }
 
-    public static void Breakdown(IUser source, ChatObject target, string modeString, Queue<string> modeParameters)
+    public static void Breakdown(IUser source, IChatObject target, string modeString, Queue<string> modeParameters)
     {
         var modeFlag = true;
 
@@ -64,7 +65,7 @@ public class ModeEngine
                         }
                     }
 
-                    var result = modeRule.Evaluate((ChatObject)source, target, modeFlag, parameter);
+                    var result = modeRule.Evaluate((IChatObject)source, target, modeFlag, parameter);
 
                     switch (result)
                     {

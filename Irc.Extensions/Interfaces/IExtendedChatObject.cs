@@ -4,6 +4,6 @@ namespace Irc.Extensions.Interfaces;
 
 public interface IExtendedChatObject : IChatObject
 {
-    IPropCollection PropCollection { get; }
-    IAccessList AccessList { get; }
+    public IPropCollection PropCollection { get; }
+    public IAccessList AccessList { get; }
 }
