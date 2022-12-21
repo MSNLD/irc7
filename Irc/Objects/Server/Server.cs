@@ -2,14 +2,11 @@
 using System.Reflection;
 using Irc.Commands;
 using Irc.Constants;
-using Irc.Enumerations;
-using Irc.Extensions.Security;
 using Irc.Factories;
 using Irc.Interfaces;
 using Irc.IO;
+using Irc.Models.Enumerations;
 using Irc.Objects.User;
-using Irc.Security;
-using Irc7d;
 using Version = System.Version;
 
 namespace Irc.Objects.Server;
@@ -55,7 +52,7 @@ public class Server : ChatObject, IServer
             new ChannelModes().GetSupportedModes());
         _dataStore.Set("supported.user.modes", new UserModes().GetSupportedModes());
 
-        _protocols.Add(EnumProtocolType.IRC, new Irc());
+        _protocols.Add(EnumProtocolType.IRC, new Protocols.Irc());
 
         socketServer.OnClientConnecting += (sender, connection) =>
         {
@@ -80,7 +77,7 @@ public class Server : ChatObject, IServer
     // Server Properties To be moved to another class later
     public bool AnnonymousAllowed { get; }
     public int ChannelCount { get; }
-    public IList<ChatObject> IgnoredUsers { get; }
+    public IList<IChatObject> IgnoredUsers { get; }
     public IList<string> Info { get; }
     public int MaxMessageLength { get; } = 512;
     public int MaxInputBytes { get; } = 512;
@@ -91,15 +88,15 @@ public class Server : ChatObject, IServer
     public string SecurityPackages => _securityManager.GetSupportedPackages();
     public int SysopCount { get; }
     public int UnknownConnectionCount => _socketServer.CurrentConnections - NetUserCount;
-    public string RemoteIP { set; get; }
+    public string RemoteIp { set; get; }
 
-    public void SetMOTD(string motd)
+    public void SetMotd(string motd)
     {
         var lines = motd.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
         _dataStore.SetAs("motd", lines);
     }
 
-    public string[] GetMOTD()
+    public string[] GetMotd()
     {
         return _dataStore.GetAs<string[]>("motd");
     }
@@ -193,7 +190,7 @@ public class Server : ChatObject, IServer
             string.Equals(c.GetName(), name, StringComparison.InvariantCultureIgnoreCase));
     }
 
-    public ChatObject GetChatObject(string name)
+    public IChatObject GetChatObject(string name)
     {
         return Channel.Channel.ValidName(name)
             ? (ChatObject)GetChannelByName(name)

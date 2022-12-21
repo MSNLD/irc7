@@ -1,14 +1,23 @@
-﻿namespace Irc.Extensions.Apollo.Security.Credentials;
+﻿using System.Text.Json.Serialization;
+
+namespace Irc.Extensions.Security.Credentials;
 
 public class RegCookie
 {
-    public long issueDate;
-    public string nickname;
-    public string salt;
-    public int version;
+    [JsonPropertyName("issueDate")]
+    public long IssueDate;
+    
+    [JsonPropertyName("nickname")]
+    public string Nickname;
+    
+    [JsonPropertyName("salt")]
+    public string Salt;
+    
+    [JsonPropertyName("version")]
+    public int Version;
 
     public RegCookie(int version)
     {
-        this.version = version;
+        this.Version = version;
     }
 }

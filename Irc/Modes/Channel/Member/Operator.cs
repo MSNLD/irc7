@@ -1,6 +1,6 @@
 ﻿using Irc.Constants;
-using Irc.Enumerations;
 using Irc.Interfaces;
+using Irc.Models.Enumerations;
 using Irc.Objects;
 
 namespace Irc.Modes.Channel.Member;
@@ -22,7 +22,7 @@ public class Operator : ModeRule, IModeRule
     {
     }
 
-    public EnumIrcError Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
+    public EnumIrcError Evaluate(IChatObject source, IChatObject target, bool flag, string parameter)
     {
         var channel = (IChannel)target;
         if (!channel.CanBeModifiedBy(source)) return EnumIrcError.ERR_NOTONCHANNEL;

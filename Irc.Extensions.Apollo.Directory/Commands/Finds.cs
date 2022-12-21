@@ -1,5 +1,6 @@
 ﻿using Irc.Commands;
-using Irc.Enumerations;
+using Irc.Interfaces;
+using Irc.Models.Enumerations;
 
 namespace Irc.Extensions.Apollo.Commands;
 
@@ -7,15 +8,15 @@ internal class Finds : Command, ICommand
 {
     public Finds()
     {
-        _minParams = 1;
+        MinParams = 1;
     }
 
-    public EnumCommandDataType GetDataType()
+    public new EnumCommandDataType GetDataType()
     {
         return EnumCommandDataType.None;
     }
 
-    public void Execute(ChatFrame chatFrame)
+    public new void Execute(IChatFrame chatFrame)
     {
         chatFrame.User.Send(Raw.IRCX_RPL_FINDS_613(chatFrame.Server, chatFrame.User));
     }

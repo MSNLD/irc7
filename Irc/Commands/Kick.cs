@@ -1,5 +1,5 @@
-﻿using Irc.Enumerations;
-using Irc.Interfaces;
+﻿using Irc.Interfaces;
+using Irc.Models.Enumerations;
 using Irc.Objects;
 
 namespace Irc.Commands;
@@ -15,7 +15,7 @@ internal class Kick : Command, ICommand
         return EnumCommandDataType.Standard;
     }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new void Execute(IChatFrame chatFrame)
     {
         var source = chatFrame.User;
         var channelName = chatFrame.Message.Parameters.First();

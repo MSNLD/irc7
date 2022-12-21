@@ -1,5 +1,5 @@
 ﻿using Irc.Commands;
-using Irc.Enumerations;
+using Irc.Extensions.Apollo.Commands;
 using Irc.Extensions.Apollo.Factories;
 using Irc.Extensions.Apollo.Objects.Channel;
 using Irc.Extensions.Apollo.Objects.User;
@@ -14,8 +14,8 @@ using Irc.Extensions.Security.Packages;
 using Irc.Factories;
 using Irc.Interfaces;
 using Irc.IO;
+using Irc.Models.Enumerations;
 using Irc.Objects;
-using Irc7d;
 
 namespace Irc.Extensions.Apollo.Objects.Server;
 

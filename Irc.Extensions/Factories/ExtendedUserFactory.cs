@@ -1,10 +1,10 @@
-﻿using Irc.Enumerations;
-using Irc.Extensions.Objects.User;
+﻿using Irc.Extensions.Objects.User;
 using Irc.Factories;
+using Irc.Interfaces;
 using Irc.IO;
+using Irc.Models.Enumerations;
 using Irc.Objects;
 using Irc.Objects.Server;
-using Irc7d;
 
 namespace Irc.Extensions.Factories;
 

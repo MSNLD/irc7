@@ -1,15 +1,14 @@
-﻿using Irc.Objects;
-using Irc.Objects.Server;
+﻿using Irc.Interfaces;
 
 namespace Irc;
 
-public class ChatFrame
+public class ChatFrame : IChatFrame
 {
-    public readonly Message Message;
-    public readonly IServer Server;
-    public readonly IUser User;
+    public IMessage Message { get; }
+    public IServer Server { get; }
+    public IUser User { get; }
 
-    public ChatFrame(IServer server, IUser user, Message message)
+    public ChatFrame(IServer server, IUser user, IMessage message)
     {
         Server = server;
         User = user;

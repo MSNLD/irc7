@@ -1,7 +1,6 @@
 ﻿using Irc.Commands;
-using Irc.Enumerations;
 using Irc.Interfaces;
-using Irc.Objects;
+using Irc.Models.Enumerations;
 
 namespace Irc.Extensions.Commands;
 
@@ -16,7 +15,7 @@ internal class Whisper : Command, ICommand
         return EnumCommandDataType.None;
     }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new void Execute(IChatFrame chatFrame)
     {
         // <sender> WHISPER <channel> <nick list> :<text>
 

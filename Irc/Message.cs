@@ -1,8 +1,9 @@
 ﻿using Irc.Commands;
+using Irc.Interfaces;
 
 namespace Irc;
 
-public class Message
+public class Message : IMessage
 {
     private readonly IProtocol _protocol;
     private ICommand _command;

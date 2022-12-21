@@ -1,6 +1,5 @@
-﻿using Irc.Enumerations;
-using Irc.Interfaces;
-using Irc.Objects;
+﻿using Irc.Interfaces;
+using Irc.Models.Enumerations;
 
 namespace Irc.Commands;
 
@@ -15,7 +14,7 @@ internal class Names : Command, ICommand
         return EnumCommandDataType.None;
     }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new void Execute(IChatFrame chatFrame)
     {
         var channelName = chatFrame.Message.Parameters.First();
 

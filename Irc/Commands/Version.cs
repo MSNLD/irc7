@@ -1,4 +1,5 @@
-﻿using Irc.Enumerations;
+﻿using Irc.Interfaces;
+using Irc.Models.Enumerations;
 
 namespace Irc.Commands;
 
@@ -13,7 +14,7 @@ public class Version : Command, ICommand
         return EnumCommandDataType.None;
     }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new void Execute(IChatFrame chatFrame)
     {
         chatFrame.User.Send(Raw.IRCX_RPL_VERSION_351(chatFrame.Server, chatFrame.User, chatFrame.Server.GetVersion()));
     }

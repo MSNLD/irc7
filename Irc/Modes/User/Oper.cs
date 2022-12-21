@@ -1,6 +1,6 @@
 ﻿using Irc.Constants;
-using Irc.Enumerations;
 using Irc.Interfaces;
+using Irc.Models.Enumerations;
 using Irc.Objects;
 
 namespace Irc.Modes.User;
@@ -11,7 +11,7 @@ public class Oper : ModeRule, IModeRule
     {
     }
 
-    public new EnumIrcError Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
+    public new EnumIrcError Evaluate(IChatObject source, IChatObject target, bool flag, string parameter)
     {
         // :sky-8a15b323126 908 Sky :No permissions to perform command
         if (source is IUser && ((IUser)source).IsSysop() && flag == false)

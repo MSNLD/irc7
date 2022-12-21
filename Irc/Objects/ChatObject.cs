@@ -1,7 +1,7 @@
 ﻿using Irc.Constants;
-using Irc.Enumerations;
 using Irc.Interfaces;
 using Irc.IO;
+using Irc.Models.Enumerations;
 
 namespace Irc.Objects;
 
@@ -41,7 +41,7 @@ public class ChatObject : IChatObject
         throw new NotImplementedException();
     }
 
-    public virtual void Send(string message, ChatObject except = null)
+    public virtual void Send(string message, IChatObject except = null)
     {
         throw new NotImplementedException();
     }

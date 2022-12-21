@@ -1,8 +1,8 @@
-﻿using Irc.Interfaces;
-using Irc.Modes.Channel.Member;
+﻿using Irc.Extensions.Modes.Channel.Member;
+using Irc.Interfaces;
 using Irc.Objects;
 
-namespace Irc.Extensions.Objects;
+namespace Irc.Extensions.Objects.Member;
 
 public class ExtendedMemberModes : global::Irc.Objects.Member.Member, IMemberModes
 {
@@ -10,7 +10,7 @@ public class ExtendedMemberModes : global::Irc.Objects.Member.Member, IMemberMod
     {
     }
 
-    public ExtendedMemberModes(IUser User) : base(User)
+    public ExtendedMemberModes(IUser user) : base(user)
     {
         modes.Add(ExtendedResources.MemberModeOwner, new Owner());
     }
@@ -29,7 +29,7 @@ public class ExtendedMemberModes : global::Irc.Objects.Member.Member, IMemberMod
         return base.GetModeChar();
     }
 
-    public bool IsNormal()
+    public new bool IsNormal()
     {
         return !IsOwner() && base.IsNormal();
     }
@@ -40,12 +40,12 @@ public class ExtendedMemberModes : global::Irc.Objects.Member.Member, IMemberMod
         base.SetNormal();
     }
 
-    public bool IsOwner()
+    public new bool IsOwner()
     {
         return GetModeChar(ExtendedResources.MemberModeOwner) > 0;
     }
 
-    public void SetOwner(bool flag)
+    public new void SetOwner(bool flag)
     {
         modes[ExtendedResources.MemberModeOwner].Set(flag ? 1 : 0);
     }

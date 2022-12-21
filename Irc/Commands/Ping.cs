@@ -1,4 +1,5 @@
-﻿using Irc.Enumerations;
+﻿using Irc.Interfaces;
+using Irc.Models.Enumerations;
 
 namespace Irc.Commands;
 
@@ -13,7 +14,7 @@ internal class Ping : Command, ICommand
         return EnumCommandDataType.None;
     }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new void Execute(IChatFrame chatFrame)
     {
         chatFrame.User.Send($"PONG :{chatFrame.Message.Parameters.First()}");
     }

@@ -1,6 +1,6 @@
 ﻿using Irc.Constants;
-using Irc.Enumerations;
 using Irc.Interfaces;
+using Irc.Models.Enumerations;
 using Irc.Objects;
 using Irc.Objects.Server;
 
@@ -12,7 +12,7 @@ public class Voice : ModeRule, IModeRule
     {
     }
 
-    public EnumIrcError Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
+    public EnumIrcError Evaluate(IChatObject source, IChatObject target, bool flag, string parameter)
     {
         var channel = (IChannel)target;
 

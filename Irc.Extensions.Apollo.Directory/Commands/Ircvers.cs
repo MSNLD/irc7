@@ -1,5 +1,6 @@
 ﻿using Irc.Commands;
-using Irc.Enumerations;
+using Irc.Interfaces;
+using Irc.Models.Enumerations;
 
 namespace Irc.Extensions.Apollo.Directory.Commands;
 
@@ -9,12 +10,12 @@ internal class Ircvers : Command, ICommand
     {
     }
 
-    public EnumCommandDataType GetDataType()
+    public new EnumCommandDataType GetDataType()
     {
         return EnumCommandDataType.Standard;
     }
 
-    public void Execute(ChatFrame chatFrame)
+    public new void Execute(IChatFrame chatFrame)
     {
     }
 }

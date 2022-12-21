@@ -1,5 +1,4 @@
 ﻿using Irc.Commands;
-using Irc.Enumerations;
 using Irc.Extensions.Apollo.Commands;
 using Irc.Extensions.Apollo.Directory.Commands;
 using Irc.Extensions.Apollo.Factories;
@@ -9,8 +8,8 @@ using Irc.Extensions.Security;
 using Irc.Factories;
 using Irc.Interfaces;
 using Irc.IO;
+using Irc.Models.Enumerations;
 using Irc.Security;
-using Irc7d;
 
 namespace Irc.Extensions.Apollo.Directory;
 

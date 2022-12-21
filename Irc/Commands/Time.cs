@@ -1,19 +1,16 @@
-﻿using Irc.Enumerations;
+﻿using Irc.Interfaces;
+using Irc.Models.Enumerations;
 
 namespace Irc.Commands;
 
 public class Time : Command, ICommand
 {
-    public Time() : base()
-    {
-    }
-
     public new EnumCommandDataType GetDataType()
     {
         return EnumCommandDataType.None;
     }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new void Execute(IChatFrame chatFrame)
     {
         chatFrame.User.Send(Raw.IRCX_RPL_TIME_391(chatFrame.Server, chatFrame.User));
     }

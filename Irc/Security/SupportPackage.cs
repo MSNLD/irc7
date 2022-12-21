@@ -1,5 +1,5 @@
-﻿using Irc.Extensions.Security;
-using Irc.Interfaces;
+﻿using Irc.Interfaces;
+using Irc.Models.Enumerations;
 
 namespace Irc.Security;
 
@@ -13,7 +13,7 @@ public class SupportPackage : ISupportPackage
     public uint ServerVersion;
     public bool Authenticated { get; protected set; }
 
-    public virtual SupportPackage CreateInstance(ICredentialProvider credentialProvider)
+    public virtual ISupportPackage CreateInstance(ICredentialProvider credentialProvider)
     {
         throw new NotImplementedException();
     }

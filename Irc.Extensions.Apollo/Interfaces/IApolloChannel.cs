@@ -1,11 +1,11 @@
-using Irc.Enumerations;
 using Irc.Extensions.Interfaces;
 using Irc.Interfaces;
 using Irc.IO;
+using Irc.Models.Enumerations;
 using Irc.Objects;
 using Irc.Objects.Server;
 
-namespace Irc.Extensions.Apollo.Objects.Channel;
+namespace Irc.Extensions.Apollo.Interfaces;
 
 public interface IApolloChannel
 {
@@ -21,9 +21,9 @@ public interface IApolloChannel
     IAccessList AccessList { get; }
     IModeCollection GetModes();
     void Send(string message);
-    void Send(string message, ChatObject u = null);
+    void Send(string message, IChatObject u = null);
     string GetName();
-    IChannelMember GetMember(IUser User);
+    IChannelMember GetMember(IUser user);
     IChannelMember GetMemberByNickname(string nickname);
     bool Allows(IUser user);
     IChannel SendTopic(IUser user);
@@ -34,15 +34,15 @@ public interface IApolloChannel
     void SendMessage(IUser user, string message);
     void SendNotice(IUser user, string message);
     IList<IChannelMember> GetMembers();
-    bool CanBeModifiedBy(ChatObject source);
+    bool CanBeModifiedBy(IChatObject source);
 
     EnumIrcError CanModifyMember(IChannelMember source, IChannelMember target,
         EnumChannelAccessLevel requiredLevel);
 
-    void ProcessChannelError(EnumIrcError error, IServer server, IUser source, ChatObject target = null,
+    void ProcessChannelError(EnumIrcError error, IServer server, IUser source, IChatObject target = null,
         string data = null);
 
-    EnumChannelAccessResult GetAccess(IUser user, string key, bool IsGoto = false);
-    void SetName(string Name);
+    EnumChannelAccessResult GetAccess(IUser user, string key, bool isGoto = false);
+    void SetName(string name);
     bool IsOnChannel(IUser user);
 }

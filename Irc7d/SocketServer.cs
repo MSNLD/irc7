@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using System.Numerics;
+using Irc.Interfaces;
 
 namespace Irc7d;
 

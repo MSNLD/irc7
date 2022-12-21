@@ -4,6 +4,7 @@ using Irc.Extensions.Apollo.Security.Packages;
 using Irc.Extensions.Security;
 using Irc.Extensions.Security.Packages;
 using Irc.Helpers.CSharpTools;
+using Irc.Models.Enumerations;
 using NUnit.Framework;
 
 namespace Irc.Extensions.Apollo.Tests;

@@ -1,17 +1,16 @@
-﻿using Irc.Enumerations;
-using Irc.Extensions.Security;
-using Irc.Extensions.Security.Credentials;
-using Irc.Security;
+﻿using Irc.Extensions.Security.Credentials;
+using Irc.Interfaces;
+using Irc.Models.Enumerations;
 
 namespace Irc7d;
 
 internal class NTLMCredentials : NtlmProvider, ICredentialProvider
 {
-    private readonly Dictionary<string, ICredential> credentials = new();
+    private readonly Dictionary<string, ICredential> _credentials = new();
 
     public NTLMCredentials()
     {
-        credentials.Add(@"DOMAIN\username", new Credential
+        _credentials.Add(@"DOMAIN\username", new Credential
         {
             Domain = "DOMAIN",
             Username = "username",
@@ -23,14 +22,14 @@ internal class NTLMCredentials : NtlmProvider, ICredentialProvider
         });
     }
 
-    public ICredential ValidateTokens(Dictionary<string, string> tokens)
+    public new ICredential ValidateTokens(Dictionary<string, string> tokens)
     {
         throw new NotImplementedException();
     }
 
-    public ICredential GetUserCredentials(string domain, string username)
+    public new ICredential GetUserCredentials(string domain, string username)
     {
-        credentials.TryGetValue($"{domain}\\{username}", out var credential);
+        _credentials.TryGetValue($"{domain}\\{username}", out var credential);
         return credential;
     }
 }

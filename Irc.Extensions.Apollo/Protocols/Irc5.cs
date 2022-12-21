@@ -1,6 +1,6 @@
-﻿using Irc.Enumerations;
-using Irc.Extensions.Apollo.Objects.User;
+﻿using Irc.Extensions.Apollo.Objects.User;
 using Irc.Interfaces;
+using Irc.Models.Enumerations;
 using Irc.Objects;
 
 namespace Irc.Extensions.Apollo.Protocols;

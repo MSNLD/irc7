@@ -1,5 +1,6 @@
 ﻿using Irc.Commands;
-using Irc.Enumerations;
+using Irc.Interfaces;
+using Irc.Models.Enumerations;
 
 namespace Irc.Extensions.Commands;
 
@@ -14,7 +15,7 @@ internal class Isircx : Command, ICommand
         return EnumCommandDataType.None;
     }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new void Execute(IChatFrame chatFrame)
     {
         chatFrame.User.Send(Raw.IRCX_ERR_NOTIMPLEMENTED(chatFrame.Server, chatFrame.User, nameof(Access)));
     }

@@ -1,5 +1,5 @@
-﻿using Irc.Enumerations;
-using Irc.Interfaces;
+﻿using Irc.Interfaces;
+using Irc.Models.Enumerations;
 using Irc.Objects;
 using Irc.Objects.User;
 
@@ -19,7 +19,7 @@ namespace Irc.IO;
 
 public class FloodProtectionManager : IFloodProtectionManager
 {
-    public EnumFloodResult FloodCheck(EnumCommandDataType type, User user)
+    public EnumFloodResult FloodCheck(EnumCommandDataType type, IUser user)
     {
         return Audit(user.GetFloodProtectionProfile(), type, user.GetLevel());
     }

@@ -1,4 +1,6 @@
-﻿namespace Irc.Extensions.Props.Channel;
+﻿using Irc.Models.Enumerations;
+
+namespace Irc.Extensions.Props.Channel;
 
 internal class ServicePath : PropRule
 {

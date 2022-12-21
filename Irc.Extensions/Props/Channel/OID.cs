@@ -1,8 +1,10 @@
-﻿namespace Irc.Extensions.Props.Channel;
+﻿using Irc.Models.Enumerations;
 
-internal class OID : PropRule
+namespace Irc.Extensions.Props.Channel;
+
+internal class Oid : PropRule
 {
-    public OID() : base(ExtendedResources.ChannelPropOID, EnumChannelAccessLevel.ChatMember,
+    public Oid() : base(ExtendedResources.ChannelPropOid, EnumChannelAccessLevel.ChatMember,
         EnumChannelAccessLevel.ChatMember, "0", true)
     {
     }

@@ -1,9 +1,9 @@
 ﻿using System.Text.RegularExpressions;
 using Irc.Commands;
 using Irc.Constants;
-using Irc.Enumerations;
 using Irc.Interfaces;
 using Irc.IO;
+using Irc.Models.Enumerations;
 using Irc.Objects.Server;
 
 namespace Irc.Objects.Channel;
@@ -108,7 +108,7 @@ public class Channel : ChatObject, IChannel
         return _modes;
     }
 
-    public bool CanBeModifiedBy(ChatObject source)
+    public bool CanBeModifiedBy(IChatObject source)
     {
         return source is IServer || ((IUser)source).GetChannels().Keys.Contains(this);
     }
@@ -133,7 +133,7 @@ public class Channel : ChatObject, IChannel
         return EnumIrcError.OK;
     }
 
-    public void ProcessChannelError(EnumIrcError error, IServer server, IUser source, ChatObject target = null,
+    public void ProcessChannelError(EnumIrcError error, IServer server, IUser source, IChatObject target = null,
         string data = null)
     {
         switch (error)
@@ -201,7 +201,7 @@ public class Channel : ChatObject, IChannel
         Send(message, null);
     }
 
-    public override void Send(string message, ChatObject u = null)
+    public override void Send(string message, IChatObject u = null)
     {
         foreach (var channelMember in _members)
             if (channelMember.GetUser() != u)

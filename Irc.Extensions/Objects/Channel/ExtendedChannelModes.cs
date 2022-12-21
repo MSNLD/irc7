@@ -1,5 +1,5 @@
 ﻿using Irc.Extensions.Modes.Channel;
-using Irc.Modes.Channel.Member;
+using Irc.Extensions.Modes.Channel.Member;
 using Irc.Objects;
 
 namespace Irc.Extensions.Objects.Channel;

@@ -1,9 +1,8 @@
 ﻿using Irc.Commands;
-using Irc.Enumerations;
 using Irc.Extensions.Access;
 using Irc.Extensions.Interfaces;
 using Irc.Interfaces;
-using Irc.Objects;
+using Irc.Models.Enumerations;
 using Irc.Objects.Channel;
 using Irc.Objects.Server;
 using Irc.Objects.User;
@@ -21,7 +20,7 @@ internal class Access : Command, ICommand
         return EnumCommandDataType.None;
     }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new void Execute(IChatFrame chatFrame)
     {
         //// $ (individual chat server)
         //else if (name == "$")
@@ -87,7 +86,7 @@ internal class Access : Command, ICommand
     }
 
     // TODO: The below should be offloaded to the respective Access class
-    private bool CanModify(ChatFrame chatFrame, IExtendedChatObject targetObject)
+    private bool CanModify(IChatFrame chatFrame, IExtendedChatObject targetObject)
     {
         if (targetObject is Server && !chatFrame.User.IsAdministrator())
             // No Access
@@ -110,7 +109,7 @@ internal class Access : Command, ICommand
         return true;
     }
 
-    private void ClearAccess(ChatFrame chatFrame, IExtendedChatObject targetObject)
+    private void ClearAccess(IChatFrame chatFrame, IExtendedChatObject targetObject)
     {
         var parameters = chatFrame.Message.Parameters.TakeLast(chatFrame.Message.Parameters.Count - 2).ToList();
 
@@ -135,7 +134,7 @@ internal class Access : Command, ICommand
         }
     }
 
-    private void DeleteAccess(ChatFrame chatFrame, IExtendedChatObject targetObject)
+    private void DeleteAccess(IChatFrame chatFrame, IExtendedChatObject targetObject)
     {
         // ACCESS <object> ADD|DELETE <level> <mask>
 
@@ -166,7 +165,7 @@ internal class Access : Command, ICommand
                 entry.EntryLevel.ToString(), entry.Mask, entry.Timeout, entry.EntryAddress, entry.Reason));
     }
 
-    private void AddAccess(ChatFrame chatFrame, IExtendedChatObject targetObject)
+    private void AddAccess(IChatFrame chatFrame, IExtendedChatObject targetObject)
     {
         // ACCESS <object> ADD|DELETE <level> <mask> [< timeout > [:< reason >]]
 
@@ -207,7 +206,7 @@ internal class Access : Command, ICommand
                 entry.AccessLevel.ToString(), entry.Mask, entry.Timeout, entry.EntryAddress, entry.Reason));
     }
 
-    private void ListAccess(ChatFrame chatFrame, IExtendedChatObject targetObject)
+    private void ListAccess(IChatFrame chatFrame, IExtendedChatObject targetObject)
     {
         chatFrame.User.Send(Raw.IRCX_RPL_ACCESSSTART_803(chatFrame.Server, chatFrame.User, targetObject));
 

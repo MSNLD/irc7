@@ -1,5 +1,5 @@
-﻿using Irc.Enumerations;
-using Irc.Interfaces;
+﻿using Irc.Interfaces;
+using Irc.Models.Enumerations;
 using Irc.Objects.Channel;
 using Irc.Objects.User;
 
@@ -16,12 +16,12 @@ public class Privmsg : Command, ICommand
         return EnumCommandDataType.Standard;
     }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new void Execute(IChatFrame chatFrame)
     {
         SendMessage(chatFrame, false);
     }
 
-    public static void SendMessage(ChatFrame chatFrame, bool Notice)
+    public static void SendMessage(IChatFrame chatFrame, bool notice)
     {
         var targetName = chatFrame.Message.Parameters.First();
         var message = chatFrame.Message.Parameters[1];
@@ -31,9 +31,9 @@ public class Privmsg : Command, ICommand
         {
             IChatObject chatObject = null;
             if (Channel.ValidName(target))
-                chatObject = (IChatObject)chatFrame.Server.GetChannelByName(target);
+                chatObject = chatFrame.Server.GetChannelByName(target);
             else
-                chatObject = (IChatObject)chatFrame.Server.GetUserByNickname(target);
+                chatObject = chatFrame.Server.GetUserByNickname(target);
 
             if (chatObject == null)
             {
@@ -44,12 +44,12 @@ public class Privmsg : Command, ICommand
 
             if (chatObject is Channel)
             {
-                if (Notice) ((Channel)chatObject).SendNotice(chatFrame.User, message);
+                if (notice) ((Channel)chatObject).SendNotice(chatFrame.User, message);
                 else ((Channel)chatObject).SendMessage(chatFrame.User, message);
             }
             else if (chatObject is User)
             {
-                if (Notice)
+                if (notice)
                     ((User)chatObject).Send(
                         Raw.RPL_NOTICE_USER(chatFrame.Server, chatFrame.User, chatObject, message)
                     );

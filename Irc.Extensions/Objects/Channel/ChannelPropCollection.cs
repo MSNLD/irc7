@@ -1,5 +1,5 @@
-﻿using Irc.Extensions.Props.Channel;
-using Irc.Objects.Collections;
+﻿using Irc.Extensions.Objects.Collections;
+using Irc.Extensions.Props.Channel;
 
 namespace Irc.Extensions.Objects.Channel;
 
@@ -7,7 +7,7 @@ internal class ChannelPropCollection : PropCollection
 {
     public ChannelPropCollection()
     {
-        AddProp(new OID());
+        AddProp(new Oid());
         AddProp(new Name());
         AddProp(new Creation());
         AddProp(new Language());
@@ -21,7 +21,7 @@ internal class ChannelPropCollection : PropCollection
         AddProp(new Onpart());
         AddProp(new Lag());
         AddProp(new Client());
-        AddProp(new ClientGUID());
+        AddProp(new ClientGuid());
         AddProp(new ServicePath());
     }
 }

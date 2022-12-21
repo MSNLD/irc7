@@ -1,9 +1,9 @@
-﻿using Irc.Enumerations;
-using Irc.Extensions.Commands;
+﻿using Irc.Extensions.Commands;
+using Irc.Models.Enumerations;
 
 namespace Irc.Extensions.Protocols;
 
-public class IrcX : Irc
+public class IrcX : Irc.Protocols.Irc
 {
     public IrcX()
     {

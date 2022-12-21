@@ -1,6 +1,7 @@
 ﻿using Irc.Commands;
-using Irc.Enumerations;
 using Irc.Extensions.Interfaces;
+using Irc.Interfaces;
+using Irc.Models.Enumerations;
 using Irc.Objects;
 using Irc.Objects.Channel;
 using Irc.Objects.Server;
@@ -18,7 +19,7 @@ public class Prop : Command, ICommand
         return EnumCommandDataType.None;
     }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new void Execute(IChatFrame chatFrame)
     {
         //chatFrame.User.Send(Raw.IRCX_ERR_NOTIMPLEMENTED(chatFrame.Server, chatFrame.User, nameof(Access)));
         // Passport hack
@@ -85,7 +86,7 @@ public class Prop : Command, ICommand
         }
         else
         {
-            IExtendedChatObject chatObject = null;
+            IExtendedChatObject chatObject;
 
             // <$> The $ value is used to indicate the user that originated the request.
             if (objectName == "$")

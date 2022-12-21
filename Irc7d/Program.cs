@@ -119,7 +119,7 @@ internal class Program
 
                         var motd = "\r\n** Welcome to the MSN.com Chat Service Network **\r\n";
 
-                        server.SetMOTD(motd);
+                        server.SetMotd(motd);
 
                         break;
                     }
@@ -132,7 +132,7 @@ internal class Program
                     }
                 }
 
-                server.RemoteIP = fqdn;
+                server.RemoteIp = fqdn;
 
                 var defaultChannels =
                     JsonSerializer.Deserialize<List<DefaultChannel>>(File.ReadAllText("DefaultChannels.json"));

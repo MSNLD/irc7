@@ -1,10 +1,12 @@
-﻿namespace Irc;
+﻿using Irc.Interfaces;
+
+namespace Irc.IO;
 
 public class DataRegulator : IDataRegulator
 {
     private readonly int _incomingByteThreshold;
 
-    private readonly Queue<Message> _incomingQueue = new();
+    private readonly Queue<IMessage> _incomingQueue = new();
     private readonly int _outgoingByteThreshold;
     private readonly Queue<string> _outgoingQueue = new();
     private int _incomingBytes;
@@ -48,7 +50,7 @@ public class DataRegulator : IDataRegulator
         return _outgoingQueue.Count;
     }
 
-    public int PushIncoming(Message message)
+    public int PushIncoming(IMessage message)
     {
         _incomingQueue.Enqueue(message);
         _incomingBytes += message.OriginalText.Length;
@@ -64,12 +66,12 @@ public class DataRegulator : IDataRegulator
         return _outgoingBytes;
     }
 
-    public Message PeekIncoming()
+    public IMessage PeekIncoming()
     {
         return _incomingQueue.Peek();
     }
 
-    public Message PopIncoming()
+    public IMessage PopIncoming()
     {
         var message = _incomingQueue.Dequeue();
         _incomingBytes -= message.OriginalText.Length;

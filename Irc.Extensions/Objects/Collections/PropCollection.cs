@@ -1,29 +1,29 @@
 ﻿using Irc.Extensions.Interfaces;
 
-namespace Irc.Objects.Collections;
+namespace Irc.Extensions.Objects.Collections;
 
 public class PropCollection : IPropCollection
 {
-    protected Dictionary<string, IPropRule> properties = new();
+    protected readonly Dictionary<string, IPropRule> Properties = new();
 
     public IPropRule GetProp(string name)
     {
-        properties.TryGetValue(name, out var rule);
+        Properties.TryGetValue(name, out var rule);
         return rule;
     }
 
     public List<IPropRule> GetProps()
     {
-        return properties.Values.ToList();
+        return Properties.Values.ToList();
     }
 
     public void AddProp(IPropRule prop)
     {
-        properties[prop.Name.ToUpper()] = prop;
+        Properties[prop.Name.ToUpper()] = prop;
     }
 
     public void SetProp(string name, string value)
     {
-        properties[name].SetValue(value);
+        Properties[name].SetValue(value);
     }
 }

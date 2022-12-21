@@ -1,9 +1,10 @@
 ﻿using Irc.Constants;
+using Irc.Interfaces;
 using Irc.Modes.User;
 
 namespace Irc.Objects.User;
 
-public class UserModes : ModeCollection, IModeCollection
+public class UserModes : ModeCollection
 {
     public UserModes()
     {

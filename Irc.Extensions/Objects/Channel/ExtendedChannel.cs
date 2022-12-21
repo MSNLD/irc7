@@ -1,16 +1,16 @@
 ﻿using System.Text.RegularExpressions;
 using Irc.Constants;
-using Irc.Enumerations;
 using Irc.Extensions.Access.Channel;
 using Irc.Extensions.Interfaces;
 using Irc.Extensions.Objects.Member;
 using Irc.Interfaces;
 using Irc.IO;
+using Irc.Models.Enumerations;
 using Irc.Objects;
 
 namespace Irc.Extensions.Objects.Channel;
 
-public class ExtendedChannel : global::Irc.Objects.Channel.Channel, IExtendedChatObject, IExtendedChannel
+public class ExtendedChannel : global::Irc.Objects.Channel.Channel, IExtendedChannel
 {
     private readonly ChannelAccess _accessList = new();
     private readonly ChannelPropCollection _properties = new();
@@ -39,13 +39,13 @@ public class ExtendedChannel : global::Irc.Objects.Channel.Channel, IExtendedCha
         return member;
     }
 
-    public override EnumChannelAccessResult GetAccess(IUser user, string key, bool IsGoto = false)
+    public override EnumChannelAccessResult GetAccess(IUser user, string key, bool isGoto = false)
     {
         var operCheck = CheckOper(user);
         var keyCheck = CheckMemberKey(user, key);
         var hostKeyCheck = CheckHostKey(user, key);
         var inviteOnlyCheck = CheckInviteOnly();
-        var userLimitCheck = CheckUserLimit(IsGoto);
+        var userLimitCheck = CheckUserLimit(isGoto);
 
         return (EnumChannelAccessResult)new[]
         {

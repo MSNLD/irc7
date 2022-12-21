@@ -1,10 +1,11 @@
 ﻿using System.Text.RegularExpressions;
+using Irc.Interfaces;
 
 namespace Irc.Objects;
 
-public class Address
+public partial class Address : IAddress
 {
-    public UserHostPair UserHost = new();
+    public IUserHostPair UserHost { get; set; } = new UserHostPair();
 
     public string Nickname { set; get; }
 
@@ -24,7 +25,7 @@ public class Address
     public string Server { set; get; }
 
     public string RealName { set; get; }
-    public string RemoteIP { set; get; }
+    public string RemoteIp { set; get; }
 
     public string GetUserHost()
     {
@@ -79,15 +80,4 @@ public class Address
           be used to represent the local server the client is
           connected to.
     */
-
-    public record UserHostPair
-    {
-        public string User { get; set; }
-        public string Host { get; set; }
-
-        public override string ToString()
-        {
-            return $"{User}@{Host}";
-        }
-    }
 }

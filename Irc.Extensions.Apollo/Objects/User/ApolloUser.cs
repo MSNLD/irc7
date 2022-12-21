@@ -3,7 +3,6 @@ using Irc.Interfaces;
 using Irc.IO;
 using Irc.Objects;
 using Irc.Objects.Server;
-using Irc7d;
 
 namespace Irc.Extensions.Apollo.Objects.User;
 

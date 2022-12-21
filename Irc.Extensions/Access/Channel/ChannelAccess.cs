@@ -1,4 +1,4 @@
-﻿using Irc.Enumerations;
+﻿using Irc.Models.Enumerations;
 
 namespace Irc.Extensions.Access.Channel;
 
@@ -6,7 +6,7 @@ public class ChannelAccess : AccessList
 {
     public ChannelAccess()
     {
-        accessEntries = new Dictionary<EnumAccessLevel, List<AccessEntry>>
+        AccessEntries = new Dictionary<EnumAccessLevel, List<AccessEntry>>
         {
             { EnumAccessLevel.OWNER, new List<AccessEntry>() },
             { EnumAccessLevel.HOST, new List<AccessEntry>() },

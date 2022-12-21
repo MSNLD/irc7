@@ -1,9 +1,7 @@
-﻿using Irc.Commands;
-using Irc.Enumerations;
-using Irc.Interfaces;
-using Irc.Objects;
+﻿using Irc.Interfaces;
+using Irc.Models.Enumerations;
 
-namespace Irc;
+namespace Irc.Protocols;
 
 public class Protocol : IProtocol
 {

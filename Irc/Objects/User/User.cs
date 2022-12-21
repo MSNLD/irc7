@@ -1,12 +1,9 @@
 ﻿using System.Collections.Concurrent;
 using System.Text;
 using Irc.Constants;
-using Irc.Enumerations;
-using Irc.Extensions.Security.Packages;
 using Irc.Interfaces;
-using Irc.IO;
-using Irc.Objects.Server;
-using Irc7d;
+using Irc.Models.Enumerations;
+using Irc.Security.Packages;
 
 namespace Irc.Objects.User;
 
@@ -49,7 +46,7 @@ public class User : ChatObject, IUser
             dataRegulator.PushIncoming(message);
         };
 
-        Address.RemoteIP = connection.GetAddress();
+        Address.RemoteIp = connection.GetAddress();
     }
 
     public override EnumUserAccessLevel Level => GetLevel();
@@ -161,7 +158,7 @@ public class User : ChatObject, IUser
         return _level;
     }
 
-    public Address GetAddress()
+    public IAddress GetAddress()
     {
         return Address;
     }

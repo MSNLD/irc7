@@ -1,6 +1,7 @@
-﻿using Irc.Enumerations;
+﻿using Irc.Interfaces;
+using Irc.Models.Enumerations;
 
-namespace Irc.Extensions.Security;
+namespace Irc.Extensions.Security.Credentials;
 
 public class Credential : ICredential
 {

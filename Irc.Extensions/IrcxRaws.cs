@@ -1,4 +1,5 @@
 ﻿using Irc.Extensions.Interfaces;
+using Irc.Interfaces;
 using Irc.Objects;
 using Irc.Objects.Server;
 

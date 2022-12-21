@@ -1,6 +1,6 @@
-﻿using Irc.Enumerations;
-using Irc.Extensions.Apollo.Objects.Channel;
+﻿using Irc.Extensions.Apollo.Objects.Channel;
 using Irc.Interfaces;
+using Irc.Models.Enumerations;
 using Irc.Modes;
 using Irc.Objects;
 
@@ -12,7 +12,7 @@ public class Host : ModeRule, IModeRule
     {
     }
 
-    public new EnumIrcError Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
+    public new EnumIrcError Evaluate(IChatObject source, IChatObject target, bool flag, string parameter)
     {
         // TODO: Write this better
         if (target == source && flag)
@@ -20,12 +20,12 @@ public class Host : ModeRule, IModeRule
             var user = (IUser)source;
             var channel = (ApolloChannel)user.GetChannels().LastOrDefault().Key;
             var member = user.GetChannels().LastOrDefault().Value;
-            if (channel.PropCollection.GetProp("OWNERKEY").GetValue() == parameter)
+            if (channel.PropCollection.GetProp(ExtendedResources.ChannelPropOwnerkey).GetValue() == parameter)
             {
                 member.SetOwner(true);
                 channel.Modes.GetMode('q').DispatchModeChange(source, channel, true, target.ToString());
             }
-            else if (channel.PropCollection.GetProp("HOSTKEY").GetValue() == parameter)
+            else if (channel.PropCollection.GetProp(ExtendedResources.ChannelPropHostkey).GetValue() == parameter)
             {
                 if (member.IsOwner())
                 {

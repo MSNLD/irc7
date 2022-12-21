@@ -1,18 +1,19 @@
-﻿using Irc.Enumerations;
+﻿using Irc.Interfaces;
+using Irc.Models.Enumerations;
 
 namespace Irc.Commands;
 
 public class Command : ICommand
 {
     private readonly bool _needsReg;
-    protected int _maxParams;
-    protected int _minParams;
+    protected readonly int MaxParams;
+    protected int MinParams;
 
     public Command(int minParams = 0, bool needsReg = true, int maxParams = -1)
     {
-        _minParams = minParams;
+        MinParams = minParams;
         _needsReg = needsReg;
-        _maxParams = maxParams;
+        MaxParams = maxParams;
     }
 
     public string GetName()
@@ -25,21 +26,21 @@ public class Command : ICommand
         throw new NotImplementedException();
     }
 
-    public void Execute(ChatFrame chatFrame)
+    public virtual void Execute(IChatFrame chatFrame)
     {
         throw new NotImplementedException();
     }
 
-    public bool CheckParameters(ChatFrame chatFrame)
+    public bool CheckParameters(IChatFrame chatFrame)
     {
-        if (chatFrame.Message.Parameters.Count >= _minParams) return true;
-        if (_maxParams < 0 || chatFrame.Message.Parameters.Count <= _maxParams) return true;
+        if (chatFrame.Message.Parameters.Count >= MinParams) return true;
+        if (MaxParams < 0 || chatFrame.Message.Parameters.Count <= MaxParams) return true;
 
         chatFrame.User.Send(Raw.IRCX_ERR_NEEDMOREPARAMS_461(chatFrame.Server, chatFrame.User, GetName()));
         return false;
     }
 
-    public bool CheckRegister(ChatFrame chatFrame)
+    public bool CheckRegister(IChatFrame chatFrame)
     {
         if (!_needsReg || (_needsReg && chatFrame.User.IsRegistered())) return true;
 

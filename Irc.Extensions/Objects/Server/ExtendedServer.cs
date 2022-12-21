@@ -1,5 +1,4 @@
 ﻿using Irc.Commands;
-using Irc.Enumerations;
 using Irc.Extensions.Commands;
 using Irc.Extensions.Factories;
 using Irc.Extensions.Interfaces;
@@ -10,13 +9,12 @@ using Irc.Extensions.Security;
 using Irc.Factories;
 using Irc.Interfaces;
 using Irc.IO;
+using Irc.Models.Enumerations;
 using Irc.Objects;
-using Irc.Objects.Server;
-using Irc7d;
 
 namespace Irc.Extensions.Objects.Server;
 
-public class ExtendedServer : global::Irc.Objects.Server.Server, IServer, IExtendedServerObject
+public class ExtendedServer : global::Irc.Objects.Server.Server, IExtendedServerObject
 {
     public ExtendedServer(ISocketServer socketServer, ISecurityManager securityManager,
         IFloodProtectionManager floodProtectionManager, IDataStore dataStore, IList<IChannel> channels,

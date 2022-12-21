@@ -1,8 +1,9 @@
-﻿using Irc.Constants;
-using Irc.Enumerations;
-using Irc.Extensions;
+﻿using Irc.Commands;
+using Irc.Constants;
+using Irc.Interfaces;
+using Irc.Models.Enumerations;
 
-namespace Irc.Commands;
+namespace Irc.Extensions.Commands;
 
 internal class Ircx : Command, ICommand
 {
@@ -15,7 +16,7 @@ internal class Ircx : Command, ICommand
         return EnumCommandDataType.None;
     }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new void Execute(IChatFrame chatFrame)
     {
         var protocol = chatFrame.User.GetProtocol().GetProtocolType();
         if (protocol < EnumProtocolType.IRCX)

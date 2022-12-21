@@ -1,4 +1,6 @@
-﻿namespace Irc.Extensions.Interfaces;
+﻿using Irc.Models.Enumerations;
+
+namespace Irc.Extensions.Interfaces;
 
 public interface IPropRule
 {

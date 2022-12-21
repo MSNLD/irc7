@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Irc.Interfaces;
 
 namespace Irc.IO;
 

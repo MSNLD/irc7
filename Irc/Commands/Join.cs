@@ -1,8 +1,6 @@
-﻿using Irc.Enumerations;
-using Irc.Interfaces;
-using Irc.Objects;
+﻿using Irc.Interfaces;
+using Irc.Models.Enumerations;
 using Irc.Objects.Channel;
-using Irc.Objects.Server;
 
 namespace Irc.Commands;
 
@@ -17,7 +15,7 @@ internal class Join : Command, ICommand
         return EnumCommandDataType.None;
     }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new void Execute(IChatFrame chatFrame)
     {
         var server = chatFrame.Server;
         var user = chatFrame.User;

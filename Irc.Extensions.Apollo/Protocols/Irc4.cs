@@ -1,4 +1,4 @@
-﻿using Irc.Enumerations;
+﻿using Irc.Models.Enumerations;
 
 namespace Irc.Extensions.Apollo.Protocols;
 

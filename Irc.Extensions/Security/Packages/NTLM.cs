@@ -2,6 +2,7 @@
 using Irc.Extensions.NTLM;
 using Irc.Helpers.CSharpTools;
 using Irc.Interfaces;
+using Irc.Models.Enumerations;
 using Irc.Security;
 
 namespace Irc.Extensions.Security.Packages;

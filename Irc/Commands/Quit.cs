@@ -1,6 +1,6 @@
 ﻿using Irc.Constants;
-using Irc.Enumerations;
-using Irc.Objects;
+using Irc.Interfaces;
+using Irc.Models.Enumerations;
 
 namespace Irc.Commands;
 
@@ -15,7 +15,7 @@ internal class Quit : Command, ICommand
         return EnumCommandDataType.None;
     }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new void Execute(IChatFrame chatFrame)
     {
         var server = chatFrame.Server;
         var user = chatFrame.User;

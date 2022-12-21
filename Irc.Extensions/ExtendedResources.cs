@@ -46,8 +46,8 @@ public static class ExtendedResources
     public static string ChannelPropOwnerkey = "OWNERKEY";
     public static string ChannelPropHostkey = "HOSTKEY";
     public static string ChannelPropCreation = "CREATION";
-    public static string ChannelPropOID = "OID";
-    public static string ChannelPropPICS = "PICS";
+    public static string ChannelPropOid = "OID";
+    public static string ChannelPropPics = "PICS";
     public static string ChannelPropOnJoin = "ONJOIN";
     public static string ChannelPropOnPart = "ONPART";
     public static string ChannelPropAccount = "ACCOUNT";

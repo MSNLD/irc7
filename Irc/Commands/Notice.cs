@@ -1,4 +1,5 @@
-﻿using Irc.Enumerations;
+﻿using Irc.Interfaces;
+using Irc.Models.Enumerations;
 
 namespace Irc.Commands;
 
@@ -13,7 +14,7 @@ internal class Notice : Command, ICommand
         return EnumCommandDataType.Standard;
     }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new void Execute(IChatFrame chatFrame)
     {
         Privmsg.SendMessage(chatFrame, true);
     }

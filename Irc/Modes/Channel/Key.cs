@@ -1,6 +1,6 @@
 ﻿using Irc.Constants;
-using Irc.Enumerations;
 using Irc.Interfaces;
+using Irc.Models.Enumerations;
 using Irc.Objects;
 
 namespace Irc.Modes.Channel;
@@ -11,7 +11,7 @@ internal class Key : ModeRule, IModeRule
     {
     }
 
-    public new EnumIrcError Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
+    public new EnumIrcError Evaluate(IChatObject source, IChatObject target, bool flag, string parameter)
     {
         var member = (IChannelMember)source;
         if (member.IsHost())

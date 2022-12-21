@@ -1,21 +1,21 @@
-﻿using Irc.Extensions.Security;
+﻿using Irc.Interfaces;
 
 namespace Irc.Security;
 
 public class SecurityManager : ISecurityManager
 {
-    private readonly Dictionary<string, SupportPackage> _supportProviders =
+    private readonly Dictionary<string, ISupportPackage> _supportProviders =
         new(StringComparer.InvariantCultureIgnoreCase);
 
     private string _supportedPackages = string.Empty;
 
-    public void AddSupportPackage(SupportPackage supportPackage)
+    public void AddSupportPackage(ISupportPackage supportPackage)
     {
         _supportProviders.Add(supportPackage.GetType().Name, supportPackage);
         UpdateSupportPackages();
     }
 
-    public SupportPackage CreatePackageInstance(string name, ICredentialProvider credentialProvider)
+    public ISupportPackage CreatePackageInstance(string name, ICredentialProvider credentialProvider)
     {
         try
         {
@@ -35,7 +35,7 @@ public class SecurityManager : ISecurityManager
     private void UpdateSupportPackages()
     {
         _supportedPackages = string.Join(',',
-            _supportProviders.Where(provider => provider.Value.Listed)
+            _supportProviders.Where(provider => ((SupportPackage)provider.Value).Listed)
                 .Select(provider => provider.Value.GetPackageName()).Reverse());
     }
 }

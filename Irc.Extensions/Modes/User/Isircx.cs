@@ -1,7 +1,6 @@
-﻿using Irc.Enumerations;
-using Irc.Interfaces;
+﻿using Irc.Interfaces;
+using Irc.Models.Enumerations;
 using Irc.Modes;
-using Irc.Objects;
 
 namespace Irc.Extensions.Modes.User;
 
@@ -11,7 +10,7 @@ public class Isircx : ModeRule, IModeRule
     {
     }
 
-    public new EnumIrcError Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
+    public new EnumIrcError Evaluate(IChatObject source, IChatObject target, bool flag, string parameter)
     {
         return EnumIrcError.ERR_UNKNOWNMODEFLAG;
     }

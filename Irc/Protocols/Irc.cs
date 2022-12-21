@@ -1,9 +1,9 @@
 ﻿using Irc.Commands;
-using Irc.Enumerations;
 using Irc.Interfaces;
+using Irc.Models.Enumerations;
 using Version = Irc.Commands.Version;
 
-namespace Irc;
+namespace Irc.Protocols;
 
 public class Irc : Protocol, IProtocol
 {

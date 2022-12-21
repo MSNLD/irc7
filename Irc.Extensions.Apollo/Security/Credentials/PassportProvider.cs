@@ -1,5 +1,7 @@
 ﻿using Irc.Extensions.Apollo.Security.Passport;
 using Irc.Extensions.Security;
+using Irc.Extensions.Security.Credentials;
+using Irc.Interfaces;
 using Irc.Security;
 
 namespace Irc.Extensions.Apollo.Security.Credentials;

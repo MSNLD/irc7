@@ -17,6 +17,8 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Irc.ClassExtensions\Irc.Helpers.csproj" />
+        <ProjectReference Include="..\Irc.Interfaces\Irc.Interfaces.csproj" />
+        <ProjectReference Include="..\Irc.Models\Irc.Models.csproj" />
     </ItemGroup>
 
     <ItemGroup>

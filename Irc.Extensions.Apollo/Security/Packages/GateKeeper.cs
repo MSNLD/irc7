@@ -2,10 +2,11 @@
 using System.Security.Cryptography;
 using System.Text;
 using Irc.ClassExtensions.CSharpTools;
-using Irc.Enumerations;
 using Irc.Extensions.Apollo.Security.Packages;
+using Irc.Extensions.Security.Credentials;
 using Irc.Helpers.CSharpTools;
 using Irc.Interfaces;
+using Irc.Models.Enumerations;
 using Irc.Security;
 
 // ReSharper disable once CheckNamespace
@@ -27,7 +28,7 @@ public class GateKeeper : SupportPackage, ISupportPackage
         ServerSequence = EnumSupportPackageSequence.SSP_INIT;
     }
 
-    public override SupportPackage CreateInstance(ICredentialProvider credentialProvider)
+    public override ISupportPackage CreateInstance(ICredentialProvider credentialProvider)
     {
         return new GateKeeper();
     }

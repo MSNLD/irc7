@@ -1,4 +1,4 @@
-﻿namespace Irc.Extensions.Commands;
+﻿namespace Irc.Commands;
 
 internal class Invite
 {

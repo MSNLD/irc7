@@ -1,5 +1,7 @@
-﻿namespace Irc.Objects.Server;
+﻿using Irc.Interfaces;
 
-public class ServerModes : ModeCollection, IModeCollection
+namespace Irc.Objects.Server;
+
+public class ServerModes : ModeCollection
 {
 }

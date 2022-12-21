@@ -1,5 +1,6 @@
 ﻿using Irc.Constants;
-using Irc.Enumerations;
+using Irc.Interfaces;
+using Irc.Models.Enumerations;
 
 namespace Irc.Commands;
 
@@ -14,7 +15,7 @@ internal class Ison : Command, ICommand
         return EnumCommandDataType.Data;
     }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new void Execute(IChatFrame chatFrame)
     {
         var server = chatFrame.Server;
         var user = chatFrame.User;

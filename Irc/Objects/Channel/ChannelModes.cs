@@ -1,4 +1,5 @@
 ﻿using Irc.Constants;
+using Irc.Interfaces;
 using Irc.Modes.Channel;
 using Irc.Modes.Channel.Member;
 

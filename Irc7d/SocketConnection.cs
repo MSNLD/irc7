@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Numerics;
 using Irc.ClassExtensions.CSharpTools;
 using Irc.Helpers.CSharpTools;
+using Irc.Interfaces;
 
 namespace Irc7d;
 

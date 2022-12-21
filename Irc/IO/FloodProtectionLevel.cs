@@ -1,6 +1,9 @@
-﻿using Irc.Enumerations;
+﻿using Irc.Interfaces;
+using Irc.Models.Enumerations;
 
-public class FloodProtectionLevel
+namespace Irc.IO;
+
+public class FloodProtectionLevel : IFloodProtectionLevel
 {
     //Parameters, Invitation, Join, WrongChannelPassword, Standard, HostMessage, None
     public int Delay, DelayData, DelayInvite, DelayJoin, DelayWrongPass, DelayStandard, DelayHostMessage;

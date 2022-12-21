@@ -1,8 +1,6 @@
-using System.Security.Authentication.ExtendedProtection;
 using Irc.Constants;
-using Irc.Enumerations;
 using Irc.Interfaces;
-using Irc.Objects;
+using Irc.Models.Enumerations;
 
 namespace Irc.Commands;
 
@@ -17,7 +15,7 @@ internal class Topic : Command, ICommand
         return EnumCommandDataType.Standard;
     }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new void Execute(IChatFrame chatFrame)
     {
         var source = chatFrame.User;
         var channelName = chatFrame.Message.Parameters.First();

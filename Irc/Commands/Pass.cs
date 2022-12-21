@@ -1,5 +1,6 @@
 ﻿using Irc.Constants;
-using Irc.Enumerations;
+using Irc.Interfaces;
+using Irc.Models.Enumerations;
 
 namespace Irc.Commands;
 
@@ -14,7 +15,7 @@ public class Pass : Command, ICommand
         return EnumCommandDataType.None;
     }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new void Execute(IChatFrame chatFrame)
     {
         if (!chatFrame.User.IsRegistered())
             // TODO: Encrypt below pass

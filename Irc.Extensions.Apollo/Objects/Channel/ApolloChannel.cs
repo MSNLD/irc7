@@ -1,9 +1,10 @@
 ﻿using Irc.Constants;
-using Irc.Enumerations;
+using Irc.Extensions.Apollo.Interfaces;
 using Irc.Extensions.Apollo.Objects.User;
 using Irc.Extensions.Objects.Channel;
 using Irc.Interfaces;
 using Irc.IO;
+using Irc.Models.Enumerations;
 using Irc.Objects;
 
 namespace Irc.Extensions.Apollo.Objects.Channel;

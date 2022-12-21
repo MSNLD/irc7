@@ -1,5 +1,7 @@
 ﻿using System.Globalization;
 using Irc.Extensions.Security;
+using Irc.Interfaces;
+using Irc.Models.Enumerations;
 using Irc.Security;
 
 namespace Irc.Extensions.Apollo.Security.Packages;

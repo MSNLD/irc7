@@ -1,10 +1,11 @@
 ﻿using Irc.Constants;
-using Irc.Enumerations;
 using Irc.Interfaces;
+using Irc.Models.Enumerations;
+using Irc.Modes;
 using Irc.Objects;
 using Irc.Objects.Server;
 
-namespace Irc.Modes.Channel.Member;
+namespace Irc.Extensions.Modes.Channel.Member;
 
 public class Owner : ModeRule, IModeRule
 {
@@ -23,7 +24,7 @@ public class Owner : ModeRule, IModeRule
     {
     }
 
-    public EnumIrcError Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
+    public new EnumIrcError Evaluate(IChatObject source, IChatObject target, bool flag, string parameter)
     {
         var channel = (IChannel)target;
 

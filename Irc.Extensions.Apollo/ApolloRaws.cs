@@ -1,4 +1,4 @@
-﻿using Irc.Extensions.Apollo.Objects.Channel;
+﻿using Irc.Extensions.Apollo.Interfaces;
 using Irc.Extensions.Apollo.Objects.User;
 using Irc.Interfaces;
 

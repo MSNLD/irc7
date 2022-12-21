@@ -1,6 +1,7 @@
-﻿using Irc.Security;
+﻿using Irc.Interfaces;
+using Irc.Models.Enumerations;
 
-namespace Irc.Extensions.Security.Packages;
+namespace Irc.Security.Packages;
 
 public class ANON : SupportPackage
 {

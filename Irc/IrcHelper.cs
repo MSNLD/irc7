@@ -9,19 +9,19 @@ public static class IrcHelper
         ObjIdExtendedGlobalChannel = 0x3,
         ObjIdExtendedLocalChannel = 0x4,
         ObjIdLastChannel = 0xF,
-        ObjIdIRCUser = 0x5,
-        ObjIdIRCUserUnicode = 0x6,
-        ObjIdIRCUserHex = 0x7,
+        ObjIdIrcUser = 0x5,
+        ObjIdIrcUserUnicode = 0x6,
+        ObjIdIrcUserHex = 0x7,
         ObjIdInternal = 0xE,
         ObjIdNetwork = 0xD,
         ObjIdServer = 0xC,
         InvalidObjId = 0xFF
     }
 
-    public static ObjIdentifier IdentifyObject(string ObjectName)
+    public static ObjIdentifier IdentifyObject(string objectName)
     {
-        if (ObjectName.Length == 1)
-            switch (ObjectName[0])
+        if (objectName.Length == 1)
+            switch (objectName[0])
             {
                 case '$':
                 {
@@ -36,12 +36,12 @@ public static class IrcHelper
                     return ObjIdentifier.ObjIdLastChannel;
                 }
             }
-        else if (ObjectName.Length > 1)
-            switch (ObjectName[0])
+        else if (objectName.Length > 1)
+            switch (objectName[0])
             {
                 case '%':
                 {
-                    switch (ObjectName[1])
+                    switch (objectName[1])
                     {
                         case '#':
                         {
@@ -59,7 +59,7 @@ public static class IrcHelper
                 }
                 case '^':
                 {
-                    return ObjIdentifier.ObjIdIRCUserHex;
+                    return ObjIdentifier.ObjIdIrcUserHex;
                 }
                 case '0':
                 {
@@ -67,7 +67,7 @@ public static class IrcHelper
                 }
                 case '\'':
                 {
-                    return ObjIdentifier.ObjIdIRCUserUnicode;
+                    return ObjIdentifier.ObjIdIrcUserUnicode;
                 }
                 case '#':
                 {
@@ -80,14 +80,14 @@ public static class IrcHelper
             }
 
         // Default is user nickname
-        return ObjIdentifier.ObjIdIRCUser;
+        return ObjIdentifier.ObjIdIrcUser;
     }
 
-    public static bool IsObject(string Name)
+    public static bool IsObject(string name)
     {
         // Rule that an object must begin with 0
-        if (Name.Length > 0)
-            if (Name[0] == 48)
+        if (name.Length > 0)
+            if (name[0] == 48)
                 return true;
 
         return false;

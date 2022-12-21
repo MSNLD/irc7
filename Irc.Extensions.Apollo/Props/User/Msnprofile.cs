@@ -1,16 +1,17 @@
 ﻿using Irc.Extensions.Apollo.Objects.User;
 using Irc.Extensions.Props;
+using Irc.Models.Enumerations;
 
 namespace Irc.Extensions.Apollo.Props.User;
 
 internal class Msnprofile : PropRule
 {
-    private readonly ApolloProfile profile;
+    private readonly ApolloProfile _profile;
 
     public Msnprofile(ApolloProfile profile) : base(ExtendedResources.UserPropMsnProfile,
         EnumChannelAccessLevel.ChatMember, EnumChannelAccessLevel.ChatMember, "0", true)
     {
-        this.profile = profile;
+        this._profile = profile;
     }
 
     public override string GetValue()
@@ -23,6 +24,6 @@ internal class Msnprofile : PropRule
     {
         // TODO: Need to reply bad value if not valid, or reject if already done more than once
         int.TryParse(value, out var profileCode);
-        profile.SetProfileCode(profileCode);
+        _profile.SetProfileCode(profileCode);
     }
 }

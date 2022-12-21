@@ -1,5 +1,5 @@
-﻿using Irc.Enumerations;
-using Irc.Extensions.Interfaces;
+﻿using Irc.Extensions.Interfaces;
+using Irc.Models.Enumerations;
 using Irc.Objects;
 
 namespace Irc.Extensions.Props;

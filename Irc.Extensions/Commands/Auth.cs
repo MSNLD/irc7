@@ -1,112 +1,115 @@
 ﻿using Irc.ClassExtensions.CSharpTools;
-using Irc.Enumerations;
 using Irc.Extensions.Security;
 using Irc.Extensions.Security.Packages;
+using Irc.Interfaces;
+using Irc.Models.Enumerations;
+using Irc.Security.Packages;
 
-namespace Irc.Commands;
-
-public class Auth : Command, ICommand
+namespace Irc.Commands
 {
-    public Auth() : base(3, false)
+    public class Auth : Command, ICommand
     {
-    }
-
-    public new EnumCommandDataType GetDataType()
-    {
-        return EnumCommandDataType.None;
-    }
-
-    public new void Execute(ChatFrame chatFrame)
-    {
-        if (chatFrame.User.IsRegistered())
+        public Auth() : base(3, false)
         {
-            chatFrame.User.Send(Raw.IRCX_ERR_ALREADYREGISTERED_462(chatFrame.Server, chatFrame.User));
         }
-        else if (chatFrame.User.IsAuthenticated())
+
+        public new EnumCommandDataType GetDataType()
         {
-            chatFrame.User.Send(Raw.IRCX_ERR_ALREADYAUTHENTICATED_909(chatFrame.Server, chatFrame.User));
+            return EnumCommandDataType.None;
         }
-        else
+
+        public new void Execute(IChatFrame chatFrame)
         {
-            var parameters = chatFrame.Message.Parameters;
-
-            var supportPackage = chatFrame.User.GetSupportPackage();
-            var packageName = parameters[0];
-            var sequence = parameters[1].ToUpper();
-            var token = parameters[2].ToLiteral();
-
-            if (sequence == "I")
+            if (chatFrame.User.IsRegistered())
             {
-                var targetPackage = chatFrame.Server.GetSecurityManager()
-                    .CreatePackageInstance(packageName, chatFrame.Server.GetCredentialManager());
+                chatFrame.User.Send(Raw.IRCX_ERR_ALREADYREGISTERED_462(chatFrame.Server, chatFrame.User));
+            }
+            else if (chatFrame.User.IsAuthenticated())
+            {
+                chatFrame.User.Send(Raw.IRCX_ERR_ALREADYAUTHENTICATED_909(chatFrame.Server, chatFrame.User));
+            }
+            else
+            {
+                var parameters = chatFrame.Message.Parameters;
 
-                if (targetPackage == null)
-                {
-                    chatFrame.User.Send(Raw.IRCX_ERR_UNKNOWNPACKAGE_912(chatFrame.Server, chatFrame.User, packageName));
-                    return;
-                }
+                var supportPackage = chatFrame.User.GetSupportPackage();
+                var packageName = parameters[0];
+                var sequence = parameters[1].ToUpper();
+                var token = parameters[2].ToLiteral();
 
-                if (supportPackage == null || supportPackage is ANON)
+                if (sequence == "I")
                 {
-                    supportPackage = chatFrame.Server.GetSecurityManager()
+                    var targetPackage = chatFrame.Server.GetSecurityManager()
                         .CreatePackageInstance(packageName, chatFrame.Server.GetCredentialManager());
 
-                    chatFrame.User.SetSupportPackage(supportPackage);
+                    if (targetPackage == null)
+                    {
+                        chatFrame.User.Send(Raw.IRCX_ERR_UNKNOWNPACKAGE_912(chatFrame.Server, chatFrame.User, packageName));
+                        return;
+                    }
 
+                    if (supportPackage == null || supportPackage is ANON)
+                    {
+                        supportPackage = chatFrame.Server.GetSecurityManager()
+                            .CreatePackageInstance(packageName, chatFrame.Server.GetCredentialManager());
+
+                        chatFrame.User.SetSupportPackage(supportPackage);
+
+                        var supportPackageSequence =
+                            supportPackage.InitializeSecurityContext(token, chatFrame.Server.RemoteIp);
+
+                        if (supportPackageSequence == EnumSupportPackageSequence.SSP_OK)
+                        {
+                            var securityToken = supportPackage.CreateSecurityChallenge().ToEscape();
+                            chatFrame.User.Send(Raw.RPL_AUTH_SEC_REPLY(packageName, securityToken));
+                            // Send reply
+                            return;
+                        }
+                    }
+                }
+                else if (sequence == "S")
+                {
                     var supportPackageSequence =
-                        supportPackage.InitializeSecurityContext(token, chatFrame.Server.RemoteIP);
-
+                        chatFrame.User.GetSupportPackage().AcceptSecurityContext(token, chatFrame.Server.RemoteIp);
                     if (supportPackageSequence == EnumSupportPackageSequence.SSP_OK)
                     {
-                        var securityToken = supportPackage.CreateSecurityChallenge().ToEscape();
-                        chatFrame.User.Send(Raw.RPL_AUTH_SEC_REPLY(packageName, securityToken));
-                        // Send reply
+                        chatFrame.User.Authenticate();
+
+                        var credentials = chatFrame.User.GetSupportPackage().GetCredentials();
+                        if (credentials == null)
+                        {
+                            // Invalid credentials handle
+                        }
+                        else
+                        {
+                            var user = chatFrame.User.GetSupportPackage().GetCredentials().GetUsername();
+                            var domain = chatFrame.User.GetSupportPackage().GetCredentials().GetDomain();
+
+                            var userAddress = chatFrame.User.GetAddress();
+                            chatFrame.User.Name = credentials.GetNickname();
+                            userAddress.User = credentials.GetUsername();
+                            userAddress.Host = credentials.GetDomain();
+                            userAddress.Server = chatFrame.Server.RemoteIp;
+                            userAddress.RealName = string.Empty;
+
+                            // Send reply
+                            chatFrame.User.Send(Raw.RPL_AUTH_SUCCESS(packageName, $"{user}@{domain}", 0));
+                        }
+
+                        return;
+                    }
+
+                    if (supportPackageSequence == EnumSupportPackageSequence.SSP_CREDENTIALS)
+                    {
+                        chatFrame.User.Send(Raw.RPL_AUTH_SEC_REPLY(packageName, "OK"));
                         return;
                     }
                 }
+
+                // auth failed
+                chatFrame.User.Disconnect(
+                    Raw.IRCX_ERR_AUTHENTICATIONFAILED_910(chatFrame.Server, chatFrame.User, packageName));
             }
-            else if (sequence == "S")
-            {
-                var supportPackageSequence =
-                    chatFrame.User.GetSupportPackage().AcceptSecurityContext(token, chatFrame.Server.RemoteIP);
-                if (supportPackageSequence == EnumSupportPackageSequence.SSP_OK)
-                {
-                    chatFrame.User.Authenticate();
-
-                    var credentials = chatFrame.User.GetSupportPackage().GetCredentials();
-                    if (credentials == null)
-                    {
-                        // Invalid credentials handle
-                    }
-                    else
-                    {
-                        var user = chatFrame.User.GetSupportPackage().GetCredentials().GetUsername();
-                        var domain = chatFrame.User.GetSupportPackage().GetCredentials().GetDomain();
-
-                        var userAddress = chatFrame.User.GetAddress();
-                        chatFrame.User.Name = credentials.GetNickname();
-                        userAddress.User = credentials.GetUsername();
-                        userAddress.Host = credentials.GetDomain();
-                        userAddress.Server = chatFrame.Server.RemoteIP;
-                        userAddress.RealName = string.Empty;
-
-                        // Send reply
-                        chatFrame.User.Send(Raw.RPL_AUTH_SUCCESS(packageName, $"{user}@{domain}", 0));
-                    }
-
-                    return;
-                }
-
-                if (supportPackageSequence == EnumSupportPackageSequence.SSP_CREDENTIALS)
-                {
-                    chatFrame.User.Send(Raw.RPL_AUTH_SEC_REPLY(packageName, "OK"));
-                    return;
-                }
-            }
-
-            // auth failed
-            chatFrame.User.Disconnect(
-                Raw.IRCX_ERR_AUTHENTICATIONFAILED_910(chatFrame.Server, chatFrame.User, packageName));
         }
     }
 }
