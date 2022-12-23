@@ -5,7 +5,7 @@ namespace Irc.Security;
 
 public class SupportPackage : ISupportPackage
 {
-    protected ICredential _credentials;
+    protected ICredential Credentials;
     public bool Guest;
     public bool Listed = true;
     public EnumSupportPackageSequence ServerSequence;
@@ -45,7 +45,7 @@ public class SupportPackage : ISupportPackage
 
     public ICredential GetCredentials()
     {
-        return _credentials;
+        return Credentials;
     }
 
     public bool IsAuthenticated()

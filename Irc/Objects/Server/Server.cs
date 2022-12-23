@@ -151,7 +151,8 @@ public class Server : ChatObject, IServer
     public IList<IUser> GetUsersByList(List<string> nicknames, char separator)
     {
         return Users.Where(user =>
-            nicknames.Contains(user.GetAddress().Nickname, StringComparer.InvariantCultureIgnoreCase)).ToList();
+                nicknames.Contains(user.GetAddress().Nickname, StringComparer.InvariantCultureIgnoreCase)).Distinct()
+            .ToList();
     }
 
     public IList<IChannel> GetChannels()

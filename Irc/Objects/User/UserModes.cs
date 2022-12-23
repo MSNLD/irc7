@@ -1,5 +1,4 @@
 ﻿using Irc.Constants;
-using Irc.Interfaces;
 using Irc.Modes.User;
 
 namespace Irc.Objects.User;

@@ -1,4 +1,6 @@
-﻿using Irc.Interfaces;
+﻿using System.Text.RegularExpressions;
+using Irc.Constants;
+using Irc.Interfaces;
 using Irc.Models.Enumerations;
 
 namespace Irc.Commands;
@@ -25,8 +27,23 @@ public class Nick : Command, ICommand
         else HandleRegisteredNicknameChange(chatFrame);
     }
 
+    private bool ValidateNickname(string nickname)
+    {
+        return Regex.Match(nickname, Resources.NicknameMask).Success;
+    }
+
     private bool HandleUnregisteredNicknameChange(IChatFrame chatFrame)
     {
+        var newNick = chatFrame.Message.Parameters.First();
+
+        var isValid = ValidateNickname(newNick);
+        if (!isValid)
+        {
+            chatFrame.User.Send(Raw.IRCX_ERR_ERRONEOUSNICK_432(chatFrame.Server, chatFrame.User, newNick));
+            // Invalid Nickname
+            return false;
+        }
+        
         chatFrame.User.GetAddress().Nickname = chatFrame.Message.Parameters.First();
         chatFrame.User.Name = chatFrame.User.GetAddress().Nickname;
         return true;
@@ -34,8 +51,30 @@ public class Nick : Command, ICommand
 
     private bool HandleRegisteredNicknameChange(IChatFrame chatFrame)
     {
-        chatFrame.User.GetAddress().Nickname = chatFrame.Message.Parameters.First();
-        chatFrame.User.Name = chatFrame.User.GetAddress().Nickname;
+        var newNick = chatFrame.Message.Parameters.First();
+
+        var isValid = ValidateNickname(newNick);
+        if (!isValid)
+        {
+            chatFrame.User.Send(Raw.IRCX_ERR_ERRONEOUSNICK_432(chatFrame.Server, chatFrame.User, newNick));
+            // Invalid Nickname
+            return false;
+        }
+        
+        var channels = chatFrame.User.GetChannels();
+        var inUse = channels.Count(kvp => kvp.Key.GetMemberByNickname(newNick) != null);
+        if (inUse > 0)
+        {
+            chatFrame.User.Send(Raw.IRCX_ERR_NICKINUSE_433(chatFrame.User.Server, chatFrame.User, newNick));
+            // Nickname in use
+            return false;
+        }
+
+        var raw = Raw.RPL_NICK(chatFrame.Server, chatFrame.User, newNick);
+        chatFrame.User.GetAddress().Nickname = newNick;
+        chatFrame.User.Name = newNick;
+        chatFrame.User.Send(raw);
+        chatFrame.User.BroadcastToChannels(raw, true);
         return true;
     }
 }

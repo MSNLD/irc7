@@ -157,9 +157,9 @@ public static class Raw
         return $":{user.GetAddress()} KNOCK {channel} %s";
     }
 
-    public static string RPL_NICK(IServer server, IUser user)
+    public static string RPL_NICK(IServer server, IUser user, string nickname)
     {
-        return $":{user.GetAddress()} NICK %s";
+        return $":{user.GetAddress()} NICK {nickname}";
     }
 
     public static string RPL_PONG(IServer server, IUser user)
@@ -266,7 +266,7 @@ public static class Raw
         return $":{server} 266 {user} :Current global users: {globalUsers} Max: {globalMax}";
     }
 
-    public static string IRCX_RPL_AWAY_301(IServer server, IUser user)
+    public static string IRCX_RPL_AWAY_301(IServer server, IUser user, IUser targetUser, string reason)
     {
         return $":{server} 301 {user} %s :%s";
     }
@@ -517,14 +517,14 @@ public static class Raw
         return $":{server} 422 {user} :MOTD File is missing";
     }
 
-    public static string IRCX_ERR_ERRONEOUSNICK_432(IServer server, IUser user)
+    public static string IRCX_ERR_ERRONEOUSNICK_432(IServer server, IUser user, string nick)
     {
-        return $":{server} 432 %s :Erroneous nickname";
+        return $":{server} 432 {nick} :Erroneous nickname";
     }
 
-    public static string IRCX_ERR_NICKINUSE_433(IServer server, IUser user)
+    public static string IRCX_ERR_NICKINUSE_433(IServer server, IUser user, string nick)
     {
-        return $":{server} 433 * {user} :Nickname is already in use";
+        return $":{server} 433 {user} {nick} :Nickname is already in use";
     }
 
     public static string IRCX_ERR_NONICKCHANGES_439(IServer server, IUser user)
@@ -777,12 +777,12 @@ public static class Raw
 
     public static string IRCX_RPL_USERUNAWAY_821(IServer server, IUser user)
     {
-        return $":{user.GetAddress()} 821 :IUser unaway";
+        return $":{user.GetAddress()} 821 :User unaway";
     }
 
-    public static string IRCX_RPL_USERNOWAWAY_822(IServer server, IUser user)
+    public static string IRCX_RPL_USERNOWAWAY_822(IServer server, IUser user, string reason)
     {
-        return $":{user.GetAddress()} 822 :%s";
+        return $":{user.GetAddress()} 822 :{reason}";
     }
 
     public static string IRCX_RPL_REVEAL_851(IServer server, IUser user)
