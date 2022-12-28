@@ -63,9 +63,15 @@ internal class Join : Command, ICommand
 
             var channelAccessResult = channel.GetAccess(user, key);
 
-            if (!channel.Allows(user) || channelAccessResult < EnumChannelAccessResult.NONE)
+            if (channel.IsOnChannel(user))
             {
-                user.Send("CANNOT JOIN CHANNEL");
+                user.Send(Raw.IRCX_ERR_ALREADYONCHANNEL_927(server, user, channel));
+                continue;
+            }
+            
+            if (channelAccessResult < EnumChannelAccessResult.NONE)
+            {
+                user.Send($"Bad Access: {channelAccessResult}");
                 continue;
             }
 

@@ -22,9 +22,9 @@ public class Admin : Command, ICommand
          <- :sky-8a15b323126 259 Sky :
         */
         var hasAdminInfo = false;
-        var adminInfo1 = "Your Admin is X";
-        var adminInfo2 = "Y and Z";
-        var adminInfo3 = "admin@aol.com";
+        var adminInfo1 = chatFrame.Server.GetDataStore().Get("admininfo1");
+        var adminInfo2 = chatFrame.Server.GetDataStore().Get("admininfo2");
+        var adminInfo3 = chatFrame.Server.GetDataStore().Get("admininfo3");
 
         if (!string.IsNullOrWhiteSpace(adminInfo1))
         {

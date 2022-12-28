@@ -1,4 +1,7 @@
 {
-  "Id": "DefaultServerId",
-  "Name": "DefaultServerName"
+  "id": "DefaultServerId",
+  "name": "DefaultServerName",
+  "admininfo1": "Your Admin is <Name>",
+  "admininfo2": "Can be contacted at",
+  "admininfo3": "Email: admin@hostname"
 }

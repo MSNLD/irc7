@@ -33,8 +33,9 @@ public class Command : ICommand
 
     public bool CheckParameters(IChatFrame chatFrame)
     {
-        if (chatFrame.Message.Parameters.Count >= MinParams) return true;
-        if (MaxParams < 0 || chatFrame.Message.Parameters.Count <= MaxParams) return true;
+        if (chatFrame.Message.Parameters.Count >= MinParams &&
+             (MaxParams < 0 || chatFrame.Message.Parameters.Count <= MaxParams)
+           ) return true;
 
         chatFrame.User.Send(Raw.IRCX_ERR_NEEDMOREPARAMS_461(chatFrame.Server, chatFrame.User, GetName()));
         return false;

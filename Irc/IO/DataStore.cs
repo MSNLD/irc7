@@ -7,7 +7,7 @@ public class DataStore : IDataStore
 {
     private readonly bool _persist;
     private readonly string _section;
-    private readonly Dictionary<string, string> _sets = new(StringComparer.InvariantCultureIgnoreCase);
+    private readonly Dictionary<string, string> _sets = new(StringComparer.OrdinalIgnoreCase);
     private string _id;
 
     public DataStore(string id, string section, bool persist = true)
@@ -21,6 +21,7 @@ public class DataStore : IDataStore
     {
         if (!string.IsNullOrWhiteSpace(path))
             _sets = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(path));
+        _sets = new Dictionary<string, string>(_sets, StringComparer.OrdinalIgnoreCase);
     }
 
     public void SetId(string id)

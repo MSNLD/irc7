@@ -12,6 +12,7 @@ public interface IChannel: IChatObject
     public IChannel Part(IUser user);
     public IChannel Quit(IUser user);
     public IChannel Kick(IUser source, IUser target, string reason);
+    public bool IsOnChannel(IUser user);
     public void SendMessage(IUser user, string message);
     public void SendNotice(IUser user, string message);
     public IList<IChannelMember> GetMembers();

@@ -129,7 +129,7 @@ public class Channel : ChatObject, IChannel
 
         if (!source.IsOwner() && (requiredLevel >= EnumChannelAccessLevel.ChatOwner || target.IsOwner()))
             return EnumIrcError.ERR_NOCHANOWNER;
-        if (!source.IsHost() && requiredLevel >= EnumChannelAccessLevel.ChatVoice) return EnumIrcError.ERR_NOCHANOP;
+        if (!source.IsHost() && !source.IsOwner() && requiredLevel >= EnumChannelAccessLevel.ChatVoice) return EnumIrcError.ERR_NOCHANOP;
         return EnumIrcError.OK;
     }
 

@@ -11,7 +11,7 @@ namespace Irc.Extensions.Commands;
 
 internal class Access : Command, ICommand
 {
-    public Access() : base(2)
+    public Access() : base(1)
     {
     }
 
@@ -57,6 +57,13 @@ internal class Access : Command, ICommand
         {
             case AccessCommand.LIST:
             {
+                if (!CanModify(chatFrame, targetObject))
+                {
+                    chatFrame.User.Send(Raw.IRCX_ERR_SECURITY_908(chatFrame.Server, chatFrame.User));
+                    // No permissions
+                    return;
+                }
+                
                 ListAccess(chatFrame, targetObject);
                 break;
             }
