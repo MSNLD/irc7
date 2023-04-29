@@ -28,9 +28,9 @@ public static class Raw
         return $"ERROR :Closing Link: {user}[%s] 009 (Output Saturation)";
     }
 
-    public static string IRCX_CLOSINGLINK_011_PINGTIMEOUT(IServer server, IUser user)
+    public static string IRCX_CLOSINGLINK_011_PINGTIMEOUT(IServer server, IUser user, string ip)
     {
-        return $"ERROR :Closing Link: {user}[%s] 011 (Ping timeout)";
+        return $"ERROR :Closing Link: {user}[{ip}] 011 (Ping timeout)";
     }
 
     public static string RPL_AUTH_INIT(IServer server, IUser user)

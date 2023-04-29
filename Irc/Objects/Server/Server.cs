@@ -244,6 +244,7 @@ public class Server : ChatObject, IServer
                 }
 
                 if (!user.DisconnectIfOutgoingThresholdExceeded()) user.Flush();
+                user.DisconnectIfInactive();
             }
 
             if (!hasWork)

@@ -48,4 +48,5 @@ public interface IUser
     void Register();
     void Authenticate();
     IDataStore GetDataStore();
+    void DisconnectIfInactive();
 }

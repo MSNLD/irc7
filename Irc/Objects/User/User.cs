@@ -29,6 +29,7 @@ public class User : ChatObject, IUser
     public string Client;
 
     public long LastIdle;
+    public long PingCount;
     public long LoggedOn;
 
     public User(IConnection connection, IProtocol protocol, IDataRegulator dataRegulator,
@@ -46,6 +47,8 @@ public class User : ChatObject, IUser
 
         _connection.OnReceive += (sender, s) =>
         {
+            LastIdle = DateTime.UtcNow.Ticks;
+            PingCount = 0;
             var message = new Message(_protocol, s);
             dataRegulator.PushIncoming(message);
         };
@@ -247,6 +250,25 @@ public class User : ChatObject, IUser
         }
 
         return false;
+    }
+
+    public void DisconnectIfInactive()
+    {
+        var seconds = (DateTime.UtcNow.Ticks - LastIdle) / TimeSpan.TicksPerSecond;
+        if (seconds > ((PingCount + 1) * 10))
+        {
+            if (PingCount < 3)
+            {
+                Console.WriteLine($"Ping Count for {this} hit stage {PingCount+1}");
+                PingCount++;
+                Send(Raw.RPL_PING(Server, this));
+            }
+            else
+            {
+                GetDataRegulator().Purge();
+                Disconnect(Raw.IRCX_CLOSINGLINK_011_PINGTIMEOUT(Server, this, _connection.GetAddress()));
+            }
+        }
     }
 
     public void Register()
