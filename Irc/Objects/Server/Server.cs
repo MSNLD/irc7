@@ -341,7 +341,7 @@ public class Server : ChatObject, IServer
                     }
                     catch (Exception e)
                     {
-                        chatFrame.User.Send(IrcRaws.IRC_RAW_999(chatFrame.Server, chatFrame.User, e));
+                        chatFrame.User.Send(IrcRaws.IRC_RAW_999(chatFrame.Server, chatFrame.User, Resources.ServerError));
                     }
                 }
 

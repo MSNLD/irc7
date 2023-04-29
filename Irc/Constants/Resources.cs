@@ -80,6 +80,7 @@ public static long epoch = 621355968000000000;
     public static string Service = "SERVICE";
     public static string Delete = "DELETE";
     public static string IRCXOptions = "*";
+    public static string ServerError = "Server Error. Please report this to the Administrator";
 
 
     public static string UserAccessGroupService = "Service Accounts";
