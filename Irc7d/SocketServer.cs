@@ -32,6 +32,24 @@ public class SocketServer : Socket, ISocketServer
     public int BuffSize { get; }
     public int CurrentConnections { get; }
 
+
+    public void AcceptConnection(Socket acceptSocket)
+    {
+        var connection = new SocketConnection(acceptSocket) as IConnection;
+        OnClientConnecting?.Invoke(this, connection);
+    }
+    public void AcceptLoop(SocketAsyncEventArgs args)
+    {
+        do
+        {
+            AcceptConnection(args.AcceptSocket);
+            // Get next socket
+            // Reset AcceptSocket for next accept
+            args.AcceptSocket = null;
+        }
+        while (!AcceptAsync(args));
+    }
+
     public void Listen()
     {
         Bind(new IPEndPoint(IP, Port));
@@ -43,13 +61,7 @@ public class SocketServer : Socket, ISocketServer
         var acceptAsync = new SocketAsyncEventArgs();
         acceptAsync.Completed += (sender, args) =>
         {
-            var connection = new SocketConnection(args.AcceptSocket) as IConnection;
-            OnClientConnecting?.Invoke(this, connection);
-
-            // Get next socket
-            // Reset AcceptSocket for next accept
-            args.AcceptSocket = null;
-            AcceptAsync(acceptAsync);
+            AcceptLoop(args);
         };
 
         // Get first socket

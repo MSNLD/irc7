@@ -13,6 +13,7 @@
     <Compile Remove="Operations\**" />
     <EmbeddedResource Remove="Operations\**" />
     <None Remove="Operations\**" />
+    <None Remove="Logging\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,6 +22,7 @@
 
   <ItemGroup>
     <Folder Include="Modes\Server\" />
+    <Folder Include="Logging\" />
   </ItemGroup>
 
 </Project>
