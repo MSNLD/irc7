@@ -33,3 +33,6 @@ msbuild.wrn
 
 # Config specific files
 DefaultServer.json
+
+#irc7d specific files
+states/
