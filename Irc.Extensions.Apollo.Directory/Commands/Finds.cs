@@ -1,5 +1,6 @@
 ﻿using Irc.Commands;
 using Irc.Enumerations;
+using Irc.Extensions.Apollo.Directory;
 
 namespace Irc.Extensions.Apollo.Commands;
 
@@ -17,6 +18,6 @@ internal class Finds : Command, ICommand
 
     public void Execute(ChatFrame chatFrame)
     {
-        chatFrame.User.Send(Raw.IRCX_RPL_FINDS_613(chatFrame.Server, chatFrame.User));
+        chatFrame.User.Send(ApolloDirectoryRaws.RPL_FINDS_MSN((DirectoryServer)chatFrame.Server, chatFrame.User));
     }
 }

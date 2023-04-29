@@ -14,6 +14,8 @@ namespace Irc.Extensions.Apollo.Directory
 {
     public class DirectoryServer: Apollo.Objects.Server.ApolloServer
     {
+        public string ChatServerIP;
+
         public DirectoryServer(ISocketServer socketServer, ISecurityManager securityManager,
         IFloodProtectionManager floodProtectionManager, IDataStore dataStore, IList<IChannel> channels,
         ICommandCollection commands, IUserFactory userFactory = null, ICredentialProvider ntlmCredentialProvider = null) : base(socketServer, securityManager,

@@ -55,6 +55,7 @@ internal class Program
             CommandOptionType.SingleValue);
         var serverType = app.Option("-t|--type <type>",
             "Type of server e.g. IRC, IRCX, MSN, DIR", CommandOptionType.SingleValue);
+        var chatServerIP = app.Option("-s|--server", "The Chat Server IP (temporary, DIR mode only)", CommandOptionType.SingleValue);
 
         app.OnExecute(() =>
         {
@@ -83,13 +84,16 @@ internal class Program
                 var fqdn = "localhost";
                 if (fqdnOption.HasValue()) fqdn = fqdnOption.Value();
 
+                var forwardServer = "";
+                if (chatServerIP.HasValue()) forwardServer = chatServerIP.Value();
+
                 Enum.TryParse<IrcType>(serverType.Value(), true, out var type);
 
                 var socketServer = new SocketServer(ip, port, backlog, maxConnections, bufferSize);
                 socketServer.OnListen += (sender, server1) =>
                 {
                     Console.WriteLine(
-                        $"Listening on {ip}:{port} backlog={backlog} buffer={bufferSize} maxconn={maxConnections} fqdn={fqdn} type={type}");
+                        $"Listening on {ip}:{port} backlog={backlog} buffer={bufferSize} maxconn={maxConnections} fqdn={fqdn} type={type} {(chatServerIP.HasValue() ? "forwardserver=" : "")}{forwardServer}");
                 };
 
                 var securityManager = new SecurityManager();
@@ -122,6 +126,7 @@ internal class Program
                             string motd = "\r\n** Welcome to the MSN.com Chat Service Network **\r\n";
 
                             server.SetMOTD(motd);
+                            ((DirectoryServer)server).ChatServerIP = forwardServer;
 
                             break;
                         }
