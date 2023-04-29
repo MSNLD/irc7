@@ -15,6 +15,7 @@ namespace Irc.Extensions.Apollo.Directory
     public class DirectoryServer: Apollo.Objects.Server.ApolloServer
     {
         public string ChatServerIP;
+        public string ChatServerPORT;
 
         public DirectoryServer(ISocketServer socketServer, ISecurityManager securityManager,
         IFloodProtectionManager floodProtectionManager, IDataStore dataStore, IList<IChannel> channels,
