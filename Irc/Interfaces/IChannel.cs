@@ -24,6 +24,7 @@ public interface IChannel
     EnumIrcError CanModifyMember(IChannelMember source, IChannelMember target, EnumChannelAccessLevel requiredLevel);
     void ProcessChannelError(EnumIrcError error, IServer server, IUser source, ChatObject target = null, string data = null);
     IChannel SendTopic(IUser user);
+    IChannel SendTopic();
     IChannel SendNames(IUser user);
     bool Allows(IUser user);
     IModeCollection GetModes();

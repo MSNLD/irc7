@@ -33,6 +33,7 @@ public class Irc : Protocol, IProtocol
         AddCommand(new Links());
         AddCommand(new Whois());
         AddCommand(new Users());
+        AddCommand(new Topic());
     }
 
     public new ICommand GetCommand(string name)

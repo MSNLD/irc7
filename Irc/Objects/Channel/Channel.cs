@@ -78,6 +78,11 @@ public class Channel : ChatObject, IChannel
         user.Send(Raw.IRCX_RPL_TOPIC_332(user.Server, user, this, DataStore.Get("topic")));
         return this;
     }
+    public IChannel SendTopic()
+    {
+        _members.ToList().ForEach(member => SendTopic(member.GetUser()));
+        return this;
+    }
 
     public IChannel SendNames(IUser user)
     {

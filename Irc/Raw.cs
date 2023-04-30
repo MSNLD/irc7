@@ -73,9 +73,9 @@ public static class Raw
         return $":{user.GetAddress()} MODE {target} {modeString}";
     }
 
-    public static string RPL_TOPIC_IRC(IServer server, IUser user, IChannel channel)
+    public static string RPL_TOPIC_IRC(IServer server, IUser user, IChannel channel, string topic)
     {
-        return $":{user.GetAddress()} TOPIC {channel} :%s";
+        return $":{user.GetAddress()} TOPIC {channel} :{topic}";
     }
 
     public static string RPL_PROP_IRCX(IServer server, IUser user, IChannel channel)

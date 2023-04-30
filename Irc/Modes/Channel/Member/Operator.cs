@@ -38,16 +38,16 @@ namespace Irc.Modes.Channel.Member
 
             IChannelMember sourceMember = channel.GetMember((IUser)source);
 
-            EnumIrcError result = channel.CanModifyMember(sourceMember, targetMember, EnumChannelAccessLevel.ChatHost);
+            EnumIrcError result = sourceMember.CanModify(targetMember, EnumChannelAccessLevel.ChatHost);
             if (result != EnumIrcError.OK) return result;
 
             if (targetMember.IsOwner())
             {
                 targetMember.SetOwner(false);
-                ModeRule.DispatchModeChange(Resources.MemberModeOwner, source, target, false, parameter);
+                ModeRule.DispatchModeChange(Resources.MemberModeOwner, source, target, false, targetMember.GetUser().ToString());
             }
             targetMember.SetHost(flag);
-            DispatchModeChange(source, target, flag, parameter);
+            DispatchModeChange(source, target, flag, targetMember.GetUser().ToString());
             return result;
         }
     }

@@ -2,7 +2,7 @@
 
 namespace Irc.Commands;
 
-internal class Ping : Command, ICommand
+public class Ping : Command, ICommand
 {
     public Ping() : base(1, false) { }
     public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;

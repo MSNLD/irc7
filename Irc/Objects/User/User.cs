@@ -252,12 +252,14 @@ public class User : ChatObject, IUser
         return false;
     }
 
+    public static long PING_INTERVAL = 180;
+    public static long PING_MAX_ATTEMPTS = 3;
     public void DisconnectIfInactive()
     {
         var seconds = (DateTime.UtcNow.Ticks - LastIdle) / TimeSpan.TicksPerSecond;
-        if (seconds > ((PingCount + 1) * 10))
+        if (seconds > ((PingCount + 1) * PING_INTERVAL))
         {
-            if (PingCount < 3)
+            if (PingCount < PING_MAX_ATTEMPTS)
             {
                 Console.WriteLine($"Ping Count for {this} hit stage {PingCount+1}");
                 PingCount++;

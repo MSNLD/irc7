@@ -31,6 +31,8 @@ namespace Irc.Extensions.Apollo.Directory
             AddCommand(new Finds());
             AddCommand(new Prop());
             AddCommand(new Create());
+            AddCommand(new Ping());
+            AddCommand(new Pong());
         }
     }
 }
