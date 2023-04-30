@@ -98,16 +98,42 @@ public class Prop : Command, ICommand
             else
             {
                 var props = new List<IPropRule>();
-                if (chatFrame.Message.Parameters[1] == "*")
+                if (chatFrame.Message.Parameters.Count >= 3)
                 {
-                    props.AddRange(chatObject.PropCollection.GetProps());
-                }
-                else
-                {
+                    // Setter
+                    // TODO: Needs refactoring
                     var prop = chatObject.PropCollection.GetProp(chatFrame.Message.Parameters[1]);
                     if (prop != null)
                     {
-                        props.Add(prop);
+                        if (chatObject.CanBeModifiedBy((ChatObject)chatFrame.User))
+                        {
+                            if (chatObject is Channel)
+                            {
+                                var channelMember = ((Channel)chatObject).GetMember(chatFrame.User);
+                                if (channelMember.GetLevel() >= prop.WriteLevel)
+                                {
+                                    var propValue = chatFrame.Message.Parameters[2];
+                                    prop.SetValue(propValue);
+                                    chatObject.Send(Raw.RPL_PROP_IRCX(chatFrame.Server, chatFrame.User, (ChatObject)chatObject, prop.Name, propValue));
+                                }
+                                else chatFrame.User.Send(Raw.IRCX_ERR_NOACCESS_913(chatFrame.Server, chatFrame.User, chatObject));
+                            }
+                            else if (chatObject == chatFrame.User)
+                            {
+                                var propValue = chatFrame.Message.Parameters[2];
+                                prop.SetValue(propValue);
+                                chatObject.Send(Raw.RPL_PROP_IRCX(chatFrame.Server, chatFrame.User, (ChatObject)chatObject, prop.Name, propValue));
+                            }
+                            else
+                            {
+                                chatFrame.User.Send(Raw.IRCX_ERR_NOACCESS_913(chatFrame.Server, chatFrame.User, chatObject));
+                            }
+
+                        }
+                        else
+                        {
+                            chatFrame.User.Send(Raw.IRCX_ERR_NOACCESS_913(chatFrame.Server, chatFrame.User, chatObject));
+                        }
                     }
                     else
                     {
@@ -115,11 +141,34 @@ public class Prop : Command, ICommand
                         chatFrame.User.Send(Raw.IRCX_ERR_BADPROPERTY_905(chatFrame.Server, chatFrame.User, objectName));
                     }
                 }
-
-                if (props.Count > 0)
+                else
                 {
-                    SendProps(chatFrame.Server, chatFrame.User, chatObject, props);
+                    // Getter
+
+                    if (chatFrame.Message.Parameters[1] == "*")
+                    {
+                        props.AddRange(chatObject.PropCollection.GetProps());
+                    }
+                    else
+                    {
+                        var prop = chatObject.PropCollection.GetProp(chatFrame.Message.Parameters[1]);
+                        if (prop != null)
+                        {
+                            props.Add(prop);
+                        }
+                        else
+                        {
+                            // Bad prop
+                            chatFrame.User.Send(Raw.IRCX_ERR_BADPROPERTY_905(chatFrame.Server, chatFrame.User, objectName));
+                        }
+                    }
+
+                    if (props.Count > 0)
+                    {
+                        SendProps(chatFrame.Server, chatFrame.User, chatObject, props);
+                    }
                 }
+
             }
         }
     }

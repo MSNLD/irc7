@@ -161,9 +161,18 @@ public class Channel : ChatObject, IChannel
             else if (source.GetUser().GetLevel() < EnumUserAccessLevel.Administrator && source.GetUser().GetLevel() < target.GetUser().GetLevel()) return EnumIrcError.ERR_NOPERMS;
         }
 
-        if (!source.IsOwner() && (requiredLevel >= EnumChannelAccessLevel.ChatOwner || target.IsOwner())) return EnumIrcError.ERR_NOCHANOWNER;
-        else if (!source.IsHost() && requiredLevel >= EnumChannelAccessLevel.ChatVoice) return EnumIrcError.ERR_NOCHANOP;
-        else return EnumIrcError.OK;
+        if (source.GetLevel() >= requiredLevel)
+        {
+            return EnumIrcError.OK;
+        }
+        else if (!source.IsOwner() && requiredLevel >= EnumChannelAccessLevel.ChatOwner)
+        {
+            return EnumIrcError.ERR_NOCHANOWNER;
+        }
+        else
+        {
+            return EnumIrcError.ERR_NOCHANOP;
+        }
     }
 
     public void ProcessChannelError(EnumIrcError error, IServer server, IUser source, ChatObject target = null, string data = null)

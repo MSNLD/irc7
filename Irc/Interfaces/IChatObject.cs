@@ -15,5 +15,6 @@ namespace Irc.Interfaces
         void Send(string message);
         void Send(string message, ChatObject except = null);
         string ToString();
+        public bool CanBeModifiedBy(ChatObject source);
     }
 }

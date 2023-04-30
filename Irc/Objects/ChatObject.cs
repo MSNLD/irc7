@@ -57,4 +57,9 @@ public class ChatObject : IChatObject
     {
         return Name;
     }
+
+    public bool CanBeModifiedBy(ChatObject source)
+    {
+        throw new NotImplementedException();
+    }
 }

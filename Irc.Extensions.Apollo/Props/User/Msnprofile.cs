@@ -1,5 +1,7 @@
-﻿using Irc.Extensions.Apollo.Objects.User;
+﻿using Irc.Enumerations;
+using Irc.Extensions.Apollo.Objects.User;
 using Irc.Extensions.Props;
+using Irc.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,11 +25,12 @@ namespace Irc.Extensions.Apollo.Props.User
             return string.Empty;
         }
 
-        public override void SetValue(string value)
+        public override EnumIrcError SetValue(string value, ChatObject chatObject)
         {
             // TODO: Need to reply bad value if not valid, or reject if already done more than once
             int.TryParse(value, out var profileCode);
             profile.SetProfileCode(profileCode);
+            return EnumIrcError.OK;
         }
     }
 }

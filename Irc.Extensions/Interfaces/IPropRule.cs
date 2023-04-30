@@ -1,4 +1,5 @@
 ﻿using Irc.Enumerations;
+using Irc.Objects;
 
 namespace Irc.Extensions.Interfaces
 {
@@ -9,6 +10,6 @@ namespace Irc.Extensions.Interfaces
         string Name { get; }
         bool ReadOnly { get; }
         string GetValue();
-        void SetValue(string value);
+        EnumIrcError SetValue(string value, ChatObject source = null);
     }
 }

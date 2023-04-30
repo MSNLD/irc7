@@ -26,14 +26,10 @@ namespace Irc.Extensions.Props
         private string _value { get; set; }
         public bool ReadOnly { get; }
 
-        public EnumIrcError SetValue(ChatObject source, string value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void SetValue(string value)
+        public virtual EnumIrcError SetValue(string value, ChatObject source = null)
         {
             _value = value;
+            return EnumIrcError.OK;
         }
 
         public virtual string GetValue() => _value;

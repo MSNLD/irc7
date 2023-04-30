@@ -78,9 +78,9 @@ public static class Raw
         return $":{user.GetAddress()} TOPIC {channel} :{topic}";
     }
 
-    public static string RPL_PROP_IRCX(IServer server, IUser user, IChannel channel)
+    public static string RPL_PROP_IRCX(IServer server, IUser user, ChatObject chatObject, string propName, string propValue)
     {
-        return $":{user.GetAddress()} PROP {channel} %s :%s";
+        return $":{user.GetAddress()} PROP {chatObject} {propName} :{propValue}";
     }
 
     public static string RPL_KICK_IRC(IUser user, IChannel channel, IUser target, string reason)
@@ -852,9 +852,9 @@ public static class Raw
         return $":{server} 912 {user} {package} :Unsupported authentication package";
     }
 
-    public static string IRCX_ERR_NOACCESS_913(IServer server, IUser user)
+    public static string IRCX_ERR_NOACCESS_913(IServer server, IUser user, IChatObject chatObject)
     {
-        return $":{server} 913 {user} %s :No access";
+        return $":{server} 913 {user} {chatObject} :No access";
     }
 
     public static string IRCX_ERR_DUPACCESS_914(IServer server, IUser user)
