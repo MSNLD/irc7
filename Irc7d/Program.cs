@@ -2,6 +2,7 @@
 
 using System.Net;
 using System.Text.Json;
+using System.Threading;
 using Irc.Extensions.Apollo.Directory;
 using Irc.Extensions.Apollo.Factories;
 using Irc.Extensions.Apollo.Objects.Channel;
@@ -32,6 +33,8 @@ namespace Irc7d;
 internal class Program
 {
     private enum IrcType { IRC, IRCX, MSN, DIR };
+    private static IServer server = null;
+    private static CancellationTokenSource cancellationTokenSource;
     private static void Main(string[] args)
     {
         var app = new CommandLineApplication();
@@ -57,7 +60,7 @@ internal class Program
             "Type of server e.g. IRC, IRCX, MSN, DIR", CommandOptionType.SingleValue);
         var chatServerIP = app.Option("-s|--server", "The Chat Server IP and Port e.g. 127.0.0.1:6667 (temporary, DIR mode only)", CommandOptionType.SingleValue);
 
-        app.OnExecute(() =>
+        app.OnExecute(async () =>
         {
             if (app.OptionHelp.HasValue())
             {
@@ -99,7 +102,7 @@ internal class Program
                 var securityManager = new SecurityManager();
                 securityManager.AddSupportPackage(new NTLM(new NTLMCredentials()));
 
-                IServer server = null;
+                
 
                 switch (type)
                 {
@@ -164,13 +167,22 @@ internal class Program
                     server.AddChannel(channel);
                 }
 
-                Console.ReadLine();
-                server.Shutdown();
+                cancellationTokenSource = new CancellationTokenSource();
+                AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+                Console.CancelKeyPress += CurrentDomain_ProcessExit;
+                await Task.Delay(-1, cancellationTokenSource.Token).ContinueWith(t => { });
             }
 
             return 0;
         });
 
         app.Execute(args);
+    }
+
+    private static void CurrentDomain_ProcessExit(object? sender, EventArgs e)
+    {
+        Console.WriteLine("Shutting down...");
+        server.Shutdown();
+        cancellationTokenSource.Cancel();
     }
 }
