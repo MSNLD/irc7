@@ -126,9 +126,6 @@ internal class Program
                             new DataStore("DefaultServer.json"),
                             new List<IChannel>(), null, new ApolloUserFactory());
 
-                            string motd = "\r\n** Welcome to the MSN.com Chat Service Network **\r\n";
-
-                            server.SetMOTD(motd);
                             var parts = forwardServer.Split(':', StringSplitOptions.None);
                             if (parts.Length > 0) ((DirectoryServer)server).ChatServerIP = parts[0];
                             if (parts.Length > 1) ((DirectoryServer)server).ChatServerPORT = parts[1];

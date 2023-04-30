@@ -1,4 +1,5 @@
 {
   "Id": "DefaultServerId",
-  "Name": "DefaultServerName"
+  "Name": "DefaultServerName",
+  "Motd": "[\"*** Welcome to the Server ***\"]"
 }
