@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Irc.Constants;
 
 namespace Irc.Extensions.Props.Channel
 {
@@ -13,7 +14,7 @@ namespace Irc.Extensions.Props.Channel
         // The ACCOUNT property is limited to 31 characters.
         // It can only be read by sysop managers, sysops and owners of the channel.
 
-        public Account() : base(ExtendedResources.ChannelPropAccount, EnumChannelAccessLevel.ChatHost, EnumChannelAccessLevel.ChatHost, string.Empty, true)
+        public Account() : base(ExtendedResources.ChannelPropAccount, EnumChannelAccessLevel.ChatHost, EnumChannelAccessLevel.ChatHost, Resources.GenericProps, string.Empty, true)
         {
 
         }

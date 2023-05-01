@@ -1,4 +1,5 @@
-﻿using Irc.Extensions.Interfaces;
+﻿using Irc.Constants;
+using Irc.Extensions.Interfaces;
 using Irc.IO;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace Irc.Extensions.Props.User
         private readonly IDataStore dataStore;
 
         // limited to 200 bytes including 1 or 2 characters for channel prefix
-        public Nick(IDataStore dataStore) : base(ExtendedResources.UserPropNickname, EnumChannelAccessLevel.ChatMember, EnumChannelAccessLevel.ChatMember, string.Empty, true)
+        public Nick(IDataStore dataStore) : base(ExtendedResources.UserPropNickname, EnumChannelAccessLevel.ChatMember, EnumChannelAccessLevel.ChatMember, Resources.GenericProps, string.Empty, true)
         {
             this.dataStore = dataStore;
         }

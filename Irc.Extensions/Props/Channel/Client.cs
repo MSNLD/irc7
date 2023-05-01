@@ -1,4 +1,5 @@
-﻿using Irc.Enumerations;
+﻿using Irc.Constants;
+using Irc.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace Irc.Extensions.Props.Channel
         // The format is not defined by the server.
         // The CLIENT property is limited to 255 characters.
         // This property may be set and read like the TOPIC property.
-        public Client() : base(ExtendedResources.ChannelPropClient, EnumChannelAccessLevel.ChatMember, EnumChannelAccessLevel.ChatHost, string.Empty, true)
+        public Client() : base(ExtendedResources.ChannelPropClient, EnumChannelAccessLevel.ChatMember, EnumChannelAccessLevel.ChatHost, Resources.GenericProps, string.Empty, true)
         {
 
         }

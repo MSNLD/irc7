@@ -1,4 +1,5 @@
 ﻿using Irc.Enumerations;
+using Irc.Interfaces;
 using Irc.Objects;
 
 namespace Irc.Extensions.Interfaces
@@ -6,10 +7,12 @@ namespace Irc.Extensions.Interfaces
     public interface IPropRule
     {
         EnumChannelAccessLevel ReadAccessLevel { get; }
-        EnumChannelAccessLevel WriteLevel { get; }
+        EnumChannelAccessLevel WriteAccessLevel { get; }
+        EnumIrcError EvaluateSet(IChatObject source, IChatObject target, string propValue);
+        EnumIrcError EvaluateGet(IChatObject source, IChatObject target);
         string Name { get; }
         bool ReadOnly { get; }
         string GetValue();
-        EnumIrcError SetValue(string value, ChatObject source = null);
+        void SetValue(string value);
     }
 }

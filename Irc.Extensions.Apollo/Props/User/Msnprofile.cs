@@ -1,4 +1,5 @@
-﻿using Irc.Enumerations;
+﻿using Irc.Constants;
+using Irc.Enumerations;
 using Irc.Extensions.Apollo.Objects.User;
 using Irc.Extensions.Props;
 using Irc.Objects;
@@ -14,7 +15,7 @@ namespace Irc.Extensions.Apollo.Props.User
     {
         private readonly ApolloProfile profile;
 
-        public Msnprofile(ApolloProfile profile) : base(ExtendedResources.UserPropMsnProfile, EnumChannelAccessLevel.ChatMember, EnumChannelAccessLevel.ChatMember, "0", true)
+        public Msnprofile(ApolloProfile profile) : base(ExtendedResources.UserPropMsnProfile, EnumChannelAccessLevel.ChatMember, EnumChannelAccessLevel.ChatMember, Resources.GenericProps, "0", true)
         {
             this.profile = profile;
         }
@@ -25,12 +26,11 @@ namespace Irc.Extensions.Apollo.Props.User
             return string.Empty;
         }
 
-        public override EnumIrcError SetValue(string value, ChatObject chatObject)
+        public override void SetValue(string value)
         {
             // TODO: Need to reply bad value if not valid, or reject if already done more than once
             int.TryParse(value, out var profileCode);
             profile.SetProfileCode(profileCode);
-            return EnumIrcError.OK;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Irc.IO;
+﻿using Irc.Constants;
+using Irc.IO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace Irc.Extensions.Props.User
     {
         private readonly IDataStore dataStore;
 
-        public OID(IDataStore dataStore) : base(ExtendedResources.UserPropOid, EnumChannelAccessLevel.ChatMember, EnumChannelAccessLevel.ChatMember, "0", true)
+        public OID(IDataStore dataStore) : base(ExtendedResources.UserPropOid, EnumChannelAccessLevel.ChatMember, EnumChannelAccessLevel.ChatMember, Resources.GenericProps, "0", true)
         {
             this.dataStore = dataStore;
         }

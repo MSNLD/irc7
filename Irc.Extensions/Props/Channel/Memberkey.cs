@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Irc.Constants;
 
 namespace Irc.Extensions.Props.Channel
 {
@@ -10,7 +11,7 @@ namespace Irc.Extensions.Props.Channel
     {
         // The MEMBERKEY channel property is the keyword required to enter the channel. The MEMBERKEY property is limited to 31 characters. 
         // It may never be read.
-        public Memberkey() : base(ExtendedResources.ChannelPropMemberkey, EnumChannelAccessLevel.None, EnumChannelAccessLevel.ChatHost, string.Empty, false)
+        public Memberkey() : base(ExtendedResources.ChannelPropMemberkey, EnumChannelAccessLevel.None, EnumChannelAccessLevel.ChatHost, Resources.GenericProps, string.Empty, false)
         {
 
         }

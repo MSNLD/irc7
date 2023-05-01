@@ -168,6 +168,15 @@ public static long epoch = 621355968000000000;
     public static string ChannelPropOnPart = "ONPART";
     public static string ChannelPropClientGuid = "CLIENTGUID";
 
+    public static string ChannelPropNameRegex = @"^%?[#&][^ \07,]{1,200}$";
+    public static string ChannelPropOIDRegex = @"/0(?:[a-fA-F0-9]{8})?/";
+    public static string ChannelPropPICSRegex = @"[\x20-\x7F]{1,255}";
+    public static string ChannelPropTopicRegex = @"[\x20-\x7F]{1,160}";
+    public static string ChannelPropOnjoinRegex = @"[\x20-\x7F]{1,255}";
+    public static string ChannelPropOnpartRegex = @"[\x20-\x7F]{1,255}";
+    public static string ChannelPropLagRegex = @"[0-2]{1}";
+    public static string ChannelPropAccountRegex = @"[\x20-\x7F]{1,31}";
+
     #endregion
 
     #region Server Events
@@ -232,7 +241,7 @@ public static long epoch = 621355968000000000;
     #region "Regular Expressions"
 
     public static string StandardIRC = @"[(\x00-\x2C)(\x2E-\x2F)(\x3A-\x40)]{1}|\\N|\\R|\\0|\\T";
-    public static string GenericProps = @"[\x00-\x19]{1}";
+    public static string GenericProps = @"[\x20-\x7F]{0,31}";
     public static string JoinPartProp = @"[\x00]{1}";
     public static string IrcChannelRegex = @"#[\x21-\x2B,\x2D-\xFF]{1,200}";
     public static string IrcxChannelRegex = @"%#[\x21-\x2B,\x2D-\xFF]{1,200}";

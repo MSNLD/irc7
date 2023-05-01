@@ -3,6 +3,7 @@ using Irc.Enumerations;
 using Irc.Extensions.Interfaces;
 using Irc.Extensions.Objects.Channel;
 using Irc.Extensions.Objects.User;
+using Irc.Interfaces;
 using Irc.Objects;
 using Irc.Objects.Channel;
 using Irc.Objects.Server;
@@ -100,6 +101,8 @@ public class Prop : Command, ICommand
                 var props = new List<IPropRule>();
                 if (chatFrame.Message.Parameters.Count >= 3)
                 {
+                    var propValue = chatFrame.Message.Parameters[2];
+
                     // Setter
                     // TODO: Needs refactoring
                     var prop = chatObject.PropCollection.GetProp(chatFrame.Message.Parameters[1]);
@@ -107,28 +110,20 @@ public class Prop : Command, ICommand
                     {
                         if (chatObject.CanBeModifiedBy((ChatObject)chatFrame.User))
                         {
-                            if (chatObject is Channel)
-                            {
-                                var channelMember = ((Channel)chatObject).GetMember(chatFrame.User);
-                                if (channelMember.GetLevel() >= prop.WriteLevel)
-                                {
-                                    var propValue = chatFrame.Message.Parameters[2];
-                                    prop.SetValue(propValue);
-                                    chatObject.Send(Raw.RPL_PROP_IRCX(chatFrame.Server, chatFrame.User, (ChatObject)chatObject, prop.Name, propValue));
-                                }
-                                else chatFrame.User.Send(Raw.IRCX_ERR_NOACCESS_913(chatFrame.Server, chatFrame.User, chatObject));
-                            }
-                            else if (chatObject == chatFrame.User)
-                            {
-                                var propValue = chatFrame.Message.Parameters[2];
-                                prop.SetValue(propValue);
-                                chatObject.Send(Raw.RPL_PROP_IRCX(chatFrame.Server, chatFrame.User, (ChatObject)chatObject, prop.Name, propValue));
-                            }
-                            else
+                            var ircError = prop.EvaluateSet((IChatObject)chatFrame.User, chatObject, propValue);
+                            if (ircError == EnumIrcError.ERR_NOPERMS)
                             {
                                 chatFrame.User.Send(Raw.IRCX_ERR_NOACCESS_913(chatFrame.Server, chatFrame.User, chatObject));
+                                return;
+                            }
+                            else if (ircError == EnumIrcError.ERR_BADVALUE)
+                            {
+                                chatFrame.User.Send(Raw.IRCX_ERR_BADVALUE_906(chatFrame.Server, chatFrame.User, propValue));
+                                return;
                             }
 
+                            prop.SetValue(propValue);
+                            chatObject.Send(Raw.RPL_PROP_IRCX(chatFrame.Server, chatFrame.User, (ChatObject)chatObject, prop.Name, propValue));
                         }
                         else
                         {
@@ -179,7 +174,7 @@ public class Prop : Command, ICommand
         var propsSent = 0;
         foreach (var prop in props)
         {
-            if (prop.ReadAccessLevel == EnumChannelAccessLevel.None)
+            if (prop.EvaluateGet((IChatObject)user, targetObject) == EnumIrcError.ERR_NOPERMS)
             {
                 if (props.Count == 1) user.Send(Raw.IRCX_ERR_SECURITY_908(server, user));
                 continue;
@@ -192,7 +187,7 @@ public class Prop : Command, ICommand
                 {
                     var member = kvp.Value;
                     var propValue = prop.GetValue();
-                    if (member.GetLevel() >= prop.ReadAccessLevel && !string.IsNullOrEmpty(propValue))
+                    if (!string.IsNullOrEmpty(propValue))
                     {
                         SendProp(server, user, targetObject, prop.Name, propValue);
                         propsSent++;
