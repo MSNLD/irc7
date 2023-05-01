@@ -28,7 +28,7 @@ public class User : ChatObject, IUser
     public IDictionary<IChannel, IChannelMember> Channels;
     public string Client;
 
-    public long LastIdle;
+    public long LastIdle = DateTime.UtcNow.Ticks;
     public long PingCount;
     public long LoggedOn;
 
