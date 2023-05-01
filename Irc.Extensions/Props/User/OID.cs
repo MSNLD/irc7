@@ -12,14 +12,14 @@ namespace Irc.Extensions.Props.User
     {
         private readonly IDataStore dataStore;
 
-        public OID(IDataStore dataStore) : base(ExtendedResources.UserPropOid, EnumChannelAccessLevel.ChatMember, EnumChannelAccessLevel.ChatMember, Resources.GenericProps, "0", true)
+        public OID(IDataStore dataStore) : base(ExtendedResources.UserPropOid, EnumChannelAccessLevel.ChatMember, EnumChannelAccessLevel.None, Resources.GenericProps, "0", true)
         {
             this.dataStore = dataStore;
         }
 
         public override string GetValue()
         {
-            return dataStore.Get("ObjectId");
+            return dataStore.Get(Resources.UserPropOid);
         }
     }
 }

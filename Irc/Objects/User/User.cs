@@ -287,4 +287,9 @@ public class User : ChatObject, IUser
     {
         return _dataStore;
     }
+
+    public virtual bool CanBeModifiedBy(ChatObject source)
+    {
+        return source == this;
+    }
 }

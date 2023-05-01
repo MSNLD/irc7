@@ -9,7 +9,7 @@ namespace Irc.Extensions.Props.Channel
 {
     internal class OID : PropRule
     {
-        public OID() : base(ExtendedResources.ChannelPropOID, EnumChannelAccessLevel.ChatMember, EnumChannelAccessLevel.ChatMember, Resources.ChannelPropOIDRegex, "0", true)
+        public OID() : base(ExtendedResources.ChannelPropOID, EnumChannelAccessLevel.ChatMember, EnumChannelAccessLevel.None, Resources.ChannelPropOIDRegex, "0", true)
         {
 
         }

@@ -49,7 +49,7 @@ namespace Irc.Extensions.Props
                     return EnumIrcError.ERR_NOPERMS;
                 }
             }
-            else if (target is IUser && source != target)
+            else if (WriteAccessLevel == EnumChannelAccessLevel.None || target is IUser && source != target)
             {
                 return EnumIrcError.ERR_NOPERMS;
             }
@@ -81,7 +81,7 @@ namespace Irc.Extensions.Props
                     return EnumIrcError.ERR_NOPERMS;
                 }
             }
-            else if (target is IUser && source != target)
+            else if (ReadAccessLevel == EnumChannelAccessLevel.None || target is IUser && source != target)
             {
                 return EnumIrcError.ERR_NOPERMS;
             }

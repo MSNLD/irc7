@@ -260,7 +260,10 @@ public class Server : ChatObject, IServer
         if (PendingNewUserQueue.Count > 0)
         {
             // add new pending users
-            foreach (var user in PendingNewUserQueue) Users.Add(user);
+            foreach (var user in PendingNewUserQueue) {
+                user.GetDataStore().Set(Resources.UserPropOid, "0");
+                Users.Add(user);
+            }
 
             Console.WriteLine($"Added {PendingNewUserQueue.Count} users. Total Users = {Users.Count}");
             PendingNewUserQueue.Clear();
