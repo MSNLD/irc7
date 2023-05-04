@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Irc.Modes.Channel
 {
-    public class Private : ModeRule, IModeRule
+    public class Private : ModeRuleChannel, IModeRule
     {
         public Private() : base(Resources.ChannelModePrivate)
         {

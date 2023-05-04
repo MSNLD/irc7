@@ -1,4 +1,6 @@
-﻿using Irc.Enumerations;
+﻿using Irc.Constants;
+using Irc.Enumerations;
+using Channel = Irc.Objects.Channel.Channel;
 
 namespace Irc.Commands;
 
@@ -21,7 +23,7 @@ public class Privmsg : Command, ICommand
         foreach (var target in targets)
         {
             Interfaces.IChatObject chatObject = null;
-            if (Objects.Channel.Channel.ValidName(target))
+            if (Channel.ValidName(target))
             {
                 chatObject = (Interfaces.IChatObject)chatFrame.Server.GetChannelByName(target);
             }
@@ -37,10 +39,17 @@ public class Privmsg : Command, ICommand
                 return;
             }
 
-            if (chatObject is Objects.Channel.Channel)
+            if (chatObject is Channel)
             {
-                if (Notice) ((Objects.Channel.Channel)chatObject).SendNotice(chatFrame.User, message);
-                else ((Objects.Channel.Channel)chatObject).SendMessage(chatFrame.User, message);
+                var channel = ((Channel)chatObject);
+                if (channel.Modes.GetModeChar(Resources.ChannelModeNoExtern) == 1)
+                {
+                    chatFrame.User.Send(Raw.IRCX_ERR_CANNOTSENDTOCHAN_404(chatFrame.Server, chatFrame.User, chatObject));
+                    return;
+                }
+
+                if (Notice) ((Channel)chatObject).SendNotice(chatFrame.User, message);
+                else ((Channel)chatObject).SendMessage(chatFrame.User, message);
             }
             else if (chatObject is Objects.User)
             {

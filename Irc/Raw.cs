@@ -472,12 +472,7 @@ public static class Raw
         return $":{server} 403 {user} {channel} :No such channel";
     }
 
-    public static string IRCX_ERR_CANNOTSENDTOCHAN_404(IServer server, IUser user)
-    {
-        return $":{server} 404 {user} %s :Cannot send to channel";
-    }
-
-    public static string IRCX_ERR_CANNOTSENDTOCHAN_404X(IServer server, IUser user, IChannel channel)
+    public static string IRCX_ERR_CANNOTSENDTOCHAN_404(IServer server, IUser user, IChatObject channel)
     {
         return $":{server} 404 {user} {channel} :Cannot send to channel";
     }
@@ -497,9 +492,9 @@ public static class Raw
         return $":{server} 411 {user} :No recipient given (%s)";
     }
 
-    public static string IRC_ERR_NOTEXT_412(IServer server, IUser user)
+    public static string IRC_ERR_NOTEXT_412(IServer server, IUser user, IChatObject channel)
     {
-        return $":{server} 412 {user} :No text to send (%s)";
+        return $":{server} 412 {user} :No text to send ({channel})";
     }
 
     public static string IRCX_ERR_UNKNOWNCOMMAND_421(IServer server, IUser user, string command)

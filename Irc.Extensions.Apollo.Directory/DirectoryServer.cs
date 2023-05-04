@@ -9,6 +9,7 @@ using Irc.Interfaces;
 using Irc.IO;
 using Irc.Security;
 using Irc7d;
+using Version = Irc.Commands.Version;
 
 namespace Irc.Extensions.Apollo.Directory
 {
@@ -33,6 +34,7 @@ namespace Irc.Extensions.Apollo.Directory
             AddCommand(new Create());
             AddCommand(new Ping());
             AddCommand(new Pong());
+            AddCommand(new Version());
         }
     }
 }

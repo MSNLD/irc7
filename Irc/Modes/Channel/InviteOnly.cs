@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Irc.Modes.Channel
 {
-    public class InviteOnly : ModeRule, IModeRule
+    public class InviteOnly : ModeRuleChannel, IModeRule
     {
         public InviteOnly() : base(Resources.ChannelModeInvite)
         {

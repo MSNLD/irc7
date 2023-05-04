@@ -7,6 +7,6 @@ public interface ICommand
     EnumCommandDataType GetDataType();
     string GetName();
     void Execute(ChatFrame chatFrame);
-    bool CheckParameters(ChatFrame chatFrame);
-    bool CheckRegister(ChatFrame chatFrame);
+    bool ParametersAreValid(ChatFrame chatFrame);
+    bool RegistrationNeeded(ChatFrame chatFrame);
 }

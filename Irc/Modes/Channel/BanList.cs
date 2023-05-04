@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Irc.Modes.Channel
 {
-    public class BanList : ModeRule, IModeRule
+    public class BanList : ModeRuleChannel, IModeRule
     {
         public BanList() : base(Resources.ChannelModeBan)
         {

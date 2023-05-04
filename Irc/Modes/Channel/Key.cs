@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Irc.Modes.Channel
 {
-    internal class Key : ModeRule, IModeRule
+    internal class Key : ModeRuleChannel, IModeRule
     {
         public Key() : base(Resources.ChannelModeKey, true)
         {

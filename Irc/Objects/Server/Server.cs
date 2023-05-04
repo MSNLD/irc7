@@ -337,7 +337,7 @@ public class Server : ChatObject, IServer
                 Console.WriteLine($"Processing: {message.OriginalText}");
 
                 var chatFrame = new ChatFrame(this, user, message);
-                if (command.CheckRegister(chatFrame) && command.CheckParameters(chatFrame))
+                if (!command.RegistrationNeeded(chatFrame) && command.ParametersAreValid(chatFrame))
                 {
                     try
                     {
@@ -346,6 +346,7 @@ public class Server : ChatObject, IServer
                     catch (Exception e)
                     {
                         chatFrame.User.Send(IrcRaws.IRC_RAW_999(chatFrame.Server, chatFrame.User, Resources.ServerError));
+                        Console.WriteLine(e.ToString());
                     }
                 }
 

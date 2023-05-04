@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Irc.Modes.Channel
 {
-    public class Moderated : ModeRule, IModeRule
+    public class Moderated : ModeRuleChannel, IModeRule
     {
         public Moderated() : base(Resources.ChannelModeModerated)
         {

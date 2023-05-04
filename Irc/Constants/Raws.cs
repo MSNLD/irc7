@@ -79,7 +79,7 @@ public static class IrcRaws
     public static string IRC_RAW_462(IServer server, IUser user) => $":{server} 462 {user} :You may not reregister";
     public static string IRC_RAW_467 = ":%h 467 %a %c :Channel key already set  ";
     public static string IRC_RAW_471 = ":%h 471 %a %s :Cannot join channel (+l) ";
-    public static string IRC_RAW_472 = ":%h 472 %a %l :is unknown mode char to me   ";
+    public static string IRC_RAW_472(IServer server, IUser user, string modeChar) => $":{server} 472 {user} {modeChar} :is unknown mode char to me";
     public static string IRC_RAW_473 = ":%h 473 %a %s :Cannot join channel (+i) ";
     public static string IRC_RAW_474 = ":%h 474 %a %s :Cannot join channel (+b) ";
     public static string IRC_RAW_475 = ":%h 475 %a %s :Cannot join channel (+k) ";

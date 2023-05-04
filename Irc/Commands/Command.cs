@@ -31,20 +31,24 @@ public class Command : ICommand
         throw new NotImplementedException();
     }
 
-    public bool CheckParameters(ChatFrame chatFrame)
+    public bool ParametersAreValid(ChatFrame chatFrame)
     {
-        if (chatFrame.Message.Parameters.Count >= _requiredMinimumParameters) return true;
-        if (_requiredMaximumParameters < 0 || chatFrame.Message.Parameters.Count <= _requiredMaximumParameters) return true;
+        var parameterCount = chatFrame.Message.Parameters.Count;
+
+        if (
+            parameterCount >= _requiredMinimumParameters &&
+            (_requiredMaximumParameters < 0 || parameterCount <= _requiredMaximumParameters)
+            ) return true;
 
         chatFrame.User.Send(Raw.IRCX_ERR_NEEDMOREPARAMS_461(chatFrame.Server, chatFrame.User, GetName()));
         return false;
     }
 
-    public bool CheckRegister(ChatFrame chatFrame)
+    public bool RegistrationNeeded(ChatFrame chatFrame)
     {
-        if (!_registrationRequired || (_registrationRequired && chatFrame.User.IsRegistered())) return true;
+        if (!_registrationRequired || (_registrationRequired && chatFrame.User.IsRegistered())) return false;
 
         chatFrame.User.Send(Raw.IRCX_ERR_NOTREGISTERED_451(chatFrame.Server, chatFrame.User));
-        return false;
+        return true;
     }
 }
