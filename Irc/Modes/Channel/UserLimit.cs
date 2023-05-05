@@ -36,7 +36,7 @@ namespace Irc.Modes.Channel
                 {
                     // TODO: Currently does not support unsetting limit without extra parameter
 
-                    channel.GetModes().GetMode(Resources.ChannelModeUserLimit).Set(0);
+                    channel.Modes.GetMode(Resources.ChannelModeUserLimit).Set(0);
                     DispatchModeChange(source, target, false, string.Empty);
                 }
                 return EnumIrcError.OK;
@@ -51,7 +51,7 @@ namespace Irc.Modes.Channel
 
             if (limit > 0 && (limit <= 100 || isAdministrator))
             {
-                channel.GetModes().GetMode(Resources.ChannelModeUserLimit).Set(limit);
+                channel.Modes.GetMode(Resources.ChannelModeUserLimit).Set(limit);
                 DispatchModeChange(source, target, true, limit.ToString());
             }
             return EnumIrcError.OK;

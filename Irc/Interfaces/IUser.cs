@@ -12,6 +12,7 @@ public interface IUser
     Guid Id { get; }
     string ShortId { get; }
     string Name { get; set; }
+    IModeCollection Modes { get; }
     event EventHandler<string> OnSend;
     void BroadcastToChannels(string data, bool ExcludeUser);
     void AddChannel(IChannel channel, IChannelMember member);

@@ -1,4 +1,5 @@
-﻿using Irc.Enumerations;
+﻿using Irc.Constants;
+using Irc.Enumerations;
 using Irc.Interfaces;
 using Irc.IO;
 using Irc.Objects;
@@ -77,9 +78,9 @@ internal class Join : Command, ICommand
         var channel = server.CreateChannel(name);
         channel.ChannelStore.Set("topic", name);
         channel.ChannelStore.Set("key", key);
-        channel.GetModes().SetModeChar('n', 1);
-        channel.GetModes().SetModeChar('t', 1);
-        channel.GetModes().SetModeChar('l', 50);
+        channel.Modes.NoExtern = true;
+        channel.Modes.TopicOp = true;
+        channel.Modes.UserLimit = 50;
         server.AddChannel(channel);
         return channel;
     }

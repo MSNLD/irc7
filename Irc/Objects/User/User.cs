@@ -197,8 +197,8 @@ public class User : ChatObject, IUser
         return _supportPackage is ANON;
     }
 
-    public bool IsSysop() => GetModes().GetModeChar(Resources.UserModeOper) == 1;
-    public bool IsAdministrator() => GetModes().HasMode('a') && GetModes().GetModeChar(Resources.UserModeAdmin) == 1;
+    public bool IsSysop() => Modes.GetModeChar(Resources.UserModeOper) == 1;
+    public bool IsAdministrator() => Modes.HasMode('a') && Modes.GetModeChar(Resources.UserModeAdmin) == 1;
 
     public void PromoteToAdministrator()
     {

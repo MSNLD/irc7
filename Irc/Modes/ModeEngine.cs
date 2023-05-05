@@ -41,7 +41,7 @@ namespace Irc.Modes
                         }
                     default:
                         {
-                            var modeCollection = target.GetModes();
+                            var modeCollection = target.Modes;
                             bool exists = modeCollection.HasMode(c);
                             int modeValue = exists ? modeCollection.GetModeChar(c) : -1;
 

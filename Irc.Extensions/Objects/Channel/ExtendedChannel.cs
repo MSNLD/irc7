@@ -18,7 +18,7 @@ public class ExtendedChannel : global::Irc.Objects.Channel.Channel, IExtendedCha
 
     public IAccessList AccessList => _accessList;
 
-    public ExtendedChannel(string name, IModeCollection modeCollection, IDataStore dataStore) : base(name,
+    public ExtendedChannel(string name, IChannelModeCollection modeCollection, IDataStore dataStore) : base(name,
         modeCollection, dataStore)
     {
         _properties.SetProp("NAME", name);

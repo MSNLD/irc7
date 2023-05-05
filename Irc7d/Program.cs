@@ -19,15 +19,6 @@ using Irc.Objects.Server;
 using Irc.Security;
 using Microsoft.Extensions.CommandLineUtils;
 
-/*
- *  Server
- *      .Channels
- *          .Where(c in channels)
- *          .Where(c => c.Allows(user))
- *          .Join(user).SendTopic(user).SendNames(user)
- *
- */
-
 namespace Irc7d;
 
 internal class Program
@@ -150,7 +141,7 @@ internal class Program
                     var channel = server.CreateChannel(name);
                     channel.ChannelStore.Set("topic", defaultChannel.Topic);
                     foreach (KeyValuePair<char, int> keyValuePair in defaultChannel.Modes) {
-                        channel.GetModes().SetModeChar(keyValuePair.Key, keyValuePair.Value);
+                        channel.Modes.SetModeChar(keyValuePair.Key, keyValuePair.Value);
                     }
 
                     if (channel is ExtendedChannel || channel is ApolloChannel)

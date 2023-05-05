@@ -14,11 +14,13 @@ public class Channel : ChatObject, IChannel
     public IList<Address> BanList = new List<Address>();
     public IList<User> InviteList = new List<User>();
 
-    public Channel(string name, IModeCollection modes, IDataStore dataStore) : base(modes, dataStore)
+    public Channel(string name, IChannelModeCollection modes, IDataStore dataStore) : base(modes, dataStore)
     {
         SetName(name);
         DataStore.SetId(Name);
     }
+
+    public override IChannelModeCollection Modes => (IChannelModeCollection)base.Modes;
 
     // TODO: The ‘l’, ‘b’, ‘k’ mode is stored with the Channel Store.
     public IDataStore ChannelStore => DataStore;
@@ -92,8 +94,8 @@ public class Channel : ChatObject, IChannel
 
     public IChannel Part(IUser user)
     {
-        RemoveMember(user);
         Send(IrcRaws.RPL_PART(user, this));
+        RemoveMember(user);
         return this;
     }
 
@@ -125,9 +127,9 @@ public class Channel : ChatObject, IChannel
         return _members;
     }
 
-    public IModeCollection GetModes()
+    public IChannelModeCollection GetModes()
     {
-        return _modes;
+        return (IChannelModeCollection)_modes;
     }
 
     public void SetName(string Name)

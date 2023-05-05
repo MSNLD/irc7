@@ -19,7 +19,7 @@ internal class Ircx : Command, ICommand
         }
 
         var isircx = protocol > EnumProtocolType.IRC;
-        chatFrame.User.GetModes().ToggleModeChar(ExtendedResources.UserModeIrcx, true);
+        chatFrame.User.Modes.ToggleModeChar(ExtendedResources.UserModeIrcx, true);
 
 
         chatFrame.User.Send(Raw.IRCX_RPL_IRCX_800(chatFrame.Server, chatFrame.User, isircx ? 1 : 0, 0,

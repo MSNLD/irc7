@@ -378,9 +378,9 @@ public static class Raw
         return $":{server} 352 {user} %s %s %s {server} %s %s%s%s :0 %s";
     }
 
-    public static string IRCX_RPL_NAMEREPLY_353(IServer server, IUser user, IChannel channel, string names)
+    public static string IRCX_RPL_NAMEREPLY_353(IServer server, IUser user, IChannel channel, char channelType, string names)
     {
-        return $":{server} 353 {user} = {channel} :{names}";
+        return $":{server} 353 {user} {channelType} {channel} :{names}";
     }
 
     public static string IRCX_RPL_NAMEREPLY_353X(IServer server, IUser user, IChannel channel)

@@ -1,4 +1,5 @@
-﻿using Irc.Enumerations;
+﻿using Irc.Constants;
+using Irc.Enumerations;
 using Irc.Interfaces;
 using Irc.Objects;
 
@@ -52,7 +53,7 @@ internal class Topic : Command, ICommand
 
         IChannelMember sourceMember = channel.GetMember((IUser)source);
 
-        if (sourceMember.GetLevel() < EnumChannelAccessLevel.ChatHost)
+        if (sourceMember.GetLevel() < EnumChannelAccessLevel.ChatHost && channel.Modes.TopicOp)
         {
             return EnumIrcError.ERR_NOCHANOP;
         }

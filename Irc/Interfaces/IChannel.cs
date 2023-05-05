@@ -27,6 +27,7 @@ public interface IChannel
     IChannel SendTopic();
     IChannel SendNames(IUser user);
     bool Allows(IUser user);
-    IModeCollection GetModes();
+    IChannelModeCollection GetModes();
+    IChannelModeCollection Modes { get; }
     EnumChannelAccessResult GetAccess(IUser user, string key, bool IsGoto = false);
 }

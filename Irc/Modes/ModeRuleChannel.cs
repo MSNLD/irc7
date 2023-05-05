@@ -48,7 +48,7 @@ namespace Irc.Modes
 
         public void SetChannelMode(ChatObject source, IChannel target, bool flag, string parameter)
         {
-            target.GetModes().GetMode(ModeChar).Set(flag == true ? 1 : 0);
+            target.Modes.GetMode(ModeChar).Set(flag == true ? 1 : 0);
             DispatchModeChange(source, (ChatObject)target, flag, parameter);
         }
     }

@@ -80,12 +80,12 @@ internal class Mode : Command, ICommand
         if (chatObject is IChannel)
         {
             chatFrame.User.Send(Raw.IRCX_RPL_MODE_324(chatFrame.Server, chatFrame.User, ((IChannel)chatObject),
-                ((IChannel)chatObject).GetModes().ToString()));
+                ((IChannel)chatObject).Modes.ToString()));
 
         }
         else if (chatObject is IUser)
         {
-            chatFrame.User.Send(Raw.IRCX_RPL_UMODEIS_221(chatFrame.Server, chatFrame.User, chatObject.GetModes().ToString()));
+            chatFrame.User.Send(Raw.IRCX_RPL_UMODEIS_221(chatFrame.Server, chatFrame.User, chatObject.Modes.ToString()));
         }
     }
 }

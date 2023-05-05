@@ -16,7 +16,7 @@ public class ChatObject : IChatObject
         }
     }
     protected readonly IModeCollection _modes;
-    public IModeCollection Modes
+    public virtual IModeCollection Modes
     {
         get
         {

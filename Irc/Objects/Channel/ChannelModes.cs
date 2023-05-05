@@ -1,22 +1,25 @@
 ﻿using Irc.Constants;
+using Irc.Interfaces;
+using Irc.IO;
 
 namespace Irc.Objects;
 
-public class ChannelModes : ModeCollection, IModeCollection
+public class ChannelModes : ModeCollection, IChannelModeCollection
 {
     /*
-           o - give/take channel operator privileges;
-           p - private channel flag;
-           s - secret channel flag;
-           i - invite-only channel flag;
-           t - topic settable by channel operator only flag;
-           n - no messages to channel from clients on the outside;
-           m - moderated channel;
-           l - set the user limit to channel;
-           b - set a ban mask to keep users out;
-           v - give/take the ability to speak on a moderated channel;
-           k - set a channel key (password).
-    */
+o - give/take channel operator privileges;
+p - private channel flag;
+s - secret channel flag;
+i - invite-only channel flag;
+t - topic settable by channel operator only flag;
+n - no messages to channel from clients on the outside;
+m - moderated channel;
+l - set the user limit to channel;
+b - set a ban mask to keep users out;
+v - give/take the ability to speak on a moderated channel;
+k - set a channel key (password).
+*/
+
     public ChannelModes()
     {
         modes.Add(Resources.MemberModeHost, new Modes.Channel.Member.Operator());
@@ -30,16 +33,40 @@ public class ChannelModes : ModeCollection, IModeCollection
         modes.Add(Resources.ChannelModeUserLimit, new Modes.Channel.UserLimit());
         modes.Add(Resources.ChannelModeBan, new Modes.Channel.BanList());
         modes.Add(Resources.ChannelModeKey, new Modes.Channel.Key());
+    }
 
-        //modes.Add(Resources.ChannelModeKey, 0);
-        //modes.Add(Resources.ChannelModeInvite, 0);
-        //modes.Add(Resources.ChannelModeUserLimit, 0);
-        //modes.Add(Resources.ChannelModeModerated, 0);
-        //modes.Add(Resources.ChannelModeNoExtern, 0);
-        //modes.Add(Resources.ChannelModePrivate, 0);
-        //modes.Add(Resources.ChannelModeSecret, 0);
-        //modes.Add(Resources.ChannelModeTopicOp, 0);
-        //modes.Add(Resources.ChannelModeBan, 0);
+    public bool InviteOnly {
+        get => modes[Resources.ChannelModeInvite].Get() == 1;
+        set => modes[Resources.ChannelModeInvite].Set(Convert.ToInt32(value));
+    }
+    public string Key
+    {
+        get => keypass;
+        set => keypass = value;
+    }
+    public bool Moderated {
+        get => modes[Resources.ChannelModeModerated].Get() == 1;
+        set => modes[Resources.ChannelModeModerated].Set(Convert.ToInt32(value));
+    }
+    public bool NoExtern {
+        get => modes[Resources.ChannelModeNoExtern].Get() == 1;
+        set => modes[Resources.ChannelModeNoExtern].Set(Convert.ToInt32(value));
+    }
+    public bool Private {
+        get => modes[Resources.ChannelModePrivate].Get() == 1;
+        set => modes[Resources.ChannelModePrivate].Set(Convert.ToInt32(value));
+    }
+    public bool Secret {
+        get => modes[Resources.ChannelModeSecret].Get() == 1;
+        set => modes[Resources.ChannelModeSecret].Set(Convert.ToInt32(value));
+    }
+    public bool TopicOp {
+        get => modes[Resources.ChannelModeTopicOp].Get() == 1;
+        set => modes[Resources.ChannelModeTopicOp].Set(Convert.ToInt32(value));
+    }
+    public int UserLimit {
+        get => modes[Resources.ChannelModeUserLimit].Get();
+        set => modes[Resources.ChannelModeUserLimit].Set(value);
     }
 
     public override string ToString()

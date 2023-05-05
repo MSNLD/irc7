@@ -11,7 +11,7 @@ namespace Irc.Extensions.Apollo.Objects.Channel;
 
 public class ApolloChannel : ExtendedChannel
 {
-    public ApolloChannel(string name, IModeCollection modeCollection, IDataStore dataStore) : base(name, modeCollection,
+    public ApolloChannel(string name, IChannelModeCollection modeCollection, IDataStore dataStore) : base(name, modeCollection,
         dataStore)
     {
     }
