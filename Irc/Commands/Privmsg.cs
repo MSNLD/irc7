@@ -1,5 +1,6 @@
 ﻿using Irc.Constants;
 using Irc.Enumerations;
+using Irc.Interfaces;
 using Channel = Irc.Objects.Channel.Channel;
 
 namespace Irc.Commands;
@@ -41,8 +42,19 @@ public class Privmsg : Command, ICommand
 
             if (chatObject is Channel)
             {
-                var channel = ((Channel)chatObject);
-                if (channel.Modes.GetModeChar(Resources.ChannelModeNoExtern) == 1)
+                var channel = ((IChannel)chatObject);
+                var channelMember = channel.GetMember(chatFrame.User);
+                var channelModes = channel.GetModes();
+                var isOnChannel = channelMember != null;
+                var noExtern = channelModes.GetModeChar(Resources.ChannelModeNoExtern) == 1;
+                var moderated = channelModes.GetModeChar(Resources.ChannelModeModerated) == 1;
+
+                if (
+                    // No External Messages
+                    (!isOnChannel && noExtern) ||
+                    // Moderated
+                    (isOnChannel && moderated && channelMember.IsNormal())
+                    )
                 {
                     chatFrame.User.Send(Raw.IRCX_ERR_CANNOTSENDTOCHAN_404(chatFrame.Server, chatFrame.User, chatObject));
                     return;

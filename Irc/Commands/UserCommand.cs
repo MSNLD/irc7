@@ -21,11 +21,13 @@ public class UserCommand : Command, ICommand
         else
         {
             // Gotta check each param
-            chatFrame.User.GetAddress().User = chatFrame.Message.Parameters[0];
+            //chatFrame.User.GetAddress().User = chatFrame.Message.Parameters[0];
             //chatFrame.User.Address.Host = chatFrame.Message.Parameters[1];
-            chatFrame.User.GetAddress().Host = chatFrame.User.GetAddress().RemoteIP;
-            chatFrame.User.GetAddress().Server = chatFrame.Message.Parameters[2];
-            chatFrame.User.GetAddress().RealName = chatFrame.Message.Parameters[3];
+            var address = chatFrame.User.GetAddress();
+            address.User = address.MaskedIP;
+            address.Host = "anon";
+            address.Server = chatFrame.Message.Parameters[2];
+            address.RealName = chatFrame.Message.Parameters[3];
         }
     }
 }

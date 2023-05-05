@@ -53,7 +53,7 @@ public class User : ChatObject, IUser
             dataRegulator.PushIncoming(message);
         };
 
-        Address.RemoteIP = connection.GetAddress();
+        Address.SetIP(connection.GetAddress());
     }
 
     public IServer Server { get; }

@@ -30,11 +30,14 @@ public class SocketConnection : IConnection
             //       BitConverter.ToUInt64(remoteAddressBytes, 8)
             //     : BitConverter.ToUInt32(remoteAddressBytes, 0);
 
+            var remoteEndPoint = ((IPEndPoint)_socket.RemoteEndPoint);
+            var ipAddress = remoteEndPoint.Address;
+
             _address = _socket.RemoteEndPoint != null
-                ? ((IPEndPoint) _socket.RemoteEndPoint).Address.ToString()
+                ? ipAddress.ToString()
                 : string.Empty;
             _fullAddress = _socket.RemoteEndPoint != null
-                ? ((IPEndPoint) _socket.RemoteEndPoint).ToString()
+                ? remoteEndPoint.ToString()
                 : string.Empty;
         }
     }

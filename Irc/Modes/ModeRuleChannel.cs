@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Reflection.Metadata;
+using Irc.Constants;
 using Irc.Enumerations;
 using Irc.Interfaces;
 using Irc.Objects;
@@ -32,6 +34,22 @@ namespace Irc.Modes
             }
 
             return EnumIrcError.OK;
+        }
+
+        public EnumIrcError EvaluateAndSet(ChatObject source, ChatObject target, bool flag, string parameter)
+        {
+            var result = Evaluate(source, target, flag, parameter);
+            if (result == EnumIrcError.OK)
+            {
+                SetChannelMode(source, (IChannel)target, flag, parameter);
+            }
+            return result;
+        }
+
+        public void SetChannelMode(ChatObject source, IChannel target, bool flag, string parameter)
+        {
+            target.GetModes().GetMode(ModeChar).Set(flag == true ? 1 : 0);
+            DispatchModeChange(source, (ChatObject)target, flag, parameter);
         }
     }
 }

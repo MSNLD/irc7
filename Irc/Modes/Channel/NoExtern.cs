@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Irc.Modes.Channel
 {
-    public class NoExtern : ModeRule, IModeRule
+    public class NoExtern : ModeRuleChannel, IModeRule
     {
         public NoExtern() : base(Resources.ChannelModeNoExtern)
         {
@@ -18,8 +18,7 @@ namespace Irc.Modes.Channel
 
         public new EnumIrcError Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
         {
-            
-            return EnumIrcError.OK;
+            return EvaluateAndSet(source, target, flag, parameter);
         }
     }
 }

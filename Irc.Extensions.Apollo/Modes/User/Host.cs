@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Irc.Extensions.Apollo.Modes.User
 {
-    public class Host : ModeRule, IModeRule
+    public class Host : ModeRuleChannel, IModeRule
     {
         public Host() : base(ApolloResources.UserModeHost, true)
         {
@@ -46,7 +46,7 @@ namespace Irc.Extensions.Apollo.Modes.User
                 }
                 return EnumIrcError.OK;
             }
-            return EnumIrcError.ERR_UNKNOWNMODEFLAG;
+                return EnumIrcError.ERR_UNKNOWNMODEFLAG;
         }
     }
 }

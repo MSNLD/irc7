@@ -1,4 +1,6 @@
 ﻿using System.Text.RegularExpressions;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Irc.Objects;
 
@@ -33,7 +35,14 @@ public class Address
     public string Server { set; get; }
 
     public string RealName { set; get; }
-    public string RemoteIP { set; get; }
+    public string RemoteIP { protected set; get; }
+    public string MaskedIP { protected set; get; }
+
+    public void SetIP(string address)
+    {
+        RemoteIP = address;
+        MaskedIP = ObfuscatedAddress(address);
+    }
 
     public string GetUserHost()
     {
@@ -76,6 +85,17 @@ public class Address
         }
 
         return false;
+    }
+
+    public static string ObfuscatedAddress(string address)
+    {
+        using MD5 md5 = MD5.Create();
+        // TODO: Temporary randomized
+        byte[] encoded = Encoding.UTF8.GetBytes(address + DateTime.UtcNow.Ticks.ToString());
+        byte[] hash = md5.ComputeHash(encoded);
+        var hexStr = string.Concat(hash.Select(b => $"{b:x2}"));
+
+        return hexStr.Substring(8, address.Length - 8);
     }
 
     public override string ToString()

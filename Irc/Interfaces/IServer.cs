@@ -35,6 +35,7 @@ public interface IServer
     IUser CreateUser(IConnection connection);
     IList<IUser> GetUsers();
     IUser GetUserByNickname(string nickname);
+    IUser GetUserByNickname(string nickname, IUser currentUser);
     IList<IUser> GetUsersByList(string nicknames, char separator);
     IList<IUser> GetUsersByList(List<string> nicknames, char separator);
     IList<IChannel> GetChannels();

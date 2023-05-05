@@ -38,7 +38,7 @@ internal class Mode : Command, ICommand
             }
             else
             {
-                chatObject = (ChatObject)chatFrame.Server.GetUsers().FirstOrDefault(user => user.Name.ToUpperInvariant() == objectName.ToUpperInvariant());
+                chatObject = (ChatObject)chatFrame.Server.GetUserByNickname(objectName, chatFrame.User);
             }
 
             // Execute / List

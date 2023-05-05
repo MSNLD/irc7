@@ -54,7 +54,7 @@ namespace Irc.Modes
                                 continue;
                             }
 
-                            string parameter = string.Empty;
+                            string parameter = null;
                             if (modeRule.RequiresParameter)
                             {
                                 if (modeParameters != null && modeParameters.Count > 0) { parameter = modeParameters.Dequeue(); }

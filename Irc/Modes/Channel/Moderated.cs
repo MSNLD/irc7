@@ -18,7 +18,7 @@ namespace Irc.Modes.Channel
 
         public new EnumIrcError Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
         {
-            return EnumIrcError.OK;
+            return EvaluateAndSet(source, target, flag, parameter);
         }
     }
 }

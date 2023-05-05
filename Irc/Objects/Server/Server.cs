@@ -138,7 +138,21 @@ public class Server : ChatObject, IServer
         return Users;
     }
 
-    public IUser GetUserByNickname(string nickname) => Users.FirstOrDefault(user => string.Compare(user.GetAddress().Nickname.Trim(), nickname, true) == 0);
+
+    public IUser GetUserByNickname(string nickname)
+    {
+        return Users.FirstOrDefault(user => string.Compare(user.GetAddress().Nickname.Trim(), nickname, true) == 0);
+    }
+
+    public IUser GetUserByNickname(string nickname, IUser currentUser)
+    {
+        if (nickname.ToUpperInvariant() == currentUser.Name.ToUpperInvariant())
+        {
+            return currentUser;
+        }
+
+        return GetUserByNickname(nickname);
+    }
 
     public IList<IUser> GetUsersByList(string nicknames, char separator)
     {
@@ -351,7 +365,7 @@ public class Server : ChatObject, IServer
                 }
 
                 // Check if user can register
-                if (!chatFrame.User.IsRegistered()) Register.Execute(chatFrame);
+                if (!chatFrame.User.IsRegistered()) Register.TryRegister(chatFrame);
             }
         }
         else

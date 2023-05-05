@@ -30,6 +30,13 @@ internal class Part : Command, ICommand
             .ForEach(
                 channel =>
                 {
+                    if (!user.IsOn(channel))
+                    {
+                        user.Send(Raw.IRCX_ERR_NOTONCHANNEL_442(server, user, (ChatObject)channel));
+
+                        return;
+                    }
+
                     channel.Part(user);
                     user.RemoveChannel(channel);
                 }

@@ -2,7 +2,7 @@
 
 public static class Register
 {
-    public static void Execute(ChatFrame chatFrame)
+    public static void TryRegister(ChatFrame chatFrame)
     {
         if (CanRegister(chatFrame))
         {
