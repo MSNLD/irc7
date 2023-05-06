@@ -11,7 +11,7 @@ public class Irc3 : IrcX
 {
     public Irc3() : base()
     {
-        //AddCommand(new Ircvers());
+        AddCommand(new Goto());
     }
 
     public override EnumProtocolType GetProtocolType()

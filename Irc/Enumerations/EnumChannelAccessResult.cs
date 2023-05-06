@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 namespace Irc.Enumerations
 {
     public enum EnumChannelAccessResult
-    { 
+    {
+        NONE = -9,
         ERR_NICKINUSE = -8,
         ERR_ALREADYINCHANNEL = -7,
         ERR_CHANNELISFULL = -6,
@@ -16,7 +17,7 @@ namespace Irc.Enumerations
         ERR_BADCHANNELKEY = -3,
         ERR_AUTHONLYCHAN = -2,
         ERR_SECUREONLYCHAN = -1,
-        NONE = 0,
+        SUCCESS_GUEST = 0,
         SUCCESS_MEMBER = 1,
         SUCCESS_VOICE = 2,
         SUCCESS_HOST = 3,

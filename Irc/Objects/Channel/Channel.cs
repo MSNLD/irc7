@@ -275,12 +275,14 @@ public class Channel : ChatObject, IChannel
         var inviteOnlyCheck = CheckInviteOnly();
         var userLimitCheck = CheckUserLimit(IsGoto);
 
-        return (EnumChannelAccessResult)(new int[] {
+        var accessPermissions = (EnumChannelAccessResult)(new int[] {
             (int)operCheck,
             (int)keyCheck,
             (int)inviteOnlyCheck,
             (int)userLimitCheck
         }).Max();
+
+        return accessPermissions == EnumChannelAccessResult.NONE ? EnumChannelAccessResult.SUCCESS_GUEST : accessPermissions;
     }
 
     protected EnumChannelAccessResult CheckOper(IUser user)
@@ -293,7 +295,7 @@ public class Channel : ChatObject, IChannel
     {
         if (Modes.GetModeChar(Resources.ChannelModeKey) == 1)
         {
-            if (ChannelStore.Get("MEMBERKEY") == key)
+            if (Modes.Key == key)
             {
                 return EnumChannelAccessResult.SUCCESS_MEMBER;
             }
@@ -307,17 +309,14 @@ public class Channel : ChatObject, IChannel
 
     protected EnumChannelAccessResult CheckInviteOnly()
     {
-        return EnumChannelAccessResult.NONE;
-        return EnumChannelAccessResult.ERR_INVITEONLYCHAN;
+        return Modes.InviteOnly ? EnumChannelAccessResult.ERR_INVITEONLYCHAN : EnumChannelAccessResult.NONE;
     }
 
     protected EnumChannelAccessResult CheckUserLimit(bool IsGoto)
     {
-        var userLimit = int.MaxValue;
+        var userLimit = Modes.UserLimit > 0 ? Modes.UserLimit : int.MaxValue;
 
-        if (Modes.GetModeChar(Resources.ChannelModeInvite) > 0) userLimit = Modes.GetModeChar(Resources.ChannelModeInvite);
-
-        if (IsGoto) userLimit = (int)(userLimit * 1.2);
+        if (IsGoto) userLimit = (int)(Math.Ceiling(userLimit * 1.2));
 
         if (GetMembers().Count >= userLimit) return EnumChannelAccessResult.ERR_CHANNELISFULL;
         else return EnumChannelAccessResult.NONE;

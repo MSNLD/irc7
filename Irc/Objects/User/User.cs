@@ -108,7 +108,7 @@ public class User : ChatObject, IUser
                 stringBuilder.Append("\r\n");
             }
 
-            Console.WriteLine($"Sending[{_protocol.GetType().Name}]: {stringBuilder}");
+            Console.WriteLine($"Sending[{_protocol.GetType().Name}/{Name}]: {stringBuilder}");
             _connection?.Send(stringBuilder.ToString());
         }
     }

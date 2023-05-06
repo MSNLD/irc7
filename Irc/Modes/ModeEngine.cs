@@ -126,6 +126,11 @@ namespace Irc.Modes
                                         source.Send(Raw.IRCX_ERR_SECURITY_908(source.Server, source));
                                         break;
                                     }
+                                case EnumIrcError.ERR_KEYSET:
+                                    {
+                                        source.Send(Raw.IRCX_ERR_KEYSET_467(source.Server, source, (IChannel)target));
+                                        break;
+                                    }
                             }
 
                             break;

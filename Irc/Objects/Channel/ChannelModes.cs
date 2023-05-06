@@ -42,7 +42,11 @@ k - set a channel key (password).
     public string Key
     {
         get => keypass;
-        set => keypass = value;
+        set {
+            bool hasKey = !string.IsNullOrWhiteSpace(value);
+            modes[Resources.ChannelModeKey].Set(hasKey);
+            keypass = value;
+        }
     }
     public bool Moderated {
         get => modes[Resources.ChannelModeModerated].Get() == 1;

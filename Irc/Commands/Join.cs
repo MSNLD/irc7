@@ -8,7 +8,7 @@ using Irc.Objects.Server;
 
 namespace Irc.Commands;
 
-internal class Join : Command, ICommand
+public class Join : Command, ICommand
 {
     public Join() : base(1) { }
     public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
@@ -47,7 +47,7 @@ internal class Join : Command, ICommand
         return channelNames;
     }
 
-    public void JoinChannels(IServer server, IUser user, List<string> channelNames, string key)
+    public static void JoinChannels(IServer server, IUser user, List<string> channelNames, string key)
     {
         // TODO: Optimize the below code
         foreach (var channelName in channelNames)
@@ -62,8 +62,8 @@ internal class Join : Command, ICommand
 
             EnumChannelAccessResult channelAccessResult = channel.GetAccess(user, key, false);
 
-            if (!channel.Allows(user) || channelAccessResult < EnumChannelAccessResult.NONE) {
-                user.Send("CANNOT JOIN CHANNEL");
+            if (!channel.Allows(user) || channelAccessResult < EnumChannelAccessResult.SUCCESS_GUEST) {
+                SendJoinError(server, channel, user, channelAccessResult);
                 continue;
             }
 
@@ -73,7 +73,32 @@ internal class Join : Command, ICommand
         }
     }
 
-    public IChannel Create(IServer server, IUser user, string name, string key)
+    public static void SendJoinError(IServer server, IChannel channel, IUser user, EnumChannelAccessResult result)
+    {
+        switch (result) {
+            case EnumChannelAccessResult.ERR_BADCHANNELKEY:
+                {
+                    user.Send(Raw.IRCX_ERR_BADCHANNELKEY_475(server, user, channel));
+                    break;
+                }
+            case EnumChannelAccessResult.ERR_INVITEONLYCHAN:
+                {
+                    user.Send(Raw.IRCX_ERR_INVITEONLYCHAN_473(server, user, channel));
+                    break;
+                }
+            case EnumChannelAccessResult.ERR_CHANNELISFULL:
+                {
+                    user.Send(Raw.IRCX_ERR_CHANNELISFULL_471(server, user, channel));
+                    break;
+                }
+            default:{
+                user.Send($"CANNOT JOIN CHANNEL {result.ToString()}");
+                break;
+            }
+        }
+    }
+
+    public static IChannel Create(IServer server, IUser user, string name, string key)
     {
         var channel = server.CreateChannel(name);
         channel.ChannelStore.Set("topic", name);

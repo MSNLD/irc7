@@ -39,19 +39,14 @@ public class ExtendedChannel : global::Irc.Objects.Channel.Channel, IExtendedCha
 
     public override EnumChannelAccessResult GetAccess(IUser user, string key, bool IsGoto = false)
     {
-        var operCheck = CheckOper(user);
-        var keyCheck = CheckMemberKey(user, key);
         var hostKeyCheck = CheckHostKey(user, key);
-        var inviteOnlyCheck = CheckInviteOnly();
-        var userLimitCheck = CheckUserLimit(IsGoto);
 
-        return (EnumChannelAccessResult)(new int[] {
-            (int)operCheck,
-            (int)keyCheck,
-            (int)hostKeyCheck,
-            (int)inviteOnlyCheck,
-            (int)userLimitCheck
+        var accessPermissions = (EnumChannelAccessResult)(new int[] {
+            (int)base.GetAccess(user, key, IsGoto),
+            (int)hostKeyCheck
         }).Max();
+
+        return accessPermissions == EnumChannelAccessResult.NONE ? EnumChannelAccessResult.SUCCESS_GUEST : accessPermissions;
     }
 
 

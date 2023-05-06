@@ -18,9 +18,29 @@ namespace Irc.Modes.Channel
 
         public new EnumIrcError Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
         {
-            IChannelMember member = (IChannelMember)source;
-            if (member.IsHost())
+            var channel = (IChannel)target;
+            IChannelMember member = channel.GetMember((IUser)source);
+            if (member.GetLevel() >= EnumChannelAccessLevel.ChatHost)
             {
+                // Unset key
+                if (!flag && parameter == channel.Modes.Key)
+                {
+                    channel.Modes.Key = null;
+                    DispatchModeChange(source, (ChatObject)target, flag, parameter);
+                    return EnumIrcError.OK;
+                }
+
+                // Set key
+                if (flag)
+                {
+                    if (!string.IsNullOrWhiteSpace(channel.Modes.Key))
+                    {
+                        return EnumIrcError.ERR_KEYSET;
+                    }
+
+                    channel.Modes.Key = flag ? parameter : null;
+                    DispatchModeChange(source, (ChatObject)target, flag, parameter);
+                }
                 return EnumIrcError.OK;
             }
             else
