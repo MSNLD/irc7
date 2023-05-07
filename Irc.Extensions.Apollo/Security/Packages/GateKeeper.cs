@@ -138,10 +138,11 @@ public class GateKeeper : SupportPackage, ISupportPackage
         var h1 = md5.ComputeHash(ctx.ToByteArray(), 0, ctx.Length);
 
         bool b = h1.SequenceEqual(context);
+        Console.WriteLine($"Auth: Received = {JsonSerializer.Serialize(context.Select(b => (int)b).ToArray())}");
+        Console.WriteLine($"Auth: Expected = {JsonSerializer.Serialize(h1.Select(b => (int)b).ToArray())}");
+
         if (!b)
         {
-            Console.WriteLine($"Auth Fail: Received = {JsonSerializer.Serialize(context.Select(b => (int)b).ToArray())}");
-            Console.WriteLine($"Auth Fail: Expected = {JsonSerializer.Serialize(h1.Select(b => (int)b).ToArray())}");
 
             return false;
         }
