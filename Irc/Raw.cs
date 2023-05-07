@@ -926,4 +926,9 @@ public static class Raw
     {
         return $":{server} 999 {user} :%s Oops! Looks like you've hit a snag here, please can you kindly report this.";
     }
+
+    public static string IRCX_INFO(IServer server, IUser user, string message)
+    {
+        return $":{server} 000 {user} :{message}";
+    }
 }

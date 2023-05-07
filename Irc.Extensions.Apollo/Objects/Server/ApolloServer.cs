@@ -44,6 +44,7 @@ public class ApolloServer : ExtendedServer
 
         // Override by adding command support at base IRC
         AddCommand(new Auth());
+        AddCommand(new AuthX());
         AddCommand(new Ircvers());
         AddCommand(new Prop());
 

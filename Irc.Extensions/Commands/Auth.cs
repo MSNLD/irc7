@@ -46,17 +46,17 @@ public class Auth : Command, ICommand
                         .CreatePackageInstance(packageName, chatFrame.Server.GetCredentialManager());
 
                     chatFrame.User.SetSupportPackage(supportPackage);
+                }
 
-                    var supportPackageSequence =
-                        supportPackage.InitializeSecurityContext(token, chatFrame.Server.RemoteIP);
+                var supportPackageSequence =
+    supportPackage.InitializeSecurityContext(token, chatFrame.Server.RemoteIP);
 
-                    if (supportPackageSequence == EnumSupportPackageSequence.SSP_OK)
-                    {
-                        var securityToken = supportPackage.CreateSecurityChallenge().ToEscape();
-                        chatFrame.User.Send(Raw.RPL_AUTH_SEC_REPLY(packageName, securityToken));
-                        // Send reply
-                        return;
-                    }
+                if (supportPackageSequence == EnumSupportPackageSequence.SSP_OK)
+                {
+                    var securityToken = supportPackage.CreateSecurityChallenge().ToEscape();
+                    chatFrame.User.Send(Raw.RPL_AUTH_SEC_REPLY(packageName, securityToken));
+                    // Send reply
+                    return;
                 }
             }
             else if (sequence == "S")

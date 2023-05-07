@@ -26,6 +26,7 @@ namespace Irc.Extensions.Apollo.Directory
             FlushCommands();
             AddCommand(new Ircvers());
             AddCommand(new Auth());
+            AddCommand(new AuthX());
             AddCommand(new Pass());
             AddCommand(new Nick());
             AddCommand(new UserCommand(), Enumerations.EnumProtocolType.IRC, "User");

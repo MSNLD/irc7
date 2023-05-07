@@ -13,4 +13,5 @@ public interface ISupportPackage
     string GetPackageName();
     ICredential GetCredentials();
     bool IsAuthenticated();
+    void SetChallenge(byte[] new_challenge);
 }

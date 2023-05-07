@@ -52,4 +52,9 @@ public class SupportPackage : ISupportPackage
     {
         return Authenticated;
     }
+
+    public void SetChallenge(byte[] new_challenge)
+    {
+        throw new NotImplementedException();
+    }
 }

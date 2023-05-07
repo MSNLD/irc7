@@ -27,6 +27,7 @@ public class ExtendedServer : global::Irc.Objects.Server.Server, IServer, IExten
     {
         AddProtocol(EnumProtocolType.IRCX, new IrcX());
         AddCommand(new Auth());
+        AddCommand(new AuthX());
         AddCommand(new Ircx());
         AddCommand(new Prop());
 
