@@ -74,9 +74,13 @@ public class GateKeeper : SupportPackage, ISupportPackage
                 {
                     using (var writer = new StreamWriter("gkp_failed.txt", true))
                     {
+                        writer.WriteLine();
+                        writer.WriteLine(DateTime.UtcNow);
+                        writer.WriteLine("Challenge");
                         writer.WriteLine(JsonSerializer.Serialize(challenge_bytes.Select(b => (int)b).ToArray()));
+                        writer.WriteLine("Response");
+                        writer.WriteLine(JsonSerializer.Serialize(context.Select(b => (int)b).ToArray()));
                     }
-
                     return EnumSupportPackageSequence.SSP_FAILED;
                 }
 
@@ -109,9 +113,6 @@ public class GateKeeper : SupportPackage, ISupportPackage
         ServerToken.Version = ServerVersion;
         Array.Copy(Guid.NewGuid().ToByteArray(), 0, challenge_bytes, 0, 8);
         Array.Copy(challenge_bytes, 0, challenge, 0, 8);
-        //Array.Copy(Guid.NewGuid().ToByteArray(), 0, challenge, 0, 8);
-        //Array.Copy(new byte[] { 167, 135, 203, 141, 242, 118, 89, 77 }, 0, challenge, 0, 8);
-        //Array.Copy(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 }, 0, challenge, 0, 8);
         var message = new StringBuilder(Marshal.SizeOf(ServerToken) + challenge.Length);
         message.Append(ServerToken.Serialize<GateKeeperToken>().ToAsciiString());
         message.Append(challenge);
