@@ -69,18 +69,17 @@ public class GateKeeper : SupportPackage, ISupportPackage
                 if (clientVersion == 1 && token.Length > 0x20) return EnumSupportPackageSequence.SSP_FAILED;
 
                 var context = token.Substring(0x10, 0x10).ToByteArray();
-                using (var writer = new StreamWriter("gkp_failed.txt", true))
-                {
-                    writer.WriteLine();
-                    writer.WriteLine(DateTime.UtcNow);
-                    writer.WriteLine("Challenge");
-                    writer.WriteLine(JsonSerializer.Serialize(challenge_bytes.Select(b => (int)b).ToArray()));
-                    writer.WriteLine("Response");
-                    writer.WriteLine(JsonSerializer.Serialize(context.Select(b => (int)b).ToArray()));
-                }
                 if (!VerifySecurityContext(new string(challenge), context, ip, ServerVersion))
                 {
-
+                    using (var writer = new StreamWriter("gkp_failed.txt", true))
+                    {
+                        writer.WriteLine();
+                        writer.WriteLine(DateTime.UtcNow);
+                        writer.WriteLine("Challenge");
+                        writer.WriteLine(JsonSerializer.Serialize(challenge_bytes.Select(b => (int)b).ToArray()));
+                        writer.WriteLine("Response");
+                        writer.WriteLine(JsonSerializer.Serialize(context.Select(b => (int)b).ToArray()));
+                    }
                     return EnumSupportPackageSequence.SSP_FAILED;
                 }
 
@@ -137,9 +136,13 @@ public class GateKeeper : SupportPackage, ISupportPackage
         var md5 = new HMACMD5(key.ToByteArray());
         var ctx = $"{challenge}{ip}";
         var h1 = md5.ComputeHash(ctx.ToByteArray(), 0, ctx.Length);
+
         bool b = h1.SequenceEqual(context);
         if (!b)
         {
+            Console.WriteLine($"Auth Fail: Received = {context.Select(b => (int)b).ToArray()}");
+            Console.WriteLine($"Auth Fail: Expected = {h1.Select(b => (int)b).ToArray()}");
+
             return false;
         }
         return b;
