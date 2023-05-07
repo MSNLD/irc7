@@ -83,9 +83,10 @@ public class Message
 
     private void parse()
     {
-        if (string.IsNullOrWhiteSpace(OriginalText)) return;
+        var trimmedText = OriginalText.TrimStart();
+        if (string.IsNullOrWhiteSpace(trimmedText)) return;
 
-        var parts = OriginalText.Split(' ');
+        var parts = trimmedText.Split(' ');
 
         if (parts.Length > 0)
         {
