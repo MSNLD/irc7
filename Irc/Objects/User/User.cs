@@ -115,6 +115,7 @@ public class User : ChatObject, IUser
 
     public void Disconnect(string message)
     {
+        Console.WriteLine($"Disconnecting[{_protocol.GetType().Name}/{Name}]: {message}");
         _connection?.Disconnect($"{message}\r\n");
     }
 
@@ -162,7 +163,6 @@ public class User : ChatObject, IUser
         {
             return GetLevel();
         }
-    
     }
 
     public Address Address { get => address; set => address = value; }
