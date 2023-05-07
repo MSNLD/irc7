@@ -140,8 +140,8 @@ public class GateKeeper : SupportPackage, ISupportPackage
         bool b = h1.SequenceEqual(context);
         if (!b)
         {
-            Console.WriteLine($"Auth Fail: Received = {context.Select(b => (int)b).ToArray()}");
-            Console.WriteLine($"Auth Fail: Expected = {h1.Select(b => (int)b).ToArray()}");
+            Console.WriteLine($"Auth Fail: Received = {JsonSerializer.Serialize(context.Select(b => (int)b).ToArray())}");
+            Console.WriteLine($"Auth Fail: Expected = {JsonSerializer.Serialize(h1.Select(b => (int)b).ToArray())}");
 
             return false;
         }
