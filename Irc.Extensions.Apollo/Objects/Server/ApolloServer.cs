@@ -70,7 +70,7 @@ public class ApolloServer : ExtendedServer
                     );
             }
         }
-        else if (name == "SUBSCRIBERINFO" && user.IsAuthenticated() && !user.IsRegistered())
+        else if (name == "SUBSCRIBERINFO" && user.IsAuthenticated() && user.IsRegistered())
         {
             var subscribedString = passport.ValidateSubscriberInfo(value, user.GetSupportPackage().GetCredentials().GetIssuedAt());
             int.TryParse(subscribedString, out var subscribed);

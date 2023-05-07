@@ -142,6 +142,7 @@ public static long epoch = 621355968000000000;
     public static string UserPropOid = "OID";
     public static string UserPropName = "NAME";
     public static string UserPropRole = "ROLE";
+    public static string UserPropSubscriberInfo = "SUBSCRIBERINFO";
     public static string UserPropMsnProfile = "MSNPROFILE"; //
     public static string UserPropMsnRegCookie = "MSNREGCOOKIE";
     public static string UserPropNickname = "NICK";

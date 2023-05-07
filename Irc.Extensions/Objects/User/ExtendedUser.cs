@@ -10,7 +10,7 @@ namespace Irc.Extensions.Objects.User;
 
 public class ExtendedUser : global::Irc.Objects.User, IExtendedChatObject
 {
-    private UserPropCollection _properties;
+    protected UserPropCollection _properties;
     private UserAccess _accessList = new();
     public IPropCollection PropCollection => _properties;
 

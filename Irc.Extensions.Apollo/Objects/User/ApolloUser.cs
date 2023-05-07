@@ -1,4 +1,5 @@
-﻿using Irc.Extensions.Objects.User;
+﻿using Irc.Extensions.Apollo.Objects.Server;
+using Irc.Extensions.Objects.User;
 using Irc.Interfaces;
 using Irc.IO;
 using Irc.Objects;
@@ -15,7 +16,7 @@ public class ApolloUser : ExtendedUser
         IFloodProtectionProfile floodProtectionProfile, IDataStore dataStore, IModeCollection modes, IServer server) :
         base(connection, protocol, dataRegulator, floodProtectionProfile, dataStore, modes, server)
     {
-
+        _properties = new ApolloUserPropCollection((ApolloServer)server, dataStore);
     }
 
     public ApolloProfile GetProfile() => Profile;

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Irc.Extensions.Objects.User
 {
-    internal class UserPropCollection: PropCollection
+    public class UserPropCollection: PropCollection
     {
         private readonly IDataStore dataStore;
 

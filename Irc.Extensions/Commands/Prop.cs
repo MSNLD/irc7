@@ -122,8 +122,11 @@ public class Prop : Command, ICommand
                                 return;
                             }
 
-                            prop.SetValue(propValue);
-                            chatObject.Send(Raw.RPL_PROP_IRCX(chatFrame.Server, chatFrame.User, (ChatObject)chatObject, prop.Name, propValue));
+                            if (ircError == EnumIrcError.OK)
+                            {
+                                prop.SetValue(propValue);
+                                chatObject.Send(Raw.RPL_PROP_IRCX(chatFrame.Server, chatFrame.User, (ChatObject)chatObject, prop.Name, propValue));
+                            }
                         }
                         else
                         {

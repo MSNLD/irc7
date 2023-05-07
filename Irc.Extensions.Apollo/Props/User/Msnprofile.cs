@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Irc.Extensions.Apollo.Props.User
 {
-    internal class Msnprofile : PropRule
+    public class Msnprofile : PropRule
     {
         private readonly ApolloProfile profile;
 
