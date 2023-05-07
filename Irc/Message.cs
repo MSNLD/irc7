@@ -111,7 +111,7 @@ public class Message
                 if (parts[index].StartsWith(':'))
                 {
                     cursor++;
-                    Parameters.Add(OriginalText.Substring(cursor));
+                    Parameters.Add(trimmedText.Substring(cursor));
                     break;
                 }
 
