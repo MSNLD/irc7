@@ -43,7 +43,7 @@ public class Prop : Command, ICommand
                         // TODO: This needs rewriting
                         if (string.Compare("NICK", chatFrame.Message.Parameters[1], true) == 0)
                         {
-                            chatFrame.User.GetAddress().Nickname = chatFrame.User.Name;
+                            chatFrame.User.Nickname = chatFrame.User.Name;
                             SendProp(chatFrame.Server, chatFrame.User, (IExtendedChatObject)chatFrame.User, "NICK", chatFrame.User.Name);
                         }
                         else if (string.Compare("MSNREGCOOKIE", chatFrame.Message.Parameters[1], true) == 0)

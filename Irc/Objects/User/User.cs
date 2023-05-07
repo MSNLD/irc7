@@ -165,6 +165,16 @@ public class User : ChatObject, IUser
         }
     }
 
+    public string Nickname
+    {
+        get => Name;
+        set
+        {
+            Name = value;
+            address.SetNickname(value);
+        }
+    }
+
     public Address Address { get => address; set => address = value; }
 
     public Address GetAddress()

@@ -26,7 +26,7 @@ public class Address
 
     public UserHostPair UserHost = new();
 
-    public string Nickname { set; get; }
+    public string Nickname { private set; get; }
 
     public string User { set => UserHost.User = value; get => UserHost.User; }
 
@@ -37,6 +37,11 @@ public class Address
     public string RealName { set; get; }
     public string RemoteIP { protected set; get; }
     public string MaskedIP { protected set; get; }
+
+    public void SetNickname(string nickname)
+    {
+        Nickname = nickname;
+    }
 
     public void SetIP(string address)
     {

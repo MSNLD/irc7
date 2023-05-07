@@ -1,4 +1,5 @@
 ﻿using Irc.Commands;
+using Irc.Constants;
 using Irc.Enumerations;
 using Irc.Extensions.Apollo.Commands;
 using Irc.Extensions.Apollo.Factories;
@@ -60,7 +61,7 @@ public class ApolloServer : ExtendedServer
 
     public override void ProcessCookie(IUser user, string name, string value)
     {
-        if (name == "MSNREGCOOKIE" && user.IsAuthenticated() && !user.IsRegistered())
+        if (name == Resources.UserPropMsnRegCookie && user.IsAuthenticated() && !user.IsRegistered())
         {
             var nickname = passport.ValidateRegCookie(value);
             if (nickname != null)
@@ -70,13 +71,13 @@ public class ApolloServer : ExtendedServer
                     );
             }
         }
-        else if (name == "SUBSCRIBERINFO" && user.IsAuthenticated() && user.IsRegistered())
+        else if (name == Resources.UserPropSubscriberInfo && user.IsAuthenticated() && user.IsRegistered())
         {
             var subscribedString = passport.ValidateSubscriberInfo(value, user.GetSupportPackage().GetCredentials().GetIssuedAt());
             int.TryParse(subscribedString, out var subscribed);
             if ((subscribed & 1) == 1) ((ApolloUser)user).GetProfile().Registered = true;
         }
-        else if (name == "MSNPROFILE" && user.IsAuthenticated() && !user.IsRegistered())
+        else if (name == Resources.UserPropMsnProfile && user.IsAuthenticated() && !user.IsRegistered())
         {
             int.TryParse(value, out var profileCode);
             ((ApolloUser)user).GetProfile().SetProfileCode(profileCode);

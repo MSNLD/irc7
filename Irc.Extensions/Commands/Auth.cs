@@ -78,7 +78,12 @@ public class Auth : Command, ICommand
                         var domain = chatFrame.User.GetSupportPackage().GetCredentials().GetDomain();
 
                         var userAddress = chatFrame.User.GetAddress();
-                        chatFrame.User.Name = credentials.GetNickname();
+
+                        var nickname = credentials.GetNickname();
+                        if (nickname != null)
+                        {
+                            chatFrame.User.Name = credentials.GetNickname();
+                        }
                         userAddress.User = credentials.GetUsername();
                         userAddress.Host = credentials.GetDomain();
                         userAddress.Server = chatFrame.Server.RemoteIP;
