@@ -23,6 +23,7 @@ public class Message
         <crlf>     ::= CR LF
      */
 
+    // TODO: Tests around Message class
     // TODO: To get rid of below
     public int ParamOffset;
 
@@ -94,6 +95,7 @@ public class Message
                 cursor = GetPrefix.Length + 1;
             }
 
+            if (index <= parts.Length) return;
             if (getCommand(parts[index]))
             {
                 cursor += parts[index].Length + 1;
