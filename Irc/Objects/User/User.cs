@@ -50,7 +50,7 @@ public class User : ChatObject, IUser
             LastIdle = DateTime.UtcNow.Ticks;
             PingCount = 0;
             var message = new Message(_protocol, s);
-            dataRegulator.PushIncoming(message);
+            if (message.HasCommand) dataRegulator.PushIncoming(message);
         };
 
         Address.SetIP(connection.GetAddress());

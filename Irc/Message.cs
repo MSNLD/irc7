@@ -40,6 +40,8 @@ public class Message
 
     public string GetPrefix { get; private set; }
 
+    public bool HasCommand { get; private set; }
+
     public ICommand GetCommand()
     {
         return _command;
@@ -70,6 +72,7 @@ public class Message
     {
         if (!string.IsNullOrWhiteSpace(command))
         {
+            HasCommand = true;
             _commandName = command;
             _command = _protocol.GetCommand(command);
             return true;
@@ -95,7 +98,7 @@ public class Message
                 cursor = GetPrefix.Length + 1;
             }
 
-            if (index <= parts.Length) return;
+            if (index >= parts.Length) return;
             if (getCommand(parts[index]))
             {
                 cursor += parts[index].Length + 1;
