@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using Irc.ClassExtensions.CSharpTools;
 using Irc.Enumerations;
 using Irc.Extensions.Apollo.Security.Packages;
@@ -17,6 +18,7 @@ public class GateKeeper : SupportPackage, ISupportPackage
 
     // Credit to JD for discovering the below key through XOR'ing (Discovered 2017/05/04)
     private static readonly string key = "SRFMKSJANDRESKKC";
+    private readonly byte[] challenge_bytes = new byte[8];
     private readonly char[] challenge = new char[8];
     protected GateKeeperToken ServerToken;
 
@@ -69,7 +71,14 @@ public class GateKeeper : SupportPackage, ISupportPackage
                 var context = token.Substring(0x10, 0x10).ToByteArray();
 
                 if (!VerifySecurityContext(new string(challenge), context, ip, ServerVersion))
+                {
+                    using (var writer = new StreamWriter("gkp_failed.txt", true))
+                    {
+                        writer.WriteLine(JsonSerializer.Serialize(challenge_bytes.Select(b => (int)b).ToArray()));
+                    }
+
                     return EnumSupportPackageSequence.SSP_FAILED;
+                }
 
                 var guid = Guid.NewGuid();
                 if (token.Length >= 0x30) guid = new Guid(token.Substring(0x20, 0x10).ToByteArray());
@@ -98,7 +107,9 @@ public class GateKeeper : SupportPackage, ISupportPackage
     {
         ServerToken.Sequence = (int) EnumSupportPackageSequence.SSP_SEC;
         ServerToken.Version = ServerVersion;
-        Array.Copy(Guid.NewGuid().ToByteArray(), 0, challenge, 0, 8);
+        Array.Copy(Guid.NewGuid().ToByteArray(), 0, challenge_bytes, 0, 8);
+        Array.Copy(challenge_bytes, 0, challenge, 0, 8);
+        //Array.Copy(Guid.NewGuid().ToByteArray(), 0, challenge, 0, 8);
         //Array.Copy(new byte[] { 167, 135, 203, 141, 242, 118, 89, 77 }, 0, challenge, 0, 8);
         //Array.Copy(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 }, 0, challenge, 0, 8);
         var message = new StringBuilder(Marshal.SizeOf(ServerToken) + challenge.Length);
