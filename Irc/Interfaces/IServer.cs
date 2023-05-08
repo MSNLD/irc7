@@ -17,6 +17,8 @@ public interface IServer
     int MaxMessageLength { get; }
     int MaxInputBytes { get; }
     int MaxOutputBytes { get; }
+    int PingInterval { get; }
+    int PingAttempts { get; }
     int NetInvisibleCount { get; }
     int NetServerCount { get; }
     int NetUserCount { get; }

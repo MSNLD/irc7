@@ -49,17 +49,7 @@ public class Server : ChatObject, IServer
         _processingTask = new Task(Process);
         _processingTask.Start();
 
-        var maxInputBytes = _dataStore.GetAs<int>("MaxInputBytes");
-        var maxOutputBytes = _dataStore.GetAs<int>("MaxOutputBytes");
-
-        if (maxInputBytes > 0)
-        {
-            MaxInputBytes = maxInputBytes;
-        }
-        if (maxOutputBytes > 0)
-        {
-            MaxOutputBytes = maxOutputBytes;
-        }
+        LoadSettingsFromDataStore();
 
         _dataStore.SetAs("creation", DateTime.UtcNow);
         _dataStore.Set("supported.channel.modes",
@@ -86,6 +76,20 @@ public class Server : ChatObject, IServer
         socketServer.Listen();
     }
 
+    public void LoadSettingsFromDataStore()
+    {
+        var maxInputBytes = _dataStore.GetAs<int>("MaxInputBytes");
+        var maxOutputBytes = _dataStore.GetAs<int>("MaxOutputBytes");
+        var pingInterval = _dataStore.GetAs<int>("PingInterval");
+        var pingAttempts = _dataStore.GetAs<int>("PingAttempts");
+
+        if (maxInputBytes > 0) MaxInputBytes = maxInputBytes;
+        if (maxOutputBytes > 0) MaxOutputBytes = maxOutputBytes;
+        if (pingInterval > 0) PingInterval = pingInterval;
+        if (pingAttempts > 0) PingAttempts = pingAttempts;
+
+    }
+
     public DateTime CreationDate => _dataStore.GetAs<DateTime>("creation");
 
     // Server Properties To be moved to another class later
@@ -94,8 +98,10 @@ public class Server : ChatObject, IServer
     public IList<ChatObject> IgnoredUsers { get; }
     public IList<string> Info { get; }
     public int MaxMessageLength { get; } = 512;
-    public int MaxInputBytes { get; } = 512;
-    public int MaxOutputBytes { get; } = 4096;
+    public int MaxInputBytes { get; private set; } = 512;
+    public int MaxOutputBytes { get; private set; } = 4096;
+    public int PingInterval { get; private set; } = 180;
+    public int PingAttempts { get; private set; } = 3;
     public int NetInvisibleCount { get; }
     public int NetServerCount { get; }
     public int NetUserCount { get; }
@@ -351,6 +357,7 @@ public class Server : ChatObject, IServer
     private void ProcessNextCommand(IUser user)
     {
         var message = user.GetDataRegulator().PeekIncoming();
+        if (message == null) return;
 
         var command = message.GetCommand();
         if (command != null)

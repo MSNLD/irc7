@@ -1,5 +1,10 @@
 {
   "Id": "DefaultServerId",
   "Name": "DefaultServerName",
-  "Motd": "[\"*** Welcome to the Server ***\"]"
+  "Motd": "[\"*** Welcome to the Server ***\"]",
+  "Passport.V4.Secret": "mysecret",
+  "MaxInputBytes": "1024",
+  "MaxOutputBytes": "4096",
+  "PingInterval": "180",
+  "PingAttempts": "3"
 }

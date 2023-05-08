@@ -69,6 +69,8 @@ public class SocketConnection : IConnection
         sendAsync.SetBuffer(message.ToByteArray());
         sendAsync.Completed += (sender, args) => { OnSend(this, message); };
 
+        if (!_socket.Connected) OnDisconnect?.Invoke(this, GetId());
+
         if (_socket.Connected)
             if (!_socket.SendAsync(sendAsync)) // Report data is sent
                 OnSend?.Invoke(this, message.Substring(sendAsync.Offset, sendAsync.BytesTransferred));
@@ -85,6 +87,8 @@ public class SocketConnection : IConnection
         {
             _socket.Close();
         }
+
+        if (!_socket.Connected) OnDisconnect?.Invoke(this, GetId());
     }
 
     public void Accept()
