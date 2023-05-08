@@ -81,7 +81,7 @@ public class SocketConnection : IConnection
         if (!string.IsNullOrWhiteSpace(message))
         {
             Send(message);
-            _socket.Close(1000);
+            _socket.Close();
         }
         else
         {
