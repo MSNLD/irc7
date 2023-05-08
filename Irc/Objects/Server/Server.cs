@@ -310,10 +310,14 @@ public class Server : ChatObject, IServer
 
             foreach (var user in PendingRemoveUserQueue)
             {
-                Quit.QuitChannels(user, "Connection reset by peer");
+                if (!Users.Remove(user))
+                {
+                    Console.WriteLine($"Failed to remove {user}. Requeueing");
+                    PendingRemoveUserQueue.Enqueue(user);
+                    continue;
+                }
 
-                var foundUser = Users.Where(u => u.GetConnection().GetId() == user.GetConnection().GetId()).FirstOrDefault();
-                if (foundUser != null) Users.Remove(foundUser);
+                Quit.QuitChannels(user, "Connection reset by peer");
             }
 
             Console.WriteLine($"Removed {PendingRemoveUserQueue.Count} users. Total Users = {Users.Count}");
