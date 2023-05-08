@@ -49,6 +49,18 @@ public class Server : ChatObject, IServer
         _processingTask = new Task(Process);
         _processingTask.Start();
 
+        var maxInputBytes = _dataStore.GetAs<int>("MaxInputBytes");
+        var maxOutputBytes = _dataStore.GetAs<int>("MaxOutputBytes");
+
+        if (maxInputBytes > 0)
+        {
+            MaxInputBytes = maxInputBytes;
+        }
+        if (maxOutputBytes > 0)
+        {
+            MaxOutputBytes = maxOutputBytes;
+        }
+
         _dataStore.SetAs("creation", DateTime.UtcNow);
         _dataStore.Set("supported.channel.modes",
             new ChannelModes().GetSupportedModes());
