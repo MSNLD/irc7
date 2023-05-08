@@ -311,8 +311,9 @@ public class Server : ChatObject, IServer
             foreach (var user in PendingRemoveUserQueue)
             {
                 Quit.QuitChannels(user, "Connection reset by peer");
-                user.Disconnect("Connection reset by peer");
-                Users.Remove(user);
+
+                var foundUser = Users.Where(u => u.GetConnection().GetId() == user.GetConnection().GetId()).FirstOrDefault();
+                if (foundUser != null) Users.Remove(foundUser);
             }
 
             Console.WriteLine($"Removed {PendingRemoveUserQueue.Count} users. Total Users = {Users.Count}");
