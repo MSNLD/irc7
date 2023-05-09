@@ -371,10 +371,7 @@ public class Server : ChatObject, IServer
                 command.GetDataType(), user.GetLevel());
             if (floodResult == EnumFloodResult.Ok)
             {
-                if (command is not Ping && command is not Pong)
-                {
-                    user.LastIdle = DateTime.UtcNow;
-                }
+                if (command is not Ping && command is not Pong) user.LastIdle = DateTime.UtcNow;
 
                 user.GetDataRegulator().PopIncoming();
                 Console.WriteLine($"Processing: {message.OriginalText}");

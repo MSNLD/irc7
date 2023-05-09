@@ -52,6 +52,8 @@ public class ExtendedChannel : global::Irc.Objects.Channel.Channel, IExtendedCha
 
     protected EnumChannelAccessResult CheckHostKey(IUser user, string key)
     {
+        if (string.IsNullOrWhiteSpace(key)) return EnumChannelAccessResult.NONE;
+
         if (PropCollection.GetProp("OWNERKEY").GetValue() == key) {
             return EnumChannelAccessResult.SUCCESS_OWNER;
         }

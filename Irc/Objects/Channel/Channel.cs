@@ -293,6 +293,8 @@ public class Channel : ChatObject, IChannel
 
     protected EnumChannelAccessResult CheckMemberKey(IUser user, string key)
     {
+        if (string.IsNullOrWhiteSpace(key)) return EnumChannelAccessResult.NONE;
+
         if (Modes.GetModeChar(Resources.ChannelModeKey) == 1)
         {
             if (Modes.Key == key)
