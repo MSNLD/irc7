@@ -44,6 +44,16 @@ namespace Irc.Modes
                     )
                 );
         }
+        public void DispatchModeChange(ChatObject recipientObject, char modeChar, ChatObject source, ChatObject target, bool flag, string parameter)
+        {
+            recipientObject.Send(
+                Raw.RPL_MODE_IRC(
+                        (IUser)source,
+                        target,
+                        $"{(flag ? "+" : "-")}{modeChar}{(parameter != null ? $" {parameter}" : string.Empty)}"
+                    )
+                );
+        }
 
         public void Set(int value) => ModeValue = value;
         public void Set(bool value) => ModeValue = (value == true ? 1 : 0);

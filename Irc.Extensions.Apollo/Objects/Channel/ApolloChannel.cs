@@ -4,6 +4,7 @@ using Irc.Extensions.Apollo.Objects.User;
 using Irc.Extensions.Objects.Channel;
 using Irc.Interfaces;
 using Irc.IO;
+using Irc.Modes;
 using Irc.Objects;
 using Irc.Objects.Member;
 
@@ -27,7 +28,7 @@ public class ApolloChannel : ExtendedChannel
 
                 if (!sourceMember.IsNormal()) {
                     char modeChar = sourceMember.IsOwner() ? 'q' : (sourceMember.IsHost() ? 'o' : 'v');
-                    Modes.GetMode(modeChar).DispatchModeChange((ChatObject)user, this, true, user.ToString());
+                    ((ModeRule)Modes.GetMode(modeChar)).DispatchModeChange((ChatObject)targetUser, modeChar, (ChatObject)user, (ChatObject)this, true, user.ToString());
                 }
             }
             else {
