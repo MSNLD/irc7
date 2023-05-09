@@ -1,6 +1,8 @@
-﻿using Irc.Constants;
+﻿using System.Linq;
+using Irc.Constants;
 using Irc.Enumerations;
 using Irc.Objects;
+using Irc.Objects.Server;
 
 namespace Irc.Commands;
 
@@ -17,31 +19,50 @@ public class Whois : Command, ICommand
          <- :sky-8a15b323126 312 Sky Sky sky-8a15b323126 :Microsoft Exchange Chat Service
          <- :sky-8a15b323126 318 Sky Sky :End of /WHOIS list
         */
-        IUser targetUser = chatFrame.Server.GetUserByNickname(chatFrame.Message.Parameters.First());
+        var nicknames = chatFrame.Message.Parameters.First().Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
-        chatFrame.User.Send(IrcRaws.IRC_RAW_311(chatFrame.Server, chatFrame.User, targetUser));
-
-        if (chatFrame.User.GetChannels().Count > 0)
+        foreach (var nickname in nicknames)
         {
+            ProcessWhoisReply(chatFrame.Server, chatFrame.User, nickname);
+        }
+    }
+
+    public static void ProcessWhoisReply(IServer server, IUser user, string nickname)
+    {
+        IUser targetUser = server.GetUserByNickname(nickname);
+
+        if (targetUser == null)
+        {
+            user.Send(Raw.IRCX_ERR_NOSUCHNICK_401(server, user, nickname));
+            return;
+        }
+
+        user.Send(IrcRaws.IRC_RAW_311(server, user, targetUser));
+
+        if (targetUser.GetChannels().Count > 0)
+        {
+            var channels = targetUser.GetChannels();
+            var channelStrings = channels.Select(c => $"{c.Value.GetListedMode()}{c.Key}").ToArray<string>();
+
             // TODO: Properly format channels & user modes
-            chatFrame.User.Send(IrcRaws.IRC_RAW_319(chatFrame.Server, chatFrame.User, targetUser,
-                string.Join(' ', chatFrame.User.GetChannels())
+            user.Send(IrcRaws.IRC_RAW_319(server, user, targetUser,
+                string.Join(' ', channelStrings)
             ));
         }
 
         if (targetUser.GetLevel() >= EnumUserAccessLevel.Guide)
         {
-            chatFrame.User.Send(IrcRaws.IRC_RAW_313(chatFrame.Server, chatFrame.User, targetUser));
+            user.Send(IrcRaws.IRC_RAW_313(server, user, targetUser));
         }
 
         var idleSeconds = 1;
         var idleEpoch = (long)DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds;
         if (idleSeconds > 0)
         {
-            chatFrame.User.Send(IrcRaws.IRC_RAW_317(chatFrame.Server, chatFrame.User, targetUser, idleSeconds, idleEpoch));
+            user.Send(IrcRaws.IRC_RAW_317(server, user, targetUser, idleSeconds, idleEpoch));
         }
 
-        chatFrame.User.Send(IrcRaws.IRC_RAW_318(chatFrame.Server, chatFrame.User, targetUser));
+        user.Send(IrcRaws.IRC_RAW_318(server, user, targetUser));
 
     }
 }

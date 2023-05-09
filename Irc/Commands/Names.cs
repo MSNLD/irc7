@@ -13,14 +13,25 @@ internal class Names : Command, ICommand
 
     public new void Execute(ChatFrame chatFrame)
     {
-        var channelName = chatFrame.Message.Parameters.First();
+        var user = chatFrame.User;
+        var channelNames = chatFrame.Message.Parameters.First().Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
-        var channel = chatFrame.Server.GetChannelByName(channelName);
+        foreach (var channelName in channelNames)
+        {
+            var channel = chatFrame.Server.GetChannelByName(channelName.Trim());
 
-        if (channel != null)
-            ProcessNamesReply(chatFrame.User, channel);
-        else
-            chatFrame.User.Send(Raw.IRCX_ERR_NOSUCHCHANNEL_403(chatFrame.Server, chatFrame.User, channelName));
+            if (channel != null)
+            {
+                if (user.IsOn(channel) || (!channel.Modes.Private && !channel.Modes.Secret))
+                {
+                    ProcessNamesReply(user, channel);
+                }
+
+                user.Send(Raw.IRCX_RPL_ENDOFNAMES_366(user.Server, user, channel));
+            }
+            else
+                chatFrame.User.Send(Raw.IRCX_ERR_NOSUCHCHANNEL_403(chatFrame.Server, chatFrame.User, channelName));
+        }
     }
 
     public static void ProcessNamesReply(IUser user, IChannel channel)
@@ -48,6 +59,5 @@ internal class Names : Command, ICommand
                                               )
                                         )
             );
-        user.Send(Raw.IRCX_RPL_ENDOFNAMES_366(user.Server, user, channel));
     }
 }

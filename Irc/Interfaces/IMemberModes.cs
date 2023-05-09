@@ -3,7 +3,7 @@
 public interface IMemberModes
 {
     string GetModeString();
-    char GetListedMode();
+    string GetListedMode();
 
     char GetModeChar();
 

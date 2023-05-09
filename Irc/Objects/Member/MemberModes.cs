@@ -16,13 +16,13 @@ public class MemberModes : ModeCollection, IMemberModes
         return modes?.ToString()!;
     }
 
-    public char GetListedMode()
+    public string GetListedMode()
     {
-        if (IsOwner()) return Resources.MemberModeFlagOwner;
-        if (IsHost()) return Resources.MemberModeFlagHost;
-        if (IsVoice()) return Resources.MemberModeFlagVoice;
+        if (IsOwner()) return Resources.MemberModeFlagOwner.ToString();
+        if (IsHost()) return Resources.MemberModeFlagHost.ToString();
+        if (IsVoice()) return Resources.MemberModeFlagVoice.ToString();
 
-        return (char) 0;
+        return "";
     }
 
     public char GetModeChar()

@@ -14,9 +14,9 @@ public class ExtendedMemberModes : global::Irc.Objects.Member.Member, IMemberMod
         modes.Add(ExtendedResources.MemberModeOwner, new global::Irc.Modes.Channel.Member.Owner());
     }
 
-    public new char GetListedMode()
+    public new string GetListedMode()
     {
-        if (IsOwner()) return ExtendedResources.MemberModeFlagOwner;
+        if (IsOwner()) return ExtendedResources.MemberModeFlagOwner.ToString();
 
         return base.GetListedMode();
     }

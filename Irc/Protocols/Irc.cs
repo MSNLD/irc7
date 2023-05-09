@@ -20,6 +20,7 @@ public class Irc : Protocol, IProtocol
         AddCommand(new Join());
         AddCommand(new Part());
         AddCommand(new Kick());
+        AddCommand(new Names());
         AddCommand(new Userhost());
         AddCommand(new Version());
         AddCommand(new Info());
