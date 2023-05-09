@@ -19,12 +19,16 @@ public class Whois : Command, ICommand
          <- :sky-8a15b323126 312 Sky Sky sky-8a15b323126 :Microsoft Exchange Chat Service
          <- :sky-8a15b323126 318 Sky Sky :End of /WHOIS list
         */
-        var nicknames = chatFrame.Message.Parameters.First().Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+        var server = chatFrame.Server;
+        var user = chatFrame.User;
+        var nicknameString = chatFrame.Message.Parameters.First();
+        var nicknames = nicknameString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
         foreach (var nickname in nicknames)
         {
             ProcessWhoisReply(chatFrame.Server, chatFrame.User, nickname);
         }
+        user.Send(IrcRaws.IRC_RAW_318(server, user, nicknameString));
     }
 
     public static void ProcessWhoisReply(IServer server, IUser user, string nickname)
@@ -61,8 +65,5 @@ public class Whois : Command, ICommand
         {
             user.Send(IrcRaws.IRC_RAW_317(server, user, targetUser, idleSeconds, idleEpoch));
         }
-
-        user.Send(IrcRaws.IRC_RAW_318(server, user, targetUser));
-
     }
 }

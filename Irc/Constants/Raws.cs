@@ -30,7 +30,7 @@ public static class IrcRaws
     public static string IRC_RAW_313(IServer server, IUser user, IUser targetUser) => $":{server} 313 {user} {targetUser} :is an IRC operator";
     public static string IRC_RAW_315 = ":%h 315 %a %s :End of /WHO list ";
     public static string IRC_RAW_317(IServer server, IUser user, IUser targetUser, int seconds, long epoch) => $":{server} 317 {user} {targetUser} {seconds} {epoch} :seconds idle, signon time";
-    public static string IRC_RAW_318(IServer server, IUser user, IUser targetUser) => $":{server} 318 {user} {targetUser} :End of /WHOIS list";
+    public static string IRC_RAW_318(IServer server, IUser user, string targetNicknames) => $":{server} 318 {user} {targetNicknames} :End of /WHOIS list";
     public static string IRC_RAW_319(IServer server, IUser user, IUser targetUser, string channelList) => $":{server} 319 {user} {targetUser} :{channelList}";
     public static string IRC_RAW_321 = ":%h 321 %a Channel :Users  Name ";
     public static string IRC_RAW_322 = ":%h 322 %a %s %d :%s";
