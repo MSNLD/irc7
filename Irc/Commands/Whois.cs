@@ -59,11 +59,10 @@ public class Whois : Command, ICommand
             user.Send(IrcRaws.IRC_RAW_313(server, user, targetUser));
         }
 
-        var idleSeconds = 1;
-        var idleEpoch = (long)DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds;
-        if (idleSeconds > 0)
-        {
-            user.Send(IrcRaws.IRC_RAW_317(server, user, targetUser, idleSeconds, idleEpoch));
-        }
+        var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        var secondsSinceLogin = (targetUser.LoggedOn - epoch).Ticks / TimeSpan.TicksPerSecond;
+        var secondsIdle = (DateTime.UtcNow.Ticks - targetUser.LastIdle.Ticks) / TimeSpan.TicksPerSecond;
+
+        user.Send(IrcRaws.IRC_RAW_317(server, user, targetUser, secondsIdle, secondsSinceLogin));
     }
 }

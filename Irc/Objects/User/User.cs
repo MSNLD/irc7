@@ -28,9 +28,10 @@ public class User : ChatObject, IUser
     public IDictionary<IChannel, IChannelMember> Channels;
     public string Client;
 
-    public long LastIdle = DateTime.UtcNow.Ticks;
+    public DateTime LastPing = DateTime.UtcNow;
+    public DateTime LastIdle { get; set; } = DateTime.UtcNow;
+    public DateTime LoggedOn { get; private set; } = DateTime.UtcNow;
     public long PingCount;
-    public long LoggedOn;
 
     public User(IConnection connection, IProtocol protocol, IDataRegulator dataRegulator,
         IFloodProtectionProfile floodProtectionProfile, IDataStore dataStore, IModeCollection modes,
@@ -47,7 +48,7 @@ public class User : ChatObject, IUser
 
         _connection.OnReceive += (sender, s) =>
         {
-            LastIdle = DateTime.UtcNow.Ticks;
+            LastPing = DateTime.UtcNow;
             PingCount = 0;
             var message = new Message(_protocol, s);
             if (message.HasCommand) dataRegulator.PushIncoming(message);
@@ -264,7 +265,7 @@ public class User : ChatObject, IUser
 
     public void DisconnectIfInactive()
     {
-        var seconds = (DateTime.UtcNow.Ticks - LastIdle) / TimeSpan.TicksPerSecond;
+        var seconds = (DateTime.UtcNow.Ticks - LastPing.Ticks) / TimeSpan.TicksPerSecond;
         if (seconds > ((PingCount + 1) * Server.PingInterval))
         {
             if (PingCount < Server.PingAttempts)
@@ -283,6 +284,7 @@ public class User : ChatObject, IUser
 
     public void Register()
     {
+        LoggedOn = DateTime.UtcNow;
         _registered = true;
     }
 

@@ -13,6 +13,8 @@ public interface IUser
     string ShortId { get; }
     string Name { get; set; }
     string Nickname { get; set; }
+    DateTime LastIdle { get; set; }
+    DateTime LoggedOn { get; }
     IModeCollection Modes { get; }
     event EventHandler<string> OnSend;
     void BroadcastToChannels(string data, bool ExcludeUser);
