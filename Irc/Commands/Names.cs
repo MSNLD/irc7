@@ -26,8 +26,6 @@ internal class Names : Command, ICommand
                 {
                     ProcessNamesReply(user, channel);
                 }
-
-                user.Send(Raw.IRCX_RPL_ENDOFNAMES_366(user.Server, user, channel));
             }
             else
                 chatFrame.User.Send(Raw.IRCX_ERR_NOSUCHCHANNEL_403(chatFrame.Server, chatFrame.User, channelName));
@@ -59,5 +57,6 @@ internal class Names : Command, ICommand
                                               )
                                         )
             );
+        user.Send(Raw.IRCX_RPL_ENDOFNAMES_366(user.Server, user, channel));
     }
 }

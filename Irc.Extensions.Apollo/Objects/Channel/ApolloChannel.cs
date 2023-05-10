@@ -32,7 +32,7 @@ public class ApolloChannel : ExtendedChannel
                 }
             }
             else {
-                member.GetUser().Send(ApolloRaws.RPL_JOIN_MSN(member.GetUser().GetProtocol(), (ApolloUser)user, this));
+                member.GetUser().Send(ApolloRaws.RPL_JOIN_MSN(member, (ApolloUser)user, this));
             }
         }
         
