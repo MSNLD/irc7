@@ -19,20 +19,20 @@ public class ApolloChannel : ExtendedChannel
 
     public override IChannel Join(IUser user, EnumChannelAccessResult accessResult = EnumChannelAccessResult.NONE)
     {
-        var sourceMember = AddMember(user, accessResult);
-        foreach (var member in GetMembers())
+        var joinMember = AddMember(user, accessResult);
+        foreach (var channelMember in GetMembers())
         {
-            var targetUser = member.GetUser();
-            if (targetUser.GetProtocol().GetProtocolType() <= Enumerations.EnumProtocolType.IRC3) {
-                member.GetUser().Send(IrcRaws.RPL_JOIN(user, this));
+            var channelUser = channelMember.GetUser();
+            if (channelUser.GetProtocol().GetProtocolType() <= Enumerations.EnumProtocolType.IRC3) {
+                channelMember.GetUser().Send(IrcRaws.RPL_JOIN(user, this));
 
-                if (!sourceMember.IsNormal()) {
-                    char modeChar = sourceMember.IsOwner() ? 'q' : (sourceMember.IsHost() ? 'o' : 'v');
-                    ((ModeRule)Modes.GetMode(modeChar)).DispatchModeChange((ChatObject)targetUser, modeChar, (ChatObject)user, (ChatObject)this, true, user.ToString());
+                if (!joinMember.IsNormal()) {
+                    char modeChar = joinMember.IsOwner() ? 'q' : (joinMember.IsHost() ? 'o' : 'v');
+                    ((ModeRule)Modes.GetMode(modeChar)).DispatchModeChange((ChatObject)channelUser, modeChar, (ChatObject)user, (ChatObject)this, true, user.ToString());
                 }
             }
             else {
-                member.GetUser().Send(ApolloRaws.RPL_JOIN_MSN(member, (ApolloUser)user, this));
+                channelUser.Send(ApolloRaws.RPL_JOIN_MSN(channelMember, this, joinMember));
             }
         }
         

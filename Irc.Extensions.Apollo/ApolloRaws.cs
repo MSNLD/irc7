@@ -12,11 +12,11 @@ namespace Irc.Extensions.Apollo
 {
     public static class ApolloRaws
     {
-        public static string RPL_JOIN_MSN(IChannelMember member, ApolloUser user, IChannel channel)
+        public static string RPL_JOIN_MSN(IChannelMember channelMember, IChannel channel, IChannelMember joinMember)
         {
-            var listedMode = member.GetListedMode();
+            var listedMode = joinMember.GetListedMode();
             var listedModeString = !string.IsNullOrWhiteSpace(listedMode) ? $",{listedMode}" : "";
-            return $":{user.GetAddress()} JOIN {member.GetUser().GetProtocol().GetFormat(user)}{listedModeString} :{channel}";
+            return $":{joinMember.GetUser().GetAddress()} JOIN {channelMember.GetUser().GetProtocol().GetFormat(joinMember.GetUser())}{listedModeString} :{channel}";
         }
     }
 }
