@@ -178,6 +178,8 @@ public class User : ChatObject, IUser
 
     public Address Address { get => address; set => address = value; }
 
+    public bool Away { get; set; }
+
     public Address GetAddress()
     {
         return Address;
@@ -210,6 +212,28 @@ public class User : ChatObject, IUser
 
     public bool IsSysop() => Modes.GetModeChar(Resources.UserModeOper) == 1;
     public bool IsAdministrator() => Modes.HasMode('a') && Modes.GetModeChar(Resources.UserModeAdmin) == 1;
+
+    public virtual void SetAway(IServer server, IUser user, string message) 
+    {
+        user.Away = true;
+        foreach (var channelPair in user.GetChannels()) {
+            var channel = channelPair.Key;
+            channel.Send(Raw.IRCX_RPL_USERNOWAWAY_822(server, user, message), (ChatObject)user);
+        }
+
+        user.Send(Raw.IRCX_RPL_NOWAWAY_306(server, user));
+    }
+
+    public virtual void SetBack(IServer server, IUser user) 
+    {
+        user.Away = false;
+        foreach (var channelPair in user.GetChannels()) {
+            var channel = channelPair.Key;
+            channel.Send(Raw.IRCX_RPL_USERUNAWAY_821(server, user), (ChatObject)user);
+        }
+
+        user.Send(Raw.IRCX_RPL_UNAWAY_305(server, user));
+    }
 
     public void PromoteToAdministrator()
     {

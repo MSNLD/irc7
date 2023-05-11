@@ -13,6 +13,9 @@ public interface IUser
     string ShortId { get; }
     string Name { get; set; }
     string Nickname { get; set; }
+    bool Away { get; set; }
+    void SetAway(IServer server, IUser user, string message);
+    void SetBack(IServer server, IUser user);
     DateTime LastIdle { get; set; }
     DateTime LoggedOn { get; }
     IModeCollection Modes { get; }

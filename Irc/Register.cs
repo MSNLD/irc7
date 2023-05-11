@@ -9,10 +9,10 @@ public static class Register
             chatFrame.User.Register();
             chatFrame.User.Send(Raw.IRCX_RPL_WELCOME_001(chatFrame.Server, chatFrame.User));
             chatFrame.User.Send(Raw.IRCX_RPL_WELCOME_002(chatFrame.Server, chatFrame.User,
-                chatFrame.Server.GetVersion()));
+                chatFrame.Server.ServerVersion));
             chatFrame.User.Send(Raw.IRCX_RPL_WELCOME_003(chatFrame.Server, chatFrame.User));
             chatFrame.User.Send(Raw.IRCX_RPL_WELCOME_004(chatFrame.Server, chatFrame.User,
-                chatFrame.Server.GetVersion()));
+                chatFrame.Server.ServerVersion));
 
             chatFrame.User.Send(Raw.IRCX_RPL_LUSERCLIENT_251(chatFrame.Server, chatFrame.User, 0, 0, 0));
             chatFrame.User.Send(Raw.IRCX_RPL_LUSEROP_252(chatFrame.Server, chatFrame.User, 0));

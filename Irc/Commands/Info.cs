@@ -10,7 +10,7 @@ internal class Info : Command, ICommand
     public new void Execute(ChatFrame chatFrame)
     {
         chatFrame.User.Send(Raw.IRCX_RPL_RPL_INFO_371_VERS(chatFrame.Server, chatFrame.User,
-            chatFrame.Server.GetVersion()));
+            chatFrame.Server.ServerVersion));
         chatFrame.User.Send(Raw.IRCX_RPL_RPL_INFO_371_RUNAS(chatFrame.Server, chatFrame.User));
         chatFrame.User.Send(Raw.IRCX_RPL_RPL_INFO_371_UPTIME(chatFrame.Server, chatFrame.User,
             chatFrame.Server.GetDataStore().GetAs<DateTime>("creation")));

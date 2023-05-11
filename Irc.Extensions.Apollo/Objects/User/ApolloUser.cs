@@ -19,5 +19,15 @@ public class ApolloUser : ExtendedUser
         _properties = new ApolloUserPropCollection((ApolloServer)server, dataStore);
     }
 
+    public override void SetAway(IServer server, IUser user, string message) {
+        Profile.Away = true;
+        base.SetAway(server, user, message);
+    }
+
+    public override void SetBack(IServer server, IUser user) {
+        Profile.Away = false;
+        base.SetBack(server, user);
+    }
+
     public ApolloProfile GetProfile() => Profile;
 }

@@ -206,9 +206,11 @@ public class Server : ChatObject, IServer
         return _protocols;
     }
 
-    public System.Version GetVersion()
+    private System.Version _version = Assembly.GetExecutingAssembly().GetName().Version;
+    public System.Version ServerVersion
     {
-        return Assembly.GetExecutingAssembly().GetName().Version;
+        get => _version;
+        set => _version = value;
     }
 
     public IDataStore GetDataStore()

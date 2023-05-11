@@ -45,7 +45,7 @@ public interface IServer
     string GetSupportedChannelModes();
     string GetSupportedUserModes();
     IDictionary<EnumProtocolType, IProtocol> GetProtocols();
-    Version GetVersion();
+    System.Version ServerVersion { set; get; }
     IDataStore GetDataStore();
     IChannel GetChannelByName(string name);
     ChatObject GetChatObject(string name);

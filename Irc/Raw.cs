@@ -193,7 +193,7 @@ public static class Raw
     public static string IRCX_RPL_WELCOME_002(IServer server, IUser user, Version version)
     {
         return
-            $":{server} 002 {user} :Your host is {server}, running version {version.Major}.{version.Minor}.{version.Build}";
+            $":{server} 002 {user} :Your host is {server}, running version {version.Major}.{version.Minor}.{version.Revision}";
     }
 
     public static string IRCX_RPL_WELCOME_003(IServer server, IUser user)
@@ -204,7 +204,7 @@ public static class Raw
     public static string IRCX_RPL_WELCOME_004(IServer server, IUser user, Version version)
     {
         return
-            $":{server} 004 {user} {server} {version.Major}.{version.Minor}.{version.Build} {server.GetSupportedUserModes()} {server.GetSupportedChannelModes()}";
+            $":{server} 004 {user} {server} {version.Major}.{version.Minor}.{version.Revision} {server.GetSupportedUserModes()} {server.GetSupportedChannelModes()}";
     }
 
     public static string IRCX_RPL_UMODEIS_221(IServer server, IUser user, string modes)
@@ -267,9 +267,9 @@ public static class Raw
         return $":{server} 266 {user} :Current global users: {globalUsers} Max: {globalMax}";
     }
 
-    public static string IRCX_RPL_AWAY_301(IServer server, IUser user)
+    public static string IRCX_RPL_AWAY_301(IServer server, IUser user, IUser awayUser, string message)
     {
-        return $":{server} 301 {user} %s :%s";
+        return $":{server} 301 {user} {awayUser} :{message}";
     }
 
     public static string IRCX_RPL_USERHOST_302(IServer server, IUser user)
@@ -370,7 +370,7 @@ public static class Raw
     public static string IRCX_RPL_VERSION_351(IServer server, IUser user, Version version)
     {
         return
-            $":{server} 351 {user} {version.Major}.{version.Minor}.{version.Revision} {server} :{server} {version.Major}.{version.Minor}";
+            $":{server} 351 {user} {version.Major}.{version.Minor}.{version.Revision}.{version.Build} {server} :{server} {version.Major}.{version.Minor}";
     }
 
     public static string IRCX_RPL_WHOREPLY_352(IServer server, IUser user)
@@ -412,7 +412,7 @@ public static class Raw
     public static string IRCX_RPL_RPL_INFO_371_VERS(IServer server, IUser user, Version version)
     {
         // TODO: Get Full Name
-        return $":{server} 371 {user} :{server.Name} {server.GetVersion().Major}.{server.GetVersion().Minor}";
+        return $":{server} 371 {user} :{server.Name} {server.ServerVersion.Major}.{server.ServerVersion.Minor}";
     }
 
     public static string IRCX_RPL_RPL_INFO_371_RUNAS(IServer server, IUser user)
@@ -769,12 +769,12 @@ public static class Raw
 
     public static string IRCX_RPL_USERUNAWAY_821(IServer server, IUser user)
     {
-        return $":{user.GetAddress()} 821 :IUser unaway";
+        return $":{user.GetAddress()} 821 :User unaway";
     }
 
-    public static string IRCX_RPL_USERNOWAWAY_822(IServer server, IUser user)
+    public static string IRCX_RPL_USERNOWAWAY_822(IServer server, IUser user, string reason)
     {
-        return $":{user.GetAddress()} 822 :%s";
+        return $":{user.GetAddress()} 822 :{reason}";
     }
 
     public static string IRCX_RPL_REVEAL_851(IServer server, IUser user)

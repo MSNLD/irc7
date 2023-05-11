@@ -9,6 +9,6 @@ public class Version : Command, ICommand
 
     public new void Execute(ChatFrame chatFrame)
     {
-        chatFrame.User.Send(Raw.IRCX_RPL_VERSION_351(chatFrame.Server, chatFrame.User, chatFrame.Server.GetVersion()));
+        chatFrame.User.Send(Raw.IRCX_RPL_VERSION_351(chatFrame.Server, chatFrame.User, chatFrame.Server.ServerVersion));
     }
 }
