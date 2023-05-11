@@ -477,7 +477,7 @@ public static class Raw
         return $":{server} 404 {user} {channel} :Cannot send to channel";
     }
 
-    public static string IRCX_ERR_TOOMANYCHANNELS_405(IServer server, IUser user, IChannel channel)
+    public static string IRCX_ERR_TOOMANYCHANNELS_405(IServer server, IUser user, string channel)
     {
         return $":{server} 405 {user} {channel} :You have joined too many channels";
     }

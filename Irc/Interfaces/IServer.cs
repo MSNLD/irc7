@@ -19,6 +19,7 @@ public interface IServer
     int MaxOutputBytes { get; }
     int PingInterval { get; }
     int PingAttempts { get; }
+    int MaxChannels { get; }
     int NetInvisibleCount { get; }
     int NetServerCount { get; }
     int NetUserCount { get; }

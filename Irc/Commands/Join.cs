@@ -52,6 +52,11 @@ public class Join : Command, ICommand
         // TODO: Optimize the below code
         foreach (var channelName in channelNames)
         {
+            if (user.GetChannels().Count >= server.MaxChannels) {
+                user.Send(Raw.IRCX_ERR_TOOMANYCHANNELS_405(server, user, channelName));
+                continue;
+            }
+
             var channel = server
                             .GetChannels()
                                 .FirstOrDefault(c => c.GetName().ToUpper() == channelName.ToUpper());

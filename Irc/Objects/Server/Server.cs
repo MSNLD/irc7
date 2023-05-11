@@ -82,12 +82,13 @@ public class Server : ChatObject, IServer
         var maxOutputBytes = _dataStore.GetAs<int>("MaxOutputBytes");
         var pingInterval = _dataStore.GetAs<int>("PingInterval");
         var pingAttempts = _dataStore.GetAs<int>("PingAttempts");
+        var maxChannels = _dataStore.GetAs<int>("MaxChannels");
 
         if (maxInputBytes > 0) MaxInputBytes = maxInputBytes;
         if (maxOutputBytes > 0) MaxOutputBytes = maxOutputBytes;
         if (pingInterval > 0) PingInterval = pingInterval;
         if (pingAttempts > 0) PingAttempts = pingAttempts;
-
+        if (maxChannels > 0) MaxChannels = maxChannels;
     }
 
     public DateTime CreationDate => _dataStore.GetAs<DateTime>("creation");
@@ -102,6 +103,7 @@ public class Server : ChatObject, IServer
     public int MaxOutputBytes { get; private set; } = 4096;
     public int PingInterval { get; private set; } = 180;
     public int PingAttempts { get; private set; } = 3;
+    public int MaxChannels { get; private set; } = 128;
     public int NetInvisibleCount { get; }
     public int NetServerCount { get; }
     public int NetUserCount { get; }
