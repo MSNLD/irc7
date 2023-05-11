@@ -2,6 +2,7 @@
 using Irc.Enumerations;
 using Irc.Extensions.Apollo.Objects.User;
 using Irc.Extensions.Props;
+using Irc.Interfaces;
 using Irc.Objects;
 using System;
 using System.Collections.Generic;
@@ -13,24 +14,26 @@ namespace Irc.Extensions.Apollo.Props.User
 {
     public class Msnprofile : PropRule
     {
-        private readonly ApolloProfile profile;
-
-        public Msnprofile(ApolloProfile profile) : base(ExtendedResources.UserPropMsnProfile, EnumChannelAccessLevel.ChatMember, EnumChannelAccessLevel.ChatMember, Resources.GenericProps, "0", true)
+        public Msnprofile() : base(ExtendedResources.UserPropMsnProfile, EnumChannelAccessLevel.ChatMember, EnumChannelAccessLevel.ChatMember, Resources.GenericProps, "0", true)
         {
-            this.profile = profile;
         }
 
-        public override string GetValue()
+        public override EnumIrcError EvaluateSet(IChatObject source, IChatObject target, string propValue)
         {
-            // TODO: No permissions reply
-            return string.Empty;
-        }
+            if (source != target) return EnumIrcError.ERR_NOPERMS;
 
-        public override void SetValue(string value)
-        {
-            // TODO: Need to reply bad value if not valid, or reject if already done more than once
-            int.TryParse(value, out var profileCode);
-            profile.SetProfileCode(profileCode);
+            var user = ((ApolloUser)source);
+            if (int.TryParse(propValue, out int result)) {
+                var profile = user.GetProfile();
+                if (profile.HasProfile) {
+                    user.Send(Raw.IRCX_ERR_ALREADYREGISTERED_462(user.Server, user));
+                    return EnumIrcError.OK;
+                }
+
+                profile.SetProfileCode(result);
+                return EnumIrcError.OK;
+            }
+            return EnumIrcError.ERR_BADVALUE;
         }
     }
 }

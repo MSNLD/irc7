@@ -11,7 +11,7 @@ namespace Irc.Extensions.Apollo.Objects.User
 		public ApolloUserPropCollection(ApolloServer apolloServer, IDataStore dataStore) : base(dataStore)
 		{
 			AddProp(new SubscriberInfo(apolloServer));
-			//AddProp(new Msnprofile());
+			AddProp(new Msnprofile());
 		}
 	}
 }
