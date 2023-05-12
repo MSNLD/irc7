@@ -1,4 +1,5 @@
-﻿using Irc.Commands;
+﻿using System.Text;
+using Irc.Commands;
 using Irc.Constants;
 using Irc.Enumerations;
 using Irc.Extensions.Apollo.Commands;
@@ -67,8 +68,9 @@ public class ApolloServer : ExtendedServer
             var nickname = passport.ValidateRegCookie(value);
             if (nickname != null)
             {
+                var encodedNickname = Encoding.Convert(Encoding.UTF8, Encoding.Latin1, Encoding.UTF8.GetBytes(nickname));
                 user.GetDataRegulator().PushIncoming(
-                    new Message(user.GetProtocol(), $"NICK {nickname}")
+                    new Message(user.GetProtocol(), $"NICK {encodedNickname}")
                     );
             }
         }
