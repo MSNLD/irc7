@@ -11,5 +11,6 @@ public interface ICredential
     string GetUserGroup();
     string GetModes();
     long GetIssuedAt();
+    bool Guest { get; set; }
     EnumUserAccessLevel GetLevel();
 }

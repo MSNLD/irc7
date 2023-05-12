@@ -111,6 +111,7 @@ public class Server : ChatObject, IServer
     public int SysopCount { get; }
     public int UnknownConnectionCount => _socketServer.CurrentConnections - NetUserCount;
     public string RemoteIP { set; get; }
+    public bool DisableGuestMode { set; get; }
 
     public void SetMOTD(string motd)
     {

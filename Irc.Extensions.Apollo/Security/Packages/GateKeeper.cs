@@ -95,7 +95,8 @@ public class GateKeeper : SupportPackage, ISupportPackage
                     {
                         Level = Guest ? EnumUserAccessLevel.Guest : EnumUserAccessLevel.Member,
                         Domain = GetType().Name,
-                        Username = guid.ToUnformattedString().ToUpper()
+                        Username = guid.ToUnformattedString().ToUpper(),
+                        Guest = (this is not GateKeeperPassport)
                     };
 
                     if (this is GateKeeperPassport) return EnumSupportPackageSequence.SSP_EXT;
@@ -137,15 +138,10 @@ public class GateKeeper : SupportPackage, ISupportPackage
         var ctx = $"{challenge}{ip}";
         var h1 = md5.ComputeHash(ctx.ToByteArray(), 0, ctx.Length);
 
-        bool b = h1.SequenceEqual(context);
+        bool bHashEqual = h1.SequenceEqual(context);
         Console.WriteLine($"Auth: Received = {JsonSerializer.Serialize(context.Select(b => (int)b).ToArray())}");
         Console.WriteLine($"Auth: Expected = {JsonSerializer.Serialize(h1.Select(b => (int)b).ToArray())}");
 
-        if (!b)
-        {
-
-            return false;
-        }
-        return b;
+        return bHashEqual;
     }
 }

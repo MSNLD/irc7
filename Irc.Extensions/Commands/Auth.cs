@@ -84,6 +84,8 @@ public class Auth : Command, ICommand
                         {
                             chatFrame.User.Name = credentials.GetNickname();
                         }
+
+                        chatFrame.User.SetGuest(credentials.Guest);
                         userAddress.User = credentials.GetUsername();
                         userAddress.Host = credentials.GetDomain();
                         userAddress.Server = chatFrame.Server.RemoteIP;

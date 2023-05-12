@@ -107,19 +107,19 @@ public class ApolloServer : ExtendedServer
                 {
                     case "A":
                         {
-                            user.ChangeNickname($"'{user.Nickname}");
+                            user.ChangeNickname(user.Nickname, true);
                             user.PromoteToAdministrator();
                             break;
                         }
                     case "S":
                         {
-                            user.ChangeNickname($"'{user.Nickname}");
+                            user.ChangeNickname(user.Nickname, true);
                             user.PromoteToSysop();
                             break;
                         }
                     case "G":
                         {
-                            user.ChangeNickname($"'{user.Nickname}");
+                            user.ChangeNickname(user.Nickname, true);
                             user.PromoteToGuide();
                             break;
                         }

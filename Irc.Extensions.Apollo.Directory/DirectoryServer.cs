@@ -23,6 +23,7 @@ namespace Irc.Extensions.Apollo.Directory
         ICommandCollection commands, IUserFactory userFactory = null, ICredentialProvider ntlmCredentialProvider = null) : base(socketServer, securityManager,
         floodProtectionManager, dataStore, channels, commands, userFactory ?? new ApolloUserFactory())
         {
+            DisableGuestMode = true;
             FlushCommands();
             AddCommand(new Ircvers());
             AddCommand(new Auth());

@@ -176,9 +176,15 @@ public class User : ChatObject, IUser
         }
     }
 
-    public void ChangeNickname(string newNick) {
-        Send(Raw.RPL_NICK(Server, this, newNick));
-        Nickname = newNick;
+    public void ChangeNickname(string newNick, bool utf8Prefix) {
+        var nickname = utf8Prefix ? $"'{newNick}" : newNick;
+        var rawNicknameChange = Raw.RPL_NICK(Server, this, nickname);
+        Send(rawNicknameChange);
+        Nickname = nickname;
+
+        foreach (var channel in Channels) {
+            channel.Key.Send(rawNicknameChange, this);
+        }
     }
 
     public Address Address { get => address; set => address = value; }
@@ -193,6 +199,14 @@ public class User : ChatObject, IUser
     public bool IsGuest()
     {
         return _guest;
+    }
+
+    public void SetGuest(bool guest) {
+        if (Server.DisableGuestMode) {
+            return;
+        }
+        _guest = guest;
+        _level = EnumUserAccessLevel.Guest;
     }
 
     public bool IsRegistered()

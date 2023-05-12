@@ -27,6 +27,7 @@ public interface IServer
     int SysopCount { get; }
     int UnknownConnectionCount { get; }
     string RemoteIP { set; get; }
+    bool DisableGuestMode { set; get; }
     Guid Id { get; }
     string ShortId { get; }
     string Name { get; set; }

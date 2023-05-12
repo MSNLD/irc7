@@ -13,9 +13,9 @@ public static class Raw
         return $"ERROR :Closing Link: {user}[%s] (%s)";
     }
 
-    public static string IRCX_CLOSINGLINK_007_SYSTEMKILL(IServer server, IUser user)
+    public static string IRCX_CLOSINGLINK_007_SYSTEMKILL(IServer server, IUser user, string ip)
     {
-        return $"ERROR :Closing Link: {user}[%s] 007 (Killed by system operator)";
+        return $"ERROR :Closing Link: {user}[{ip}] 007 (Killed by system operator)";
     }
 
     public static string IRCX_CLOSINGLINK_008_INPUTFLOODING(IServer server, IUser user)
@@ -88,9 +88,9 @@ public static class Raw
         return $":{user.GetAddress()} KICK {channel} {target} :{reason}";
     }
 
-    public static string RPL_KILL_IRC(IServer server, IUser user)
+    public static string RPL_KILL_IRC(IUser user, IUser targetUser, string message)
     {
-        return $":{user.GetAddress()} KILL %s :%s";
+        return $":{user.GetAddress()} KILL {targetUser} :{message}";
     }
 
     public static string RPL_SERVERKILL_IRC(IServer server, IUser user)
@@ -512,9 +512,9 @@ public static class Raw
         return $":{server} 422 {user} :MOTD File is missing";
     }
 
-    public static string IRCX_ERR_ERRONEOUSNICK_432(IServer server, IUser user)
+    public static string IRCX_ERR_ERRONEOUSNICK_432(IServer server, IUser user, string nickname)
     {
-        return $":{server} 432 %s :Erroneous nickname";
+        return $":{server} 432 {nickname} :Erroneous nickname";
     }
 
     public static string IRCX_ERR_NICKINUSE_433(IServer server, IUser user)
