@@ -63,7 +63,7 @@ public class Join : Command, ICommand
 
 
 
-            if (channel == null) channel = Create(server, user, channelName, key);
+            if (channel == null) channel = server.CreateChannel(user, channelName, key);
 
             EnumChannelAccessResult channelAccessResult = channel.GetAccess(user, key, false);
 
@@ -101,17 +101,5 @@ public class Join : Command, ICommand
                 break;
             }
         }
-    }
-
-    public static IChannel Create(IServer server, IUser user, string name, string key)
-    {
-        var channel = server.CreateChannel(name);
-        channel.ChannelStore.Set("topic", name);
-        channel.ChannelStore.Set("key", key);
-        channel.Modes.NoExtern = true;
-        channel.Modes.TopicOp = true;
-        channel.Modes.UserLimit = 50;
-        server.AddChannel(channel);
-        return channel;
     }
 }

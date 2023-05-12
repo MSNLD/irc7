@@ -32,6 +32,7 @@ public class Irc : Protocol, IProtocol
         AddCommand(new Time());
         AddCommand(new Admin());
         AddCommand(new Links());
+        AddCommand(new Who());
         AddCommand(new Whois());
         AddCommand(new Users());
         AddCommand(new Topic());

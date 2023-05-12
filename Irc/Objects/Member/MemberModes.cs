@@ -11,11 +11,6 @@ public class MemberModes : ModeCollection, IMemberModes
         modes.Add(Resources.MemberModeVoice, new Modes.Channel.Member.Voice());
     }
 
-    public string GetModeString()
-    {
-        return modes?.ToString()!;
-    }
-
     public string GetListedMode()
     {
         if (IsOwner()) return Resources.MemberModeFlagOwner.ToString();

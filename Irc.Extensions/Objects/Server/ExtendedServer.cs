@@ -59,4 +59,15 @@ public class ExtendedServer : global::Irc.Objects.Server.Server, IServer, IExten
         // TODO: Whatever this is...
         return EnumChannelAccessResult.ERR_SECUREONLYCHAN;
     }
+
+    public override IChannel CreateChannel(IUser creator, string name, string key) {
+        var channel = (ExtendedChannel)CreateChannel(name);
+        channel.ChannelStore.Set("topic", name);
+        channel.PropCollection.GetProp(ExtendedResources.ChannelPropOwnerkey).SetValue(key);
+        channel.Modes.NoExtern = true;
+        channel.Modes.TopicOp = true;
+        channel.Modes.UserLimit = 50;
+        AddChannel(channel);
+        return channel;
+    }
 }

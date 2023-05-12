@@ -8,7 +8,7 @@ namespace Irc.Commands;
 
 public class Whois : Command, ICommand
 {
-    public Whois() : base(0) { }
+    public Whois() : base(1) { }
     public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
 
     public new void Execute(ChatFrame chatFrame)

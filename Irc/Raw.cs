@@ -307,9 +307,9 @@ public static class Raw
         return $":{server} 313 {user} %s :is an IRC operator";
     }
 
-    public static string IRCX_RPL_ENDOFWHO_315(IServer server, IUser user)
+    public static string IRCX_RPL_ENDOFWHO_315(IServer server, IUser user, string criteria)
     {
-        return $":{server} 315 {user} %s :End of /WHO list";
+        return $":{server} 315 {user} {criteria} :End of /WHO list";
     }
 
     public static string IRCX_RPL_WHOISIDLE_317(IServer server, IUser user)
@@ -373,9 +373,9 @@ public static class Raw
             $":{server} 351 {user} {version.Major}.{version.Minor}.{version.Revision}.{version.Build} {server} :{server} {version.Major}.{version.Minor}";
     }
 
-    public static string IRCX_RPL_WHOREPLY_352(IServer server, IUser user)
+    public static string IRCX_RPL_WHOREPLY_352(IServer server, IUser user, string channelName, string userName, string hostName, string serverName, string nickName, string userStatus, int hopCount, string realName)
     {
-        return $":{server} 352 {user} %s %s %s {server} %s %s%s%s :0 %s";
+        return $":{server} 352 {user} {channelName} {userName} {hostName} {serverName} {nickName} {userStatus} :{hopCount} {realName}";
     }
 
     public static string IRCX_RPL_NAMEREPLY_353(IServer server, IUser user, IChannel channel, char channelType, string names)

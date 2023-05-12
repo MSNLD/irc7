@@ -218,6 +218,21 @@ public class Server : ChatObject, IServer
         return _dataStore;
     }
 
+    public virtual IChannel CreateChannel(IUser creator, string name, string key)
+    {
+        var channel = CreateChannel(name);
+        channel.ChannelStore.Set("topic", name);
+        if (!string.IsNullOrEmpty(key)) {
+            channel.Modes.Key = key;
+            channel.ChannelStore.Set("key", key);
+        }
+        channel.Modes.NoExtern = true;
+        channel.Modes.TopicOp = true;
+        channel.Modes.UserLimit = 50;
+        AddChannel(channel);
+        return channel;
+    }
+
     public IChannel GetChannelByName(string name)
     {
         return Channels.SingleOrDefault(c =>

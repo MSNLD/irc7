@@ -23,6 +23,11 @@ public class ModeCollection : IModeCollection
         modes.TryGetValue(mode, out var value);
         return value.Get();
     }
+
+    public string GetModeString() {
+        return $"{new string(modes.Where(mode => mode.Value.Get() > 0).Select(mode => mode.Key).ToArray())}";
+    }
+
     public IModeRule GetMode(char mode)
     {
         modes.TryGetValue(mode, out var value);

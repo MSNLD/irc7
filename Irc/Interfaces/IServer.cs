@@ -35,6 +35,7 @@ public interface IServer
     void AddChannel(IChannel channel);
     void RemoveChannel(IChannel channel);
     IChannel CreateChannel(string name);
+    IChannel CreateChannel(IUser creator, string name, string key);
     IUser CreateUser(IConnection connection);
     IList<IUser> GetUsers();
     IUser GetUserByNickname(string nickname);
