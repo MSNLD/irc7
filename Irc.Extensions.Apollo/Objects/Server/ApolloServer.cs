@@ -85,5 +85,8 @@ public class ApolloServer : ExtendedServer
             int.TryParse(value, out var profileCode);
             ((ApolloUser)user).GetProfile().SetProfileCode(profileCode);
         }
+        else if (name == Resources.UserPropRole && user.IsAuthenticated() && user.IsRegistered()) {
+             
+        }
     }
 }

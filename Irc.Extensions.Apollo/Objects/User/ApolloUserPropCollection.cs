@@ -12,6 +12,7 @@ namespace Irc.Extensions.Apollo.Objects.User
 		{
 			AddProp(new SubscriberInfo(apolloServer));
 			AddProp(new Msnprofile());
+			AddProp(new Role(apolloServer));
 		}
 	}
 }
