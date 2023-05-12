@@ -162,7 +162,7 @@ namespace Irc.Extensions.Apollo.Security.Passport
                 memStream.Read(iv, 0, ivLength);
                 aesAlg.IV = iv;
                 cStream = new CryptoStream(memStream, aesAlg.CreateDecryptor(), CryptoStreamMode.Read);
-                sReader = new StreamReader(cStream, Encoding.ASCII);
+                sReader = new StreamReader(cStream, Encoding.UTF8);
                 decodedValue = sReader.ReadToEnd();
             }
             catch (Exception e)
