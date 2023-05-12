@@ -65,6 +65,10 @@ public class Prop : Command, ICommand
                             var msnprofile = chatFrame.Message.Parameters[2];
                             ((IExtendedServerObject)chatFrame.Server).ProcessCookie(chatFrame.User, "MSNPROFILE", msnprofile);
                         }
+                        else if (string.Compare("ROLE", chatFrame.Message.Parameters[1], true) == 0) {
+                            var role = chatFrame.Message.Parameters[2];
+                            ((IExtendedServerObject)chatFrame.Server).ProcessCookie(chatFrame.User, "ROLE", role);
+                        }
                         else chatFrame.User.Send(Raw.IRCX_ERR_BADPROPERTY_905(chatFrame.Server, chatFrame.User, chatFrame.Message.Parameters[1]));
                     }
                 }

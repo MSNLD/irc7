@@ -13,6 +13,7 @@ public interface IUser
     string ShortId { get; }
     string Name { get; set; }
     string Nickname { get; set; }
+    void ChangeNickname(string newNick);
     bool Away { get; set; }
     void SetAway(IServer server, IUser user, string message);
     void SetBack(IServer server, IUser user);

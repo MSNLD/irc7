@@ -176,6 +176,11 @@ public class User : ChatObject, IUser
         }
     }
 
+    public void ChangeNickname(string newNick) {
+        Send(Raw.RPL_NICK(Server, this, newNick));
+        Nickname = newNick;
+    }
+
     public Address Address { get => address; set => address = value; }
 
     public bool Away { get; set; }
@@ -235,7 +240,7 @@ public class User : ChatObject, IUser
         user.Send(Raw.IRCX_RPL_UNAWAY_305(server, user));
     }
 
-    public void PromoteToAdministrator()
+    public virtual void PromoteToAdministrator()
     {
         var mode = Modes[Resources.UserModeAdmin];
         mode.Set(true);
@@ -244,7 +249,7 @@ public class User : ChatObject, IUser
         Send(Raw.IRCX_RPL_YOUREADMIN_386(Server, this));
     }
 
-    public void PromoteToSysop()
+    public virtual void PromoteToSysop()
     {
         var mode = Modes[Resources.UserModeOper];
         mode.Set(true);
@@ -253,7 +258,7 @@ public class User : ChatObject, IUser
         Send(Raw.IRCX_RPL_YOUREOPER_381(Server, this));
     }
 
-    public void PromoteToGuide()
+    public virtual void PromoteToGuide()
     {
         var mode = Modes[Resources.UserModeOper];
         mode.Set(true);

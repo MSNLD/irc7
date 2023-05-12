@@ -19,6 +19,24 @@ public class ApolloUser : ExtendedUser
         _properties = new ApolloUserPropCollection((ApolloServer)server, dataStore);
     }
 
+    public override void PromoteToAdministrator()
+    {
+        Profile.Level = Enumerations.EnumUserAccessLevel.Administrator;
+        base.PromoteToAdministrator();
+    }
+
+    public override void PromoteToSysop()
+    {
+        Profile.Level = Enumerations.EnumUserAccessLevel.Sysop;
+        base.PromoteToSysop();
+    }
+
+    public override void PromoteToGuide()
+    {
+        Profile.Level = Enumerations.EnumUserAccessLevel.Guide;
+        base.PromoteToGuide();
+    }
+
     public override void SetAway(IServer server, IUser user, string message) {
         Profile.Away = true;
         base.SetAway(server, user, message);

@@ -69,9 +69,7 @@ public class ApolloServer : ExtendedServer
             if (nickname != null)
             {
                 var encodedNickname = Encoding.Latin1.GetString(Encoding.UTF8.GetBytes(nickname));
-                user.GetDataRegulator().PushIncoming(
-                    new Message(user.GetProtocol(), $"NICK {encodedNickname}")
-                    );
+                user.Nickname = encodedNickname;
             }
         }
         else if (name == Resources.UserPropSubscriberInfo && user.IsAuthenticated() && user.IsRegistered())
@@ -85,8 +83,48 @@ public class ApolloServer : ExtendedServer
             int.TryParse(value, out var profileCode);
             ((ApolloUser)user).GetProfile().SetProfileCode(profileCode);
         }
-        else if (name == Resources.UserPropRole && user.IsAuthenticated() && user.IsRegistered()) {
-             
+        else if (name == Resources.UserPropRole && user.IsAuthenticated())
+        {
+            var dict = passport.ValidateRole(value);
+            if (dict == null) return;
+
+            if (dict.ContainsKey("umode"))
+            {
+                var modes = dict["umode"];
+                foreach (var mode in modes)
+                {
+                    var modeRule = user.GetModes().GetMode(mode);
+                    modeRule?.Set(1);
+                    modeRule?.DispatchModeChange((ChatObject)user, (ChatObject)user, true);
+                }
+            }
+
+            if (dict.ContainsKey("utype"))
+            {
+                var levelType = dict["utype"];
+
+                switch (levelType)
+                {
+                    case "A":
+                        {
+                            user.ChangeNickname($"'{user.Nickname}");
+                            user.PromoteToAdministrator();
+                            break;
+                        }
+                    case "S":
+                        {
+                            user.ChangeNickname($"'{user.Nickname}");
+                            user.PromoteToSysop();
+                            break;
+                        }
+                    case "G":
+                        {
+                            user.ChangeNickname($"'{user.Nickname}");
+                            user.PromoteToGuide();
+                            break;
+                        }
+                }
+            }
         }
     }
 }

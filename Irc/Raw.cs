@@ -158,9 +158,9 @@ public static class Raw
         return $":{user.GetAddress()} KNOCK {channel} %s";
     }
 
-    public static string RPL_NICK(IServer server, IUser user)
+    public static string RPL_NICK(IServer server, IUser user, string newNick)
     {
-        return $":{user.GetAddress()} NICK %s";
+        return $":{user.GetAddress()} NICK {newNick}";
     }
 
     public static string RPL_PONG(IServer server, IUser user)

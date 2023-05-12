@@ -97,6 +97,10 @@ namespace Irc.Extensions.Apollo.Security.Passport
             return null;
         }
 
+        public Dictionary<string, string> ValidateRole(string role) {
+            return Decrypt(role);
+        }
+
         private Dictionary<string, string> Decrypt(string cookie)
         {
             cookie = DecodeToken(cookie, cryptKey);
