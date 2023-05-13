@@ -20,15 +20,15 @@ public class Nick : Command, ICommand
         else HandleRegisteredNicknameChange(chatFrame);
     }
 
-    private bool ValidateNickname(string nickname, EnumUserAccessLevel level) {
+    public static bool ValidateNickname(string nickname, EnumUserAccessLevel level) {
 
-        var nickMask = Resources.NicknameMask;
+        var nickMask = Resources.StandardNickname;
 
-        if (level == EnumUserAccessLevel.Guest) {
-            nickMask = Resources.GuestNicknameMask;
+        if (level == EnumUserAccessLevel.None) {
+            nickMask = Resources.AnyNickname;
         }
-        else if (level >= EnumUserAccessLevel.Guide) {
-            nickMask = Resources.OperMask;
+        else if (level == EnumUserAccessLevel.Guest) {
+            nickMask = Resources.GuestNicknameMask;
         }
 
         return nickname.Length <= Resources.MaxFieldLen &&
@@ -38,7 +38,7 @@ public class Nick : Command, ICommand
     private bool HandleUnregisteredNicknameChange(ChatFrame chatFrame)
     {
         var nickname = chatFrame.Message.Parameters.First();
-        if (!ValidateNickname(nickname, chatFrame.User.GetLevel())) {
+        if (!ValidateNickname(nickname, EnumUserAccessLevel.None)) {
             chatFrame.User.Send(Raw.IRCX_ERR_ERRONEOUSNICK_432(chatFrame.Server, chatFrame.User, nickname));
             return false;
         }

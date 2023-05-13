@@ -1,4 +1,7 @@
-﻿namespace Irc;
+﻿using Irc.Commands;
+using Irc.Constants;
+
+namespace Irc;
 
 public static class Register
 {
@@ -58,9 +61,23 @@ public static class Register
 
     public static bool CanRegister(ChatFrame chatFrame)
     {
+        var server = chatFrame.Server;
+        var user = chatFrame.User;
         var authenticating = chatFrame.User.IsAuthenticated() != true && chatFrame.User.IsAnon() == false;
         var registered = chatFrame.User.IsRegistered();
-        var hasNickname = !string.IsNullOrWhiteSpace(chatFrame.User.GetAddress().Nickname);
+        var nickname = chatFrame.User.GetAddress().Nickname;
+        var hasNickname = !string.IsNullOrWhiteSpace(nickname);
+
+        if (!authenticating && !registered && hasNickname) {
+            var isNicknameValid = Nick.ValidateNickname(nickname, chatFrame.User.GetLevel());
+
+            if (!isNicknameValid) {
+                user.Nickname = Resources.Wildcard;
+                user.Send(Raw.IRCX_ERR_ERRONEOUSNICK_432(server, user, nickname));
+                return false;
+            }
+        }
+
         var hasAddress = chatFrame.User.GetAddress().IsAddressPopulated();
 
         return !authenticating && !registered & hasNickname & hasAddress;

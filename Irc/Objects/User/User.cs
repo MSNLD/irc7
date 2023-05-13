@@ -206,7 +206,7 @@ public class User : ChatObject, IUser
             return;
         }
         _guest = guest;
-        _level = EnumUserAccessLevel.Guest;
+        _level = guest ? EnumUserAccessLevel.Guest : EnumUserAccessLevel.Member;
     }
 
     public bool IsRegistered()
