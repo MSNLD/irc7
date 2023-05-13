@@ -59,15 +59,15 @@ public class Join : Command, ICommand
 
             var channel = server
                             .GetChannels()
-                                .FirstOrDefault(c => c.GetName().ToUpper() == channelName.ToUpper());
-
-
-
-            if (channel == null) channel = server.CreateChannel(user, channelName, key);
+                                .FirstOrDefault(c => c.GetName().ToUpper() == channelName.ToUpper()) ?? server.CreateChannel(user, channelName, key);
+            
+            if (channel.HasUser(user)) {
+                user.Send(Raw.IRCX_ERR_ALREADYONCHANNEL_927(server, user, channel));
+                continue;
+            }
 
             EnumChannelAccessResult channelAccessResult = channel.GetAccess(user, key, false);
-
-            if (!channel.Allows(user) || channelAccessResult < EnumChannelAccessResult.SUCCESS_GUEST) {
+            if (channelAccessResult < EnumChannelAccessResult.SUCCESS_GUEST) {
                 SendJoinError(server, channel, user, channelAccessResult);
                 continue;
             }

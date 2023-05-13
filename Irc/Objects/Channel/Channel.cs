@@ -43,7 +43,7 @@ public class Channel : ChatObject, IChannel
 
     public bool Allows(IUser user)
     {
-        if (IsOnChannel(user)) return false;
+        if (HasUser(user)) return false;
         return true;
     }
 
@@ -137,7 +137,7 @@ public class Channel : ChatObject, IChannel
         this.Name = Name;
     }
 
-    public bool IsOnChannel(IUser user)
+    public bool HasUser(IUser user)
     {
         foreach (var member in _members)
             // TODO: Re-enable below

@@ -11,6 +11,7 @@ public interface IChannel
     string GetName();
     IChannelMember GetMember(IUser User);
     IChannelMember GetMemberByNickname(string nickname);
+    bool HasUser(IUser user);
     void Send(string message, ChatObject u = null);
     void Send(string message);
     IChannel Join(IUser user, EnumChannelAccessResult accessResult = EnumChannelAccessResult.NONE);
