@@ -249,7 +249,7 @@ public static long epoch = 621355968000000000;
     public static string GuestNicknameMask = @"^>(?!(Sysop)|(Admin)|(Guide))[\x41-\xFF\-0-9]+$";
     public static string NicknameMask = @"^(?!(Sysop)|(Admin)|(Guide))[\x41-\xFF][\x41-\xFF\-0-9]*$";
     public static string StandardNickname = @"^[\x41-\xFF][\x41-\xFF\-0-9]*$";
-    public static string AnyNickname = @"^>?[\x41-\xFF][\x41-\xFF\-0-9]*$";
+    public static string AnyNickname = @"^>?[\x41-\xFF\-0-9]*$";
 
     #endregion
 }

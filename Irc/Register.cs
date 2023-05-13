@@ -72,7 +72,7 @@ public static class Register
             var isNicknameValid = Nick.ValidateNickname(nickname, chatFrame.User.GetLevel());
 
             if (!isNicknameValid) {
-                user.Nickname = Resources.Wildcard;
+                user.Nickname = string.Empty;
                 user.Send(Raw.IRCX_ERR_ERRONEOUSNICK_432(server, user, nickname));
                 return false;
             }
