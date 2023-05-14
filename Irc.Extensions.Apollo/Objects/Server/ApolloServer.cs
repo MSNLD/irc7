@@ -32,9 +32,13 @@ public class ApolloServer : ExtendedServer
         ICommandCollection commands, IUserFactory userFactory = null) : base(socketServer, securityManager,
         floodProtectionManager, dataStore, channels, commands, userFactory ?? new ApolloUserFactory())
     {
-        passport = new PassportV4(dataStore.Get("Passport.V4.AppID"), dataStore.Get("Passport.V4.Secret"));
-        securityManager.AddSupportPackage(new GateKeeper());
-        securityManager.AddSupportPackage(new GateKeeperPassport(new PassportProvider(passport)));
+
+        if (SupportPackages.Contains("GateKeeper"))
+        {
+            passport = new PassportV4(dataStore.Get("Passport.V4.AppID"), dataStore.Get("Passport.V4.Secret"));
+            securityManager.AddSupportPackage(new GateKeeper());
+            securityManager.AddSupportPackage(new GateKeeperPassport(new PassportProvider(passport)));
+        }
 
         AddProtocol(EnumProtocolType.IRC3, new Irc3());
         AddProtocol(EnumProtocolType.IRC4, new Irc4());
@@ -70,6 +74,9 @@ public class ApolloServer : ExtendedServer
             {
                 var encodedNickname = Encoding.Latin1.GetString(Encoding.UTF8.GetBytes(nickname));
                 user.Nickname = encodedNickname;
+
+                // Set the RealName to empty string to allow it to pass register
+                user.GetAddress().RealName = string.Empty;
             }
         }
         else if (name == Resources.UserPropSubscriberInfo && user.IsAuthenticated() && user.IsRegistered())

@@ -89,7 +89,7 @@ public class Auth : Command, ICommand
                         userAddress.User = credentials.GetUsername();
                         userAddress.Host = credentials.GetDomain();
                         userAddress.Server = chatFrame.Server.RemoteIP;
-                        userAddress.RealName = string.Empty;
+                        userAddress.RealName = credentials.Guest ? string.Empty : null;
 
                         // Send reply
                         chatFrame.User.Send(Raw.RPL_AUTH_SUCCESS(packageName, $"{user}@{domain}", 0));

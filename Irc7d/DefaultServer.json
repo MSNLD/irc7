@@ -6,5 +6,11 @@
   "MaxInputBytes": "1024",
   "PingInterval": "60",
   "PingAttempts": "2",
-  "MaxChannels": "1"
+  "MaxChannels": "1",
+  "MaxConnections": "10000",
+  "MaxAuthenticatedConnections": "1000",
+  "MaxAnonymousConnections": "100",
+  "MaxGuestConnections": "100",
+  "BasicAuthentication": "true",
+  "AnonymousConnections": "true"
 }

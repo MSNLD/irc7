@@ -20,6 +20,12 @@ public interface IServer
     int PingInterval { get; }
     int PingAttempts { get; }
     int MaxChannels { get; }
+    int MaxConnections { get; }
+    int MaxAuthenticatedConnections { get; }
+    int MaxAnonymousConnections { get; }
+    int MaxGuestConnections { get; }
+    bool BasicAuthentication { get; }
+    bool AnonymousConnections { get; }
     int NetInvisibleCount { get; }
     int NetServerCount { get; }
     int NetUserCount { get; }
@@ -28,6 +34,7 @@ public interface IServer
     int UnknownConnectionCount { get; }
     string RemoteIP { set; get; }
     bool DisableGuestMode { set; get; }
+    bool DisableUserRegistration { get; set; }
     Guid Id { get; }
     string ShortId { get; }
     string Name { get; set; }

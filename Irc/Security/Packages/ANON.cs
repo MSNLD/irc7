@@ -8,7 +8,7 @@ public class ANON : SupportPackage
     {
         Guest = true;
         Authenticated = true;
-        Listed = false;
+        Listed = true;
     }
 
     public EnumSupportPackageSequence InitializeSecurityContext(string data, string ip)

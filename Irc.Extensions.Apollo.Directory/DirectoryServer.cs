@@ -24,6 +24,7 @@ namespace Irc.Extensions.Apollo.Directory
         floodProtectionManager, dataStore, channels, commands, userFactory ?? new ApolloUserFactory())
         {
             DisableGuestMode = true;
+            DisableUserRegistration = true;
             FlushCommands();
             AddCommand(new Ircvers());
             AddCommand(new Auth());

@@ -8,7 +8,6 @@ using Irc.Extensions.Apollo.Objects.Server;
 using Irc.Extensions.Factories;
 using Irc.Extensions.Objects.Channel;
 using Irc.Extensions.Objects.Server;
-using Irc.Extensions.Security.Packages;
 using Irc.Factories;
 using Irc.Interfaces;
 using Irc.IO;
@@ -93,30 +92,25 @@ internal class Program
                     $"Listening on {ip}:{port} backlog={backlog} buffer={bufferSize} maxconn={maxConnections} fqdn={fqdn} type={type} {(chatServerIP.HasValue() ? "forwardserver=" : "")}{forwardServer}");
             };
 
-            var securityManager = new SecurityManager();
-            securityManager.AddSupportPackage(new NTLM(new NTLMCredentials()));
-
-            
-
             switch (type)
             {
                 case IrcType.IRC:
                     {
-                        server = new Server(socketServer, securityManager, new FloodProtectionManager(),
+                        server = new Server(socketServer, new SecurityManager(), new FloodProtectionManager(),
                         new DataStore("DefaultServer.json"),
                         new List<IChannel>(), null, new UserFactory());
                         break;
                     }
                 case IrcType.IRCX:
                     {
-                        server = new ExtendedServer(socketServer, securityManager, new FloodProtectionManager(),
+                        server = new ExtendedServer(socketServer, new SecurityManager(), new FloodProtectionManager(),
                         new DataStore("DefaultServer.json"),
                         new List<IChannel>(), null, new ExtendedUserFactory());
                         break;
                     }
                 case IrcType.DIR:
                     {
-                        server = new DirectoryServer(socketServer, securityManager, new FloodProtectionManager(),
+                        server = new DirectoryServer(socketServer, new SecurityManager(), new FloodProtectionManager(),
                         new DataStore("DefaultServer.json"),
                         new List<IChannel>(), null, new ApolloUserFactory());
 
@@ -128,7 +122,7 @@ internal class Program
                     }
                 default:
                     {
-                        server = new ApolloServer(socketServer, securityManager, new FloodProtectionManager(),
+                        server = new ApolloServer(socketServer, new SecurityManager(), new FloodProtectionManager(),
                         new DataStore("DefaultServer.json"),
                         new List<IChannel>(), null, new ApolloUserFactory());
                         break;

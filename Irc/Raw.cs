@@ -8,9 +8,9 @@ namespace Irc;
 
 public static class Raw
 {
-    public static string IRCX_CLOSINGLINK(IServer server, IUser user)
+    public static string IRCX_CLOSINGLINK(IServer server, IUser user, string code, string message)
     {
-        return $"ERROR :Closing Link: {user}[%s] (%s)";
+        return $"ERROR :Closing Link: {user}[{user.GetAddress().RemoteIP}] {code} ({message})";
     }
 
     public static string IRCX_CLOSINGLINK_007_SYSTEMKILL(IServer server, IUser user, string ip)

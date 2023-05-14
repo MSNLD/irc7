@@ -5,6 +5,7 @@ using Irc.Commands;
 using Irc.Constants;
 using Irc.Enumerations;
 using Irc.Extensions.Security;
+using Irc.Extensions.Security.Packages;
 using Irc.Factories;
 using Irc.Interfaces;
 using Irc.IO;
@@ -55,6 +56,11 @@ public class Server : ChatObject, IServer
         _dataStore.Set("supported.channel.modes",
             new ChannelModes().GetSupportedModes());
         _dataStore.Set("supported.user.modes", new UserModes().GetSupportedModes());
+        SupportPackages = _dataStore.GetAs<string[]>("SASL.Packages") ?? Array.Empty<string>();
+
+        if (MaxAnonymousConnections > 0) {
+            _securityManager.AddSupportPackage(new ANON());
+        }
 
         _protocols.Add(EnumProtocolType.IRC, new Irc());
 
@@ -83,12 +89,22 @@ public class Server : ChatObject, IServer
         var pingInterval = _dataStore.GetAs<int>("PingInterval");
         var pingAttempts = _dataStore.GetAs<int>("PingAttempts");
         var maxChannels = _dataStore.GetAs<int>("MaxChannels");
+        var maxConnections = _dataStore.GetAs<int>("MaxConnections");
+        var maxAuthenticatedConnections = _dataStore.GetAs<int>("MaxAuthenticatedConnections");
+        var maxAnonymousConnections = _dataStore.GetAs<int>("MaxAnonymousConnections");
+        var basicAuthentication = _dataStore.GetAs<bool>("BasicAuthentication");
+        var anonymousConnections = _dataStore.GetAs<bool>("AnonymousConnections");
 
         if (maxInputBytes > 0) MaxInputBytes = maxInputBytes;
         if (maxOutputBytes > 0) MaxOutputBytes = maxOutputBytes;
         if (pingInterval > 0) PingInterval = pingInterval;
         if (pingAttempts > 0) PingAttempts = pingAttempts;
         if (maxChannels > 0) MaxChannels = maxChannels;
+        if (maxConnections > 0) MaxConnections = maxConnections;
+        if (maxAuthenticatedConnections > 0) MaxAuthenticatedConnections = maxAuthenticatedConnections;
+        if (maxAnonymousConnections != null) MaxAnonymousConnections = maxAnonymousConnections;
+        if (basicAuthentication != null) BasicAuthentication = basicAuthentication;
+        if (anonymousConnections != null) AnonymousConnections = anonymousConnections;
     }
 
     public DateTime CreationDate => _dataStore.GetAs<DateTime>("creation");
@@ -104,6 +120,12 @@ public class Server : ChatObject, IServer
     public int PingInterval { get; private set; } = 180;
     public int PingAttempts { get; private set; } = 3;
     public int MaxChannels { get; private set; } = 128;
+    public int MaxConnections { get; private set; } = 10000;
+    public int MaxAuthenticatedConnections { get; private set; } = 1000;
+    public int MaxAnonymousConnections { get; private set; } = 1000;
+    public int MaxGuestConnections { get; private set; } = 1000;
+    public bool BasicAuthentication { get; private set; } = true;
+    public bool AnonymousConnections { get; private set; } = true;
     public int NetInvisibleCount { get; }
     public int NetServerCount { get; }
     public int NetUserCount { get; }
@@ -112,6 +134,8 @@ public class Server : ChatObject, IServer
     public int UnknownConnectionCount => _socketServer.CurrentConnections - NetUserCount;
     public string RemoteIP { set; get; }
     public bool DisableGuestMode { set; get; }
+    public bool DisableUserRegistration { get; set; }
+    public string[] SupportPackages { get; }
 
     public void SetMOTD(string motd)
     {

@@ -1,5 +1,7 @@
 ﻿using Irc.Commands;
 using Irc.Constants;
+using Irc.Objects;
+using Irc.Objects.Server;
 
 namespace Irc;
 
@@ -9,6 +11,10 @@ public static class Register
     {
         if (CanRegister(chatFrame))
         {
+            if (!ConnectionIsPermitted(chatFrame.Server, chatFrame.User)) {
+                return;
+            }
+
             chatFrame.User.Register();
             chatFrame.User.Send(Raw.IRCX_RPL_WELCOME_001(chatFrame.Server, chatFrame.User));
             chatFrame.User.Send(Raw.IRCX_RPL_WELCOME_002(chatFrame.Server, chatFrame.User,
@@ -41,22 +47,48 @@ public static class Register
 
                 chatFrame.User.Send(Raw.IRCX_RPL_RPL_ENDOFMOTD_376(chatFrame.Server, chatFrame.User));
             }
-
-            var pass = chatFrame.User.GetDataStore().Get("pass");
-
-            if (pass == "guide")
-            {
-                chatFrame.User.PromoteToGuide();
-            }
-            else if (pass == "sysop")
-            {
-                chatFrame.User.PromoteToSysop();
-            }
-            else if (pass == "admin")
-            {
-                chatFrame.User.PromoteToAdministrator();
-            }
         }
+    }
+
+    public static bool ConnectionIsPermitted(IServer server, IUser user) {
+
+        // TODO: Add check for anonymous connection count
+        if (!server.AnonymousConnections && user.IsAnon()) {
+            user.Disconnect(Raw.IRCX_CLOSINGLINK(server, user, "001", "No Authorization"));
+            return false;
+        }
+
+        // TODO: Add check for guest connection count
+        // TODO: Add check for authenticated connection count
+
+        return true;
+    }
+
+    public static bool BasicAuthentication(IServer server, IUser user) {
+
+        if (!server.BasicAuthentication) return false;
+
+        // Basic Auth would happen here
+
+        var pass = user.GetDataStore().Get("pass");
+        if (!string.IsNullOrWhiteSpace(pass)) {
+            return true;
+        }
+
+        return false;
+
+        // if (pass == "guide")
+        // {
+        //     chatFrame.User.PromoteToGuide();
+        // }
+        // else if (pass == "sysop")
+        // {
+        //     chatFrame.User.PromoteToSysop();
+        // }
+        // else if (pass == "admin")
+        // {
+        //     chatFrame.User.PromoteToAdministrator();
+        // }
     }
 
     public static bool CanRegister(ChatFrame chatFrame)
@@ -78,8 +110,8 @@ public static class Register
             }
         }
 
-        var hasAddress = chatFrame.User.GetAddress().IsAddressPopulated();
+        var hasUserAddress = (server.DisableUserRegistration || chatFrame.User.GetAddress().IsAddressPopulated());
 
-        return !authenticating && !registered & hasNickname & hasAddress;
+        return !authenticating && !registered & hasNickname & hasUserAddress;
     }
 }
