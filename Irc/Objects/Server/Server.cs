@@ -40,6 +40,7 @@ public class Server : ChatObject, IServer
         ICommandCollection commands,
         IUserFactory userFactory) : base(new ModeCollection(), dataStore)
     {
+        Title = Name;
         _socketServer = socketServer;
         _securityManager = securityManager;
         _floodProtectionManager = floodProtectionManager;
@@ -84,6 +85,7 @@ public class Server : ChatObject, IServer
 
     public void LoadSettingsFromDataStore()
     {
+        var title = _dataStore.Get("Title");
         var maxInputBytes = _dataStore.GetAs<int>("MaxInputBytes");
         var maxOutputBytes = _dataStore.GetAs<int>("MaxOutputBytes");
         var pingInterval = _dataStore.GetAs<int>("PingInterval");
@@ -95,6 +97,7 @@ public class Server : ChatObject, IServer
         var basicAuthentication = _dataStore.GetAs<bool>("BasicAuthentication");
         var anonymousConnections = _dataStore.GetAs<bool>("AnonymousConnections");
 
+        if (!string.IsNullOrWhiteSpace(title)) Title = title;
         if (maxInputBytes > 0) MaxInputBytes = maxInputBytes;
         if (maxOutputBytes > 0) MaxOutputBytes = maxOutputBytes;
         if (pingInterval > 0) PingInterval = pingInterval;
@@ -110,6 +113,7 @@ public class Server : ChatObject, IServer
     public DateTime CreationDate => _dataStore.GetAs<DateTime>("creation");
 
     // Server Properties To be moved to another class later
+    public string Title { get; private set; }
     public bool AnnonymousAllowed { get; }
     public int ChannelCount { get; }
     public IList<ChatObject> IgnoredUsers { get; }

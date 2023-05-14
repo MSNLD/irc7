@@ -9,6 +9,7 @@ namespace Irc.Objects.Server;
 
 public interface IServer
 {
+    string Title { get; }
     DateTime CreationDate { get; }
     bool AnnonymousAllowed { get; }
     int ChannelCount { get; }

@@ -1,7 +1,9 @@
 {
   "Id": "DefaultServerId",
   "Name": "DefaultServerName",
+  "Title": "Default Chat Service",
   "Motd": "[\"*** Welcome to the Server ***\"]",
+  "SASL.Packages": "[\"ANON\",\"GateKeeper\",\"NTLM\"]",
   "Passport.V4.Secret": "mysecret",
   "MaxInputBytes": "1024",
   "PingInterval": "60",

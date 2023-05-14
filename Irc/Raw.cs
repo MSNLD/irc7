@@ -187,7 +187,7 @@ public static class Raw
 
     public static string IRCX_RPL_WELCOME_001(IServer server, IUser user)
     {
-        return $":{server} 001 {user} :Welcome to the {server.Name} server, {user}";
+        return $":{server} 001 {user} :Welcome to the {server.Title} server, {user}";
     }
 
     public static string IRCX_RPL_WELCOME_002(IServer server, IUser user, Version version)
