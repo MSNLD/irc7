@@ -43,7 +43,7 @@ public class SupportPackage : ISupportPackage
         return GetType().Name;
     }
 
-    public ICredential GetCredentials()
+    public virtual ICredential GetCredentials()
     {
         return _credentials;
     }

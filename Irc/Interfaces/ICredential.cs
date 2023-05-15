@@ -1,6 +1,6 @@
 ﻿using Irc.Enumerations;
 
-namespace Irc.Extensions.Security;
+namespace Irc.Security;
 
 public interface ICredential
 {

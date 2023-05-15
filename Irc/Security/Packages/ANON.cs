@@ -1,4 +1,5 @@
-﻿using Irc.Security;
+﻿using Irc.Enumerations;
+using Irc.Security;
 
 namespace Irc.Extensions.Security.Packages;
 
@@ -29,6 +30,17 @@ public class ANON : SupportPackage
     public string GetPackageName()
     {
         return nameof(ANON);
+    }
+
+    public override ICredential GetCredentials()
+    {
+        return new Credential
+        {
+            Level = Guest ? EnumUserAccessLevel.Guest : EnumUserAccessLevel.Member,
+            Domain = GetType().Name,
+            Username = null,
+            Guest = true
+        };
     }
 
     public SupportPackage CreateInstance(ICredentialProvider credentialProvider)

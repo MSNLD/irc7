@@ -14,20 +14,22 @@ public class UserCommand : Command, ICommand
 
     public new void Execute(ChatFrame chatFrame)
     {
-        if (chatFrame.User.IsRegistered())
+        var address = chatFrame.User.GetAddress();
+        if (!string.IsNullOrWhiteSpace(address.RealName))
         {
             chatFrame.User.Send(Raw.IRCX_ERR_ALREADYREGISTERED_462(chatFrame.Server, chatFrame.User));
         }
         else
         {
-            // Gotta check each param
-            //chatFrame.User.GetAddress().User = chatFrame.Message.Parameters[0];
-            //chatFrame.User.Address.Host = chatFrame.Message.Parameters[1];
-            var address = chatFrame.User.GetAddress();
-            address.User = address.MaskedIP;
-            address.Host = "anon";
-            address.Server = chatFrame.Message.Parameters[2];
-            address.RealName = chatFrame.Message.Parameters[3];
+            var parameters = chatFrame.Message.Parameters;
+            // TODO: Check length
+            if (string.IsNullOrWhiteSpace(address.RealName)) {
+
+                if (string.IsNullOrWhiteSpace(address.User)) address.User = parameters[0];
+                if (string.IsNullOrWhiteSpace(address.Host)) address.Host = parameters[1];
+                address.Server = chatFrame.Server.Name;
+                address.RealName = parameters[3];
+            }
         }
     }
 }

@@ -327,6 +327,13 @@ public class User : ChatObject, IUser
 
     public void Register()
     {
+        var userAddress = GetAddress();
+        var credentials = GetSupportPackage().GetCredentials();
+        userAddress.User = credentials.GetUsername() ?? userAddress.MaskedIP;
+        userAddress.Host = credentials.GetDomain();
+        userAddress.Server = Server.Name;
+        userAddress.RealName = credentials.Guest ? string.Empty : null;
+
         LoggedOn = DateTime.UtcNow;
         _registered = true;
     }

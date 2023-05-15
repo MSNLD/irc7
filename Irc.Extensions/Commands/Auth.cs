@@ -76,21 +76,20 @@ public class Auth : Command, ICommand
                     {
                         var user = chatFrame.User.GetSupportPackage().GetCredentials().GetUsername();
                         var domain = chatFrame.User.GetSupportPackage().GetCredentials().GetDomain();
-
                         var userAddress = chatFrame.User.GetAddress();
-
+                        userAddress.User = credentials.GetUsername() ?? userAddress.MaskedIP;
+                        userAddress.Host = credentials.GetDomain();
+                        userAddress.Server = chatFrame.Server.Name;
                         var nickname = credentials.GetNickname();
                         if (nickname != null)
                         {
                             chatFrame.User.Name = credentials.GetNickname();
                         }
+                        if (credentials.Guest && chatFrame.User.GetAddress().RealName == null) {
+                            chatFrame.User.GetAddress().RealName = string.Empty;
+                        }
 
                         chatFrame.User.SetGuest(credentials.Guest);
-                        userAddress.User = credentials.GetUsername();
-                        userAddress.Host = credentials.GetDomain();
-                        userAddress.Server = chatFrame.Server.RemoteIP;
-                        userAddress.RealName = credentials.Guest ? string.Empty : null;
-
                         // Send reply
                         chatFrame.User.Send(Raw.RPL_AUTH_SUCCESS(packageName, $"{user}@{domain}", 0));
 
