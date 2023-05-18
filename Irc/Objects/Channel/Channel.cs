@@ -252,7 +252,7 @@ public class Channel : ChatObject, IChannel
 
     public static bool ValidName(string channel)
     {
-        var regex = new Regex(Resources.IrcChannelRegex);
+        var regex = new Regex(Resources.IrcxChannelRegex);
         return regex.Match(channel).Success;
     }
 

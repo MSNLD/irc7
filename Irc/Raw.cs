@@ -739,9 +739,9 @@ public static class Raw
         return $":{server} 811 {user} :Start of ListX";
     }
 
-    public static string IRCX_RPL_LISTXLIST_812(IServer server, IUser user)
+    public static string IRCX_RPL_LISTXLIST_812(IServer server, IUser user, IChannel channel, string modes, int memberCount, int memberLimit, string topic)
     {
-        return $":{server} 812 {user} %s %s %d %d :%s";
+        return $":{server} 812 {user} {channel} {modes} {memberCount} {memberLimit} :{topic}";
     }
 
     public static string IRCX_RPL_LISTXPICS_813(IServer server, IUser user)

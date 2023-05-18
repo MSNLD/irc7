@@ -35,6 +35,7 @@ public class ExtendedServer : global::Irc.Objects.Server.Server, IServer, IExten
         AddCommand(new AuthX());
         AddCommand(new Ircx());
         AddCommand(new Prop());
+        AddCommand(new Listx());
 
         var modes = new ExtendedChannelModes().GetSupportedModes();
         modes = new string(modes.OrderBy(c => c).ToArray());
