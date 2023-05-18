@@ -75,7 +75,14 @@ public class Who : Command, ICommand
                 var channel = channels.Count > 0 ? channels.First().Key : null;
                 var channelStoredName = channels.Count > 0 ? channel.GetName() : string.Empty;
                 var goneHome = chatUser.Away ? "G" : "H";
-                var chanMode = channel != null ? channel.GetMember(user).GetModeString() : string.Empty;
+
+                var chanMode = string.Empty;
+                var channelMember = channel?.GetMember(user);
+                if (channelMember != null)
+                {
+                    chanMode = channel.GetMember(user).GetModeString();
+                }
+
                 var modeString = chatUser.Modes.ToString();
 
                 user.Send(Raw.IRCX_RPL_WHOREPLY_352(
