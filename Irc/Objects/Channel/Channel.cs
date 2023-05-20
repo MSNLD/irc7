@@ -268,7 +268,7 @@ public class Channel : ChatObject, IChannel
                 channelMember.GetUser().Send(message);
     }
 
-    public virtual EnumChannelAccessResult GetAccess(IUser user, string key, bool IsGoto = false)
+    public EnumChannelAccessResult GetAccessEx(IUser user, string key, bool IsGoto = false)
     {
         var operCheck = CheckOper(user);
         var keyCheck = CheckMemberKey(user, key);
@@ -282,6 +282,12 @@ public class Channel : ChatObject, IChannel
             (int)userLimitCheck
         }).Max();
 
+        return accessPermissions;
+    }
+    
+    public virtual EnumChannelAccessResult GetAccess(IUser user, string key, bool IsGoto = false)
+    {
+        var accessPermissions = GetAccessEx(user, key, IsGoto);
         return accessPermissions == EnumChannelAccessResult.NONE ? EnumChannelAccessResult.SUCCESS_GUEST : accessPermissions;
     }
 

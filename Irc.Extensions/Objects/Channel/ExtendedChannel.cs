@@ -37,13 +37,76 @@ public class ExtendedChannel : global::Irc.Objects.Channel.Channel, IExtendedCha
         return member;
     }
 
+    public EnumAccessLevel GetChannelAccess(IUser user)
+    {
+        var userAccessLevel = EnumAccessLevel.NONE;
+        var addressString = user.GetAddress().GetFullAddress();
+        var accessEntries = AccessList.GetEntries();
+
+        foreach (var accessKvp in accessEntries)
+        {
+            var accessLevel = accessKvp.Key;
+            var accessList = accessKvp.Value;
+
+            foreach (var accessEntry in accessList)
+            {
+                var maskAddress = accessEntry.Mask;
+
+                var regExStr = maskAddress.Replace("*", ".*").Replace("?", ".");
+                var regEx = new Regex(regExStr, RegexOptions.IgnoreCase);
+                if (regEx.Match(addressString).Success)
+                {
+                    if ((int)accessLevel > (int)userAccessLevel)
+                    {
+                        userAccessLevel = accessLevel;
+                    }
+                }
+            }
+        }
+
+        return userAccessLevel;
+    }
+
     public override EnumChannelAccessResult GetAccess(IUser user, string key, bool IsGoto = false)
     {
         var hostKeyCheck = CheckHostKey(user, key);
 
+        var accessLevel = GetChannelAccess(user);
+        var accessResult = EnumChannelAccessResult.NONE;
+
+        switch (accessLevel)
+        {
+            case EnumAccessLevel.OWNER:
+            {
+                accessResult = EnumChannelAccessResult.SUCCESS_OWNER;
+                break;
+            }
+            case EnumAccessLevel.HOST:
+            {
+                accessResult = EnumChannelAccessResult.SUCCESS_HOST;
+                break;
+            }
+            case EnumAccessLevel.VOICE:
+            {
+                accessResult = EnumChannelAccessResult.SUCCESS_VOICE;
+                break;
+            }
+            case EnumAccessLevel.GRANT:
+            {
+                accessResult = EnumChannelAccessResult.SUCCESS_MEMBER;
+                break;
+            }
+            case EnumAccessLevel.DENY:
+            {
+                accessResult = EnumChannelAccessResult.ERR_BANNEDFROMCHAN;
+                break;
+            }
+        }
+        
         var accessPermissions = (EnumChannelAccessResult)(new int[] {
-            (int)base.GetAccess(user, key, IsGoto),
-            (int)hostKeyCheck
+            (int)base.GetAccessEx(user, key, IsGoto),
+            (int)hostKeyCheck,
+            (int)accessResult
         }).Max();
 
         return accessPermissions == EnumChannelAccessResult.NONE ? EnumChannelAccessResult.SUCCESS_GUEST : accessPermissions;
