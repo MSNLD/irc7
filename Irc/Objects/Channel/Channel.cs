@@ -163,11 +163,11 @@ public class Channel : ChatObject, IChannel
             else if (source.GetUser().GetLevel() < EnumUserAccessLevel.Administrator && source.GetUser().GetLevel() < target.GetUser().GetLevel()) return EnumIrcError.ERR_NOPERMS;
         }
 
-        if (source.GetLevel() >= requiredLevel)
+        if (source.GetLevel() >= requiredLevel && source.GetLevel() >= target.GetLevel())
         {
             return EnumIrcError.OK;
         }
-        else if (!source.IsOwner() && requiredLevel >= EnumChannelAccessLevel.ChatOwner)
+        else if (!source.IsOwner() && (requiredLevel >= EnumChannelAccessLevel.ChatOwner || target.GetLevel() >= EnumChannelAccessLevel.ChatOwner))
         {
             return EnumIrcError.ERR_NOCHANOWNER;
         }

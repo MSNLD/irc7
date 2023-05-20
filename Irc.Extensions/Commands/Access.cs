@@ -15,7 +15,7 @@ namespace Irc.Extensions.Commands;
 
 internal class Access : Command, ICommand
 {
-    public Access() : base(2) { }
+    public Access() : base(1) { }
     public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
 
     enum AccessCommand
