@@ -223,7 +223,7 @@ internal class Access : Command, ICommand
         }
 
         // TODO: Solve below level issue
-        var entry = new AccessEntry(mask, chatFrame.User.GetLevel(), accessLevel, mask, timeout, reason);
+        var entry = new AccessEntry(chatFrame.User.GetAddress().GetUserHost(), chatFrame.User.GetLevel(), accessLevel, mask, timeout, reason);
         var accessError = targetObject.AccessList.Add(entry);
 
         if (accessError == EnumAccessError.IRCERR_DUPACCESS)
@@ -242,6 +242,7 @@ internal class Access : Command, ICommand
         chatFrame.User.Send(Raw.IRCX_RPL_ACCESSSTART_803(chatFrame.Server, chatFrame.User, targetObject));
 
         // TODO: Some entries were not listed due to level restriction
+        // :TK2CHATCHATA01 804 'Admin_Koach * DENY *!96E5C937AE1CEFB3@*$* 2873 Sysop_Wondrously@cg :Violation of MSN Code of Conduct - 6-US
         targetObject.AccessList.GetEntries().Values.ToList().ForEach(
                 list => list.ForEach(entry =>
                         chatFrame.User.Send(Raw.IRCX_RPL_ACCESSLIST_804(chatFrame.Server, chatFrame.User, targetObject, entry.AccessLevel.ToString(), entry.Mask, entry.Timeout, entry.EntryAddress, entry.Reason))
