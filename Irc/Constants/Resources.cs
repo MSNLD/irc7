@@ -97,6 +97,12 @@ public static long epoch = 621355968000000000;
         return DateTime.UtcNow.Ticks;
     }
 
+    public static long GetEpochNowInSeconds()
+    {
+        var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        return (DateTime.UtcNow - epoch).Ticks / TimeSpan.TicksPerSecond;
+    }
+
     public static string GetFullTimeString(long creation)
     {
         var time = DateTime.FromBinary(creation);
