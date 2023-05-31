@@ -53,6 +53,11 @@ public class ChatObject : IChatObject
         throw new NotImplementedException();
     }
 
+    public virtual void Send(string message, EnumChannelAccessLevel accessLevel)
+    {
+        throw new NotImplementedException();
+    }
+
     public override string ToString()
     {
         return Name;

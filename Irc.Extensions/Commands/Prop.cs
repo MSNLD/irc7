@@ -129,7 +129,7 @@ public class Prop : Command, ICommand
                             if (ircError == EnumIrcError.OK)
                             {
                                 prop.SetValue(propValue);
-                                chatObject.Send(Raw.RPL_PROP_IRCX(chatFrame.Server, chatFrame.User, (ChatObject)chatObject, prop.Name, propValue));
+                                chatObject.Send(Raw.RPL_PROP_IRCX(chatFrame.Server, chatFrame.User, (ChatObject)chatObject, prop.Name, propValue), prop.WriteAccessLevel);
                             }
                         }
                         else

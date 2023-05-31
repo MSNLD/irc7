@@ -14,6 +14,7 @@ public interface IChannel
     bool HasUser(IUser user);
     void Send(string message, ChatObject u = null);
     void Send(string message);
+    void Send(string message, EnumChannelAccessLevel accessLevel);
     IChannel Join(IUser user, EnumChannelAccessResult accessResult = EnumChannelAccessResult.NONE);
     IChannel Part(IUser user);
     IChannel Quit(IUser user);

@@ -14,6 +14,7 @@ namespace Irc.Interfaces
         IModeCollection GetModes();
         void Send(string message);
         void Send(string message, ChatObject except = null);
+        void Send(string message, EnumChannelAccessLevel accessLevel);
         string ToString();
         public bool CanBeModifiedBy(ChatObject source);
     }

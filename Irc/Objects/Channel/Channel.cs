@@ -267,6 +267,13 @@ public class Channel : ChatObject, IChannel
             if (channelMember.GetUser() != u)
                 channelMember.GetUser().Send(message);
     }
+    
+    public override void Send(string message, EnumChannelAccessLevel accessLevel)
+    {
+        foreach (var channelMember in _members)
+            if (channelMember.GetLevel() >= accessLevel)
+                channelMember.GetUser().Send(message);
+    }
 
     public EnumChannelAccessResult GetAccessEx(IUser user, string key, bool IsGoto = false)
     {
