@@ -30,6 +30,7 @@ public interface IUser
     IDictionary<IChannel, IChannelMember> GetChannels();
     IModeCollection GetModes();
     void Send(string message);
+    void Send(string message, EnumChannelAccessLevel accessLevel);
     void Flush();
     void Disconnect(string message);
     IDataRegulator GetDataRegulator();

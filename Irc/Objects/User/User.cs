@@ -92,6 +92,8 @@ public class User : ChatObject, IUser
         _dataRegulator.PushOutgoing(message);
     }
 
+    public override void Send(string message, EnumChannelAccessLevel accessLevel) => Send(message);
+
     public void Flush()
     {
         var totalBytes = _dataRegulator.GetOutgoingBytes();
