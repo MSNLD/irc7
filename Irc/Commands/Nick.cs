@@ -52,6 +52,13 @@ public class Nick : Command, ICommand
         var server = chatFrame.Server;
         var user = chatFrame.User;
         var nickname = chatFrame.Message.Parameters.First();
+
+        if (!user.IsGuest())
+        {
+            chatFrame.User.Send(Raw.IRCX_ERR_NONICKCHANGES_439(server, user, nickname));
+            return false;
+        }
+        
         if (!ValidateNickname(nickname, user.GetLevel())) {
             chatFrame.User.Send(Raw.IRCX_ERR_ERRONEOUSNICK_432(server, user, nickname));
             return false;

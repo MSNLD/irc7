@@ -522,9 +522,9 @@ public static class Raw
         return $":{server} 433 * {user} :Nickname is already in use";
     }
 
-    public static string IRCX_ERR_NONICKCHANGES_439(IServer server, IUser user)
+    public static string IRCX_ERR_NONICKCHANGES_439(IServer server, IUser user, string nickname)
     {
-        return $":{server} 439 {user} %s :Nick name changes not permitted.";
+        return $":{server} 439 {user} {nickname} :Nick name changes not permitted.";
     }
 
     public static string IRCX_ERR_NOTONCHANNEL_442(IServer server, IUser user, ChatObject channel)
