@@ -12,7 +12,7 @@ namespace Irc.Extensions.Interfaces
         EnumIrcError EvaluateGet(IChatObject source, IChatObject target);
         string Name { get; }
         bool ReadOnly { get; }
-        string GetValue();
+        string GetValue(IChatObject target);
         void SetValue(string value);
     }
 }

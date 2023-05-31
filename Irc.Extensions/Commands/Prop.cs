@@ -193,7 +193,7 @@ public class Prop : Command, ICommand
                 if (kvp.Value != null)
                 {
                     var member = kvp.Value;
-                    var propValue = prop.GetValue();
+                    var propValue = prop.GetValue(targetObject);
                     if (!string.IsNullOrEmpty(propValue))
                     {
                         SendProp(server, user, targetObject, prop.Name, propValue);
@@ -201,7 +201,7 @@ public class Prop : Command, ICommand
                     }
                 }
             }
-            else SendProp(server, user, targetObject, prop.Name, prop.GetValue()); propsSent++;
+            else SendProp(server, user, targetObject, prop.Name, prop.GetValue(targetObject)); propsSent++;
         }
         if (propsSent > 0)
         {

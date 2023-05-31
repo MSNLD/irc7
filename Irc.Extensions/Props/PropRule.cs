@@ -95,6 +95,6 @@ namespace Irc.Extensions.Props
             _value = value;
         }
 
-        public virtual string GetValue() => _value;
+        public virtual string GetValue(IChatObject target) => _value;
     }
 }

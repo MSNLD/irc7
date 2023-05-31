@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Irc.Interfaces;
 
 namespace Irc.Extensions.Props.User
 {
@@ -17,7 +18,7 @@ namespace Irc.Extensions.Props.User
             this.dataStore = dataStore;
         }
 
-        public override string GetValue()
+        public override string GetValue(IChatObject target)
         {
             return dataStore.Get(Resources.UserPropOid);
         }

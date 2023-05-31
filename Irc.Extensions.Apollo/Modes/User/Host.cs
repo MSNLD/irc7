@@ -25,7 +25,7 @@ namespace Irc.Extensions.Apollo.Modes.User
                 IUser user = (IUser)source;
                 var channel = (ApolloChannel)user.GetChannels().LastOrDefault().Key;
                 var member = user.GetChannels().LastOrDefault().Value;
-                if (channel.PropCollection.GetProp("OWNERKEY").GetValue() == parameter)
+                if (channel.PropCollection.GetProp("OWNERKEY").GetValue(target) == parameter)
                 {
                     if (member.IsHost())
                     {
@@ -35,7 +35,7 @@ namespace Irc.Extensions.Apollo.Modes.User
                     member.SetOwner(true);
                     channel.Modes.GetMode('q').DispatchModeChange(source, channel, true, target.ToString());
                 }
-                else if (channel.PropCollection.GetProp("HOSTKEY").GetValue() == parameter)
+                else if (channel.PropCollection.GetProp("HOSTKEY").GetValue(target) == parameter)
                 {
                     if (member.IsOwner()) {
                         member.SetOwner(false);
