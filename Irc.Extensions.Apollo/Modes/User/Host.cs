@@ -22,6 +22,8 @@ namespace Irc.Extensions.Apollo.Modes.User
             // TODO: Write this better
             if (target == source && flag)
             {
+                if (string.IsNullOrWhiteSpace(parameter)) return EnumIrcError.OK;
+                
                 IUser user = (IUser)source;
                 var channel = (ApolloChannel)user.GetChannels().LastOrDefault().Key;
                 var member = user.GetChannels().LastOrDefault().Value;
