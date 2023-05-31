@@ -35,13 +35,19 @@ public class Command : ICommand
     {
         var parameterCount = chatFrame.Message.Parameters.Count;
 
-        if (
-            parameterCount >= _requiredMinimumParameters &&
-            (_requiredMaximumParameters < 0 || parameterCount <= _requiredMaximumParameters)
-            ) return true;
+        if (parameterCount < _requiredMinimumParameters)
+        {
+            chatFrame.User.Send(Raw.IRCX_ERR_NEEDMOREPARAMS_461(chatFrame.Server, chatFrame.User, GetName()));
+            return false;
+        }
 
-        chatFrame.User.Send(Raw.IRCX_ERR_NEEDMOREPARAMS_461(chatFrame.Server, chatFrame.User, GetName()));
-        return false;
+        if (_requiredMaximumParameters > 0 && parameterCount > _requiredMaximumParameters)
+        {
+            chatFrame.User.Send(Raw.IRCX_ERR_TOOMANYARGUMENTS_901(chatFrame.Server, chatFrame.User, GetName()));
+            return false;
+        }
+
+        return true;
     }
 
     public bool RegistrationNeeded(ChatFrame chatFrame)

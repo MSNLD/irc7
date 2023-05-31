@@ -487,14 +487,14 @@ public static class Raw
         return $":{server} 409 {user} :No origin specified";
     }
 
-    public static string IRC_ERR_NORECIPIENT_411(IServer server, IUser user)
+    public static string IRC_ERR_NORECIPIENT_411(IServer server, IUser user, string command)
     {
-        return $":{server} 411 {user} :No recipient given (%s)";
+        return $":{server} 411 {user} :No recipient given ({command})";
     }
 
-    public static string IRC_ERR_NOTEXT_412(IServer server, IUser user, IChatObject channel)
+    public static string IRC_ERR_NOTEXT_412(IServer server, IUser user, string command)
     {
-        return $":{server} 412 {user} :No text to send ({channel})";
+        return $":{server} 412 {user} :No text to send ({command})";
     }
 
     public static string IRCX_ERR_UNKNOWNCOMMAND_421(IServer server, IUser user, string command)
@@ -792,9 +792,9 @@ public static class Raw
         return $":{server} 900 {user} {command} :Bad command";
     }
 
-    public static string IRCX_ERR_TOOMANYARGUMENTS_901(IServer server, IUser user)
+    public static string IRCX_ERR_TOOMANYARGUMENTS_901(IServer server, IUser user, string commandName)
     {
-        return $":{server} 901 {user} %s :Too many arguments";
+        return $":{server} 901 {user} {commandName} :Too many arguments";
     }
 
     public static string IRCX_ERR_BADLYFORMEDPARAMS_902(IServer server, IUser user)

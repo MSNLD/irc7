@@ -20,7 +20,7 @@ internal class Userhost : Command, ICommand
         }
         else
         {
-            chatFrame.User.Send(Raw.IRCX_ERR_TOOMANYARGUMENTS_901(chatFrame.Server, chatFrame.User));
+            chatFrame.User.Send(Raw.IRCX_ERR_TOOMANYARGUMENTS_901(chatFrame.Server, chatFrame.User, GetName()));
             // :sky-8a15b323126 901 Sky2k USERHOST :Too many arguments
         }
     }
