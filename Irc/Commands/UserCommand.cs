@@ -1,4 +1,6 @@
-﻿using Irc.Enumerations;
+﻿using Irc.Constants;
+using Irc.Enumerations;
+using Irc.Interfaces;
 
 namespace Irc.Commands;
 
@@ -9,7 +11,7 @@ public class UserCommand : Command, ICommand
 
     public new string GetName()
     {
-        return "User";
+        return Resources.CommandUser;
     }
 
     public new void Execute(ChatFrame chatFrame)

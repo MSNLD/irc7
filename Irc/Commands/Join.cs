@@ -58,8 +58,7 @@ public class Join : Command, ICommand
             }
 
             var channel = server
-                            .GetChannels()
-                                .FirstOrDefault(c => c.GetName().ToUpper() == channelName.ToUpper()) ?? server.CreateChannel(user, channelName, key);
+                            .GetChannelByName(channelName) ?? server.CreateChannel(user, channelName, key);
             
             if (channel.HasUser(user)) {
                 user.Send(Raw.IRCX_ERR_ALREADYONCHANNEL_927(server, user, channel));

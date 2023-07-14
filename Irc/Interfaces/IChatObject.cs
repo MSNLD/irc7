@@ -10,12 +10,11 @@ namespace Irc.Interfaces
         IModeCollection Modes { get; }
         string Name { get; set; }
         string ShortId { get; }
-
         IModeCollection GetModes();
         void Send(string message);
         void Send(string message, ChatObject except = null);
         void Send(string message, EnumChannelAccessLevel accessLevel);
         string ToString();
-        public bool CanBeModifiedBy(ChatObject source);
+        bool CanBeModifiedBy(ChatObject source);
     }
 }

@@ -51,7 +51,7 @@ public class User : ChatObject, IUser
             LastPing = DateTime.UtcNow;
             PingCount = 0;
             var message = new Message(_protocol, s);
-            if (message.HasCommand) dataRegulator.PushIncoming(message);
+            if (message.HasCommand) _dataRegulator.PushIncoming(message);
         };
 
         Address.SetIP(connection.GetAddress());
