@@ -1,32 +1,34 @@
-﻿using Irc.Constants;
+﻿using System.Text.RegularExpressions;
+using Irc.Constants;
 using Irc.Enumerations;
-using Irc.Extensions.Access;
 using Irc.Extensions.Access.Channel;
 using Irc.Extensions.Interfaces;
+using Irc.Extensions.Objects.Member;
 using Irc.Interfaces;
 using Irc.IO;
 using Irc.Objects;
-using System.Text.RegularExpressions;
 
 namespace Irc.Extensions.Objects.Channel;
 
 public class ExtendedChannel : global::Irc.Objects.Channel.Channel, IExtendedChatObject
 {
-    private ChannelPropCollection _properties = new();
-    private ChannelAccess _accessList = new();
-    public IPropCollection PropCollection => _properties;
+    private readonly ChannelAccess _accessList = new();
+    private readonly ChannelPropCollection _properties = new();
 
-    public IAccessList AccessList => _accessList;
-
-    public ExtendedChannel(string name, IChannelModeCollection modeCollection, IDataStore dataStore) : base(name,
+    public ExtendedChannel(string name, IChannelModes modeCollection, IDataStore dataStore) : base(name,
         modeCollection, dataStore)
     {
         _properties.SetProp("NAME", name);
     }
 
-    protected override IChannelMember AddMember(IUser user, EnumChannelAccessResult accessResult = EnumChannelAccessResult.NONE)
+    public IPropCollection PropCollection => _properties;
+
+    public IAccessList AccessList => _accessList;
+
+    protected override IChannelMember AddMember(IUser user,
+        EnumChannelAccessResult accessResult = EnumChannelAccessResult.NONE)
     {
-        var member = new Member.ExtendedMember(user);
+        var member = new ExtendedMember(user);
 
         if (accessResult == EnumChannelAccessResult.SUCCESS_OWNER) member.SetOwner(true);
         else if (accessResult == EnumChannelAccessResult.SUCCESS_HOST) member.SetHost(true);
@@ -55,12 +57,8 @@ public class ExtendedChannel : global::Irc.Objects.Channel.Channel, IExtendedCha
                 var regExStr = maskAddress.Replace("*", ".*").Replace("?", ".");
                 var regEx = new Regex(regExStr, RegexOptions.IgnoreCase);
                 if (regEx.Match(addressString).Success)
-                {
                     if ((int)accessLevel > (int)userAccessLevel)
-                    {
                         userAccessLevel = accessLevel;
-                    }
-                }
             }
         }
 
@@ -102,14 +100,17 @@ public class ExtendedChannel : global::Irc.Objects.Channel.Channel, IExtendedCha
                 break;
             }
         }
-        
-        var accessPermissions = (EnumChannelAccessResult)(new int[] {
-            (int)base.GetAccessEx(user, key, IsGoto),
+
+        var accessPermissions = (EnumChannelAccessResult)new[]
+        {
+            (int)GetAccessEx(user, key, IsGoto),
             (int)hostKeyCheck,
             (int)accessResult
-        }).Max();
+        }.Max();
 
-        return accessPermissions == EnumChannelAccessResult.NONE ? EnumChannelAccessResult.SUCCESS_GUEST : accessPermissions;
+        return accessPermissions == EnumChannelAccessResult.NONE
+            ? EnumChannelAccessResult.SUCCESS_GUEST
+            : accessPermissions;
     }
 
 
@@ -117,16 +118,13 @@ public class ExtendedChannel : global::Irc.Objects.Channel.Channel, IExtendedCha
     {
         if (string.IsNullOrWhiteSpace(key)) return EnumChannelAccessResult.NONE;
 
-        if (PropCollection.GetProp("OWNERKEY").GetValue(this) == key) {
+        if (PropCollection.GetProp("OWNERKEY").GetValue(this) == key)
             return EnumChannelAccessResult.SUCCESS_OWNER;
-        }
-        else if (PropCollection.GetProp("HOSTKEY").GetValue(this) == key) {
-            return EnumChannelAccessResult.SUCCESS_HOST;
-        }
+        if (PropCollection.GetProp("HOSTKEY").GetValue(this) == key) return EnumChannelAccessResult.SUCCESS_HOST;
         return EnumChannelAccessResult.NONE;
     }
 
-    public static new bool ValidName(string channel)
+    public new static bool ValidName(string channel)
     {
         var regex = new Regex(Resources.IrcChannelRegex);
         return regex.Match(channel).Success;

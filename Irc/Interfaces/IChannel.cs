@@ -8,6 +8,7 @@ namespace Irc.Interfaces;
 public interface IChannel
 {
     IDataStore ChannelStore { get; }
+    IChannelModes Modes { get; }
     string GetName();
     IChannelMember GetMember(IUser User);
     IChannelMember GetMemberByNickname(string nickname);
@@ -22,14 +23,16 @@ public interface IChannel
     void SendMessage(IUser user, string message);
     void SendNotice(IUser user, string message);
     IList<IChannelMember> GetMembers();
-    bool CanBeModifiedBy(ChatObject source);
+    bool CanBeModifiedBy(IChatObject source);
     EnumIrcError CanModifyMember(IChannelMember source, IChannelMember target, EnumChannelAccessLevel requiredLevel);
-    void ProcessChannelError(EnumIrcError error, IServer server, IUser source, ChatObject target = null, string data = null);
+
+    void ProcessChannelError(EnumIrcError error, IServer server, IUser source, ChatObject target = null,
+        string data = null);
+
     IChannel SendTopic(IUser user);
     IChannel SendTopic();
     IChannel SendNames(IUser user);
     bool Allows(IUser user);
-    IChannelModeCollection GetModes();
-    IChannelModeCollection Modes { get; }
+    IChannelModes GetModes();
     EnumChannelAccessResult GetAccess(IUser user, string key, bool IsGoto = false);
 }

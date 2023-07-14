@@ -6,7 +6,7 @@ namespace Irc.Extensions.Access;
 
 public class AccessList : IAccessList
 {
-    protected Dictionary<EnumAccessLevel, List<AccessEntry>> accessEntries = new Dictionary<EnumAccessLevel, List<AccessEntry>>();
+    protected Dictionary<EnumAccessLevel, List<AccessEntry>> accessEntries = new();
 
     public EnumAccessError Add(AccessEntry accessEntry)
     {

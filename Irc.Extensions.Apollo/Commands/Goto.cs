@@ -1,15 +1,20 @@
-﻿using Irc.Constants;
-using Irc.Enumerations;
-using Irc.Extensions;
+﻿using Irc.Enumerations;
+using Irc.Interfaces;
 
 namespace Irc.Commands;
 
 public class Goto : Command, ICommand
 {
-    public Goto() : base(2) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
+    public Goto() : base(2)
+    {
+    }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.None;
+    }
+
+    public new void Execute(IChatFrame chatFrame)
     {
         var server = chatFrame.Server;
         var user = chatFrame.User;
@@ -31,7 +36,7 @@ public class Goto : Command, ICommand
             return;
         }
 
-        EnumChannelAccessResult channelAccessResult = channel.GetAccess(user, null, true);
+        var channelAccessResult = channel.GetAccess(user, null, true);
 
         if (!channel.Allows(user) || channelAccessResult < EnumChannelAccessResult.SUCCESS_GUEST)
         {
@@ -40,7 +45,7 @@ public class Goto : Command, ICommand
         }
 
         channel.Join(user, channelAccessResult)
-        .SendTopic(user)
-        .SendNames(user);
+            .SendTopic(user)
+            .SendNames(user);
     }
 }

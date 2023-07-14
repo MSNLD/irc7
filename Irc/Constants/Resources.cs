@@ -2,8 +2,7 @@
 
 public static class Resources
 {
-
-public static long epoch = 621355968000000000;
+    public static long epoch = 621355968000000000;
     public static string CommandAccess = "ACCESS";
     public static string CommandAdmin = "ADMIN";
     public static string CommandAway = "AWAY";
@@ -216,6 +215,7 @@ public static long epoch = 621355968000000000;
 
     public static char ChannelModePrivate = 'p';
     public static char ChannelModeSecret = 's';
+    public static char ChannelModeHidden = 'h';
     public static char ChannelModeModerated = 'm';
     public static char ChannelModeNoExtern = 'n';
     public static char ChannelModeTopicOp = 't';

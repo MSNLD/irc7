@@ -21,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Modes\Server\" />
     <Folder Include="Logging\" />
   </ItemGroup>
 

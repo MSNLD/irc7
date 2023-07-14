@@ -1,17 +1,19 @@
 ﻿using Irc.Commands;
 using Irc.Enumerations;
-using Irc.Extensions.Apollo.Objects.User;
+using Irc.Extensions.Apollo.Commands;
 using Irc.Extensions.Protocols;
 using Irc.Interfaces;
-using Irc.Objects;
 
 namespace Irc.Extensions.Apollo.Protocols;
 
 public class Irc3 : IrcX
 {
-    public Irc3() : base()
+    public Irc3()
     {
         AddCommand(new Goto());
+        AddCommand(new Esubmit());
+        AddCommand(new Eprivmsg());
+        AddCommand(new Equestion());
     }
 
     public override EnumProtocolType GetProtocolType()
@@ -22,7 +24,7 @@ public class Irc3 : IrcX
     public override string FormattedUser(IChannelMember member)
     {
         var modeChar = string.Empty;
-        if (!member.IsNormal()) modeChar += member.IsOwner() ? '.' : (member.IsHost() ? '@' : '+');
+        if (!member.IsNormal()) modeChar += member.IsOwner() ? '.' : member.IsHost() ? '@' : '+';
         return $"{modeChar}{member.GetUser().GetAddress().Nickname}";
     }
 }

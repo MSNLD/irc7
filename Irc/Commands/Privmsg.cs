@@ -1,37 +1,39 @@
-﻿using Irc.Constants;
-using Irc.Enumerations;
+﻿using Irc.Enumerations;
 using Irc.Interfaces;
-using Channel = Irc.Objects.Channel.Channel;
+using Irc.Objects;
+using Irc.Objects.Channel;
 
 namespace Irc.Commands;
 
 public class Privmsg : Command, ICommand
 {
-    public Privmsg() : base(2) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.Standard;
+    public Privmsg() : base(2)
+    {
+    }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.Standard;
+    }
+
+    public new void Execute(IChatFrame chatFrame)
     {
         SendMessage(chatFrame, false);
     }
 
-    public static void SendMessage(ChatFrame chatFrame, bool Notice)
+    public static void SendMessage(IChatFrame chatFrame, bool Notice)
     {
         var targetName = chatFrame.Message.Parameters.First();
         var message = chatFrame.Message.Parameters[1];
 
-        string[] targets = targetName.Split(',', StringSplitOptions.RemoveEmptyEntries);
+        var targets = targetName.Split(',', StringSplitOptions.RemoveEmptyEntries);
         foreach (var target in targets)
         {
-            Interfaces.IChatObject chatObject = null;
+            IChatObject chatObject = null;
             if (Channel.ValidName(target))
-            {
-                chatObject = (Interfaces.IChatObject)chatFrame.Server.GetChannelByName(target);
-            }
+                chatObject = (IChatObject)chatFrame.Server.GetChannelByName(target);
             else
-            {
-                chatObject = (Interfaces.IChatObject)chatFrame.Server.GetUserByNickname(target);
-            }
+                chatObject = (IChatObject)chatFrame.Server.GetUserByNickname(target);
 
             if (chatObject == null)
             {
@@ -42,7 +44,7 @@ public class Privmsg : Command, ICommand
 
             if (chatObject is Channel)
             {
-                var channel = ((IChannel)chatObject);
+                var channel = (IChannel)chatObject;
                 var channelMember = channel.GetMember(chatFrame.User);
                 var isOnChannel = channelMember != null;
                 var noExtern = channel.Modes.NoExtern;
@@ -53,30 +55,26 @@ public class Privmsg : Command, ICommand
                     (!isOnChannel && noExtern) ||
                     // Moderated
                     (isOnChannel && moderated && channelMember.IsNormal())
-                    )
+                )
                 {
-                    chatFrame.User.Send(Raw.IRCX_ERR_CANNOTSENDTOCHAN_404(chatFrame.Server, chatFrame.User, chatObject));
+                    chatFrame.User.Send(
+                        Raw.IRCX_ERR_CANNOTSENDTOCHAN_404(chatFrame.Server, chatFrame.User, chatObject));
                     return;
                 }
 
                 if (Notice) ((Channel)chatObject).SendNotice(chatFrame.User, message);
                 else ((Channel)chatObject).SendMessage(chatFrame.User, message);
             }
-            else if (chatObject is Objects.User)
+            else if (chatObject is User)
             {
                 if (Notice)
-                {
-                    ((Objects.User)chatObject).Send(
-                            Raw.RPL_NOTICE_USER(chatFrame.Server, chatFrame.User, chatObject, message)
-                        );
-                }
+                    ((User)chatObject).Send(
+                        Raw.RPL_NOTICE_USER(chatFrame.Server, chatFrame.User, chatObject, message)
+                    );
                 else
-                {
-                    ((Objects.User)chatObject).Send(
-                            Raw.RPL_PRIVMSG_USER(chatFrame.Server, chatFrame.User, chatObject, message)
-                        );
-                }
-
+                    ((User)chatObject).Send(
+                        Raw.RPL_PRIVMSG_USER(chatFrame.Server, chatFrame.User, chatObject, message)
+                    );
             }
         }
     }

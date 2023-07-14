@@ -1,7 +1,5 @@
-﻿using Irc.Constants;
-using Irc.Enumerations;
+﻿using Irc.Enumerations;
 using Irc.Interfaces;
-using Irc.IO;
 using Irc.Objects;
 using Irc.Objects.Channel;
 using Irc.Objects.Server;
@@ -10,10 +8,16 @@ namespace Irc.Commands;
 
 public class Join : Command, ICommand
 {
-    public Join() : base(1) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
+    public Join() : base(1)
+    {
+    }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.None;
+    }
+
+    public new void Execute(IChatFrame chatFrame)
     {
         var server = chatFrame.Server;
         var user = chatFrame.User;
@@ -52,50 +56,55 @@ public class Join : Command, ICommand
         // TODO: Optimize the below code
         foreach (var channelName in channelNames)
         {
-            if (user.GetChannels().Count >= server.MaxChannels) {
+            if (user.GetChannels().Count >= server.MaxChannels)
+            {
                 user.Send(Raw.IRCX_ERR_TOOMANYCHANNELS_405(server, user, channelName));
                 continue;
             }
 
             var channel = server
-                            .GetChannelByName(channelName) ?? server.CreateChannel(user, channelName, key);
-            
-            if (channel.HasUser(user)) {
+                .GetChannelByName(channelName) ?? server.CreateChannel(user, channelName, key);
+
+            if (channel.HasUser(user))
+            {
                 user.Send(Raw.IRCX_ERR_ALREADYONCHANNEL_927(server, user, channel));
                 continue;
             }
 
-            EnumChannelAccessResult channelAccessResult = channel.GetAccess(user, key, false);
-            if (channelAccessResult < EnumChannelAccessResult.SUCCESS_GUEST) {
+            var channelAccessResult = channel.GetAccess(user, key);
+            if (channelAccessResult < EnumChannelAccessResult.SUCCESS_GUEST)
+            {
                 SendJoinError(server, channel, user, channelAccessResult);
                 continue;
             }
 
             channel.Join(user, channelAccessResult)
-            .SendTopic(user)
-            .SendNames(user);
+                .SendTopic(user)
+                .SendNames(user);
         }
     }
 
     public static void SendJoinError(IServer server, IChannel channel, IUser user, EnumChannelAccessResult result)
     {
-        switch (result) {
+        switch (result)
+        {
             case EnumChannelAccessResult.ERR_BADCHANNELKEY:
-                {
-                    user.Send(Raw.IRCX_ERR_BADCHANNELKEY_475(server, user, channel));
-                    break;
-                }
+            {
+                user.Send(Raw.IRCX_ERR_BADCHANNELKEY_475(server, user, channel));
+                break;
+            }
             case EnumChannelAccessResult.ERR_INVITEONLYCHAN:
-                {
-                    user.Send(Raw.IRCX_ERR_INVITEONLYCHAN_473(server, user, channel));
-                    break;
-                }
+            {
+                user.Send(Raw.IRCX_ERR_INVITEONLYCHAN_473(server, user, channel));
+                break;
+            }
             case EnumChannelAccessResult.ERR_CHANNELISFULL:
-                {
-                    user.Send(Raw.IRCX_ERR_CHANNELISFULL_471(server, user, channel));
-                    break;
-                }
-            default:{
+            {
+                user.Send(Raw.IRCX_ERR_CHANNELISFULL_471(server, user, channel));
+                break;
+            }
+            default:
+            {
                 user.Send($"CANNOT JOIN CHANNEL {result.ToString()}");
                 break;
             }

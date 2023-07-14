@@ -1,4 +1,5 @@
 ﻿using Irc.Enumerations;
+using Irc.Interfaces;
 
 namespace Irc.Commands;
 
@@ -6,7 +7,7 @@ public interface ICommand
 {
     EnumCommandDataType GetDataType();
     string GetName();
-    void Execute(ChatFrame chatFrame);
-    bool ParametersAreValid(ChatFrame chatFrame);
-    bool RegistrationNeeded(ChatFrame chatFrame);
+    void Execute(IChatFrame chatFrame);
+    bool ParametersAreValid(IChatFrame chatFrame);
+    bool RegistrationNeeded(IChatFrame chatFrame);
 }

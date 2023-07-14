@@ -6,15 +6,21 @@ namespace Irc.Commands;
 
 public class UserCommand : Command, ICommand
 {
-    public UserCommand() : base(4, false) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
+    public UserCommand() : base(4, false)
+    {
+    }
+
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.None;
+    }
 
     public new string GetName()
     {
         return Resources.CommandUser;
     }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new void Execute(IChatFrame chatFrame)
     {
         var address = chatFrame.User.GetAddress();
         if (!string.IsNullOrWhiteSpace(address.RealName))
@@ -25,8 +31,8 @@ public class UserCommand : Command, ICommand
         {
             var parameters = chatFrame.Message.Parameters;
             // TODO: Check length
-            if (string.IsNullOrWhiteSpace(address.RealName)) {
-
+            if (string.IsNullOrWhiteSpace(address.RealName))
+            {
                 if (string.IsNullOrWhiteSpace(address.User)) address.User = parameters[0];
                 if (string.IsNullOrWhiteSpace(address.Host)) address.Host = parameters[1];
                 address.Server = chatFrame.Server.Name;

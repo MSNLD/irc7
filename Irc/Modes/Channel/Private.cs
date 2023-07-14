@@ -1,24 +1,40 @@
 ﻿using Irc.Constants;
 using Irc.Enumerations;
 using Irc.Interfaces;
-using Irc.Objects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Irc.Modes.Channel
+namespace Irc.Modes.Channel;
+
+public class Private : ModeRuleChannel, IModeRule
 {
-    public class Private : ModeRuleChannel, IModeRule
+    public Private() : base(Resources.ChannelModePrivate)
     {
-        public Private() : base(Resources.ChannelModePrivate)
+    }
+
+    public EnumIrcError Evaluate(IChatObject source, IChatObject target, bool flag, string parameter)
+    {
+        var result = base.Evaluate(source, target, flag, parameter);
+        if (result == EnumIrcError.OK)
         {
+            var channel = (IChannel)target;
+
+            if (flag)
+            {
+                if (channel.Modes.Secret)
+                {
+                    channel.Modes.Secret = false;
+                    DispatchModeChange(Resources.ChannelModeSecret, source, target, false, string.Empty);
+                }
+
+                if (channel.Modes.Hidden)
+                {
+                    channel.Modes.Hidden = false;
+                    DispatchModeChange(Resources.ChannelModeHidden, source, target, false, string.Empty);
+                }
+            }
+
+            SetChannelMode(source, (IChannel)target, flag, parameter);
         }
 
-        public new EnumIrcError Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
-        {
-            return EvaluateAndSet(source, target, flag, parameter);
-        }
+        return result;
     }
 }

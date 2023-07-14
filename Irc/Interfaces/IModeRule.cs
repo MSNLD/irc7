@@ -1,17 +1,15 @@
 ﻿using Irc.Enumerations;
-using Irc.Objects;
 
-namespace Irc.Interfaces
+namespace Irc.Interfaces;
+
+public interface IModeRule
 {
-    public interface IModeRule
-    {
-        void Set(int value);
-        void Set(bool value);
-        int Get();
-        char GetModeChar();
-        bool RequiresParameter { get; }
+    bool RequiresParameter { get; }
+    void Set(int value);
+    void Set(bool value);
+    int Get();
+    char GetModeChar();
 
-        EnumIrcError Evaluate(ChatObject source, ChatObject target, bool flag, string parameter);
-        void DispatchModeChange(ChatObject source, ChatObject target, bool flag, string parameter = null);
-    }
+    EnumIrcError Evaluate(IChatObject source, IChatObject target, bool flag, string parameter);
+    void DispatchModeChange(IChatObject source, IChatObject target, bool flag, string parameter = null);
 }
