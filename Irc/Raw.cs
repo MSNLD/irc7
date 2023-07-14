@@ -1,8 +1,8 @@
-﻿using Irc.Enumerations;
+﻿using System.Globalization;
+using Irc.Enumerations;
 using Irc.Interfaces;
 using Irc.Objects;
 using Irc.Objects.Server;
-using System.Globalization;
 
 namespace Irc;
 
@@ -68,7 +68,7 @@ public static class Raw
         return $":{user.GetAddress()} QUIT :%s";
     }
 
-    public static string RPL_MODE_IRC(IUser user, ChatObject target, string modeString)
+    public static string RPL_MODE_IRC(IUser user, IChatObject target, string modeString)
     {
         return $":{user.GetAddress()} MODE {target} {modeString}";
     }
@@ -78,7 +78,8 @@ public static class Raw
         return $":{user.GetAddress()} TOPIC {channel} :{topic}";
     }
 
-    public static string RPL_PROP_IRCX(IServer server, IUser user, ChatObject chatObject, string propName, string propValue)
+    public static string RPL_PROP_IRCX(IServer server, IUser user, ChatObject chatObject, string propName,
+        string propValue)
     {
         return $":{user.GetAddress()} PROP {chatObject} {propName} :{propValue}";
     }
@@ -118,7 +119,8 @@ public static class Raw
         return ":%s %s %s :%s";
     }
 
-    public static string RPL_CHAN_WHISPER(IServer server, IUser user, IChannel channel, ChatObject target, string message)
+    public static string RPL_CHAN_WHISPER(IServer server, IUser user, IChannel channel, ChatObject target,
+        string message)
     {
         return $":{user.GetAddress()} WHISPER {channel} {target} :{message}";
     }
@@ -373,12 +375,15 @@ public static class Raw
             $":{server} 351 {user} {version.Major}.{version.Minor}.{version.Revision}.{version.Build} {server} :{server} {version.Major}.{version.Minor}";
     }
 
-    public static string IRCX_RPL_WHOREPLY_352(IServer server, IUser user, string channelName, string userName, string hostName, string serverName, string nickName, string userStatus, int hopCount, string realName)
+    public static string IRCX_RPL_WHOREPLY_352(IServer server, IUser user, string channelName, string userName,
+        string hostName, string serverName, string nickName, string userStatus, int hopCount, string realName)
     {
-        return $":{server} 352 {user} {channelName} {userName} {hostName} {serverName} {nickName} {userStatus} :{hopCount} {realName}";
+        return
+            $":{server} 352 {user} {channelName} {userName} {hostName} {serverName} {nickName} {userStatus} :{hopCount} {realName}";
     }
 
-    public static string IRCX_RPL_NAMEREPLY_353(IServer server, IUser user, IChannel channel, char channelType, string names)
+    public static string IRCX_RPL_NAMEREPLY_353(IServer server, IUser user, IChannel channel, char channelType,
+        string names)
     {
         return $":{server} 353 {user} {channelType} {channel} :{names}";
     }
@@ -454,7 +459,8 @@ public static class Raw
     public static string IRCX_RPL_TIME_391(IServer server, IUser user)
     {
         //<- :sky-8a15b323126 391 Sky sky-8a15b323126 :Wed Aug 10 18:27:41 2022
-        return $":{server} 391 {user} {server} :{DateTime.Now.ToString("ddd MMM dd HH:mm:ss yyyy", CultureInfo.CreateSpecificCulture("en-us"))}";
+        return
+            $":{server} 391 {user} {server} :{DateTime.Now.ToString("ddd MMM dd HH:mm:ss yyyy", CultureInfo.CreateSpecificCulture("en-us"))}";
     }
 
     public static string IRCX_ERR_NOSUCHNICK_401_N(IServer server, IUser user)
@@ -527,7 +533,7 @@ public static class Raw
         return $":{server} 439 {user} {nickname} :Nick name changes not permitted.";
     }
 
-    public static string IRCX_ERR_NOTONCHANNEL_442(IServer server, IUser user, ChatObject channel)
+    public static string IRCX_ERR_NOTONCHANNEL_442(IServer server, IUser user, IChatObject channel)
     {
         return $":{server} 442 {user} {channel} :You're not on that channel";
     }
@@ -684,12 +690,14 @@ public static class Raw
         return $":{server} 800 {user} {isircx} {ircxversion} {server.SecurityPackages} {buffsize} {options}";
     }
 
-    public static string IRCX_RPL_ACCESSADD_801(IServer server, IUser user, IChatObject targetObject, string accessLevel, string mask, int duration, string address, string reason)
+    public static string IRCX_RPL_ACCESSADD_801(IServer server, IUser user, IChatObject targetObject,
+        string accessLevel, string mask, int duration, string address, string reason)
     {
         return $":{server} 801 {user} {targetObject} {accessLevel} {mask} {duration} {address} :{reason}";
     }
 
-    public static string IRCX_RPL_ACCESSDELETE_802(IServer server, IUser user, IChatObject targetObject, string accessLevel, string mask, int duration, string address, string reason)
+    public static string IRCX_RPL_ACCESSDELETE_802(IServer server, IUser user, IChatObject targetObject,
+        string accessLevel, string mask, int duration, string address, string reason)
     {
         return $":{server} 802 {user} {targetObject} {accessLevel} {mask} {duration} {address} :{reason}";
     }
@@ -699,7 +707,8 @@ public static class Raw
         return $":{server} 803 {user} {targetObject} :Start of access entries";
     }
 
-    public static string IRCX_RPL_ACCESSLIST_804(IServer server, IUser user, IChatObject targetObject, string accessLevel, string mask, int duration, string address, string reason)
+    public static string IRCX_RPL_ACCESSLIST_804(IServer server, IUser user, IChatObject targetObject,
+        string accessLevel, string mask, int duration, string address, string reason)
     {
         return $":{server} 804 {user} {targetObject} {accessLevel} {mask} {duration} {address} :{reason}";
     }
@@ -739,7 +748,8 @@ public static class Raw
         return $":{server} 811 {user} :Start of ListX";
     }
 
-    public static string IRCX_RPL_LISTXLIST_812(IServer server, IUser user, IChannel channel, string modes, int memberCount, int memberLimit, string topic)
+    public static string IRCX_RPL_LISTXLIST_812(IServer server, IUser user, IChannel channel, string modes,
+        int memberCount, int memberLimit, string topic)
     {
         return $":{server} 812 {user} {channel} {modes} {memberCount} {memberLimit} :{topic}";
     }
@@ -760,8 +770,8 @@ public static class Raw
     }
 
 
-
-    public static string IRCX_RPL_ACCESSCLEAR_820(IServer server, IUser user, IChatObject targetObject, EnumAccessLevel accessLevel)
+    public static string IRCX_RPL_ACCESSCLEAR_820(IServer server, IUser user, IChatObject targetObject,
+        EnumAccessLevel accessLevel)
     {
         var level = accessLevel == EnumAccessLevel.All ? "*" : accessLevel.ToString();
         return $":{server} 820 {user} {targetObject} {level} :Clear";

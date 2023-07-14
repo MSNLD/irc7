@@ -1,56 +1,43 @@
-﻿using System;
-using System.Reflection.Metadata;
-using Irc.Constants;
-using Irc.Enumerations;
+﻿using Irc.Enumerations;
 using Irc.Interfaces;
 using Irc.Objects;
 
-namespace Irc.Modes
+namespace Irc.Modes;
+
+public class ModeRuleChannel : ModeRule, IModeRule
 {
-	public class ModeRuleChannel: ModeRule, IModeRule
-	{
-        private readonly EnumChannelAccessLevel accessLevel;
+    private readonly EnumChannelAccessLevel accessLevel;
 
-        public ModeRuleChannel(char modeChar, bool requiresParameter = false, int initialValue = 0, EnumChannelAccessLevel accessLevel = EnumChannelAccessLevel.ChatHost):
-            base(modeChar, requiresParameter, initialValue)
-		{
-            this.accessLevel = accessLevel;
-        }
+    public ModeRuleChannel(char modeChar, bool requiresParameter = false, int initialValue = 0,
+        EnumChannelAccessLevel accessLevel = EnumChannelAccessLevel.ChatHost) :
+        base(modeChar, requiresParameter, initialValue)
+    {
+        this.accessLevel = accessLevel;
+    }
 
-        public EnumIrcError Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
-        {
-            var user = (IUser)source;
-            var channel = (IChannel)target;
-            var member = channel.GetMember(user);
+    public EnumIrcError Evaluate(IChatObject source, IChatObject target, bool flag, string parameter)
+    {
+        var user = (IUser)source;
+        var channel = (IChannel)target;
+        var member = channel.GetMember(user);
 
-            if (member == null && !user.IsAdministrator())
-            {
-                return EnumIrcError.ERR_NOTONCHANNEL;
-            }
+        if (member == null && !user.IsAdministrator()) return EnumIrcError.ERR_NOTONCHANNEL;
 
-            if (member.GetLevel() < accessLevel)
-            {
-                return EnumIrcError.ERR_NOCHANOP;
-            }
+        if (member.GetLevel() < accessLevel) return EnumIrcError.ERR_NOCHANOP;
 
-            return EnumIrcError.OK;
-        }
+        return EnumIrcError.OK;
+    }
 
-        public EnumIrcError EvaluateAndSet(ChatObject source, ChatObject target, bool flag, string parameter)
-        {
-            var result = Evaluate(source, target, flag, parameter);
-            if (result == EnumIrcError.OK)
-            {
-                SetChannelMode(source, (IChannel)target, flag, parameter);
-            }
-            return result;
-        }
+    public EnumIrcError EvaluateAndSet(IChatObject source, IChatObject target, bool flag, string parameter)
+    {
+        var result = Evaluate(source, target, flag, parameter);
+        if (result == EnumIrcError.OK) SetChannelMode(source, (IChannel)target, flag, parameter);
+        return result;
+    }
 
-        public void SetChannelMode(ChatObject source, IChannel target, bool flag, string parameter)
-        {
-            target.Modes.GetMode(ModeChar).Set(flag == true ? 1 : 0);
-            DispatchModeChange(source, (ChatObject)target, flag, parameter);
-        }
+    public void SetChannelMode(IChatObject source, IChannel target, bool flag, string parameter)
+    {
+        target.Modes.GetMode(ModeChar).Set(flag ? 1 : 0);
+        DispatchModeChange(source, (ChatObject)target, flag, parameter);
     }
 }
-

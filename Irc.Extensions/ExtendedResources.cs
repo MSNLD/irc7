@@ -2,7 +2,6 @@
 
 public static class ExtendedResources
 {
-    public static char ChannelModeHidden = 'h';
     public static char ChannelModeAuthOnly = 'a'; // a - NTLM auth only
     public static char ChannelModeCloneable = 'd';
     public static char ChannelModeClone = 'e';
@@ -17,7 +16,6 @@ public static class ExtendedResources
     public static char MemberModeFlagOwner = '.';
 
     public static char UserModeAdmin = 'a';
-    public static char UserModePasskey = 'h';
     public static char UserModeIrcx = 'x';
     public static char UserModeGag = 'z';
 

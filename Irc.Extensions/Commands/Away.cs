@@ -1,20 +1,22 @@
 ﻿using Irc.Commands;
 using Irc.Enumerations;
-using Irc.Objects;
-using Irc.Objects.Server;
+using Irc.Interfaces;
 
 namespace Irc.Extensions.Commands;
 
 internal class Away : Command, ICommand
 {
-    public Away() : base(0, true) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.None;
+    }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new void Execute(IChatFrame chatFrame)
     {
         var server = chatFrame.Server;
         var user = chatFrame.User;
-        if (chatFrame.Message.Parameters.Count == 0) {
+        if (chatFrame.Message.Parameters.Count == 0)
+        {
             user.SetBack(server, chatFrame.User);
             return;
         }

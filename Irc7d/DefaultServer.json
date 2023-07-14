@@ -14,5 +14,8 @@
   "MaxAnonymousConnections": "100",
   "MaxGuestConnections": "100",
   "BasicAuthentication": "true",
-  "AnonymousConnections": "true"
+  "AnonymousConnections": "true",
+  "AdminInfo1": "Your Admin is",
+  "AdminInfo2": "amazing",
+  "AdminInfo3": "example@domain.com"
 }

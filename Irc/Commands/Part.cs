@@ -1,4 +1,5 @@
 ﻿using Irc.Enumerations;
+using Irc.Interfaces;
 using Irc.Objects;
 using Irc.Objects.Server;
 
@@ -6,10 +7,16 @@ namespace Irc.Commands;
 
 internal class Part : Command, ICommand
 {
-    public Part() : base(1) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
+    public Part() : base(1)
+    {
+    }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.None;
+    }
+
+    public new void Execute(IChatFrame chatFrame)
     {
         var server = chatFrame.Server;
         var user = chatFrame.User;

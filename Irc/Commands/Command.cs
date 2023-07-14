@@ -1,15 +1,16 @@
 ﻿using Irc.Enumerations;
-using Irc.Objects;
+using Irc.Interfaces;
 
 namespace Irc.Commands;
 
 public class Command : ICommand
 {
+    private readonly bool _registrationRequired;
     protected int _requiredMaximumParameters;
     protected int _requiredMinimumParameters;
-    private readonly bool _registrationRequired;
 
-    public Command(int requiredMinimumParameters = 0, bool registrationRequired = true, int requiredMaximumParameters = -1)
+    public Command(int requiredMinimumParameters = 0, bool registrationRequired = true,
+        int requiredMaximumParameters = -1)
     {
         _requiredMinimumParameters = requiredMinimumParameters;
         _registrationRequired = registrationRequired;
@@ -26,12 +27,12 @@ public class Command : ICommand
         throw new NotImplementedException();
     }
 
-    public void Execute(ChatFrame chatFrame)
+    public void Execute(IChatFrame chatFrame)
     {
         throw new NotImplementedException();
     }
 
-    public bool ParametersAreValid(ChatFrame chatFrame)
+    public bool ParametersAreValid(IChatFrame chatFrame)
     {
         var parameterCount = chatFrame.Message.Parameters.Count;
 
@@ -50,7 +51,7 @@ public class Command : ICommand
         return true;
     }
 
-    public bool RegistrationNeeded(ChatFrame chatFrame)
+    public bool RegistrationNeeded(IChatFrame chatFrame)
     {
         if (!_registrationRequired || (_registrationRequired && chatFrame.User.IsRegistered())) return false;
 

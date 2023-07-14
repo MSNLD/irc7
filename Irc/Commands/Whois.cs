@@ -1,6 +1,6 @@
-﻿using System.Linq;
-using Irc.Constants;
+﻿using Irc.Constants;
 using Irc.Enumerations;
+using Irc.Interfaces;
 using Irc.Objects;
 using Irc.Objects.Server;
 
@@ -8,10 +8,16 @@ namespace Irc.Commands;
 
 public class Whois : Command, ICommand
 {
-    public Whois() : base(1) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
+    public Whois() : base(1)
+    {
+    }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.None;
+    }
+
+    public new void Execute(IChatFrame chatFrame)
     {
         /*
          <- :sky-8a15b323126 311 Sky Sky ~no 192.168.88.131 * :Sky
@@ -22,18 +28,15 @@ public class Whois : Command, ICommand
         var server = chatFrame.Server;
         var user = chatFrame.User;
         var nicknameString = chatFrame.Message.Parameters.First();
-        var nicknames = nicknameString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+        var nicknames = nicknameString.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
-        foreach (var nickname in nicknames)
-        {
-            ProcessWhoisReply(chatFrame.Server, chatFrame.User, nickname);
-        }
+        foreach (var nickname in nicknames) ProcessWhoisReply(chatFrame.Server, chatFrame.User, nickname);
         user.Send(IrcRaws.IRC_RAW_318(server, user, nicknameString));
     }
 
     public static void ProcessWhoisReply(IServer server, IUser user, string nickname)
     {
-        IUser targetUser = server.GetUserByNickname(nickname);
+        var targetUser = server.GetUserByNickname(nickname);
 
         if (targetUser == null)
         {
@@ -46,7 +49,7 @@ public class Whois : Command, ICommand
         if (targetUser.GetChannels().Count > 0)
         {
             var channels = targetUser.GetChannels();
-            var channelStrings = channels.Select(c => $"{c.Value.GetListedMode()}{c.Key}").ToArray<string>();
+            var channelStrings = channels.Select(c => $"{c.Value.GetListedMode()}{c.Key}").ToArray();
 
             // TODO: Properly format channels & user modes
             user.Send(IrcRaws.IRC_RAW_319(server, user, targetUser,
@@ -55,9 +58,7 @@ public class Whois : Command, ICommand
         }
 
         if (targetUser.GetLevel() >= EnumUserAccessLevel.Guide)
-        {
             user.Send(IrcRaws.IRC_RAW_313(server, user, targetUser));
-        }
 
         var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         var secondsSinceLogin = (targetUser.LoggedOn - epoch).Ticks / TimeSpan.TicksPerSecond;

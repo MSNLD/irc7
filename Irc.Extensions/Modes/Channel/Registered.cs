@@ -1,24 +1,17 @@
 ﻿using Irc.Enumerations;
 using Irc.Interfaces;
 using Irc.Modes;
-using Irc.Objects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Irc.Extensions.Modes.Channel
+namespace Irc.Extensions.Modes.Channel;
+
+public class Registered : ModeRuleChannel, IModeRule
 {
-    public class Registered : ModeRule, IModeRule
+    public Registered() : base(ExtendedResources.ChannelModeRegistered)
     {
-        public Registered() : base(ExtendedResources.ChannelModeRegistered)
-        {
-        }
+    }
 
-        public new EnumIrcError Evaluate(ChatObject source, ChatObject target, bool flag, string parameter)
-        {
-            return EnumIrcError.OK;
-        }
+    public new EnumIrcError Evaluate(IChatObject source, IChatObject target, bool flag, string parameter)
+    {
+        return EvaluateAndSet(source, target, flag, parameter);
     }
 }

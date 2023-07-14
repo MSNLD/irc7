@@ -1,10 +1,11 @@
 ﻿using Irc.Constants;
 using Irc.Interfaces;
-using Irc.IO;
+using Irc.Modes.Channel;
+using Irc.Modes.Channel.Member;
 
 namespace Irc.Objects;
 
-public class ChannelModes : ModeCollection, IChannelModeCollection
+public class ChannelModes : ModeCollection, IChannelModes
 {
     /*
 o - give/take channel operator privileges;
@@ -22,53 +23,75 @@ k - set a channel key (password).
 
     public ChannelModes()
     {
-        modes.Add(Resources.MemberModeHost, new Modes.Channel.Member.Operator());
-        modes.Add(Resources.MemberModeVoice, new Modes.Channel.Member.Voice());
-        modes.Add(Resources.ChannelModePrivate, new Modes.Channel.Private());
-        modes.Add(Resources.ChannelModeSecret, new Modes.Channel.Secret());
-        modes.Add(Resources.ChannelModeInvite, new Modes.Channel.InviteOnly());
-        modes.Add(Resources.ChannelModeTopicOp, new Modes.Channel.TopicOp());
-        modes.Add(Resources.ChannelModeNoExtern, new Modes.Channel.NoExtern());
-        modes.Add(Resources.ChannelModeModerated, new Modes.Channel.Moderated());
-        modes.Add(Resources.ChannelModeUserLimit, new Modes.Channel.UserLimit());
-        modes.Add(Resources.ChannelModeBan, new Modes.Channel.BanList());
-        modes.Add(Resources.ChannelModeKey, new Modes.Channel.Key());
+        modes.Add(Resources.MemberModeHost, new Operator());
+        modes.Add(Resources.MemberModeVoice, new Voice());
+        modes.Add(Resources.ChannelModePrivate, new Private());
+        modes.Add(Resources.ChannelModeSecret, new Secret());
+        modes.Add(Resources.ChannelModeHidden, new Hidden());
+        modes.Add(Resources.ChannelModeInvite, new InviteOnly());
+        modes.Add(Resources.ChannelModeTopicOp, new TopicOp());
+        modes.Add(Resources.ChannelModeNoExtern, new NoExtern());
+        modes.Add(Resources.ChannelModeModerated, new Moderated());
+        modes.Add(Resources.ChannelModeUserLimit, new UserLimit());
+        modes.Add(Resources.ChannelModeBan, new BanList());
+        modes.Add(Resources.ChannelModeKey, new Key());
     }
 
-    public bool InviteOnly {
+    public bool InviteOnly
+    {
         get => modes[Resources.ChannelModeInvite].Get() == 1;
         set => modes[Resources.ChannelModeInvite].Set(Convert.ToInt32(value));
     }
+
     public string Key
     {
         get => keypass;
-        set {
-            bool hasKey = !string.IsNullOrWhiteSpace(value);
+        set
+        {
+            var hasKey = !string.IsNullOrWhiteSpace(value);
             modes[Resources.ChannelModeKey].Set(hasKey);
             keypass = value;
         }
     }
-    public bool Moderated {
+
+    public bool Moderated
+    {
         get => modes[Resources.ChannelModeModerated].Get() == 1;
         set => modes[Resources.ChannelModeModerated].Set(Convert.ToInt32(value));
     }
-    public bool NoExtern {
+
+    public bool NoExtern
+    {
         get => modes[Resources.ChannelModeNoExtern].Get() == 1;
         set => modes[Resources.ChannelModeNoExtern].Set(Convert.ToInt32(value));
     }
-    public bool Private {
+
+    public bool Private
+    {
         get => modes[Resources.ChannelModePrivate].Get() == 1;
         set => modes[Resources.ChannelModePrivate].Set(Convert.ToInt32(value));
     }
-    public bool Secret {
+
+    public bool Secret
+    {
         get => modes[Resources.ChannelModeSecret].Get() == 1;
         set => modes[Resources.ChannelModeSecret].Set(Convert.ToInt32(value));
     }
-    public bool TopicOp {
+
+    public bool Hidden
+    {
+        get => modes[Resources.ChannelModeHidden].Get() == 1;
+        set => modes[Resources.ChannelModeHidden].Set(Convert.ToInt32(value));
+    }
+
+    public bool TopicOp
+    {
         get => modes[Resources.ChannelModeTopicOp].Get() == 1;
         set => modes[Resources.ChannelModeTopicOp].Set(Convert.ToInt32(value));
     }
-    public int UserLimit {
+
+    public int UserLimit
+    {
         get => modes[Resources.ChannelModeUserLimit].Get();
         set => modes[Resources.ChannelModeUserLimit].Set(value);
     }
@@ -79,6 +102,7 @@ k - set a channel key (password).
         var limit = modes['l'].Get() > 0 ? $" {modes['l'].Get()}" : string.Empty;
         var key = modes['k'].Get() != 0 ? $" {keypass}" : string.Empty;
 
-        return $"{new string(modes.Where(mode => mode.Value.Get() > 0).Select(mode => mode.Key).ToArray())}{limit}{key}";
+        return
+            $"{new string(modes.Where(mode => mode.Value.Get() > 0).Select(mode => mode.Key).ToArray())}{limit}{key}";
     }
 }

@@ -5,6 +5,7 @@ using Irc.Enumerations;
 using Irc.Extensions.Security.Packages;
 using Irc.Interfaces;
 using Irc.IO;
+using Irc.Modes;
 using Irc.Objects.Server;
 using Irc7d;
 
@@ -17,6 +18,7 @@ public class User : ChatObject, IUser
     private readonly IDataRegulator _dataRegulator;
     private readonly IDataStore _dataStore;
     private readonly IFloodProtectionProfile _floodProtectionProfile;
+    private readonly Queue<ModeOperation> _modeOperations = new();
     private bool _authenticated;
 
     private bool _guest;
@@ -24,13 +26,10 @@ public class User : ChatObject, IUser
     private IProtocol _protocol;
     private bool _registered;
     private ISupportPackage _supportPackage;
-    private Address address = new();
     public IDictionary<IChannel, IChannelMember> Channels;
     public string Client;
 
     public DateTime LastPing = DateTime.UtcNow;
-    public DateTime LastIdle { get; set; } = DateTime.UtcNow;
-    public DateTime LoggedOn { get; private set; } = DateTime.UtcNow;
     public long PingCount;
 
     public User(IConnection connection, IProtocol protocol, IDataRegulator dataRegulator,
@@ -51,11 +50,17 @@ public class User : ChatObject, IUser
             LastPing = DateTime.UtcNow;
             PingCount = 0;
             var message = new Message(_protocol, s);
-            if (message.HasCommand) dataRegulator.PushIncoming(message);
+            if (message.HasCommand) _dataRegulator.PushIncoming(message);
         };
 
         Address.SetIP(connection.GetAddress());
     }
+
+    public override EnumUserAccessLevel Level => GetLevel();
+
+    public Address Address { get; set; } = new();
+    public DateTime LastIdle { get; set; } = DateTime.UtcNow;
+    public DateTime LoggedOn { get; private set; } = DateTime.UtcNow;
 
     public IServer Server { get; }
     public event EventHandler<string> OnSend;
@@ -85,14 +90,20 @@ public class User : ChatObject, IUser
         return Channels.FirstOrDefault(c => c.Key.GetName() == Name);
     }
 
-    public IDictionary<IChannel, IChannelMember> GetChannels() => Channels;
+    public IDictionary<IChannel, IChannelMember> GetChannels()
+    {
+        return Channels;
+    }
 
     public override void Send(string message)
     {
         _dataRegulator.PushOutgoing(message);
     }
 
-    public override void Send(string message, EnumChannelAccessLevel accessLevel) => Send(message);
+    public override void Send(string message, EnumChannelAccessLevel accessLevel)
+    {
+        Send(message);
+    }
 
     public void Flush()
     {
@@ -118,6 +129,9 @@ public class User : ChatObject, IUser
 
     public void Disconnect(string message)
     {
+        // Clean modes
+        _modeOperations.Clear();
+
         Console.WriteLine($"Disconnecting[{_protocol.GetType().Name}/{Name}]: {message}");
         _connection?.Disconnect($"{message}\r\n");
     }
@@ -161,12 +175,6 @@ public class User : ChatObject, IUser
     {
         return _level;
     }
-    public override EnumUserAccessLevel Level {
-        get
-        {
-            return GetLevel();
-        }
-    }
 
     public string Nickname
     {
@@ -174,22 +182,19 @@ public class User : ChatObject, IUser
         set
         {
             Name = value;
-            address.SetNickname(value);
+            Address.SetNickname(value);
         }
     }
 
-    public void ChangeNickname(string newNick, bool utf8Prefix) {
+    public void ChangeNickname(string newNick, bool utf8Prefix)
+    {
         var nickname = utf8Prefix ? $"'{newNick}" : newNick;
         var rawNicknameChange = Raw.RPL_NICK(Server, this, nickname);
         Send(rawNicknameChange);
         Nickname = nickname;
 
-        foreach (var channel in Channels) {
-            channel.Key.Send(rawNicknameChange, this);
-        }
+        foreach (var channel in Channels) channel.Key.Send(rawNicknameChange, this);
     }
-
-    public Address Address { get => address; set => address = value; }
 
     public bool Away { get; set; }
 
@@ -203,10 +208,9 @@ public class User : ChatObject, IUser
         return _guest;
     }
 
-    public void SetGuest(bool guest) {
-        if (Server.DisableGuestMode) {
-            return;
-        }
+    public void SetGuest(bool guest)
+    {
+        if (Server.DisableGuestMode) return;
         _guest = guest;
         _level = guest ? EnumUserAccessLevel.Guest : EnumUserAccessLevel.Member;
     }
@@ -231,13 +235,21 @@ public class User : ChatObject, IUser
         return _supportPackage is ANON;
     }
 
-    public bool IsSysop() => Modes.GetModeChar(Resources.UserModeOper) == 1;
-    public bool IsAdministrator() => Modes.HasMode('a') && Modes.GetModeChar(Resources.UserModeAdmin) == 1;
+    public bool IsSysop()
+    {
+        return Modes.GetModeChar(Resources.UserModeOper) == 1;
+    }
 
-    public virtual void SetAway(IServer server, IUser user, string message) 
+    public bool IsAdministrator()
+    {
+        return Modes.HasMode('a') && Modes.GetModeChar(Resources.UserModeAdmin) == 1;
+    }
+
+    public virtual void SetAway(IServer server, IUser user, string message)
     {
         user.Away = true;
-        foreach (var channelPair in user.GetChannels()) {
+        foreach (var channelPair in user.GetChannels())
+        {
             var channel = channelPair.Key;
             channel.Send(Raw.IRCX_RPL_USERNOWAWAY_822(server, user, message), (ChatObject)user);
         }
@@ -245,10 +257,11 @@ public class User : ChatObject, IUser
         user.Send(Raw.IRCX_RPL_NOWAWAY_306(server, user));
     }
 
-    public virtual void SetBack(IServer server, IUser user) 
+    public virtual void SetBack(IServer server, IUser user)
     {
         user.Away = false;
-        foreach (var channelPair in user.GetChannels()) {
+        foreach (var channelPair in user.GetChannels())
+        {
             var channel = channelPair.Key;
             channel.Send(Raw.IRCX_RPL_USERUNAWAY_821(server, user), (ChatObject)user);
         }
@@ -311,11 +324,11 @@ public class User : ChatObject, IUser
     public void DisconnectIfInactive()
     {
         var seconds = (DateTime.UtcNow.Ticks - LastPing.Ticks) / TimeSpan.TicksPerSecond;
-        if (seconds > ((PingCount + 1) * Server.PingInterval))
+        if (seconds > (PingCount + 1) * Server.PingInterval)
         {
             if (PingCount < Server.PingAttempts)
             {
-                Console.WriteLine($"Ping Count for {this} hit stage {PingCount+1}");
+                Console.WriteLine($"Ping Count for {this} hit stage {PingCount + 1}");
                 PingCount++;
                 Send(Raw.RPL_PING(Server, this));
             }
@@ -348,6 +361,11 @@ public class User : ChatObject, IUser
     public IDataStore GetDataStore()
     {
         return _dataStore;
+    }
+
+    public Queue<ModeOperation> GetModeOperations()
+    {
+        return _modeOperations;
     }
 
     public virtual bool CanBeModifiedBy(ChatObject source)

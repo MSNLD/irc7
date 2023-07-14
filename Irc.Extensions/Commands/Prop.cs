@@ -1,8 +1,6 @@
 ﻿using Irc.Commands;
 using Irc.Enumerations;
 using Irc.Extensions.Interfaces;
-using Irc.Extensions.Objects.Channel;
-using Irc.Extensions.Objects.User;
 using Irc.Interfaces;
 using Irc.Objects;
 using Irc.Objects.Channel;
@@ -12,10 +10,16 @@ namespace Irc.Extensions.Commands;
 
 public class Prop : Command, ICommand
 {
-    public Prop() : base(2, false) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
+    public Prop() : base(2, false)
+    {
+    }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.None;
+    }
+
+    public new void Execute(IChatFrame chatFrame)
     {
         //chatFrame.User.Send(Raw.IRCX_ERR_NOTIMPLEMENTED(chatFrame.Server, chatFrame.User, nameof(Access)));
         // Passport hack
@@ -34,52 +38,54 @@ public class Prop : Command, ICommand
         if (!chatFrame.User.IsRegistered())
         {
             if (chatFrame.User.IsAuthenticated())
-            {
                 // Prop $ NICK
                 if (objectName == "$")
-                {
                     if (chatFrame.Message.Parameters.Count >= 2)
                     {
                         // TODO: This needs rewriting
                         if (string.Compare("NICK", chatFrame.Message.Parameters[1], true) == 0)
                         {
                             chatFrame.User.Nickname = chatFrame.User.Name;
-                            SendProp(chatFrame.Server, chatFrame.User, (IExtendedChatObject)chatFrame.User, "NICK", chatFrame.User.Name);
+                            SendProp(chatFrame.Server, chatFrame.User, (IExtendedChatObject)chatFrame.User, "NICK",
+                                chatFrame.User.Name);
                         }
                         else if (string.Compare("MSNREGCOOKIE", chatFrame.Message.Parameters[1], true) == 0)
                         {
                             if (chatFrame.Message.Parameters.Count >= 3)
                             {
                                 var regcookie = chatFrame.Message.Parameters[2];
-                                ((IExtendedServerObject)chatFrame.Server).ProcessCookie(chatFrame.User, "MSNREGCOOKIE", regcookie);
+                                ((IExtendedServerObject)chatFrame.Server).ProcessCookie(chatFrame.User, "MSNREGCOOKIE",
+                                    regcookie);
                             }
                         }
                         else if (string.Compare("SUBSCRIBERINFO", chatFrame.Message.Parameters[1], true) == 0)
                         {
                             var subscriberinfo = chatFrame.Message.Parameters[2];
-                            ((IExtendedServerObject)chatFrame.Server).ProcessCookie(chatFrame.User, "SUBSCRIBERINFO", subscriberinfo);
+                            ((IExtendedServerObject)chatFrame.Server).ProcessCookie(chatFrame.User, "SUBSCRIBERINFO",
+                                subscriberinfo);
                         }
                         else if (string.Compare("MSNPROFILE", chatFrame.Message.Parameters[1], true) == 0)
                         {
                             // TODO: Hook up to actual prop
                             var msnprofile = chatFrame.Message.Parameters[2];
-                            ((IExtendedServerObject)chatFrame.Server).ProcessCookie(chatFrame.User, "MSNPROFILE", msnprofile);
+                            ((IExtendedServerObject)chatFrame.Server).ProcessCookie(chatFrame.User, "MSNPROFILE",
+                                msnprofile);
                         }
-                        else if (string.Compare("ROLE", chatFrame.Message.Parameters[1], true) == 0) {
+                        else if (string.Compare("ROLE", chatFrame.Message.Parameters[1], true) == 0)
+                        {
                             var role = chatFrame.Message.Parameters[2];
                             ((IExtendedServerObject)chatFrame.Server).ProcessCookie(chatFrame.User, "ROLE", role);
                         }
-                        else chatFrame.User.Send(Raw.IRCX_ERR_BADPROPERTY_905(chatFrame.Server, chatFrame.User, chatFrame.Message.Parameters[1]));
+                        else
+                        {
+                            chatFrame.User.Send(Raw.IRCX_ERR_BADPROPERTY_905(chatFrame.Server, chatFrame.User,
+                                chatFrame.Message.Parameters[1]));
+                        }
                     }
-                }
-                // PROP $ MSNREGCOOKIE
-                // If regcookie is prop'd then no user is required, this fills in the USER info
-                // Performs a NICK command
-            }
-            else
-            {
-                // You have not authenticated or registered or whatever
-            }
+            // PROP $ MSNREGCOOKIE
+            // If regcookie is prop'd then no user is required, this fills in the USER info
+            // Performs a NICK command
+            // You have not authenticated or registered or whatever
         }
         else
         {
@@ -87,13 +93,9 @@ public class Prop : Command, ICommand
 
             // <$> The $ value is used to indicate the user that originated the request.
             if (objectName == "$")
-            {
                 chatObject = (IExtendedChatObject)chatFrame.User;
-            }
             else
-            {
                 chatObject = (IExtendedChatObject)chatFrame.Server.GetChatObject(objectName);
-            }
 
             if (chatObject == null)
             {
@@ -117,24 +119,30 @@ public class Prop : Command, ICommand
                             var ircError = prop.EvaluateSet((IChatObject)chatFrame.User, chatObject, propValue);
                             if (ircError == EnumIrcError.ERR_NOPERMS)
                             {
-                                chatFrame.User.Send(Raw.IRCX_ERR_NOACCESS_913(chatFrame.Server, chatFrame.User, chatObject));
+                                chatFrame.User.Send(Raw.IRCX_ERR_NOACCESS_913(chatFrame.Server, chatFrame.User,
+                                    chatObject));
                                 return;
                             }
-                            else if (ircError == EnumIrcError.ERR_BADVALUE)
+
+                            if (ircError == EnumIrcError.ERR_BADVALUE)
                             {
-                                chatFrame.User.Send(Raw.IRCX_ERR_BADVALUE_906(chatFrame.Server, chatFrame.User, propValue));
+                                chatFrame.User.Send(Raw.IRCX_ERR_BADVALUE_906(chatFrame.Server, chatFrame.User,
+                                    propValue));
                                 return;
                             }
 
                             if (ircError == EnumIrcError.OK)
                             {
                                 prop.SetValue(propValue);
-                                chatObject.Send(Raw.RPL_PROP_IRCX(chatFrame.Server, chatFrame.User, (ChatObject)chatObject, prop.Name, propValue), prop.WriteAccessLevel);
+                                chatObject.Send(
+                                    Raw.RPL_PROP_IRCX(chatFrame.Server, chatFrame.User, (ChatObject)chatObject,
+                                        prop.Name, propValue), prop.WriteAccessLevel);
                             }
                         }
                         else
                         {
-                            chatFrame.User.Send(Raw.IRCX_ERR_NOACCESS_913(chatFrame.Server, chatFrame.User, chatObject));
+                            chatFrame.User.Send(Raw.IRCX_ERR_NOACCESS_913(chatFrame.Server, chatFrame.User,
+                                chatObject));
                         }
                     }
                     else
@@ -155,22 +163,15 @@ public class Prop : Command, ICommand
                     {
                         var prop = chatObject.PropCollection.GetProp(chatFrame.Message.Parameters[1]);
                         if (prop != null)
-                        {
                             props.Add(prop);
-                        }
                         else
-                        {
                             // Bad prop
-                            chatFrame.User.Send(Raw.IRCX_ERR_BADPROPERTY_905(chatFrame.Server, chatFrame.User, objectName));
-                        }
+                            chatFrame.User.Send(Raw.IRCX_ERR_BADPROPERTY_905(chatFrame.Server, chatFrame.User,
+                                objectName));
                     }
 
-                    if (props.Count > 0)
-                    {
-                        SendProps(chatFrame.Server, chatFrame.User, chatObject, props);
-                    }
+                    if (props.Count > 0) SendProps(chatFrame.Server, chatFrame.User, chatObject, props);
                 }
-
             }
         }
     }
@@ -201,15 +202,19 @@ public class Prop : Command, ICommand
                     }
                 }
             }
-            else SendProp(server, user, targetObject, prop.Name, prop.GetValue(targetObject)); propsSent++;
+            else
+            {
+                SendProp(server, user, targetObject, prop.Name, prop.GetValue(targetObject));
+            }
+
+            propsSent++;
         }
-        if (propsSent > 0)
-        {
-            user.Send(IrcxRaws.IRCX_RPL_PROPEND_819(server, user, targetObject));
-        }
+
+        if (propsSent > 0) user.Send(IrcxRaws.IRCX_RPL_PROPEND_819(server, user, targetObject));
     }
 
-    public void SendProp(IServer server, IUser user, IExtendedChatObject targetObject, string propName, string propValue)
+    public void SendProp(IServer server, IUser user, IExtendedChatObject targetObject, string propName,
+        string propValue)
     {
         user.Send(IrcxRaws.IRCX_RPL_PROPLIST_818(server, user, targetObject, propName, propValue));
     }

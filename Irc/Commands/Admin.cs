@@ -1,14 +1,17 @@
 ﻿using Irc.Constants;
 using Irc.Enumerations;
+using Irc.Interfaces;
 
 namespace Irc.Commands;
 
 public class Admin : Command, ICommand
 {
-    public Admin() : base(0) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.None;
+    }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new void Execute(IChatFrame chatFrame)
     {
         /*
          <- :sky-8a15b323126 256 Sky :Administrative info about sky-8a15b323126
@@ -16,10 +19,10 @@ public class Admin : Command, ICommand
          <- :sky-8a15b323126 258 Sky :This is the second line about Admin
          <- :sky-8a15b323126 259 Sky :
         */
-        bool hasAdminInfo = false;
-        var adminInfo1 = "Your Admin is X";
-        var adminInfo2 = "Y and Z";
-        var adminInfo3 = "admin@aol.com";
+        var hasAdminInfo = false;
+        var adminInfo1 = chatFrame.Server.GetDataStore().Get("AdminInfo1");
+        var adminInfo2 = chatFrame.Server.GetDataStore().Get("AdminInfo2");
+        var adminInfo3 = chatFrame.Server.GetDataStore().Get("AdminInfo3");
 
         if (!string.IsNullOrWhiteSpace(adminInfo1))
         {

@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using Irc.Constants;
 using Irc.Enumerations;
+using Irc.Interfaces;
 using Irc.Objects;
 using Irc.Objects.Channel;
 using Irc.Objects.Server;
@@ -9,10 +10,16 @@ namespace Irc.Commands;
 
 public class Who : Command, ICommand
 {
-    public Who() : base(1) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.Data;
+    public Who() : base(1)
+    {
+    }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.Data;
+    }
+
+    public new void Execute(IChatFrame chatFrame)
     {
         var server = chatFrame.Server;
         var user = chatFrame.User;
@@ -29,27 +36,24 @@ public class Who : Command, ICommand
             }
 
             var userIsOnChannel = user.IsOn(channel);
-            var canIgnoreInvisible = (userIsOnChannel || userIsOperator);
+            var canIgnoreInvisible = userIsOnChannel || userIsOperator;
 
             if (user.IsOn(channel) || (!channel.Modes.Secret && !channel.Modes.Private) || userIsOperator)
-            {
-                SendWho(server, user, channel.GetMembers().Select(m => m.GetUser()).ToList(), criteria, canIgnoreInvisible);
-            }
+                SendWho(server, user, channel.GetMembers().Select(m => m.GetUser()).ToList(), criteria,
+                    canIgnoreInvisible);
         }
         else
         {
             var regExStr = criteria.Replace("*", ".*").Replace("?", ".");
             var regEx = new Regex(regExStr, RegexOptions.IgnoreCase);
 
-            List<IUser> matchedUsers = new List<IUser>();
+            var matchedUsers = new List<IUser>();
             foreach (var matchUser in server.GetUsers())
             {
                 var fullAddress = matchUser.GetAddress().GetFullAddress();
-                if (regEx.IsMatch(fullAddress))
-                {
-                    matchedUsers.Add(matchUser);
-                }
+                if (regEx.IsMatch(fullAddress)) matchedUsers.Add(matchUser);
             }
+
             SendWho(server, user, matchedUsers, criteria, userIsOperator);
         }
 
@@ -59,9 +63,10 @@ public class Who : Command, ICommand
         user.Send(Raw.IRCX_RPL_ENDOFWHO_315(server, user, criteria));
     }
 
-    public static void SendWho(IServer server, IUser user, IList<IUser> chatUsers, string channelName, bool ignoreInvisible)
+    public static void SendWho(IServer server, IUser user, IList<IUser> chatUsers, string channelName,
+        bool ignoreInvisible)
     {
-        foreach (IUser chatUser in chatUsers)
+        foreach (var chatUser in chatUsers)
         {
             var isCurrentUser = user == chatUser;
             if (chatUser.Modes.GetMode(Resources.UserModeInvisible).Get() == 0 || ignoreInvisible || isCurrentUser)
@@ -78,10 +83,7 @@ public class Who : Command, ICommand
 
                 var chanMode = string.Empty;
                 var channelMember = channel?.GetMember(user);
-                if (channelMember != null)
-                {
-                    chanMode = channel.GetMember(user).GetModeString();
-                }
+                if (channelMember != null) chanMode = channel.GetMember(user).GetModeString();
 
                 var modeString = chatUser.Modes.ToString();
 
@@ -97,7 +99,6 @@ public class Who : Command, ICommand
                     0,
                     address.RealName
                 ));
-
             }
         }
     }

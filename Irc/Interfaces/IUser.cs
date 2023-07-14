@@ -1,6 +1,7 @@
 ﻿using Irc.Enumerations;
 using Irc.Interfaces;
 using Irc.IO;
+using Irc.Modes;
 using Irc.Objects.Server;
 using Irc7d;
 
@@ -13,14 +14,14 @@ public interface IUser
     string ShortId { get; }
     string Name { get; set; }
     string Nickname { get; set; }
-    void ChangeNickname(string newNick, bool utf8Prefix);
     bool Away { get; set; }
-    void SetGuest(bool guest);
-    void SetAway(IServer server, IUser user, string message);
-    void SetBack(IServer server, IUser user);
     DateTime LastIdle { get; set; }
     DateTime LoggedOn { get; }
     IModeCollection Modes { get; }
+    void ChangeNickname(string newNick, bool utf8Prefix);
+    void SetGuest(bool guest);
+    void SetAway(IServer server, IUser user, string message);
+    void SetBack(IServer server, IUser user);
     event EventHandler<string> OnSend;
     void BroadcastToChannels(string data, bool ExcludeUser);
     void AddChannel(IChannel channel, IChannelMember member);
@@ -59,4 +60,5 @@ public interface IUser
     void Authenticate();
     IDataStore GetDataStore();
     void DisconnectIfInactive();
+    Queue<ModeOperation> GetModeOperations();
 }

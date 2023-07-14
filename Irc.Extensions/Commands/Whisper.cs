@@ -1,15 +1,22 @@
 ﻿using Irc.Commands;
 using Irc.Enumerations;
+using Irc.Interfaces;
 using Irc.Objects;
 
 namespace Irc.Extensions.Commands;
 
 internal class Whisper : Command, ICommand
 {
-    public Whisper() : base(1, true, 3) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
+    public Whisper() : base(1, true, 3)
+    {
+    }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.None;
+    }
+
+    public new void Execute(IChatFrame chatFrame)
     {
         // <sender> WHISPER <channel> <nick list> :<text>
 
@@ -26,8 +33,8 @@ internal class Whisper : Command, ICommand
         {
             user.Send(Raw.IRC_ERR_NOTEXT_412(server, user, typeof(Whisper).Name));
             return;
-        } 
-        
+        }
+
         var channelName = chatFrame.Message.Parameters.First();
         var channel = chatFrame.Server.GetChannelByName(channelName);
         if (channel == null)
@@ -46,17 +53,14 @@ internal class Whisper : Command, ICommand
 
         var message = chatFrame.Message.Parameters[2];
 
-        if (target.GetUser().GetProtocol().GetProtocolType() < EnumProtocolType.IRCX) {
+        if (target.GetUser().GetProtocol().GetProtocolType() < EnumProtocolType.IRCX)
             // PRIVMSG
             target.GetUser().Send(
                 Raw.RPL_PRIVMSG_USER(chatFrame.Server, chatFrame.User, (ChatObject)target.GetUser(), message)
             );
-        }
-        else {
+        else
             target.GetUser().Send(
                 Raw.RPL_CHAN_WHISPER(chatFrame.Server, chatFrame.User, channel, (ChatObject)target.GetUser(), message)
             );
-        }
-
     }
 }

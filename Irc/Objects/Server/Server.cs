@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Linq;
 using System.Reflection;
 using Irc.Commands;
 using Irc.Constants;
@@ -11,6 +10,7 @@ using Irc.Interfaces;
 using Irc.IO;
 using Irc.Security;
 using Irc7d;
+using Version = System.Version;
 
 namespace Irc.Objects.Server;
 
@@ -24,10 +24,11 @@ public class Server : ChatObject, IServer
     private readonly ISocketServer _socketServer;
     private readonly IUserFactory _userFactory;
     public readonly ICommandCollection Commands;
-    public IDictionary<EnumProtocolType, IProtocol> _protocols = new Dictionary<EnumProtocolType, IProtocol>();
-    public IList<IChannel> Channels;
     private readonly ConcurrentQueue<IUser> PendingNewUserQueue = new();
     private readonly ConcurrentQueue<IUser> PendingRemoveUserQueue = new();
+    public IDictionary<EnumProtocolType, IProtocol> _protocols = new Dictionary<EnumProtocolType, IProtocol>();
+
+    public IList<IChannel> Channels;
 
     public IList<IUser> Users = new List<IUser>();
 
@@ -59,9 +60,7 @@ public class Server : ChatObject, IServer
         _dataStore.Set("supported.user.modes", new UserModes().GetSupportedModes());
         SupportPackages = _dataStore.GetAs<string[]>("SASL.Packages") ?? Array.Empty<string>();
 
-        if (MaxAnonymousConnections > 0) {
-            _securityManager.AddSupportPackage(new ANON());
-        }
+        if (MaxAnonymousConnections > 0) _securityManager.AddSupportPackage(new ANON());
 
         _protocols.Add(EnumProtocolType.IRC, new Irc());
 
@@ -83,32 +82,7 @@ public class Server : ChatObject, IServer
         socketServer.Listen();
     }
 
-    public void LoadSettingsFromDataStore()
-    {
-        var title = _dataStore.Get("Title");
-        var maxInputBytes = _dataStore.GetAs<int>("MaxInputBytes");
-        var maxOutputBytes = _dataStore.GetAs<int>("MaxOutputBytes");
-        var pingInterval = _dataStore.GetAs<int>("PingInterval");
-        var pingAttempts = _dataStore.GetAs<int>("PingAttempts");
-        var maxChannels = _dataStore.GetAs<int>("MaxChannels");
-        var maxConnections = _dataStore.GetAs<int>("MaxConnections");
-        var maxAuthenticatedConnections = _dataStore.GetAs<int>("MaxAuthenticatedConnections");
-        var maxAnonymousConnections = _dataStore.GetAs<int>("MaxAnonymousConnections");
-        var basicAuthentication = _dataStore.GetAs<bool>("BasicAuthentication");
-        var anonymousConnections = _dataStore.GetAs<bool>("AnonymousConnections");
-
-        if (!string.IsNullOrWhiteSpace(title)) Title = title;
-        if (maxInputBytes > 0) MaxInputBytes = maxInputBytes;
-        if (maxOutputBytes > 0) MaxOutputBytes = maxOutputBytes;
-        if (pingInterval > 0) PingInterval = pingInterval;
-        if (pingAttempts > 0) PingAttempts = pingAttempts;
-        if (maxChannels > 0) MaxChannels = maxChannels;
-        if (maxConnections > 0) MaxConnections = maxConnections;
-        if (maxAuthenticatedConnections > 0) MaxAuthenticatedConnections = maxAuthenticatedConnections;
-        if (maxAnonymousConnections != null) MaxAnonymousConnections = maxAnonymousConnections;
-        if (basicAuthentication != null) BasicAuthentication = basicAuthentication;
-        if (anonymousConnections != null) AnonymousConnections = anonymousConnections;
-    }
+    public string[] SupportPackages { get; }
 
     public DateTime CreationDate => _dataStore.GetAs<DateTime>("creation");
 
@@ -127,7 +101,7 @@ public class Server : ChatObject, IServer
     public int MaxConnections { get; private set; } = 10000;
     public int MaxAuthenticatedConnections { get; private set; } = 1000;
     public int MaxAnonymousConnections { get; private set; } = 1000;
-    public int MaxGuestConnections { get; private set; } = 1000;
+    public int MaxGuestConnections { get; } = 1000;
     public bool BasicAuthentication { get; private set; } = true;
     public bool AnonymousConnections { get; private set; } = true;
     public int NetInvisibleCount { get; }
@@ -139,12 +113,11 @@ public class Server : ChatObject, IServer
     public string RemoteIP { set; get; }
     public bool DisableGuestMode { set; get; }
     public bool DisableUserRegistration { get; set; }
-    public string[] SupportPackages { get; }
 
     public void SetMOTD(string motd)
     {
-        string[] lines = motd.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-        _dataStore.SetAs<string[]>("motd", lines);
+        var lines = motd.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        _dataStore.SetAs("motd", lines);
     }
 
     public string[] GetMOTD()
@@ -195,10 +168,7 @@ public class Server : ChatObject, IServer
 
     public IUser GetUserByNickname(string nickname, IUser currentUser)
     {
-        if (nickname.ToUpperInvariant() == currentUser.Name.ToUpperInvariant())
-        {
-            return currentUser;
-        }
+        if (nickname.ToUpperInvariant() == currentUser.Name.ToUpperInvariant()) return currentUser;
 
         return GetUserByNickname(nickname);
     }
@@ -212,7 +182,8 @@ public class Server : ChatObject, IServer
 
     public IList<IUser> GetUsersByList(List<string> nicknames, char separator)
     {
-        return Users.Where(user => nicknames.Contains(user.GetAddress().Nickname, StringComparer.InvariantCultureIgnoreCase)).ToList();
+        return Users.Where(user =>
+            nicknames.Contains(user.GetAddress().Nickname, StringComparer.InvariantCultureIgnoreCase)).ToList();
     }
 
     public IList<IChannel> GetChannels()
@@ -235,12 +206,7 @@ public class Server : ChatObject, IServer
         return _protocols;
     }
 
-    private System.Version _version = Assembly.GetExecutingAssembly().GetName().Version;
-    public System.Version ServerVersion
-    {
-        get => _version;
-        set => _version = value;
-    }
+    public Version ServerVersion { get; set; } = Assembly.GetExecutingAssembly().GetName().Version;
 
     public IDataStore GetDataStore()
     {
@@ -251,10 +217,12 @@ public class Server : ChatObject, IServer
     {
         var channel = CreateChannel(name);
         channel.ChannelStore.Set("topic", name);
-        if (!string.IsNullOrEmpty(key)) {
+        if (!string.IsNullOrEmpty(key))
+        {
             channel.Modes.Key = key;
             channel.ChannelStore.Set("key", key);
         }
+
         channel.Modes.NoExtern = true;
         channel.Modes.TopicOp = true;
         channel.Modes.UserLimit = 50;
@@ -270,7 +238,9 @@ public class Server : ChatObject, IServer
 
     public ChatObject GetChatObject(string name)
     {
-        return Channel.Channel.ValidName(name) ? (ChatObject)GetChannelByName(name) : (ChatObject)GetUserByNickname(name);
+        return Channel.Channel.ValidName(name)
+            ? (ChatObject)GetChannelByName(name)
+            : (ChatObject)GetUserByNickname(name);
     }
 
     public IProtocol GetProtocol(EnumProtocolType protocolType)
@@ -300,6 +270,33 @@ public class Server : ChatObject, IServer
         return Name;
     }
 
+    public void LoadSettingsFromDataStore()
+    {
+        var title = _dataStore.Get("Title");
+        var maxInputBytes = _dataStore.GetAs<int>("MaxInputBytes");
+        var maxOutputBytes = _dataStore.GetAs<int>("MaxOutputBytes");
+        var pingInterval = _dataStore.GetAs<int>("PingInterval");
+        var pingAttempts = _dataStore.GetAs<int>("PingAttempts");
+        var maxChannels = _dataStore.GetAs<int>("MaxChannels");
+        var maxConnections = _dataStore.GetAs<int>("MaxConnections");
+        var maxAuthenticatedConnections = _dataStore.GetAs<int>("MaxAuthenticatedConnections");
+        var maxAnonymousConnections = _dataStore.GetAs<int>("MaxAnonymousConnections");
+        var basicAuthentication = _dataStore.GetAs<bool>("BasicAuthentication");
+        var anonymousConnections = _dataStore.GetAs<bool>("AnonymousConnections");
+
+        if (!string.IsNullOrWhiteSpace(title)) Title = title;
+        if (maxInputBytes > 0) MaxInputBytes = maxInputBytes;
+        if (maxOutputBytes > 0) MaxOutputBytes = maxOutputBytes;
+        if (pingInterval > 0) PingInterval = pingInterval;
+        if (pingAttempts > 0) PingAttempts = pingAttempts;
+        if (maxChannels > 0) MaxChannels = maxChannels;
+        if (maxConnections > 0) MaxConnections = maxConnections;
+        if (maxAuthenticatedConnections > 0) MaxAuthenticatedConnections = maxAuthenticatedConnections;
+        if (maxAnonymousConnections != null) MaxAnonymousConnections = maxAnonymousConnections;
+        if (basicAuthentication != null) BasicAuthentication = basicAuthentication;
+        if (anonymousConnections != null) AnonymousConnections = anonymousConnections;
+    }
+
     private void Process()
     {
         var backoffMS = 0;
@@ -323,6 +320,8 @@ public class Server : ChatObject, IServer
                     ProcessNextCommand(user);
                 }
 
+                ProcessNextModeOperation(user);
+
                 if (!user.DisconnectIfOutgoingThresholdExceeded()) user.Flush();
                 user.DisconnectIfInactive();
             }
@@ -340,7 +339,8 @@ public class Server : ChatObject, IServer
         if (PendingNewUserQueue.Count > 0)
         {
             // add new pending users
-            foreach (var user in PendingNewUserQueue) {
+            foreach (var user in PendingNewUserQueue)
+            {
                 user.GetDataStore().Set(Resources.UserPropOid, "0");
                 Users.Add(user);
             }
@@ -373,38 +373,33 @@ public class Server : ChatObject, IServer
         }
     }
 
-    protected void AddCommand(ICommand command, EnumProtocolType fromProtocol = EnumProtocolType.IRC, string name = null)
+    protected void AddCommand(ICommand command, EnumProtocolType fromProtocol = EnumProtocolType.IRC,
+        string name = null)
     {
         foreach (var protocol in _protocols)
-        {
-            if (protocol.Key >= fromProtocol) protocol.Value.AddCommand(command, name);
-        }
+            if (protocol.Key >= fromProtocol)
+                protocol.Value.AddCommand(command, name);
     }
 
     protected void AddProtocol(EnumProtocolType protocolType, IProtocol protocol, bool inheritCommands = true)
     {
         if (inheritCommands)
-        {
             for (var protocolIndex = 0; protocolIndex < (int)protocolType; protocolIndex++)
-            {
                 if (_protocols.ContainsKey((EnumProtocolType)protocolIndex))
-                {
-                    foreach (KeyValuePair<string, ICommand> command in _protocols[(EnumProtocolType)protocolIndex].GetCommands())
-                    {
+                    foreach (var command in _protocols[(EnumProtocolType)protocolIndex].GetCommands())
                         protocol.AddCommand(command.Value, command.Key);
-                    }
-                }
-            }
-        }
         _protocols.Add(protocolType, protocol);
     }
 
     protected void FlushCommands()
     {
-        foreach (var protocol in _protocols)
-        {
-            protocol.Value.FlushCommands();
-        }
+        foreach (var protocol in _protocols) protocol.Value.FlushCommands();
+    }
+
+    private void ProcessNextModeOperation(IUser user)
+    {
+        var modeOperations = user.GetModeOperations();
+        if (modeOperations.Count > 0) modeOperations.Dequeue().Execute();
     }
 
     private void ProcessNextCommand(IUser user)
@@ -424,19 +419,18 @@ public class Server : ChatObject, IServer
                 user.GetDataRegulator().PopIncoming();
                 Console.WriteLine($"Processing: {message.OriginalText}");
 
-                var chatFrame = new ChatFrame(this, user, message);
+                var chatFrame = new ChatFrame { Server = this, User = user, Message = message };
                 if (!command.RegistrationNeeded(chatFrame) && command.ParametersAreValid(chatFrame))
-                {
                     try
                     {
                         command.Execute(chatFrame);
                     }
                     catch (Exception e)
                     {
-                        chatFrame.User.Send(IrcRaws.IRC_RAW_999(chatFrame.Server, chatFrame.User, Resources.ServerError));
+                        chatFrame.User.Send(
+                            IrcRaws.IRC_RAW_999(chatFrame.Server, chatFrame.User, Resources.ServerError));
                         Console.WriteLine(e.ToString());
                     }
-                }
 
                 // Check if user can register
                 if (!chatFrame.User.IsRegistered()) Register.TryRegister(chatFrame);

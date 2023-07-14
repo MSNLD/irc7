@@ -2,15 +2,22 @@
 using Irc.Enumerations;
 using Irc.Extensions.Security;
 using Irc.Extensions.Security.Packages;
+using Irc.Interfaces;
 
 namespace Irc.Commands;
 
 public class Auth : Command, ICommand
 {
-    public Auth() : base(3, false) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.None;
+    public Auth() : base(3, false)
+    {
+    }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.None;
+    }
+
+    public new void Execute(IChatFrame chatFrame)
     {
         if (chatFrame.User.IsRegistered())
         {
@@ -49,7 +56,7 @@ public class Auth : Command, ICommand
                 }
 
                 var supportPackageSequence =
-    supportPackage.InitializeSecurityContext(token, chatFrame.Server.RemoteIP);
+                    supportPackage.InitializeSecurityContext(token, chatFrame.Server.RemoteIP);
 
                 if (supportPackageSequence == EnumSupportPackageSequence.SSP_OK)
                 {
@@ -81,22 +88,19 @@ public class Auth : Command, ICommand
                         userAddress.Host = credentials.GetDomain();
                         userAddress.Server = chatFrame.Server.Name;
                         var nickname = credentials.GetNickname();
-                        if (nickname != null)
-                        {
-                            chatFrame.User.Name = credentials.GetNickname();
-                        }
-                        if (credentials.Guest && chatFrame.User.GetAddress().RealName == null) {
+                        if (nickname != null) chatFrame.User.Name = credentials.GetNickname();
+                        if (credentials.Guest && chatFrame.User.GetAddress().RealName == null)
                             chatFrame.User.GetAddress().RealName = string.Empty;
-                        }
 
                         chatFrame.User.SetGuest(credentials.Guest);
                         // Send reply
                         chatFrame.User.Send(Raw.RPL_AUTH_SUCCESS(packageName, $"{user}@{domain}", 0));
-
                     }
+
                     return;
                 }
-                else if (supportPackageSequence == EnumSupportPackageSequence.SSP_CREDENTIALS)
+
+                if (supportPackageSequence == EnumSupportPackageSequence.SSP_CREDENTIALS)
                 {
                     chatFrame.User.Send(Raw.RPL_AUTH_SEC_REPLY(packageName, "OK"));
                     return;

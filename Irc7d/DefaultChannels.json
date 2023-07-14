@@ -21,5 +21,19 @@
       "l": 50,
       "k": 1
     }
+  },
+  {
+    "Name": "OnStage",
+    "Topic": "OnStage",
+    "Modes": {
+      "n": 1,
+      "t": 1,
+      "l": 50,
+      "g": 1
+    },
+    "Props": {
+      "OWNERKEY": "OWNERKEY",
+      "HOSTKEY": "HOSTKEY"
+    }
   }
 ]

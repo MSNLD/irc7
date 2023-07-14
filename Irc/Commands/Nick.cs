@@ -1,18 +1,25 @@
 ﻿using Irc.Constants;
 using Irc.Enumerations;
 using Irc.Helpers.CSharpTools;
+using Irc.Interfaces;
 
 namespace Irc.Commands;
 
 public class Nick : Command, ICommand
 {
-    public Nick() : base(1, false) { }
-    public new EnumCommandDataType GetDataType() => EnumCommandDataType.Standard;
+    public Nick() : base(1, false)
+    {
+    }
 
-    public new void Execute(ChatFrame chatFrame)
+    public new EnumCommandDataType GetDataType()
+    {
+        return EnumCommandDataType.Standard;
+    }
+
+    public new void Execute(IChatFrame chatFrame)
     {
         var hopcount = string.Empty;
-        if (chatFrame.Message.Parameters.Count > 1) { hopcount = chatFrame.Message.Parameters[1]; }
+        if (chatFrame.Message.Parameters.Count > 1) hopcount = chatFrame.Message.Parameters[1];
 
         // Is user not registered?
         // Set nickname according to regulations (should be available in user object and changes based on what they authenticated as)
@@ -20,25 +27,23 @@ public class Nick : Command, ICommand
         else HandleRegisteredNicknameChange(chatFrame);
     }
 
-    public static bool ValidateNickname(string nickname, EnumUserAccessLevel level) {
-
+    public static bool ValidateNickname(string nickname, EnumUserAccessLevel level)
+    {
         var nickMask = Resources.StandardNickname;
 
-        if (level == EnumUserAccessLevel.None) {
+        if (level == EnumUserAccessLevel.None)
             nickMask = Resources.AnyNickname;
-        }
-        else if (level == EnumUserAccessLevel.Guest) {
-            nickMask = Resources.GuestNicknameMask;
-        }
+        else if (level == EnumUserAccessLevel.Guest) nickMask = Resources.GuestNicknameMask;
 
         return nickname.Length <= Resources.MaxFieldLen &&
-         RegularExpressions.Match(nickMask, nickname, true);
+               RegularExpressions.Match(nickMask, nickname, true);
     }
 
-    private bool HandleUnregisteredNicknameChange(ChatFrame chatFrame)
+    private bool HandleUnregisteredNicknameChange(IChatFrame chatFrame)
     {
         var nickname = chatFrame.Message.Parameters.First();
-        if (!ValidateNickname(nickname, EnumUserAccessLevel.None)) {
+        if (!ValidateNickname(nickname, EnumUserAccessLevel.None))
+        {
             chatFrame.User.Send(Raw.IRCX_ERR_ERRONEOUSNICK_432(chatFrame.Server, chatFrame.User, nickname));
             return false;
         }
@@ -47,7 +52,7 @@ public class Nick : Command, ICommand
         return true;
     }
 
-    private bool HandleRegisteredNicknameChange(ChatFrame chatFrame)
+    private bool HandleRegisteredNicknameChange(IChatFrame chatFrame)
     {
         var server = chatFrame.Server;
         var user = chatFrame.User;
@@ -58,21 +63,21 @@ public class Nick : Command, ICommand
             chatFrame.User.Send(Raw.IRCX_ERR_NONICKCHANGES_439(server, user, nickname));
             return false;
         }
-        
-        if (!ValidateNickname(nickname, user.GetLevel())) {
+
+        if (!ValidateNickname(nickname, user.GetLevel()))
+        {
             chatFrame.User.Send(Raw.IRCX_ERR_ERRONEOUSNICK_432(server, user, nickname));
             return false;
         }
 
         var channels = user.GetChannels();
-        foreach (var channel in channels) {
-            foreach (var member in channel.Key.GetMembers()) {
-                if (member.GetUser().Nickname == nickname) {
-                    chatFrame.User.Send(Raw.IRCX_ERR_NICKINUSE_433(server, user));
-                    return false;
-                }
+        foreach (var channel in channels)
+        foreach (var member in channel.Key.GetMembers())
+            if (member.GetUser().Nickname == nickname)
+            {
+                chatFrame.User.Send(Raw.IRCX_ERR_NICKINUSE_433(server, user));
+                return false;
             }
-        }
 
         user.ChangeNickname(nickname, user.GetLevel() > EnumUserAccessLevel.Guide);
         return true;
