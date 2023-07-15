@@ -14,7 +14,10 @@ public class Protocol : IProtocol
         throw new NotImplementedException();
     }
 
-    public Dictionary<string, ICommand> GetCommands() => Commands;
+    public Dictionary<string, ICommand> GetCommands()
+    {
+        return Commands;
+    }
 
     public EnumProtocolType GetProtocolType()
     {
@@ -23,8 +26,10 @@ public class Protocol : IProtocol
 
     public void AddCommand(ICommand command, string name = null)
     {
-        if (!Commands.ContainsKey(name == null ? command.GetName() : name)) Commands.Add(name ?? command.GetName(), command);
+        if (!Commands.ContainsKey(name == null ? command.GetName() : name))
+            Commands.Add(name ?? command.GetName(), command);
     }
+
     public void FlushCommands()
     {
         Commands.Clear();
@@ -33,12 +38,19 @@ public class Protocol : IProtocol
     public virtual string FormattedUser(IChannelMember member)
     {
         var modeChar = string.Empty;
-        if (!member.IsNormal()) modeChar += member.IsOwner() ? '.' : (member.IsHost() ? '@' : '+');
+        if (!member.IsNormal()) modeChar += member.IsOwner() ? '.' : member.IsHost() ? '@' : '+';
         return $"{modeChar}{member.GetUser().GetAddress().Nickname}";
     }
 
     public virtual string GetFormat(IUser user)
     {
         throw new NotImplementedException();
+    }
+
+    public void UpdateCommand(ICommand command, string name = null)
+    {
+        var commandName = name ?? command.GetName();
+        if (Commands.ContainsKey(commandName))
+            Commands[commandName] = command;
     }
 }
