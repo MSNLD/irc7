@@ -14,4 +14,5 @@ public interface IProtocol
     EnumProtocolType GetProtocolType();
     string FormattedUser(IChannelMember user);
     string GetFormat(IUser user);
+    void UpdateCommand(ICommand command, string name = null);
 }

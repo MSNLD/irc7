@@ -3,6 +3,7 @@ using Irc.Enumerations;
 using Irc.Extensions.Apollo.Commands;
 using Irc.Extensions.Protocols;
 using Irc.Interfaces;
+using Privmsg = Irc.Extensions.Apollo.Commands.Privmsg;
 
 namespace Irc.Extensions.Apollo.Protocols;
 
@@ -14,6 +15,8 @@ public class Irc3 : IrcX
         AddCommand(new Esubmit());
         AddCommand(new Eprivmsg());
         AddCommand(new Equestion());
+        UpdateCommand(new Privmsg());
+        UpdateCommand(new Notice());
     }
 
     public override EnumProtocolType GetProtocolType()

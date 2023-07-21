@@ -39,7 +39,7 @@ internal class Part : Command, ICommand
                 {
                     if (!user.IsOn(channel))
                     {
-                        user.Send(Raw.IRCX_ERR_NOTONCHANNEL_442(server, user, (ChatObject)channel));
+                        user.Send(Raw.IRCX_ERR_NOTONCHANNEL_442(server, user, channel));
 
                         return;
                     }

@@ -22,17 +22,6 @@ internal class Access : Command, ICommand
 
     public new void Execute(IChatFrame chatFrame)
     {
-        //// $ (individual chat server)
-        //else if (name == "$")
-        //{
-        //    return this;
-        //}
-        //// * (all chat servers)
-        //else if (name == "*")
-        //{
-        //    return this;
-        //}
-
         var objectName = chatFrame.Message.Parameters.First();
         var accessCommandName = AccessCommand.LIST.ToString();
         if (chatFrame.Message.Parameters.Count > 1) accessCommandName = chatFrame.Message.Parameters[1];
@@ -52,6 +41,12 @@ internal class Access : Command, ICommand
             return;
         }
 
+        if (!CanModify(chatFrame, targetObject))
+        {
+            chatFrame.User.Send(Raw.IRCX_ERR_SECURITY_908(chatFrame.Server, chatFrame.User));
+            // No permissions
+            return;
+        }
 
         switch (accessCommand)
         {
@@ -62,13 +57,6 @@ internal class Access : Command, ICommand
             }
             case AccessCommand.ADD:
             {
-                if (!CanModify(chatFrame, targetObject))
-                {
-                    chatFrame.User.Send(Raw.IRCX_ERR_SECURITY_908(chatFrame.Server, chatFrame.User));
-                    // No permissions
-                    return;
-                }
-
                 AddAccess(chatFrame, targetObject);
                 break;
             }

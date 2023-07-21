@@ -15,6 +15,11 @@ public class ApolloChannel : ExtendedChannel
     {
     }
 
+    public override EnumChannelAccessResult GetAccess(IUser user, string key, bool IsGoto = false)
+    {
+        return base.GetAccess(user, key, IsGoto);
+    }
+
     public override IChannel Join(IUser user, EnumChannelAccessResult accessResult = EnumChannelAccessResult.NONE)
     {
         var joinMember = AddMember(user, accessResult);

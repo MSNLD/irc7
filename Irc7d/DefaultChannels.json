@@ -35,5 +35,19 @@
       "OWNERKEY": "OWNERKEY",
       "HOSTKEY": "HOSTKEY"
     }
+  },
+  {
+    "Name": "Subscribers",
+    "Topic": "Subscribers",
+    "Modes": {
+      "n": 1,
+      "t": 1,
+      "l": 50,
+      "S": 1
+    },
+    "Props": {
+      "OWNERKEY": "OWNERKEY",
+      "HOSTKEY": "HOSTKEY"
+    }
   }
 ]

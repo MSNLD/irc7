@@ -11,8 +11,8 @@ namespace Irc.Objects.Channel;
 public class Channel : ChatObject, IChannel
 {
     protected readonly IList<IChannelMember> _members = new List<IChannelMember>();
-    public IList<Address> BanList = new List<Address>();
-    public IList<User> InviteList = new List<User>();
+    public HashSet<string> BanList = new();
+    public HashSet<string> InviteList = new();
 
     public Channel(string name, IChannelModes modes, IDataStore dataStore) : base(modes, dataStore)
     {
@@ -245,6 +245,24 @@ public class Channel : ChatObject, IChannel
             : accessPermissions;
     }
 
+    public virtual bool InviteMember(IUser user)
+    {
+        var address = user.GetAddress().GetAddress();
+        return InviteList.Add(address);
+    }
+
+    public virtual bool BanMask(Address address)
+    {
+        var formattedAddress = address.GetAddress();
+        return BanList.Add(formattedAddress);
+    }
+
+    public virtual bool UnbanMask(Address address)
+    {
+        var formattedAddress = address.GetAddress();
+        return BanList.Remove(formattedAddress);
+    }
+
     protected virtual IChannelMember AddMember(IUser user,
         EnumChannelAccessResult accessResult = EnumChannelAccessResult.NONE)
     {
@@ -292,7 +310,7 @@ public class Channel : ChatObject, IChannel
     {
         var operCheck = CheckOper(user);
         var keyCheck = CheckMemberKey(user, key);
-        var inviteOnlyCheck = CheckInviteOnly();
+        var inviteOnlyCheck = CheckInviteOnly(user);
         var userLimitCheck = CheckUserLimit(IsGoto);
 
         var accessPermissions = (EnumChannelAccessResult)new[]
@@ -326,9 +344,14 @@ public class Channel : ChatObject, IChannel
         return EnumChannelAccessResult.NONE;
     }
 
-    protected EnumChannelAccessResult CheckInviteOnly()
+    protected EnumChannelAccessResult CheckInviteOnly(IUser user)
     {
-        return Modes.InviteOnly ? EnumChannelAccessResult.ERR_INVITEONLYCHAN : EnumChannelAccessResult.NONE;
+        if (Modes.InviteOnly)
+            return InviteList.Contains(user.GetAddress().GetAddress())
+                ? EnumChannelAccessResult.SUCCESS_MEMBER
+                : EnumChannelAccessResult.ERR_INVITEONLYCHAN;
+
+        return EnumChannelAccessResult.NONE;
     }
 
     protected EnumChannelAccessResult CheckUserLimit(bool IsGoto)

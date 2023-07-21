@@ -36,13 +36,13 @@ internal class Topic : Command, ICommand
             {
                 case EnumIrcError.ERR_NOTONCHANNEL:
                 {
-                    chatFrame.User.Send(Raw.IRCX_ERR_NOTONCHANNEL_442(chatFrame.Server, source, (ChatObject)channel));
+                    chatFrame.User.Send(Raw.IRCX_ERR_NOTONCHANNEL_442(chatFrame.Server, source, channel));
                     break;
                 }
                 case EnumIrcError.ERR_NOCHANOP:
                 {
                     chatFrame.User.Send(
-                        Raw.IRCX_ERR_CHANOPRIVSNEEDED_482(chatFrame.Server, source, (ChatObject)channel));
+                        Raw.IRCX_ERR_CHANOPRIVSNEEDED_482(chatFrame.Server, source, channel));
                     break;
                 }
                 case EnumIrcError.OK:
@@ -58,7 +58,7 @@ internal class Topic : Command, ICommand
     {
         if (!channel.CanBeModifiedBy((ChatObject)source)) return EnumIrcError.ERR_NOTONCHANNEL;
 
-        var sourceMember = channel.GetMember((IUser)source);
+        var sourceMember = channel.GetMember(source);
 
         if (sourceMember.GetLevel() < EnumChannelAccessLevel.ChatHost && channel.Modes.TopicOp)
             return EnumIrcError.ERR_NOCHANOP;

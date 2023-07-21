@@ -1,26 +1,24 @@
-﻿using Irc.Enumerations;
+using Irc.Commands;
+using Irc.Enumerations;
+using Irc.Extensions.Apollo.Interfaces;
+using Irc.Extensions.Apollo.Objects.Channel;
+using Irc.Extensions.Apollo.Objects.User;
 using Irc.Interfaces;
 using Irc.Objects;
 using Irc.Objects.Channel;
 
-namespace Irc.Commands;
+namespace Irc.Extensions.Apollo.Commands;
 
-public class Privmsg : Command, ICommand
+using IrcPrivmsg = global::Irc.Commands.Privmsg;
+
+public class Privmsg : IrcPrivmsg, ICommand
 {
-    public Privmsg() : base(2)
-    {
-    }
-
-    public new EnumCommandDataType GetDataType()
-    {
-        return EnumCommandDataType.Standard;
-    }
-
     public new void Execute(IChatFrame chatFrame)
     {
         SendMessage(chatFrame, false);
     }
 
+    // TODO: Refactor this as it duplicates Privmsg
     public static void SendMessage(IChatFrame chatFrame, bool Notice)
     {
         var targetName = chatFrame.Message.Parameters.First();
@@ -44,11 +42,25 @@ public class Privmsg : Command, ICommand
 
             if (chatObject is Channel)
             {
-                var channel = (IChannel)chatObject;
+                var user = (ApolloUser)chatFrame.User;
+                var channel = (ApolloChannel)chatObject;
+                var channelModes = (IApolloChannelModes)channel.GetModes();
                 var channelMember = channel.GetMember(chatFrame.User);
                 var isOnChannel = channelMember != null;
-                var noExtern = channel.Modes.NoExtern;
-                var moderated = channel.Modes.Moderated;
+                var noExtern = channelModes.NoExtern;
+                var moderated = channelModes.Moderated;
+                var subscriberOnly = channelModes.Subscriber;
+
+                // Cannot send as a non-subscriber
+                if (user.GetLevel() < EnumUserAccessLevel.Guide &&
+                    !user.GetProfile().IsSubscriber &&
+                    subscriberOnly
+                   )
+                {
+                    chatFrame.User.Send(
+                        Raw.IRCX_ERR_CANNOTSENDTOCHAN_404(chatFrame.Server, chatFrame.User, channel));
+                    return;
+                }
 
                 if (
                     // No External Messages
