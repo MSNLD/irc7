@@ -1,5 +1,6 @@
 ﻿using Irc.Commands;
 using Irc.Enumerations;
+using Irc.Extensions.Access.Server;
 using Irc.Extensions.Commands;
 using Irc.Extensions.Factories;
 using Irc.Extensions.Interfaces;
@@ -13,22 +14,19 @@ using Irc.Interfaces;
 using Irc.IO;
 using Irc.Objects;
 using Irc.Objects.Server;
-using Irc.Security;
-using Irc.Extensions.Security.Packages;
 using Irc7d;
 
 namespace Irc.Extensions.Objects.Server;
 
-public class ExtendedServer : global::Irc.Objects.Server.Server, IServer, IExtendedServerObject
+public class ExtendedServer : global::Irc.Objects.Server.Server, IServer, IExtendedChatObject, IExtendedServerObject
 {
     public ExtendedServer(ISocketServer socketServer, ISecurityManager securityManager,
         IFloodProtectionManager floodProtectionManager, IDataStore dataStore, IList<IChannel> channels,
         ICommandCollection commands, IUserFactory userFactory = null) : base(socketServer, securityManager,
         floodProtectionManager, dataStore, channels, commands, userFactory ?? new ExtendedUserFactory())
     {
-        if (SupportPackages.Contains("NTLM")) {
+        if (SupportPackages.Contains("NTLM"))
             GetSecurityManager().AddSupportPackage(new Security.Packages.NTLM(new NTLMCredentials()));
-        }
 
         AddProtocol(EnumProtocolType.IRCX, new IrcX());
         AddCommand(new Auth());
@@ -43,30 +41,21 @@ public class ExtendedServer : global::Irc.Objects.Server.Server, IServer, IExten
         _dataStore.Set("supported.user.modes", new ExtendedUserModes().GetSupportedModes());
     }
 
-    public override IChannel CreateChannel(string name)
-    {
-        return new ExtendedChannel(name, new ExtendedChannelModes(), new DataStore(name, "store"));
-    }
+    public IPropCollection PropCollection { get; }
+    public IAccessList AccessList { get; } = new ServerAccess();
 
     public virtual void ProcessCookie(IUser user, string name, string value)
     {
         // IRCX Does not use this
     }
 
-    // Ircx
-    protected EnumChannelAccessResult CheckAuthOnly()
+    public override IChannel CreateChannel(string name)
     {
-        if (Modes.GetModeChar(ExtendedResources.ChannelModeAuthOnly) == 1) return EnumChannelAccessResult.ERR_AUTHONLYCHAN;
-        return EnumChannelAccessResult.NONE;
+        return new ExtendedChannel(name, new ExtendedChannelModes(), new DataStore(name, "store"));
     }
 
-    protected EnumChannelAccessResult CheckSecureOnly()
+    public override IChannel CreateChannel(IUser creator, string name, string key)
     {
-        // TODO: Whatever this is...
-        return EnumChannelAccessResult.ERR_SECUREONLYCHAN;
-    }
-
-    public override IChannel CreateChannel(IUser creator, string name, string key) {
         var channel = (ExtendedChannel)CreateChannel(name);
         channel.ChannelStore.Set("topic", name);
         channel.PropCollection.GetProp(ExtendedResources.ChannelPropOwnerkey).SetValue(key);
@@ -75,5 +64,19 @@ public class ExtendedServer : global::Irc.Objects.Server.Server, IServer, IExten
         channel.Modes.UserLimit = 50;
         AddChannel(channel);
         return channel;
+    }
+
+    // Ircx
+    protected EnumChannelAccessResult CheckAuthOnly()
+    {
+        if (Modes.GetModeChar(ExtendedResources.ChannelModeAuthOnly) == 1)
+            return EnumChannelAccessResult.ERR_AUTHONLYCHAN;
+        return EnumChannelAccessResult.NONE;
+    }
+
+    protected EnumChannelAccessResult CheckSecureOnly()
+    {
+        // TODO: Whatever this is...
+        return EnumChannelAccessResult.ERR_SECUREONLYCHAN;
     }
 }

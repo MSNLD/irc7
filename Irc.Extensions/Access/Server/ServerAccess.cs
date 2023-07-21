@@ -1,22 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Irc.Enumerations;
 
-namespace Irc.Extensions.Access.Server
+namespace Irc.Extensions.Access.Server;
+
+public class ServerAccess : AccessList
 {
-    public class ServerAccess: AccessList
+    public ServerAccess()
     {
-        public ServerAccess()
+        accessEntries = new Dictionary<EnumAccessLevel, List<AccessEntry>>
         {
-            accessEntries = new Dictionary<Enumerations.EnumAccessLevel, List<AccessEntry>>()
-            {
-                { Enumerations.EnumAccessLevel.OWNER, new List<AccessEntry>() },
-                { Enumerations.EnumAccessLevel.HOST, new List<AccessEntry>() },
-                { Enumerations.EnumAccessLevel.VOICE, new List<AccessEntry>() },
-                { Enumerations.EnumAccessLevel.DENY, new List<AccessEntry>() },
-            };
-        }
+            { EnumAccessLevel.OWNER, new List<AccessEntry>() },
+            { EnumAccessLevel.HOST, new List<AccessEntry>() },
+            { EnumAccessLevel.VOICE, new List<AccessEntry>() },
+            { EnumAccessLevel.DENY, new List<AccessEntry>() },
+            { EnumAccessLevel.GRANT, new List<AccessEntry>() }
+        };
     }
 }

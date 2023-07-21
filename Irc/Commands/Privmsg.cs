@@ -58,7 +58,7 @@ public class Privmsg : Command, ICommand
                 )
                 {
                     chatFrame.User.Send(
-                        Raw.IRCX_ERR_CANNOTSENDTOCHAN_404(chatFrame.Server, chatFrame.User, chatObject));
+                        Raw.IRCX_ERR_CANNOTSENDTOCHAN_404(chatFrame.Server, chatFrame.User, channel));
                     return;
                 }
 

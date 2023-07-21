@@ -150,9 +150,9 @@ public static class Raw
         return $":{user.GetAddress()} PRIVMSG {channel} :{message}";
     }
 
-    public static string RPL_INVITE(IServer server, IUser user, IChannel channel)
+    public static string RPL_INVITE(IServer server, IUser user, IUser targetUser, string host, IChannel channel)
     {
-        return $":{user.GetAddress()} INVITE %s %s :{channel}";
+        return $":{user.GetAddress()} INVITE {targetUser} {host} {channel}";
     }
 
     public static string RPL_KNOCK_CHAN(IServer server, IUser user, IChannel channel)
@@ -478,7 +478,7 @@ public static class Raw
         return $":{server} 403 {user} {channel} :No such channel";
     }
 
-    public static string IRCX_ERR_CANNOTSENDTOCHAN_404(IServer server, IUser user, IChatObject channel)
+    public static string IRCX_ERR_CANNOTSENDTOCHAN_404(IServer server, IUser user, IChannel channel)
     {
         return $":{server} 404 {user} {channel} :Cannot send to channel";
     }
@@ -533,7 +533,7 @@ public static class Raw
         return $":{server} 439 {user} {nickname} :Nick name changes not permitted.";
     }
 
-    public static string IRCX_ERR_NOTONCHANNEL_442(IServer server, IUser user, IChatObject channel)
+    public static string IRCX_ERR_NOTONCHANNEL_442(IServer server, IUser user, IChannel channel)
     {
         return $":{server} 442 {user} {channel} :You're not on that channel";
     }
@@ -593,7 +593,7 @@ public static class Raw
         return $":{server} 481 {user} :Permission Denied - You're not an IRC operator";
     }
 
-    public static string IRCX_ERR_CHANOPRIVSNEEDED_482(IServer server, IUser user, ChatObject channel)
+    public static string IRCX_ERR_CHANOPRIVSNEEDED_482(IServer server, IUser user, IChannel channel)
     {
         return $":{server} 482 {user} {channel} :You're not channel operator";
     }
@@ -922,9 +922,10 @@ public static class Raw
         return $"{server} 928 {user} :You're not in a channel";
     }
 
-    public static string IRCX_ERR_TOOMANYINVITES_929(IServer server, IUser user)
+    public static string IRCX_ERR_TOOMANYINVITES_929(IServer server, IUser user, IUser targetUser,
+        IChannel targetChannel)
     {
-        return $":{server} 929 {user} %s %s :Cannot invite. Too many invites.";
+        return $":{server} 929 {user} {targetUser} {targetChannel} :Cannot invite. Too many invites.";
     }
 
     public static string IRCX_ERR_NOTIMPLEMENTED(IServer server, IUser user, string command)

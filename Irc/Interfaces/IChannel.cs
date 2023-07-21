@@ -35,4 +35,5 @@ public interface IChannel
     bool Allows(IUser user);
     IChannelModes GetModes();
     EnumChannelAccessResult GetAccess(IUser user, string key, bool IsGoto = false);
+    bool InviteMember(IUser user);
 }

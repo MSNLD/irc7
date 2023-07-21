@@ -42,14 +42,14 @@ public class Equestion : Command, ICommand
             if (!isOnChannel)
             {
                 chatFrame.User.Send(
-                    Raw.IRCX_ERR_NOTONCHANNEL_442(chatFrame.Server, chatFrame.User, chatObject));
+                    Raw.IRCX_ERR_NOTONCHANNEL_442(chatFrame.Server, chatFrame.User, channel));
                 return;
             }
 
             if (!((IApolloChannelModes)channel.Modes).OnStage)
             {
                 chatFrame.User.Send(
-                    Raw.IRCX_ERR_CANNOTSENDTOCHAN_404(chatFrame.Server, chatFrame.User, chatObject));
+                    Raw.IRCX_ERR_CANNOTSENDTOCHAN_404(chatFrame.Server, chatFrame.User, channel));
                 return;
             }
 

@@ -238,9 +238,24 @@ public class Server : ChatObject, IServer
 
     public ChatObject GetChatObject(string name)
     {
-        return Channel.Channel.ValidName(name)
-            ? (ChatObject)GetChannelByName(name)
-            : (ChatObject)GetUserByNickname(name);
+        if (string.IsNullOrWhiteSpace(name)) return null;
+
+        switch (name.Substring(0, 1))
+        {
+            case "*":
+            case "$":
+            {
+                return this;
+            }
+            case "%":
+            case "#":
+            case "&":
+                return (ChatObject)GetChannelByName(name);
+            default:
+            {
+                return (ChatObject)GetUserByNickname(name);
+            }
+        }
     }
 
     public IProtocol GetProtocol(EnumProtocolType protocolType)

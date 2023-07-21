@@ -30,7 +30,7 @@ public class ModeOperation
             case EnumIrcError.ERR_NOCHANOP:
             {
                 //:sky-8a15b323126 482 Sky3k #test :You're not channel operator
-                Source.Send(Raw.IRCX_ERR_CHANOPRIVSNEEDED_482(Source.Server, Source, Target));
+                Source.Send(Raw.IRCX_ERR_CHANOPRIVSNEEDED_482(Source.Server, Source, (IChannel)Target));
                 break;
             }
             case EnumIrcError.ERR_NOCHANOWNER:
@@ -46,7 +46,7 @@ public class ModeOperation
             }
             case EnumIrcError.ERR_NOTONCHANNEL:
             {
-                Source.Send(Raw.IRCX_ERR_NOTONCHANNEL_442(Source.Server, Source, Target));
+                Source.Send(Raw.IRCX_ERR_NOTONCHANNEL_442(Source.Server, Source, (IChannel)Target));
                 break;
             }
             // TODO: The below should not happen
