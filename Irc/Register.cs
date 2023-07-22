@@ -118,7 +118,8 @@ public static class Register
 
         if (!authenticating && !registered && hasNickname)
         {
-            var isNicknameValid = Nick.ValidateNickname(nickname, registered, chatFrame.User.IsGuest());
+            var isNicknameValid =
+                Nick.ValidateNickname(nickname, registered, chatFrame.User.IsGuest(), chatFrame.User.Utf8);
 
             if (!isNicknameValid)
             {

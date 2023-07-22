@@ -94,6 +94,10 @@ public class Auth : Command, ICommand
 
                         chatFrame.User.SetGuest(credentials.Guest);
                         chatFrame.User.SetLevel(credentials.GetLevel());
+
+                        // TODO: find another way to work in Utf8 nicknames
+                        if (chatFrame.User.GetLevel() >= EnumUserAccessLevel.Guide) chatFrame.User.Utf8 = true;
+
                         // Send reply
                         chatFrame.User.Send(Raw.RPL_AUTH_SUCCESS(packageName, $"{user}@{domain}", 0));
                     }

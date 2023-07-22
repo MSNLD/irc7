@@ -115,20 +115,20 @@ public class ApolloServer : ExtendedServer
                 {
                     case "A":
                     {
-                        user.SetLevel(EnumUserAccessLevel.Administrator);
                         user.ChangeNickname(user.Nickname, true);
+                        user.PromoteToAdministrator();
                         break;
                     }
                     case "S":
                     {
-                        user.SetLevel(EnumUserAccessLevel.Sysop);
                         user.ChangeNickname(user.Nickname, true);
+                        user.PromoteToSysop();
                         break;
                     }
                     case "G":
                     {
-                        user.SetLevel(EnumUserAccessLevel.Guide);
                         user.ChangeNickname(user.Nickname, true);
+                        user.PromoteToGuide();
                         break;
                     }
                 }

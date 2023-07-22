@@ -255,7 +255,10 @@ public static class Resources
     public static string GuestNicknameMask = @"^>(?!(Sysop)|(Admin)|(Guide))[\x41-\xFF\-0-9]+$";
     public static string NicknameMask = @"^(?!(Sysop)|(Admin)|(Guide))[\x41-\xFF][\x41-\xFF\-0-9]*$";
     public static string StandardNickname = @"^[\x41-\xFF][\x41-\xFF\-0-9]*$";
-    public static string AnyNickname = @"^>?[\x41-\xFF\-0-9]*$";
+    public static string StandardUtf8Nickname = @"^'?[\x41-\xFF][\x41-\xFF\-0-9]*$";
+    public static string AnyNickname = @"^(?!(Sysop)|(Admin)|(Guide))>?[\x41-\xFF][\x41-\xFF\-0-9]*$";
+    public static string AnyUtf8Nickname = @"^(?!(Sysop)|(Admin)|(Guide))'?[\x41-\xFF][\x41-\xFF\-0-9]*$";
+    public static string OperNickname = @"^[>']?[\x41-\xFF\-0-9]*$";
 
     #endregion
 }

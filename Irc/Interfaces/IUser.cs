@@ -18,6 +18,7 @@ public interface IUser
     DateTime LastIdle { get; set; }
     DateTime LoggedOn { get; }
     IModeCollection Modes { get; }
+    bool Utf8 { get; set; }
     void ChangeNickname(string newNick, bool utf8Prefix);
     void SetGuest(bool guest);
     void SetAway(IServer server, IUser user, string message);

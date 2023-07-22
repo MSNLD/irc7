@@ -59,6 +59,7 @@ public class User : ChatObject, IUser
     public override EnumUserAccessLevel Level => GetLevel();
 
     public Address Address { get; set; } = new();
+    public bool Utf8 { get; set; }
     public DateTime LastIdle { get; set; } = DateTime.UtcNow;
     public DateTime LoggedOn { get; private set; } = DateTime.UtcNow;
 
