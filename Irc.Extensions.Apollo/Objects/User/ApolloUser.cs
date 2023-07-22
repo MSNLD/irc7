@@ -20,6 +20,12 @@ public class ApolloUser : ExtendedUser
 
     private ApolloProfile Profile { get; } = new();
 
+    public override void SetGuest(bool guest)
+    {
+        Profile.Guest = guest;
+        base.SetGuest(guest);
+    }
+
     public override void PromoteToAdministrator()
     {
         Profile.Level = EnumUserAccessLevel.Administrator;

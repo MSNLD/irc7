@@ -2,7 +2,6 @@
 using Irc.Commands;
 using Irc.Constants;
 using Irc.Enumerations;
-using Irc.Extensions.Apollo.Commands;
 using Irc.Extensions.Apollo.Factories;
 using Irc.Extensions.Apollo.Objects.Channel;
 using Irc.Extensions.Apollo.Objects.User;
@@ -11,7 +10,6 @@ using Irc.Extensions.Apollo.Security.Credentials;
 using Irc.Extensions.Apollo.Security.Packages;
 using Irc.Extensions.Apollo.Security.Passport;
 using Irc.Extensions.Commands;
-using Irc.Extensions.Objects;
 using Irc.Extensions.Objects.Server;
 using Irc.Extensions.Security;
 using Irc.Extensions.Security.Packages;
@@ -26,13 +24,15 @@ namespace Irc.Extensions.Apollo.Objects.Server;
 
 public class ApolloServer : ExtendedServer
 {
-    PassportV4 passport;
+    private readonly PassportV4 passport;
+
     public ApolloServer(ISocketServer socketServer, ISecurityManager securityManager,
         IFloodProtectionManager floodProtectionManager, IDataStore dataStore, IList<IChannel> channels,
-        ICommandCollection commands, IUserFactory userFactory = null) : base(socketServer, securityManager,
-        floodProtectionManager, dataStore, channels, commands, userFactory ?? new ApolloUserFactory())
+        ICommandCollection commands, IUserFactory userFactory = null, ICredentialProvider ntlmCredentialProvider = null)
+        : base(socketServer, securityManager,
+            floodProtectionManager, dataStore, channels, commands, userFactory ?? new ApolloUserFactory(),
+            ntlmCredentialProvider)
     {
-
         if (SupportPackages.Contains("GateKeeper"))
         {
             passport = new PassportV4(dataStore.Get("Passport.V4.AppID"), dataStore.Get("Passport.V4.Secret"));
@@ -81,7 +81,8 @@ public class ApolloServer : ExtendedServer
         }
         else if (name == Resources.UserPropSubscriberInfo && user.IsAuthenticated() && user.IsRegistered())
         {
-            var subscribedString = passport.ValidateSubscriberInfo(value, user.GetSupportPackage().GetCredentials().GetIssuedAt());
+            var subscribedString =
+                passport.ValidateSubscriberInfo(value, user.GetSupportPackage().GetCredentials().GetIssuedAt());
             int.TryParse(subscribedString, out var subscribed);
             if ((subscribed & 1) == 1) ((ApolloUser)user).GetProfile().Registered = true;
         }
@@ -113,23 +114,23 @@ public class ApolloServer : ExtendedServer
                 switch (levelType)
                 {
                     case "A":
-                        {
-                            user.ChangeNickname(user.Nickname, true);
-                            user.PromoteToAdministrator();
-                            break;
-                        }
+                    {
+                        user.SetLevel(EnumUserAccessLevel.Administrator);
+                        user.ChangeNickname(user.Nickname, true);
+                        break;
+                    }
                     case "S":
-                        {
-                            user.ChangeNickname(user.Nickname, true);
-                            user.PromoteToSysop();
-                            break;
-                        }
+                    {
+                        user.SetLevel(EnumUserAccessLevel.Sysop);
+                        user.ChangeNickname(user.Nickname, true);
+                        break;
+                    }
                     case "G":
-                        {
-                            user.ChangeNickname(user.Nickname, true);
-                            user.PromoteToGuide();
-                            break;
-                        }
+                    {
+                        user.SetLevel(EnumUserAccessLevel.Guide);
+                        user.ChangeNickname(user.Nickname, true);
+                        break;
+                    }
                 }
             }
         }

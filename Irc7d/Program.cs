@@ -8,6 +8,7 @@ using Irc.Extensions.Apollo.Objects.Server;
 using Irc.Extensions.Factories;
 using Irc.Extensions.Objects.Channel;
 using Irc.Extensions.Objects.Server;
+using Irc.Extensions.Security.Credentials;
 using Irc.Factories;
 using Irc.Interfaces;
 using Irc.IO;
@@ -19,9 +20,9 @@ namespace Irc7d;
 
 internal class Program
 {
-    private enum IrcType { IRC, IRCX, MSN, DIR };
-    private static IServer server = null;
+    private static IServer server;
     private static CancellationTokenSource cancellationTokenSource;
+
     private static void Main(string[] args)
     {
         var app = new CommandLineApplication();
@@ -45,7 +46,9 @@ internal class Program
             CommandOptionType.SingleValue);
         var serverType = app.Option("-t|--type <type>",
             "Type of server e.g. IRC, IRCX, MSN, DIR", CommandOptionType.SingleValue);
-        var chatServerIP = app.Option("-s|--server", "The Chat Server IP and Port e.g. 127.0.0.1:6667 (temporary, DIR mode only)", CommandOptionType.SingleValue);
+        var chatServerIP = app.Option("-s|--server",
+            "The Chat Server IP and Port e.g. 127.0.0.1:6667 (temporary, DIR mode only)",
+            CommandOptionType.SingleValue);
         var versionOption = app.Option("-v|--version", "The version of the Chat Server", CommandOptionType.NoValue);
 
         app.OnExecute(async () =>
@@ -56,7 +59,8 @@ internal class Program
                 return 0;
             }
 
-            if (versionOption.HasValue()) {
+            if (versionOption.HasValue())
+            {
                 Console.WriteLine(Assembly.GetExecutingAssembly().GetName().Version);
                 return 0;
             }
@@ -92,63 +96,68 @@ internal class Program
                     $"Listening on {ip}:{port} backlog={backlog} buffer={bufferSize} maxconn={maxConnections} fqdn={fqdn} type={type} {(chatServerIP.HasValue() ? "forwardserver=" : "")}{forwardServer}");
             };
 
+            var credentials = new Dictionary<string, Credential>();
+            if (File.Exists("DefaultCredentials.json"))
+                credentials =
+                    JsonSerializer.Deserialize<Dictionary<string, Credential>>(
+                        await File.ReadAllTextAsync("DefaultCredentials.json"));
+
+            var credentialProvider = new NTLMCredentials(credentials);
+
             switch (type)
             {
                 case IrcType.IRC:
-                    {
-                        server = new Server(socketServer, new SecurityManager(), new FloodProtectionManager(),
+                {
+                    server = new Server(socketServer, new SecurityManager(), new FloodProtectionManager(),
                         new DataStore("DefaultServer.json"),
                         new List<IChannel>(), null, new UserFactory());
-                        break;
-                    }
+                    break;
+                }
                 case IrcType.IRCX:
-                    {
-                        server = new ExtendedServer(socketServer, new SecurityManager(), new FloodProtectionManager(),
+                {
+                    server = new ExtendedServer(socketServer, new SecurityManager(), new FloodProtectionManager(),
                         new DataStore("DefaultServer.json"),
-                        new List<IChannel>(), null, new ExtendedUserFactory());
-                        break;
-                    }
+                        new List<IChannel>(), null, new ExtendedUserFactory(), credentialProvider);
+                    break;
+                }
                 case IrcType.DIR:
-                    {
-                        server = new DirectoryServer(socketServer, new SecurityManager(), new FloodProtectionManager(),
+                {
+                    server = new DirectoryServer(socketServer, new SecurityManager(), new FloodProtectionManager(),
                         new DataStore("DefaultServer.json"),
-                        new List<IChannel>(), null, new ApolloUserFactory());
+                        new List<IChannel>(), null, new ApolloUserFactory(), credentialProvider);
 
-                        var parts = forwardServer.Split(':', StringSplitOptions.None);
-                        if (parts.Length > 0) ((DirectoryServer)server).ChatServerIP = parts[0];
-                        if (parts.Length > 1) ((DirectoryServer)server).ChatServerPORT = parts[1];
+                    var parts = forwardServer.Split(':');
+                    if (parts.Length > 0) ((DirectoryServer)server).ChatServerIP = parts[0];
+                    if (parts.Length > 1) ((DirectoryServer)server).ChatServerPORT = parts[1];
 
-                        break;
-                    }
+                    break;
+                }
                 default:
-                    {
-                        server = new ApolloServer(socketServer, new SecurityManager(), new FloodProtectionManager(),
+                {
+                    server = new ApolloServer(socketServer, new SecurityManager(), new FloodProtectionManager(),
                         new DataStore("DefaultServer.json"),
-                        new List<IChannel>(), null, new ApolloUserFactory());
-                        break;
-                    }
+                        new List<IChannel>(), null, new ApolloUserFactory(), credentialProvider);
+                    break;
+                }
             }
 
             server.ServerVersion = Assembly.GetExecutingAssembly().GetName().Version;
             server.RemoteIP = fqdn;
 
-            var defaultChannels = JsonSerializer.Deserialize<List<DefaultChannel>>(File.ReadAllText("DefaultChannels.json"));
+            var defaultChannels =
+                JsonSerializer.Deserialize<List<DefaultChannel>>(File.ReadAllText("DefaultChannels.json"));
             foreach (var defaultChannel in defaultChannels)
             {
                 var name = type == IrcType.IRC ? $"#{defaultChannel.Name}" : $"%#{defaultChannel.Name}";
                 var channel = server.CreateChannel(name);
                 channel.ChannelStore.Set("topic", defaultChannel.Topic);
-                foreach (KeyValuePair<char, int> keyValuePair in defaultChannel.Modes) {
+                foreach (var keyValuePair in defaultChannel.Modes)
                     channel.Modes.SetModeChar(keyValuePair.Key, keyValuePair.Value);
-                }
 
                 if (channel is ExtendedChannel || channel is ApolloChannel)
-                {
-                    foreach (KeyValuePair<string, string> keyValuePair in defaultChannel.Props)
-                    {
-                        ((ExtendedChannel)channel).PropCollection.GetProp(keyValuePair.Key).SetValue(keyValuePair.Value);
-                    }
-                }
+                    foreach (var keyValuePair in defaultChannel.Props)
+                        ((ExtendedChannel)channel).PropCollection.GetProp(keyValuePair.Key)
+                            .SetValue(keyValuePair.Value);
 
                 server.AddChannel(channel);
             }
@@ -169,5 +178,13 @@ internal class Program
         Console.WriteLine("Shutting down...");
         server.Shutdown();
         cancellationTokenSource.Cancel();
+    }
+
+    private enum IrcType
+    {
+        IRC,
+        IRCX,
+        MSN,
+        DIR
     }
 }

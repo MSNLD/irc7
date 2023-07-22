@@ -1,5 +1,5 @@
 ﻿using Irc.Commands;
-using Irc.Constants;
+using Irc.Enumerations;
 using Irc.Objects;
 using Irc.Objects.Server;
 
@@ -11,9 +11,7 @@ public static class Register
     {
         if (CanRegister(chatFrame))
         {
-            if (!ConnectionIsPermitted(chatFrame.Server, chatFrame.User)) {
-                return;
-            }
+            if (!ConnectionIsPermitted(chatFrame.Server, chatFrame.User)) return;
 
             chatFrame.User.Register();
             chatFrame.User.Send(Raw.IRCX_RPL_WELCOME_001(chatFrame.Server, chatFrame.User));
@@ -28,10 +26,12 @@ public static class Register
             chatFrame.User.Send(Raw.IRCX_RPL_LUSERUNKNOWN_253(chatFrame.Server, chatFrame.User, 0));
             chatFrame.User.Send(Raw.IRCX_RPL_LUSERCHANNELS_254(chatFrame.Server, chatFrame.User));
             chatFrame.User.Send(Raw.IRCX_RPL_LUSERME_255(chatFrame.Server, chatFrame.User, 0, 1));
-            chatFrame.User.Send(Raw.IRCX_RPL_LUSERS_265(chatFrame.Server, chatFrame.User, chatFrame.Server.GetUsers().Count, 10000));
-            chatFrame.User.Send(Raw.IRCX_RPL_GUSERS_266(chatFrame.Server, chatFrame.User, chatFrame.Server.GetUsers().Count, 10000));
+            chatFrame.User.Send(Raw.IRCX_RPL_LUSERS_265(chatFrame.Server, chatFrame.User,
+                chatFrame.Server.GetUsers().Count, 10000));
+            chatFrame.User.Send(Raw.IRCX_RPL_GUSERS_266(chatFrame.Server, chatFrame.User,
+                chatFrame.Server.GetUsers().Count, 10000));
 
-            string[] motd = chatFrame.Server.GetMOTD();
+            var motd = chatFrame.Server.GetMOTD();
             if (motd == null)
             {
                 chatFrame.User.Send(Raw.IRCX_ERR_NOMOTD_422(chatFrame.Server, chatFrame.User));
@@ -40,20 +40,38 @@ public static class Register
             {
                 chatFrame.User.Send(Raw.IRCX_RPL_RPL_MOTDSTART_375(chatFrame.Server, chatFrame.User));
 
-                foreach (string line in motd)
-                {
+                foreach (var line in motd)
                     chatFrame.User.Send(Raw.IRCX_RPL_RPL_MOTD_372(chatFrame.Server, chatFrame.User, line));
-                }
 
                 chatFrame.User.Send(Raw.IRCX_RPL_RPL_ENDOFMOTD_376(chatFrame.Server, chatFrame.User));
+            }
+
+            switch (chatFrame.User.GetLevel())
+            {
+                case EnumUserAccessLevel.Administrator:
+                {
+                    chatFrame.User.PromoteToAdministrator();
+                    break;
+                }
+                case EnumUserAccessLevel.Sysop:
+                {
+                    chatFrame.User.PromoteToSysop();
+                    break;
+                }
+                case EnumUserAccessLevel.Guide:
+                {
+                    chatFrame.User.PromoteToGuide();
+                    break;
+                }
             }
         }
     }
 
-    public static bool ConnectionIsPermitted(IServer server, IUser user) {
-
+    public static bool ConnectionIsPermitted(IServer server, IUser user)
+    {
         // TODO: Add check for anonymous connection count
-        if (!server.AnonymousConnections && user.IsAnon()) {
+        if (!server.AnonymousConnections && user.IsAnon())
+        {
             user.Disconnect(Raw.IRCX_CLOSINGLINK(server, user, "001", "No Authorization"));
             return false;
         }
@@ -64,16 +82,14 @@ public static class Register
         return true;
     }
 
-    public static bool BasicAuthentication(IServer server, IUser user) {
-
+    public static bool BasicAuthentication(IServer server, IUser user)
+    {
         if (!server.BasicAuthentication) return false;
 
         // Basic Auth would happen here
 
         var pass = user.GetDataStore().Get("pass");
-        if (!string.IsNullOrWhiteSpace(pass)) {
-            return true;
-        }
+        if (!string.IsNullOrWhiteSpace(pass)) return true;
 
         return false;
 
@@ -100,17 +116,19 @@ public static class Register
         var nickname = chatFrame.User.GetAddress().Nickname;
         var hasNickname = !string.IsNullOrWhiteSpace(nickname);
 
-        if (!authenticating && !registered && hasNickname) {
-            var isNicknameValid = Nick.ValidateNickname(nickname, chatFrame.User.GetLevel());
+        if (!authenticating && !registered && hasNickname)
+        {
+            var isNicknameValid = Nick.ValidateNickname(nickname, registered, chatFrame.User.IsGuest());
 
-            if (!isNicknameValid) {
+            if (!isNicknameValid)
+            {
                 user.Nickname = string.Empty;
                 user.Send(Raw.IRCX_ERR_ERRONEOUSNICK_432(server, user, nickname));
                 return false;
             }
         }
 
-        var hasUserAddress = (server.DisableUserRegistration || chatFrame.User.GetAddress().IsAddressPopulated());
+        var hasUserAddress = server.DisableUserRegistration || chatFrame.User.GetAddress().IsAddressPopulated();
 
         return !authenticating && !registered & hasNickname & hasUserAddress;
     }

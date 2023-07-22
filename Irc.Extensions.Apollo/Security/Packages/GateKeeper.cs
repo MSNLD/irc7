@@ -93,7 +93,7 @@ public class GateKeeper : SupportPackage, ISupportPackage
 
                     _credentials = new Credential
                     {
-                        Level = Guest ? EnumUserAccessLevel.Guest : EnumUserAccessLevel.Member,
+                        Level = EnumUserAccessLevel.Member,
                         Domain = GetType().Name,
                         Username = guid.ToUnformattedString().ToUpper(),
                         Guest = (this is not GateKeeperPassport)

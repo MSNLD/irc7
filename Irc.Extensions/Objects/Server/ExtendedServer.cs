@@ -14,6 +14,7 @@ using Irc.Interfaces;
 using Irc.IO;
 using Irc.Objects;
 using Irc.Objects.Server;
+using Irc.Security;
 using Irc7d;
 
 namespace Irc.Extensions.Objects.Server;
@@ -22,11 +23,13 @@ public class ExtendedServer : global::Irc.Objects.Server.Server, IServer, IExten
 {
     public ExtendedServer(ISocketServer socketServer, ISecurityManager securityManager,
         IFloodProtectionManager floodProtectionManager, IDataStore dataStore, IList<IChannel> channels,
-        ICommandCollection commands, IUserFactory userFactory = null) : base(socketServer, securityManager,
-        floodProtectionManager, dataStore, channels, commands, userFactory ?? new ExtendedUserFactory())
+        ICommandCollection commands, IUserFactory userFactory = null, ICredentialProvider credentialProvider = null) :
+        base(socketServer, securityManager,
+            floodProtectionManager, dataStore, channels, commands, userFactory ?? new ExtendedUserFactory())
     {
         if (SupportPackages.Contains("NTLM"))
-            GetSecurityManager().AddSupportPackage(new Security.Packages.NTLM(new NTLMCredentials()));
+            GetSecurityManager()
+                .AddSupportPackage(new Security.Packages.NTLM(credentialProvider ?? new NtlmProvider()));
 
         AddProtocol(EnumProtocolType.IRCX, new IrcX());
         AddCommand(new Auth());

@@ -22,6 +22,7 @@ public interface IUser
     void SetGuest(bool guest);
     void SetAway(IServer server, IUser user, string message);
     void SetBack(IServer server, IUser user);
+    void SetLevel(EnumUserAccessLevel level);
     event EventHandler<string> OnSend;
     void BroadcastToChannels(string data, bool ExcludeUser);
     void AddChannel(IChannel channel, IChannelMember member);
