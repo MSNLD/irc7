@@ -27,13 +27,13 @@ public class Nick : Command, ICommand
         else HandleRegisteredNicknameChange(chatFrame);
     }
 
-    public static bool ValidateNickname(string nickname, EnumUserAccessLevel level)
+    public static bool ValidateNickname(string nickname, bool registered, bool guest)
     {
         var nickMask = Resources.StandardNickname;
 
-        if (level == EnumUserAccessLevel.None)
+        if (!registered)
             nickMask = Resources.AnyNickname;
-        else if (level == EnumUserAccessLevel.Guest) nickMask = Resources.GuestNicknameMask;
+        else if (guest) nickMask = Resources.GuestNicknameMask;
 
         return nickname.Length <= Resources.MaxFieldLen &&
                RegularExpressions.Match(nickMask, nickname, true);
@@ -42,7 +42,7 @@ public class Nick : Command, ICommand
     private bool HandleUnregisteredNicknameChange(IChatFrame chatFrame)
     {
         var nickname = chatFrame.Message.Parameters.First();
-        if (!ValidateNickname(nickname, EnumUserAccessLevel.None))
+        if (!ValidateNickname(nickname, false, chatFrame.User.IsGuest()))
         {
             chatFrame.User.Send(Raw.IRCX_ERR_ERRONEOUSNICK_432(chatFrame.Server, chatFrame.User, nickname));
             return false;
@@ -64,7 +64,8 @@ public class Nick : Command, ICommand
             return false;
         }
 
-        if (!ValidateNickname(nickname, user.GetLevel()))
+        if (!ValidateNickname(nickname, true,
+                chatFrame.User.IsGuest() && chatFrame.User.GetLevel() < EnumUserAccessLevel.Guide))
         {
             chatFrame.User.Send(Raw.IRCX_ERR_ERRONEOUSNICK_432(server, user, nickname));
             return false;

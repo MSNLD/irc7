@@ -36,7 +36,7 @@ public class ANON : SupportPackage
     {
         return new Credential
         {
-            Level = Guest ? EnumUserAccessLevel.Guest : EnumUserAccessLevel.Member,
+            Level = EnumUserAccessLevel.Member,
             Domain = GetType().Name,
             Username = null,
             Guest = true

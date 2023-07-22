@@ -208,11 +208,15 @@ public class User : ChatObject, IUser
         return _guest;
     }
 
-    public void SetGuest(bool guest)
+    public virtual void SetGuest(bool guest)
     {
         if (Server.DisableGuestMode) return;
         _guest = guest;
-        _level = guest ? EnumUserAccessLevel.Guest : EnumUserAccessLevel.Member;
+    }
+
+    public void SetLevel(EnumUserAccessLevel level)
+    {
+        _level = level;
     }
 
     public bool IsRegistered()

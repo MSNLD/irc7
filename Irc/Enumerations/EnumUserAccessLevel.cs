@@ -4,10 +4,9 @@ public enum EnumUserAccessLevel
 {
     NoAccess = -1,
     None = 0,
-    Guest = 1,
-    Member = 2,
-    Guide = 7,
-    Sysop = 8,
-    Administrator = 9,
-    Service = 10
+    Member = 1,
+    Guide = 2,
+    Sysop = 3,
+    Administrator = 4,
+    Service = 5
 }

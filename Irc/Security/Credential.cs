@@ -44,13 +44,13 @@ public class Credential : ICredential
         return Modes;
     }
 
-    public EnumUserAccessLevel GetLevel()
-    {
-        return Level;
-    }
-
     public long GetIssuedAt()
     {
         return IssuedAt;
+    }
+
+    public EnumUserAccessLevel GetLevel()
+    {
+        return Level;
     }
 }

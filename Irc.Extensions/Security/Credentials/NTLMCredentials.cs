@@ -1,31 +1,14 @@
-﻿using Irc.Enumerations;
-using Irc.Extensions.Security;
-using Irc.Extensions.Security.Credentials;
-using Irc.Security;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Irc.Security;
 
 namespace Irc.Extensions.Security.Credentials;
 
-public class NTLMCredentials: NtlmProvider, ICredentialProvider
+public class NTLMCredentials : NtlmProvider, ICredentialProvider
 {
-    Dictionary<string, ICredential> credentials = new Dictionary<string, ICredential>();
+    private readonly Dictionary<string, Credential> _credentials = new();
 
-    public NTLMCredentials()
+    public NTLMCredentials(Dictionary<string, Credential> credentials)
     {
-        credentials.Add(@"DOMAIN\username", new Credential()
-        {
-            Domain = "DOMAIN",
-            Username = "username",
-            Password = "password",
-            Nickname = "username",
-            UserGroup = "group",
-            Modes = "a",
-            Level = EnumUserAccessLevel.Administrator
-        });
+        _credentials = credentials;
     }
 
     public ICredential ValidateTokens(Dictionary<string, string> tokens)
@@ -35,7 +18,7 @@ public class NTLMCredentials: NtlmProvider, ICredentialProvider
 
     public ICredential GetUserCredentials(string domain, string username)
     {
-        credentials.TryGetValue($"{domain}\\{username}", out var credential);
+        _credentials.TryGetValue($"{domain}\\{username}", out var credential);
         return credential;
     }
 }
