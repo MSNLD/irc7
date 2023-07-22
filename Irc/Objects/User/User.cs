@@ -355,6 +355,7 @@ public class User : ChatObject, IUser
         userAddress.RealName = credentials.Guest ? string.Empty : null;
 
         LoggedOn = DateTime.UtcNow;
+        _authenticated = true;
         _registered = true;
     }
 

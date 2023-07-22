@@ -115,11 +115,13 @@ public static class Register
         var registered = chatFrame.User.IsRegistered();
         var nickname = chatFrame.User.GetAddress().Nickname;
         var hasNickname = !string.IsNullOrWhiteSpace(nickname);
+        var guest = user.IsGuest();
+        var oper = user.GetLevel() >= EnumUserAccessLevel.Guide;
 
         if (!authenticating && !registered && hasNickname)
         {
             var isNicknameValid =
-                Nick.ValidateNickname(nickname, registered, chatFrame.User.IsGuest(), chatFrame.User.Utf8);
+                Nick.ValidateNickname(nickname, guest, oper, authenticating);
 
             if (!isNicknameValid)
             {

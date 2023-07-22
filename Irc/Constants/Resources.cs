@@ -247,6 +247,11 @@ public static class Resources
 
     #region "Regular Expressions"
 
+    public static string PreAuthNicknameMask = @"(^[>'][\x41-\xFF\-0-9]+$)|(^[\x41-\xFF][\x41-\xFF\-0-9]+$)";
+    public static string PostAuthNicknameMask = @"^(?!(Sysop)|(Admin)|(Guide))[\x41-\xFF][\x41-\xFF\-0-9]+$";
+    public static string PostAuthOperNicknameMask = @"^'?[\x41-\xFF][\x41-\xFF\-0-9]*$";
+    public static string PostAuthGuestNicknameMask = @"^>[\x41-\xFF][\x41-\xFF\-0-9]*$";
+
     public static string StandardIRC = @"[(\x00-\x2C)(\x2E-\x2F)(\x3A-\x40)]{1}|\\N|\\R|\\0|\\T";
     public static string GenericProps = @"[\x20-\x7F]{0,31}";
     public static string JoinPartProp = @"[\x00]{1}";
@@ -256,7 +261,7 @@ public static class Resources
     public static string NicknameMask = @"^(?!(Sysop)|(Admin)|(Guide))[\x41-\xFF][\x41-\xFF\-0-9]*$";
     public static string StandardNickname = @"^[\x41-\xFF][\x41-\xFF\-0-9]*$";
     public static string StandardUtf8Nickname = @"^'?[\x41-\xFF][\x41-\xFF\-0-9]*$";
-    public static string AnyNickname = @"^(?!(Sysop)|(Admin)|(Guide))>?[\x41-\xFF][\x41-\xFF\-0-9]*$";
+    public static string AnyNickname = @"^(?!(Sysop)|(Admin)|(Guide))>?[\x41-\xFF][\x41-\xFF\-0-9]+$";
     public static string AnyUtf8Nickname = @"^(?!(Sysop)|(Admin)|(Guide))'?[\x41-\xFF][\x41-\xFF\-0-9]*$";
     public static string OperNickname = @"^[>']?[\x41-\xFF\-0-9]*$";
 

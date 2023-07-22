@@ -26,6 +26,9 @@
 
   <ItemGroup>
     <None Remove="states\" />
+    <None Update="DefaultCredentials.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Update="DefaultChannels.json">

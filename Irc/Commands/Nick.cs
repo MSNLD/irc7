@@ -23,26 +23,29 @@ public class Nick : Command, ICommand
 
         // Is user not registered?
         // Set nickname according to regulations (should be available in user object and changes based on what they authenticated as)
-        if (!chatFrame.User.IsRegistered()) HandleUnregisteredNicknameChange(chatFrame);
-        else HandleRegisteredNicknameChange(chatFrame);
+        if (!chatFrame.User.IsAuthenticated()) HandlePreauthNicknameChange(chatFrame);
+        else if (!chatFrame.User.IsRegistered()) HandlePreregNicknameChange(chatFrame);
+        else HandleRegNicknameChange(chatFrame);
     }
 
-    public static bool ValidateNickname(string nickname, bool registered, bool guest, bool utf8)
+    public static bool ValidateNickname(string nickname, bool guest = false, bool oper = false, bool preAuth = false,
+        bool preReg = false)
     {
-        var nickMask = utf8 ? Resources.StandardUtf8Nickname : Resources.StandardNickname;
+        var mask = Resources.PostAuthNicknameMask;
 
-        if (!registered)
-            nickMask = utf8 ? Resources.AnyUtf8Nickname : Resources.AnyNickname;
-        else if (guest) nickMask = Resources.GuestNicknameMask;
+        if (preAuth) mask = Resources.PreAuthNicknameMask;
+        else if (oper) mask = Resources.PostAuthOperNicknameMask;
+        else if (guest) mask = Resources.PostAuthGuestNicknameMask;
 
         return nickname.Length <= Resources.MaxFieldLen &&
-               RegularExpressions.Match(nickMask, nickname, true);
+               RegularExpressions.Match(mask, nickname, true);
     }
 
-    private bool HandleUnregisteredNicknameChange(IChatFrame chatFrame)
+    public static bool HandlePreauthNicknameChange(IChatFrame chatFrame)
     {
         var nickname = chatFrame.Message.Parameters.First();
-        if (!ValidateNickname(nickname, false, chatFrame.User.IsGuest(), chatFrame.User.Utf8))
+        // UTF8 / Guest / Normal / Admin/Sysop/Guide OK
+        if (!ValidateNickname(nickname, preAuth: true))
         {
             chatFrame.User.Send(Raw.IRCX_ERR_ERRONEOUSNICK_432(chatFrame.Server, chatFrame.User, nickname));
             return false;
@@ -52,35 +55,36 @@ public class Nick : Command, ICommand
         return true;
     }
 
-    private bool HandleRegisteredNicknameChange(IChatFrame chatFrame)
+    public static bool HandlePreregNicknameChange(IChatFrame chatFrame)
     {
-        var server = chatFrame.Server;
-        var user = chatFrame.User;
+        return HandleRegNicknameChange(chatFrame);
+    }
+
+    public static bool HandleRegNicknameChange(IChatFrame chatFrame)
+    {
         var nickname = chatFrame.Message.Parameters.First();
+        var guest = chatFrame.User.IsGuest();
+        var oper = chatFrame.User.GetLevel() >= EnumUserAccessLevel.Guide;
 
-        if (!user.IsGuest())
+        if (!guest && !oper)
         {
-            chatFrame.User.Send(Raw.IRCX_ERR_NONICKCHANGES_439(server, user, nickname));
+            chatFrame.User.Send(Raw.IRCX_ERR_NONICKCHANGES_439(chatFrame.Server, chatFrame.User, nickname));
             return false;
         }
 
-        if (!ValidateNickname(nickname, true,
-                chatFrame.User.IsGuest() && chatFrame.User.GetLevel() < EnumUserAccessLevel.Guide, chatFrame.User.Utf8))
-        {
-            chatFrame.User.Send(Raw.IRCX_ERR_ERRONEOUSNICK_432(server, user, nickname));
-            return false;
-        }
-
-        var channels = user.GetChannels();
+        var channels = chatFrame.User.GetChannels();
         foreach (var channel in channels)
         foreach (var member in channel.Key.GetMembers())
             if (member.GetUser().Nickname == nickname)
             {
-                chatFrame.User.Send(Raw.IRCX_ERR_NICKINUSE_433(server, user));
+                chatFrame.User.Send(Raw.IRCX_ERR_NICKINUSE_433(chatFrame.Server, chatFrame.User));
                 return false;
             }
 
-        user.ChangeNickname(nickname, user.GetLevel() > EnumUserAccessLevel.Guide);
+        if (!ValidateNickname(nickname, guest, oper))
+            chatFrame.User.Send(Raw.IRCX_ERR_ERRONEOUSNICK_432(chatFrame.Server, chatFrame.User, nickname));
+
+        chatFrame.User.ChangeNickname(nickname, false);
         return true;
     }
 }
