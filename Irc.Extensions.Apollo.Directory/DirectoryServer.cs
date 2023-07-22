@@ -11,6 +11,7 @@ using Irc.Interfaces;
 using Irc.IO;
 using Irc.Security;
 using Irc7d;
+using Nick = Irc.Extensions.Apollo.Directory.Commands.Nick;
 using Version = Irc.Commands.Version;
 
 namespace Irc.Extensions.Apollo.Directory;
