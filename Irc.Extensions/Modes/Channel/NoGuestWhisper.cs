@@ -2,11 +2,11 @@ using Irc.Enumerations;
 using Irc.Interfaces;
 using Irc.Modes;
 
-namespace Irc.Extensions.Apollo.Modes.Channel;
+namespace Irc.Extensions.Modes.Channel;
 
 public class NoGuestWhisper : ModeRuleChannel, IModeRule
 {
-    public NoGuestWhisper() : base(ApolloResources.ChannelModeNoGuestWhisper)
+    public NoGuestWhisper() : base(ExtendedResources.ChannelModeNoGuestWhisper)
     {
     }
 

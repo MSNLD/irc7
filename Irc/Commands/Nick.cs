@@ -57,7 +57,18 @@ public class Nick : Command, ICommand
 
     public static bool HandlePreregNicknameChange(IChatFrame chatFrame)
     {
-        return HandleRegNicknameChange(chatFrame);
+        var nickname = chatFrame.Message.Parameters.First();
+        var guest = chatFrame.User.IsGuest();
+        var oper = chatFrame.User.GetLevel() >= EnumUserAccessLevel.Guide;
+
+        if (!ValidateNickname(nickname, guest, oper, false, true))
+        {
+            chatFrame.User.Send(Raw.IRCX_ERR_ERRONEOUSNICK_432(chatFrame.Server, chatFrame.User, nickname));
+            return false;
+        }
+
+        chatFrame.User.Nickname = nickname;
+        return true;
     }
 
     public static bool HandleRegNicknameChange(IChatFrame chatFrame)
@@ -82,7 +93,10 @@ public class Nick : Command, ICommand
             }
 
         if (!ValidateNickname(nickname, guest, oper))
+        {
             chatFrame.User.Send(Raw.IRCX_ERR_ERRONEOUSNICK_432(chatFrame.Server, chatFrame.User, nickname));
+            return false;
+        }
 
         chatFrame.User.ChangeNickname(nickname, false);
         return true;

@@ -1,5 +1,6 @@
 ﻿using Irc.Commands;
 using Irc.Enumerations;
+using Irc.Extensions.Interfaces;
 using Irc.Interfaces;
 using Irc.Objects;
 
@@ -25,13 +26,13 @@ internal class Whisper : Command, ICommand
 
         if (chatFrame.Message.Parameters.Count == 1)
         {
-            user.Send(Raw.IRC_ERR_NORECIPIENT_411(server, user, typeof(Whisper).Name));
+            user.Send(Raw.IRC_ERR_NORECIPIENT_411(server, user, nameof(Whisper)));
             return;
         }
 
         if (chatFrame.Message.Parameters.Count == 2)
         {
-            user.Send(Raw.IRC_ERR_NOTEXT_412(server, user, typeof(Whisper).Name));
+            user.Send(Raw.IRC_ERR_NOTEXT_412(server, user, nameof(Whisper)));
             return;
         }
 
@@ -40,6 +41,27 @@ internal class Whisper : Command, ICommand
         if (channel == null)
         {
             user.Send(Raw.IRCX_ERR_NOSUCHCHANNEL_403(server, user, channelName));
+            return;
+        }
+
+        var channelModes = (IExtendedChannelModes)channel.Modes;
+
+        if (!user.IsOn(channel))
+        {
+            chatFrame.User.Send(
+                Raw.IRCX_ERR_NOTONCHANNEL_442(server, user, channel));
+            return;
+        }
+
+        if (channelModes.NoWhisper)
+        {
+            user.Send(Raw.IRCX_ERR_NOWHISPER_923(server, user, channel));
+            return;
+        }
+
+        if (channelModes.NoGuestWhisper && user.IsGuest())
+        {
+            user.Send(Raw.IRCX_ERR_NOWHISPER_923(server, user, channel));
             return;
         }
 

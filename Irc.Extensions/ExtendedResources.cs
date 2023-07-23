@@ -8,6 +8,7 @@ public static class ExtendedResources
     public static char ChannelModeProfanity = 'f';
     public static char ChannelModeRegistered = 'r';
     public static char ChannelModeNoWhisper = 'w';
+    public static char ChannelModeNoGuestWhisper = 'W';
     public static char ChannelModeService = 'z';
     public static char ChannelModeKnock = 'u';
     public static char ChannelModeAuditorium = 'x';

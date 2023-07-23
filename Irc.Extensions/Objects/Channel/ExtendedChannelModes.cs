@@ -27,6 +27,12 @@ public class ExtendedChannelModes : ChannelModes, IExtendedChannelModes
         set => modes[ExtendedResources.ChannelModeAuditorium].Set(Convert.ToInt32(value));
     }
 
+    public bool NoGuestWhisper
+    {
+        get => modes[ExtendedResources.ChannelModeNoGuestWhisper].Get() == 1;
+        set => modes[ExtendedResources.ChannelModeNoGuestWhisper].Set(Convert.ToInt32(value));
+    }
+
     public bool AuthOnly
     {
         get => modes[ExtendedResources.ChannelModeAuthOnly].Get() == 1;
