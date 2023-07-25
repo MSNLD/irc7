@@ -1,4 +1,4 @@
-﻿namespace Irc.Helpers.CSharpTools;
+﻿namespace Irc.Helpers;
 
 public static class GuidExtensions
 {

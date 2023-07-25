@@ -1,10 +1,10 @@
 using System.Text.RegularExpressions;
 
-namespace Irc.Helpers.CSharpTools;
+namespace Irc.Helpers;
 
 public class RegularExpressions
 {
-    private Regex regex;
+    private readonly Regex regex;
 
     public RegularExpressions(string pattern, bool ignoreCase)
     {

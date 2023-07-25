@@ -1,7 +1,7 @@
 using Irc.Commands;
 using Irc.Constants;
 using Irc.Enumerations;
-using Irc.Helpers.CSharpTools;
+using Irc.Helpers;
 using Irc.Interfaces;
 
 namespace Irc.Extensions.Apollo.Directory.Commands;

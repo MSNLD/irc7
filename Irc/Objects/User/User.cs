@@ -8,11 +8,14 @@ using Irc.IO;
 using Irc.Modes;
 using Irc.Objects.Server;
 using Irc7d;
+using NLog;
 
 namespace Irc.Objects;
 
 public class User : ChatObject, IUser
 {
+    public static readonly NLog.Logger Log = LogManager.GetCurrentClassLogger();
+
     //public Access Access;
     private readonly IConnection _connection;
     private readonly IDataRegulator _dataRegulator;
@@ -123,7 +126,7 @@ public class User : ChatObject, IUser
                 stringBuilder.Append("\r\n");
             }
 
-            Console.WriteLine($"Sending[{_protocol.GetType().Name}/{Name}]: {stringBuilder}");
+            Log.Info($"Sending[{_protocol.GetType().Name}/{Name}]: {stringBuilder}");
             _connection?.Send(stringBuilder.ToString());
         }
     }
@@ -133,7 +136,7 @@ public class User : ChatObject, IUser
         // Clean modes
         _modeOperations.Clear();
 
-        Console.WriteLine($"Disconnecting[{_protocol.GetType().Name}/{Name}]: {message}");
+        Log.Info($"Disconnecting[{_protocol.GetType().Name}/{Name}]: {message}");
         _connection?.Disconnect($"{message}\r\n");
     }
 
@@ -333,7 +336,7 @@ public class User : ChatObject, IUser
         {
             if (PingCount < Server.PingAttempts)
             {
-                Console.WriteLine($"Ping Count for {this} hit stage {PingCount + 1}");
+                Log.Debug($"Ping Count for {this} hit stage {PingCount + 1}");
                 PingCount++;
                 Send(Raw.RPL_PING(Server, this));
             }

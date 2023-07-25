@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Irc.Helpers.CSharpTools;
+namespace Irc.Helpers;
 
 public static class SerializationExtensions
 {

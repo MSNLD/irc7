@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using Irc.Helpers.CSharpTools;
+using Irc.Helpers;
 using NUnit.Framework;
 
 namespace Irc.Extensions.NTLM.Tests.MessageTests;

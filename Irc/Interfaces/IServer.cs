@@ -39,6 +39,7 @@ public interface IServer
     Guid Id { get; }
     string ShortId { get; }
     string Name { get; set; }
+    Version ServerVersion { set; get; }
     void AddUser(IUser user);
     void RemoveUser(IUser user);
     void AddChannel(IChannel channel);
@@ -55,13 +56,12 @@ public interface IServer
     string GetSupportedChannelModes();
     string GetSupportedUserModes();
     IDictionary<EnumProtocolType, IProtocol> GetProtocols();
-    System.Version ServerVersion { set; get; }
     IDataStore GetDataStore();
     IChannel GetChannelByName(string name);
     ChatObject GetChatObject(string name);
     IProtocol GetProtocol(EnumProtocolType protocolType);
     ISecurityManager GetSecurityManager();
-    ICredentialProvider GetCredentialManager();
+    ICredentialProvider? GetCredentialManager();
     void Shutdown();
     string ToString();
     string[] GetMOTD();

@@ -1,6 +1,5 @@
-﻿using Irc.ClassExtensions.CSharpTools;
-using Irc.Extensions.NTLM;
-using Irc.Helpers.CSharpTools;
+﻿using Irc.Extensions.NTLM;
+using Irc.Helpers;
 using Irc.Interfaces;
 using Irc.Security;
 
@@ -11,14 +10,14 @@ namespace Irc.Extensions.Security.Packages;
 
 public class NTLM : SupportPackage, ISupportPackage
 {
+    private readonly ICredentialProvider? _credentialProvider;
     private readonly NTLMShared.TargetInformation _targetInformation = new();
-    private readonly ICredentialProvider _credentialProvider;
+    private ICredential? _credential;
     private NtlmType1Message _message1;
     private NtlmType2Message _message2;
     private NtlmType3Message _message3;
-    private ICredential _credential = null;
 
-    public NTLM(ICredentialProvider credentialProvider)
+    public NTLM(ICredentialProvider? credentialProvider)
     {
         Listed = true;
         _credentialProvider = credentialProvider;
@@ -26,9 +25,9 @@ public class NTLM : SupportPackage, ISupportPackage
 
     public string ServerDomain { get; set; } = "cg";
 
-    public override SupportPackage CreateInstance(ICredentialProvider credentialProvider)
+    public override SupportPackage CreateInstance(ICredentialProvider? credentialProvider)
     {
-        return new NTLM(credentialProvider == null ? _credentialProvider : credentialProvider);
+        return new NTLM(credentialProvider ?? _credentialProvider);
     }
 
     public ICredential GetCredentials()
@@ -59,7 +58,7 @@ public class NTLM : SupportPackage, ISupportPackage
         }
     }
 
-    public override string CreateSecurityChallenge()
+    public override string? CreateSecurityChallenge()
     {
         try
         {
@@ -74,6 +73,8 @@ public class NTLM : SupportPackage, ISupportPackage
 
     public override EnumSupportPackageSequence AcceptSecurityContext(string data, string ip)
     {
+        if (_credentialProvider == null) return EnumSupportPackageSequence.SSP_FAILED;
+
         try
         {
             _message3 = new NtlmType3Message(data);
@@ -81,13 +82,12 @@ public class NTLM : SupportPackage, ISupportPackage
             _credential = _credentialProvider.GetUserCredentials(_message3.TargetName, _message3.UserName);
 
             if (_credential != null)
-            {
                 if (_message3.VerifySecurityContext(_message2.Challenge.ToAsciiString(), _credential.GetPassword()))
                 {
                     Authenticated = true;
                     return EnumSupportPackageSequence.SSP_OK;
                 }
-            }
+
             return EnumSupportPackageSequence.SSP_FAILED;
         }
         catch (Exception)

@@ -1,6 +1,5 @@
 ﻿using System.Runtime.InteropServices;
-using Irc.ClassExtensions.CSharpTools;
-using Irc.Helpers.CSharpTools;
+using Irc.Helpers;
 
 namespace Irc.Extensions.NTLM;
 

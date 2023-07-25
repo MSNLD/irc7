@@ -2,24 +2,26 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using Irc.ClassExtensions.CSharpTools;
 using Irc.Enumerations;
 using Irc.Extensions.Apollo.Security.Packages;
-using Irc.Helpers.CSharpTools;
+using Irc.Helpers;
 using Irc.Interfaces;
 using Irc.Security;
+using NLog;
 
 // ReSharper disable once CheckNamespace
 namespace Irc.Extensions.Security.Packages;
 
 public class GateKeeper : SupportPackage, ISupportPackage
 {
+    public static readonly NLog.Logger Log = LogManager.GetCurrentClassLogger();
+
     private static readonly string _signature = "GKSSP\0";
 
     // Credit to JD for discovering the below key through XOR'ing (Discovered 2017/05/04)
     private static readonly string key = "SRFMKSJANDRESKKC";
-    private byte[] challenge_bytes = null;
-    private char[] challenge = null;
+    private char[] challenge;
+    private byte[] challenge_bytes;
     protected GateKeeperToken ServerToken;
 
     public GateKeeper()
@@ -29,7 +31,7 @@ public class GateKeeper : SupportPackage, ISupportPackage
         ServerSequence = EnumSupportPackageSequence.SSP_INIT;
     }
 
-    public override SupportPackage CreateInstance(ICredentialProvider credentialProvider)
+    public override SupportPackage CreateInstance(ICredentialProvider? credentialProvider)
     {
         return new GateKeeper();
     }
@@ -41,7 +43,7 @@ public class GateKeeper : SupportPackage, ISupportPackage
             if (token.StartsWith(_signature))
             {
                 var clientToken = GateKeeperTokenHelper.InitializeFromBytes(token.ToByteArray());
-                if ((EnumSupportPackageSequence) clientToken.Sequence == EnumSupportPackageSequence.SSP_INIT &&
+                if ((EnumSupportPackageSequence)clientToken.Sequence == EnumSupportPackageSequence.SSP_INIT &&
                     clientToken.Version is >= 1 and <= 3)
                 {
                     ServerSequence = EnumSupportPackageSequence.SSP_EXT;
@@ -61,7 +63,7 @@ public class GateKeeper : SupportPackage, ISupportPackage
             {
                 var clientToken = GateKeeperTokenHelper.InitializeFromBytes(token.ToByteArray());
                 var clientVersion = clientToken.Version;
-                var clientStage = (EnumSupportPackageSequence) clientToken.Sequence;
+                var clientStage = (EnumSupportPackageSequence)clientToken.Sequence;
 
                 if (clientStage != ServerSequence || clientVersion != ServerVersion)
                     return EnumSupportPackageSequence.SSP_FAILED;
@@ -80,6 +82,7 @@ public class GateKeeper : SupportPackage, ISupportPackage
                         writer.WriteLine("Response");
                         writer.WriteLine(JsonSerializer.Serialize(context.Select(b => (int)b).ToArray()));
                     }
+
                     return EnumSupportPackageSequence.SSP_FAILED;
                 }
 
@@ -96,11 +99,11 @@ public class GateKeeper : SupportPackage, ISupportPackage
                         Level = EnumUserAccessLevel.Member,
                         Domain = GetType().Name,
                         Username = guid.ToUnformattedString().ToUpper(),
-                        Guest = (this is not GateKeeperPassport)
+                        Guest = this is not GateKeeperPassport
                     };
 
                     if (this is GateKeeperPassport) return EnumSupportPackageSequence.SSP_EXT;
-                    else return EnumSupportPackageSequence.SSP_OK;
+                    return EnumSupportPackageSequence.SSP_OK;
                 }
             }
 
@@ -119,9 +122,9 @@ public class GateKeeper : SupportPackage, ISupportPackage
         }
     }
 
-    public override string CreateSecurityChallenge()
+    public override string? CreateSecurityChallenge()
     {
-        ServerToken.Sequence = (int) EnumSupportPackageSequence.SSP_SEC;
+        ServerToken.Sequence = (int)EnumSupportPackageSequence.SSP_SEC;
         ServerToken.Version = ServerVersion;
         SetChallenge(Guid.NewGuid().ToByteArray());
         var message = new StringBuilder(Marshal.SizeOf(ServerToken) + challenge.Length);
@@ -138,9 +141,9 @@ public class GateKeeper : SupportPackage, ISupportPackage
         var ctx = $"{challenge}{ip}";
         var h1 = md5.ComputeHash(ctx.ToByteArray(), 0, ctx.Length);
 
-        bool bHashEqual = h1.SequenceEqual(context);
-        Console.WriteLine($"Auth: Received = {JsonSerializer.Serialize(context.Select(b => (int)b).ToArray())}");
-        Console.WriteLine($"Auth: Expected = {JsonSerializer.Serialize(h1.Select(b => (int)b).ToArray())}");
+        var bHashEqual = h1.SequenceEqual(context);
+        Log.Debug($"Auth: Received = {JsonSerializer.Serialize(context.Select(b => (int)b).ToArray())}");
+        Log.Debug($"Auth: Expected = {JsonSerializer.Serialize(h1.Select(b => (int)b).ToArray())}");
 
         return bHashEqual;
     }

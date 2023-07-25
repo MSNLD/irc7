@@ -1,8 +1,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Numerics;
-using Irc.ClassExtensions.CSharpTools;
-using Irc.Helpers.CSharpTools;
+using Irc.Helpers;
 
 namespace Irc7d;
 
@@ -22,7 +21,7 @@ public class SocketConnection : IConnection
         _id = 0;
         if (_socket.RemoteEndPoint != null)
         {
-            var remoteAddressBytes = ((IPEndPoint) _socket.RemoteEndPoint).Address.GetAddressBytes();
+            var remoteAddressBytes = ((IPEndPoint)_socket.RemoteEndPoint).Address.GetAddressBytes();
             _id = new BigInteger(remoteAddressBytes);
 
             // _id = remoteAddressBytes.Length > 8
@@ -30,7 +29,7 @@ public class SocketConnection : IConnection
             //       BitConverter.ToUInt64(remoteAddressBytes, 8)
             //     : BitConverter.ToUInt32(remoteAddressBytes, 0);
 
-            var remoteEndPoint = ((IPEndPoint)_socket.RemoteEndPoint);
+            var remoteEndPoint = (IPEndPoint)_socket.RemoteEndPoint;
             var ipAddress = remoteEndPoint.Address;
 
             _address = _socket.RemoteEndPoint != null
@@ -111,7 +110,7 @@ public class SocketConnection : IConnection
 
             var bNewLinePending = !_received.EndsWith('\r') && !_received.EndsWith('\n');
 
-            var lines = data.Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
+            var lines = data.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
             var totalLines = bNewLinePending ? lines.Length - 1 : lines.Length;
 

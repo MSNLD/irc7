@@ -1,14 +1,18 @@
-﻿namespace Irc.ClassExtensions.CSharpTools;
+﻿using NLog;
+
+namespace Irc.Helpers;
 
 public static class Debug
 {
+    public static readonly NLog.Logger Log = LogManager.GetCurrentClassLogger();
+
     public static bool Enabled { get; private set; }
 
     public static bool Verbose { get; private set; }
 
     public static void Out(string s)
     {
-        if (Verbose) Console.WriteLine(s);
+        if (Verbose) Log.Debug(s);
     }
 
     public static void Enable()

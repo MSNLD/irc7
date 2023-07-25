@@ -10,12 +10,15 @@ using Irc.Interfaces;
 using Irc.IO;
 using Irc.Security;
 using Irc7d;
+using NLog;
 using Version = System.Version;
 
 namespace Irc.Objects.Server;
 
 public class Server : ChatObject, IServer
 {
+    public static readonly NLog.Logger Log = LogManager.GetCurrentClassLogger();
+
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     protected readonly IDataStore _dataStore;
     private readonly IFloodProtectionManager _floodProtectionManager;
@@ -71,7 +74,7 @@ public class Server : ChatObject, IServer
             var user = CreateUser(connection);
             AddUser(user);
 
-            connection.OnConnect += (o, integer) => { Console.WriteLine("Connect"); };
+            connection.OnConnect += (o, integer) => { Log.Info("Connect"); };
             connection.OnReceive += (o, s) =>
             {
                 //Console.WriteLine("OnRecv:" + s);
@@ -269,7 +272,7 @@ public class Server : ChatObject, IServer
         return _securityManager;
     }
 
-    public ICredentialProvider GetCredentialManager()
+    public ICredentialProvider? GetCredentialManager()
     {
         return null;
     }
@@ -360,7 +363,7 @@ public class Server : ChatObject, IServer
                 Users.Add(user);
             }
 
-            Console.WriteLine($"Added {PendingNewUserQueue.Count} users. Total Users = {Users.Count}");
+            Log.Info($"Added {PendingNewUserQueue.Count} users. Total Users = {Users.Count}");
             PendingNewUserQueue.Clear();
         }
     }
@@ -375,7 +378,7 @@ public class Server : ChatObject, IServer
             {
                 if (!Users.Remove(user))
                 {
-                    Console.WriteLine($"Failed to remove {user}. Requeueing");
+                    Log.Error($"Failed to remove {user}. Requeueing");
                     PendingRemoveUserQueue.Enqueue(user);
                     continue;
                 }
@@ -383,7 +386,7 @@ public class Server : ChatObject, IServer
                 Quit.QuitChannels(user, "Connection reset by peer");
             }
 
-            Console.WriteLine($"Removed {PendingRemoveUserQueue.Count} users. Total Users = {Users.Count}");
+            Log.Info($"Removed {PendingRemoveUserQueue.Count} users. Total Users = {Users.Count}");
             PendingRemoveUserQueue.Clear();
         }
     }
@@ -432,7 +435,7 @@ public class Server : ChatObject, IServer
                 if (command is not Ping && command is not Pong) user.LastIdle = DateTime.UtcNow;
 
                 user.GetDataRegulator().PopIncoming();
-                Console.WriteLine($"Processing: {message.OriginalText}");
+                Log.Info($"Processing: {message.OriginalText}");
 
                 var chatFrame = new ChatFrame { Server = this, User = user, Message = message };
                 if (!command.RegistrationNeeded(chatFrame) && command.ParametersAreValid(chatFrame))
@@ -444,7 +447,7 @@ public class Server : ChatObject, IServer
                     {
                         chatFrame.User.Send(
                             IrcRaws.IRC_RAW_999(chatFrame.Server, chatFrame.User, Resources.ServerError));
-                        Console.WriteLine(e.ToString());
+                        Log.Error(e.ToString());
                     }
 
                 // Check if user can register

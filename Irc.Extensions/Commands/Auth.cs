@@ -1,7 +1,7 @@
-﻿using Irc.ClassExtensions.CSharpTools;
-using Irc.Enumerations;
+﻿using Irc.Enumerations;
 using Irc.Extensions.Security;
 using Irc.Extensions.Security.Packages;
+using Irc.Helpers;
 using Irc.Interfaces;
 
 namespace Irc.Commands;

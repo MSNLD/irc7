@@ -12,19 +12,24 @@ using Irc.Extensions.Security.Credentials;
 using Irc.Factories;
 using Irc.Interfaces;
 using Irc.IO;
+using Irc.Logger;
 using Irc.Objects.Server;
 using Irc.Security;
 using Microsoft.Extensions.CommandLineUtils;
+using NLog;
 
 namespace Irc7d;
 
 internal class Program
 {
+    public static readonly NLog.Logger Log = LogManager.GetCurrentClassLogger();
+
     private static IServer server;
     private static CancellationTokenSource cancellationTokenSource;
 
     private static void Main(string[] args)
     {
+        Logging.Attach();
         var app = new CommandLineApplication();
         app.Name = AppDomain.CurrentDomain.FriendlyName;
         app.Description = "irc7 daemon";
@@ -61,7 +66,7 @@ internal class Program
 
             if (versionOption.HasValue())
             {
-                Console.WriteLine(Assembly.GetExecutingAssembly().GetName().Version);
+                Log.Info(Assembly.GetExecutingAssembly().GetName().Version.ToString());
                 return 0;
             }
 
@@ -92,7 +97,7 @@ internal class Program
             var socketServer = new SocketServer(ip, port, backlog, maxConnections, bufferSize);
             socketServer.OnListen += (sender, server1) =>
             {
-                Console.WriteLine(
+                Log.Info(
                     $"Listening on {ip}:{port} backlog={backlog} buffer={bufferSize} maxconn={maxConnections} fqdn={fqdn} type={type} {(chatServerIP.HasValue() ? "forwardserver=" : "")}{forwardServer}");
             };
 
@@ -175,7 +180,7 @@ internal class Program
 
     private static void CurrentDomain_ProcessExit(object? sender, EventArgs e)
     {
-        Console.WriteLine("Shutting down...");
+        Log.Info("Shutting down...");
         server.Shutdown();
         cancellationTokenSource.Cancel();
     }

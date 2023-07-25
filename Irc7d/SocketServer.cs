@@ -2,11 +2,15 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using System.Numerics;
+using Irc.Logger;
+using NLog;
 
 namespace Irc7d;
 
 public class SocketServer : Socket, ISocketServer
 {
+    public static readonly NLog.Logger Log = LogManager.GetCurrentClassLogger();
+
     public ConcurrentDictionary<BigInteger, ConcurrentBag<IConnection>> Sockets = new();
 
 
@@ -32,24 +36,6 @@ public class SocketServer : Socket, ISocketServer
     public int BuffSize { get; }
     public int CurrentConnections { get; }
 
-
-    public void AcceptConnection(Socket acceptSocket)
-    {
-        var connection = new SocketConnection(acceptSocket) as IConnection;
-        OnClientConnecting?.Invoke(this, connection);
-    }
-    public void AcceptLoop(SocketAsyncEventArgs args)
-    {
-        do
-        {
-            AcceptConnection(args.AcceptSocket);
-            // Get next socket
-            // Reset AcceptSocket for next accept
-            args.AcceptSocket = null;
-        }
-        while (!AcceptAsync(args));
-    }
-
     public void Listen()
     {
         Bind(new IPEndPoint(IP, Port));
@@ -59,10 +45,7 @@ public class SocketServer : Socket, ISocketServer
         OnListen?.Invoke(this, this);
 
         var acceptAsync = new SocketAsyncEventArgs();
-        acceptAsync.Completed += (sender, args) =>
-        {
-            AcceptLoop(args);
-        };
+        acceptAsync.Completed += (sender, args) => { AcceptLoop(args); };
 
         // Get first socket
         AcceptAsync(acceptAsync);
@@ -71,6 +54,24 @@ public class SocketServer : Socket, ISocketServer
     public void Close()
     {
         Close();
+    }
+
+
+    public void AcceptConnection(Socket acceptSocket)
+    {
+        var connection = new SocketConnection(acceptSocket) as IConnection;
+        OnClientConnecting?.Invoke(this, connection);
+    }
+
+    public void AcceptLoop(SocketAsyncEventArgs args)
+    {
+        do
+        {
+            AcceptConnection(args.AcceptSocket);
+            // Get next socket
+            // Reset AcceptSocket for next accept
+            args.AcceptSocket = null;
+        } while (!AcceptAsync(args));
     }
 
     public void Accept(IConnection connection)
@@ -86,7 +87,7 @@ public class SocketServer : Socket, ISocketServer
         connection.OnDisconnect += ClientDisconnected;
 
         var socketCollection = Sockets.GetOrAdd(connection.GetId(), new ConcurrentBag<IConnection>());
-        Console.WriteLine($"Current keys: {Sockets.Count} / Current sockets: {socketCollection.Count}");
+        Log.Info($"Current keys: {Sockets.Count} / Current sockets: {socketCollection.Count}");
 
         socketCollection.Add(connection);
         connection.Accept();
@@ -105,7 +106,7 @@ public class SocketServer : Socket, ISocketServer
         }
 
         if (connection == null)
-            Console.WriteLine(
+            Log.Info(
                 $"{connection.GetFullAddress()} has disconnected but failed to TryTake / total: {Sockets.Count} ");
 
         OnClientDisconnected?.Invoke(this, connection);

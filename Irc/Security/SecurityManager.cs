@@ -15,7 +15,7 @@ public class SecurityManager : ISecurityManager
         UpdateSupportPackages();
     }
 
-    public SupportPackage CreatePackageInstance(string name, ICredentialProvider credentialProvider)
+    public SupportPackage CreatePackageInstance(string name, ICredentialProvider? credentialProvider)
     {
         try
         {

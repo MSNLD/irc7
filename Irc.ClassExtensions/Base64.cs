@@ -1,6 +1,4 @@
-﻿using Irc.Helpers.CSharpTools;
-
-namespace Irc.ClassExtensions.CSharpTools;
+﻿namespace Irc.Helpers;
 
 // Base64 implementation with charsets for PassportCookie/RegCookie
 public class Base64

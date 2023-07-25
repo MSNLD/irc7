@@ -7,11 +7,11 @@ namespace Irc.Extensions.Apollo.Security.Packages;
 
 public class GateKeeperPassport : GateKeeper
 {
-    private readonly ICredentialProvider _credentialProvider;
-    
+    private readonly ICredentialProvider? _credentialProvider;
+
     public string Puid;
 
-    public GateKeeperPassport(ICredentialProvider credentialProvider)
+    public GateKeeperPassport(ICredentialProvider? credentialProvider)
     {
         _credentialProvider = credentialProvider;
         ServerSequence = EnumSupportPackageSequence.SSP_INIT;
@@ -19,7 +19,7 @@ public class GateKeeperPassport : GateKeeper
         Listed = false;
     }
 
-    public override SupportPackage CreateInstance(ICredentialProvider credentialProvider)
+    public override SupportPackage CreateInstance(ICredentialProvider? credentialProvider)
     {
         return new GateKeeperPassport(_credentialProvider);
     }
@@ -29,7 +29,8 @@ public class GateKeeperPassport : GateKeeper
         if (ServerSequence == EnumSupportPackageSequence.SSP_EXT)
         {
             var result = base.AcceptSecurityContext(data, ip);
-            if (result != EnumSupportPackageSequence.SSP_OK && result != EnumSupportPackageSequence.SSP_EXT) return EnumSupportPackageSequence.SSP_FAILED;
+            if (result != EnumSupportPackageSequence.SSP_OK && result != EnumSupportPackageSequence.SSP_EXT)
+                return EnumSupportPackageSequence.SSP_FAILED;
 
             Authenticated = false;
             ServerSequence = EnumSupportPackageSequence.SSP_CREDENTIALS;
@@ -47,8 +48,8 @@ public class GateKeeperPassport : GateKeeper
             _credentials = _credentialProvider.ValidateTokens(
                 new Dictionary<string, string>
                 {
-                    {"ticket", ticket},
-                    {"profile", profile}
+                    { "ticket", ticket },
+                    { "profile", profile }
                 });
 
             if (_credentials == null) return EnumSupportPackageSequence.SSP_FAILED;

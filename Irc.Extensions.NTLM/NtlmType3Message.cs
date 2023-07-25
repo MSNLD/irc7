@@ -1,8 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
-using Irc.ClassExtensions.CSharpTools;
 using Irc.Extensions.NTLM;
-using Irc.Helpers.CSharpTools;
+using Irc.Helpers;
 
 public class NtlmType3Message
 {
@@ -19,10 +18,6 @@ public class NtlmType3Message
     private string _userNameData;
     private string _workstationNameData;
 
-    public string TargetName => ASCIIEncoding.Unicode.GetString(_targetNameData.ToByteArray());
-    public string UserName => ASCIIEncoding.Unicode.GetString(_userNameData.ToByteArray());
-    public string Workstation => ASCIIEncoding.Unicode.GetString(_workstationNameData.ToByteArray());
-    
     public uint Flags;
     private NTLMShared.NTLMSSPOSVersion OSVersionInfo;
 
@@ -34,6 +29,10 @@ public class NtlmType3Message
         _byteData = _data.ToByteArray();
         Parse(_byteData);
     }
+
+    public string TargetName => Encoding.Unicode.GetString(_targetNameData.ToByteArray());
+    public string UserName => Encoding.Unicode.GetString(_userNameData.ToByteArray());
+    public string Workstation => Encoding.Unicode.GetString(_workstationNameData.ToByteArray());
 
     public void Parse(byte[] data)
     {
@@ -66,7 +65,7 @@ public class NtlmType3Message
 
         if (legagyNTLM)
         {
-            Flags = (uint) (NtlmFlag.NTLMSSP_NEGOTIATE_NTLM | NtlmFlag.NTLMSSP_NEGOTIATE_OEM);
+            Flags = (uint)(NtlmFlag.NTLMSSP_NEGOTIATE_NTLM | NtlmFlag.NTLMSSP_NEGOTIATE_OEM);
         }
         else
         {
@@ -84,7 +83,7 @@ public class NtlmType3Message
 
     private void EnumerateFlags()
     {
-        foreach (var flag in Enum.GetValues<NtlmFlag>()) _flags.Add(flag, ((uint) flag & Flags) != 0);
+        foreach (var flag in Enum.GetValues<NtlmFlag>()) _flags.Add(flag, ((uint)flag & Flags) != 0);
     }
 
     public bool VerifySecurityContext(string challenge, string password)

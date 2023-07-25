@@ -23,7 +23,8 @@ public class DirectoryServer : ApolloServer
 
     public DirectoryServer(ISocketServer socketServer, ISecurityManager securityManager,
         IFloodProtectionManager floodProtectionManager, IDataStore dataStore, IList<IChannel> channels,
-        ICommandCollection commands, IUserFactory userFactory = null, ICredentialProvider ntlmCredentialProvider = null)
+        ICommandCollection commands, IUserFactory userFactory = null,
+        ICredentialProvider? ntlmCredentialProvider = null)
         : base(socketServer, securityManager,
             floodProtectionManager, dataStore, channels, commands, userFactory ?? new ApolloUserFactory(),
             ntlmCredentialProvider)

@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Irc.ClassExtensions.CSharpTools;
+namespace Irc.Helpers;
 
 public static class StringBuilderRegEx
 {
@@ -14,16 +14,16 @@ public static class StringBuilderRegEx
         sbRegExEval.Length = 0;
         sbRegExQuery.Length = 0;
 
-        for (var i = 0; i < data.Length; i++) sbRegExEval.Append((char) data.ToByteArray()[i]);
+        for (var i = 0; i < data.Length; i++) sbRegExEval.Append((char)data.ToByteArray()[i]);
         for (var i = 0; i < query.Length; i++)
-            if (query.ToByteArray()[i] == (byte) '*')
+            if (query.ToByteArray()[i] == (byte)'*')
             {
-                sbRegExQuery.Append((char) 46); // .
-                sbRegExQuery.Append((char) 42); // *
+                sbRegExQuery.Append((char)46); // .
+                sbRegExQuery.Append((char)42); // *
             }
-            else if (query.ToByteArray()[i] == (byte) '?')
+            else if (query.ToByteArray()[i] == (byte)'?')
             {
-                sbRegExQuery.Append((char) 46); // .
+                sbRegExQuery.Append((char)46); // .
             }
             else
             {
@@ -31,10 +31,10 @@ public static class StringBuilderRegEx
                 sbRegExQuery.Append('\\');
                 sbRegExQuery.Append('x');
                 byte b;
-                b = (byte) (query.ToByteArray()[i] >> 4);
-                sbRegExQuery.Append((char) (b > 9 ? b + 0x37 : b + 0x30));
-                b = (byte) (query.ToByteArray()[i] & 0xF);
-                sbRegExQuery.Append((char) (b > 9 ? b + 0x37 : b + 0x30));
+                b = (byte)(query.ToByteArray()[i] >> 4);
+                sbRegExQuery.Append((char)(b > 9 ? b + 0x37 : b + 0x30));
+                b = (byte)(query.ToByteArray()[i] & 0xF);
+                sbRegExQuery.Append((char)(b > 9 ? b + 0x37 : b + 0x30));
             }
 
         var r = new Regex(sbRegExQuery.ToString(), IgnoreCase ? RegexOptions.IgnoreCase : RegexOptions.None);

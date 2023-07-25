@@ -1,6 +1,6 @@
-﻿using Irc.ClassExtensions.CSharpTools;
-using Irc.Commands;
+﻿using Irc.Commands;
 using Irc.Enumerations;
+using Irc.Helpers;
 using Irc.Interfaces;
 using Irc.Objects;
 using Irc.Objects.Channel;

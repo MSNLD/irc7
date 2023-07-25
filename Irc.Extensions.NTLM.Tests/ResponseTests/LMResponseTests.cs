@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Security.Cryptography;
-using Irc.Helpers.CSharpTools;
+using Irc.Helpers;
 using NUnit.Framework;
 
 namespace Irc.Extensions.NTLM.Tests;
@@ -17,7 +17,7 @@ public class LMResponseTests
         };
 
         var password = "SecREt01";
-        var challenge = new byte[] {0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef};
+        var challenge = new byte[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
 
         var ntlmAlgorithms = new NtlmResponses();
         var result = ntlmAlgorithms.LmResponse(password, challenge.ToAsciiString());

@@ -1,6 +1,5 @@
 ﻿using System.Security.Cryptography;
-using Irc.ClassExtensions.CSharpTools;
-using Irc.Helpers.CSharpTools;
+using Irc.Helpers;
 
 namespace Irc.Extensions.NTLM.Cryptography;
 
@@ -28,7 +27,7 @@ internal class DesEncryptor
         using (var MS = new MemoryStream())
         {
             var bytData = data.ToByteArray();
-            byte[] bytIV = {0, 0, 0, 0, 0, 0, 0, 0};
+            byte[] bytIV = { 0, 0, 0, 0, 0, 0, 0, 0 };
             var bytKey = key;
             symmetricAlgorithm.Key = bytKey;
             symmetricAlgorithm.IV = bytIV;
@@ -54,7 +53,7 @@ internal class DesEncryptor
         using (var MS = new MemoryStream())
         {
             var bytData = data;
-            byte[] bytIV = {0, 0, 0, 0, 0, 0, 0, 0};
+            byte[] bytIV = { 0, 0, 0, 0, 0, 0, 0, 0 };
             var bytKey = key;
             symmetricAlgorithm.Key = bytKey;
             symmetricAlgorithm.IV = bytIV;

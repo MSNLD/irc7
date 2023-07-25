@@ -1,9 +1,8 @@
 using System;
-using Irc.ClassExtensions.CSharpTools;
 using Irc.Extensions.Apollo.Security.Packages;
 using Irc.Extensions.Security;
 using Irc.Extensions.Security.Packages;
-using Irc.Helpers.CSharpTools;
+using Irc.Helpers;
 using NUnit.Framework;
 
 namespace Irc.Extensions.Apollo.Tests;
@@ -22,14 +21,14 @@ public class GateKeeperTests
         var gateKeeperToken = new GateKeeperToken();
         gateKeeperToken.Signature = "GKSSP\0".ToByteArray();
         gateKeeperToken.Version = 1;
-        gateKeeperToken.Sequence = (int) EnumSupportPackageSequence.SSP_INIT;
+        gateKeeperToken.Sequence = (int)EnumSupportPackageSequence.SSP_INIT;
 
         var token = $"{gateKeeperToken.Serialize<GateKeeperToken>().ToAsciiString()}";
 
         Assert.AreEqual(EnumSupportPackageSequence.SSP_OK, gateKeeper.InitializeSecurityContext(token, null));
 
         gateKeeperToken.Version = 1;
-        gateKeeperToken.Sequence = (int) EnumSupportPackageSequence.SSP_EXT;
+        gateKeeperToken.Sequence = (int)EnumSupportPackageSequence.SSP_EXT;
 
         token =
             $"{gateKeeperToken.Serialize<GateKeeperToken>().ToAsciiString()}{new Guid().ToByteArray().ToAsciiString()}{new Guid().ToByteArray().ToAsciiString()}";
@@ -46,14 +45,14 @@ public class GateKeeperTests
         var gateKeeperToken = new GateKeeperToken();
         gateKeeperToken.Signature = "GKSSP\0".ToByteArray();
         gateKeeperToken.Version = 2;
-        gateKeeperToken.Sequence = (int) EnumSupportPackageSequence.SSP_INIT;
+        gateKeeperToken.Sequence = (int)EnumSupportPackageSequence.SSP_INIT;
 
         var token = $"{gateKeeperToken.Serialize<GateKeeperToken>().ToAsciiString()}";
 
         Assert.AreEqual(EnumSupportPackageSequence.SSP_OK, gateKeeper.InitializeSecurityContext(token, null));
 
         gateKeeperToken.Version = 2;
-        gateKeeperToken.Sequence = (int) EnumSupportPackageSequence.SSP_EXT;
+        gateKeeperToken.Sequence = (int)EnumSupportPackageSequence.SSP_EXT;
 
         // Below contains magical answer guid to null byte challenge
         token =
@@ -71,14 +70,14 @@ public class GateKeeperTests
         var gateKeeperToken = new GateKeeperToken();
         gateKeeperToken.Signature = "GKSSP\0".ToByteArray();
         gateKeeperToken.Version = 2;
-        gateKeeperToken.Sequence = (int) EnumSupportPackageSequence.SSP_INIT;
+        gateKeeperToken.Sequence = (int)EnumSupportPackageSequence.SSP_INIT;
 
         var token = $"{gateKeeperToken.Serialize<GateKeeperToken>().ToAsciiString()}";
 
         Assert.AreEqual(EnumSupportPackageSequence.SSP_OK, gateKeeper.InitializeSecurityContext(token, null));
 
         gateKeeperToken.Version = 2;
-        gateKeeperToken.Sequence = (int) EnumSupportPackageSequence.SSP_EXT;
+        gateKeeperToken.Sequence = (int)EnumSupportPackageSequence.SSP_EXT;
 
         // Below contains magical answer guid to null byte challenge
         token =
@@ -98,14 +97,14 @@ public class GateKeeperTests
         var gateKeeperToken = new GateKeeperToken();
         gateKeeperToken.Signature = "GKSSP\0".ToByteArray();
         gateKeeperToken.Version = 3;
-        gateKeeperToken.Sequence = (int) EnumSupportPackageSequence.SSP_INIT;
+        gateKeeperToken.Sequence = (int)EnumSupportPackageSequence.SSP_INIT;
 
         var token = $"{gateKeeperToken.Serialize<GateKeeperToken>().ToAsciiString()}";
 
         Assert.AreEqual(EnumSupportPackageSequence.SSP_OK, gateKeeper.InitializeSecurityContext(token, null));
 
         gateKeeperToken.Version = 3;
-        gateKeeperToken.Sequence = (int) EnumSupportPackageSequence.SSP_EXT;
+        gateKeeperToken.Sequence = (int)EnumSupportPackageSequence.SSP_EXT;
 
         // Below contains magical answer guid to null byte challenge with ip
         token =
