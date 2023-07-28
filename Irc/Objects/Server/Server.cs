@@ -61,7 +61,7 @@ public class Server : ChatObject, IServer
         _dataStore.Set("supported.channel.modes",
             new ChannelModes().GetSupportedModes());
         _dataStore.Set("supported.user.modes", new UserModes().GetSupportedModes());
-        SupportPackages = _dataStore.GetAs<string[]>("SASL.Packages") ?? Array.Empty<string>();
+        SupportPackages = _dataStore.GetAs<string[]>(Resources.ConfigSaslPackages) ?? Array.Empty<string>();
 
         if (MaxAnonymousConnections > 0) _securityManager.AddSupportPackage(new ANON());
 
@@ -120,12 +120,12 @@ public class Server : ChatObject, IServer
     public void SetMOTD(string motd)
     {
         var lines = motd.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-        _dataStore.SetAs("motd", lines);
+        _dataStore.SetAs(Resources.ConfigMotd, lines);
     }
 
     public string[] GetMOTD()
     {
-        return _dataStore.GetAs<string[]>("motd");
+        return _dataStore.GetAs<string[]>(Resources.ConfigMotd);
     }
 
     public void AddUser(IUser user)
@@ -290,17 +290,17 @@ public class Server : ChatObject, IServer
 
     public void LoadSettingsFromDataStore()
     {
-        var title = _dataStore.Get("Title");
-        var maxInputBytes = _dataStore.GetAs<int>("MaxInputBytes");
-        var maxOutputBytes = _dataStore.GetAs<int>("MaxOutputBytes");
-        var pingInterval = _dataStore.GetAs<int>("PingInterval");
-        var pingAttempts = _dataStore.GetAs<int>("PingAttempts");
-        var maxChannels = _dataStore.GetAs<int>("MaxChannels");
-        var maxConnections = _dataStore.GetAs<int>("MaxConnections");
-        var maxAuthenticatedConnections = _dataStore.GetAs<int>("MaxAuthenticatedConnections");
-        var maxAnonymousConnections = _dataStore.GetAs<int>("MaxAnonymousConnections");
-        var basicAuthentication = _dataStore.GetAs<bool>("BasicAuthentication");
-        var anonymousConnections = _dataStore.GetAs<bool>("AnonymousConnections");
+        var title = _dataStore.Get(Resources.ConfigServerTitle);
+        var maxInputBytes = _dataStore.GetAs<int>(Resources.ConfigMaxInputBytes);
+        var maxOutputBytes = _dataStore.GetAs<int>(Resources.ConfigMaxOutputBytes);
+        var pingInterval = _dataStore.GetAs<int>(Resources.ConfigPingInterval);
+        var pingAttempts = _dataStore.GetAs<int>(Resources.ConfigPingAttempts);
+        var maxChannels = _dataStore.GetAs<int>(Resources.ConfigMaxChannels);
+        var maxConnections = _dataStore.GetAs<int>(Resources.ConfigMaxConnections);
+        var maxAuthenticatedConnections = _dataStore.GetAs<int>(Resources.ConfigMaxAuthenticatedConnections);
+        var maxAnonymousConnections = _dataStore.GetAs<int>(Resources.ConfigMaxAnonymousConnections);
+        var basicAuthentication = _dataStore.GetAs<bool>(Resources.ConfigBasicAuthentication);
+        var anonymousConnections = _dataStore.GetAs<bool>(Resources.ConfigAnonymousConnections);
 
         if (!string.IsNullOrWhiteSpace(title)) Title = title;
         if (maxInputBytes > 0) MaxInputBytes = maxInputBytes;
@@ -363,7 +363,7 @@ public class Server : ChatObject, IServer
                 Users.Add(user);
             }
 
-            Log.Info($"Added {PendingNewUserQueue.Count} users. Total Users = {Users.Count}");
+            Log.Debug($"Added {PendingNewUserQueue.Count} users. Total Users = {Users.Count}");
             PendingNewUserQueue.Clear();
         }
     }
@@ -386,7 +386,7 @@ public class Server : ChatObject, IServer
                 Quit.QuitChannels(user, "Connection reset by peer");
             }
 
-            Log.Info($"Removed {PendingRemoveUserQueue.Count} users. Total Users = {Users.Count}");
+            Log.Debug($"Removed {PendingRemoveUserQueue.Count} users. Total Users = {Users.Count}");
             PendingRemoveUserQueue.Clear();
         }
     }
@@ -434,10 +434,9 @@ public class Server : ChatObject, IServer
             {
                 if (command is not Ping && command is not Pong) user.LastIdle = DateTime.UtcNow;
 
-                user.GetDataRegulator().PopIncoming();
-                Log.Info($"Processing: {message.OriginalText}");
+                Log.Trace($"Processing: {message.OriginalText}");
 
-                var chatFrame = new ChatFrame { Server = this, User = user, Message = message };
+                var chatFrame = user.GetNextFrame();
                 if (!command.RegistrationNeeded(chatFrame) && command.ParametersAreValid(chatFrame))
                     try
                     {

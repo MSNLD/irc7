@@ -10,10 +10,12 @@ public interface IConnection
     EventHandler<BigInteger> OnDisconnect { get; set; }
     EventHandler<Exception> OnError { get; set; }
 
-    string GetAddress();
-    string GetFullAddress();
+    string GetIp();
+    string GetIpAndPort();
+    string GetHostname();
     BigInteger GetId();
     void Send(string message);
     void Disconnect(string message);
     void Accept();
+    bool TryOverrideRemoteAddress(string ip, string hostname);
 }

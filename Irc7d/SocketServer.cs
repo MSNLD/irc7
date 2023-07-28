@@ -2,14 +2,13 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using System.Numerics;
-using Irc.Logger;
 using NLog;
 
 namespace Irc7d;
 
 public class SocketServer : Socket, ISocketServer
 {
-    public static readonly NLog.Logger Log = LogManager.GetCurrentClassLogger();
+    public static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
     public ConcurrentDictionary<BigInteger, ConcurrentBag<IConnection>> Sockets = new();
 
@@ -107,7 +106,7 @@ public class SocketServer : Socket, ISocketServer
 
         if (connection == null)
             Log.Info(
-                $"{connection.GetFullAddress()} has disconnected but failed to TryTake / total: {Sockets.Count} ");
+                $"{connection.GetIpAndPort()} has disconnected but failed to TryTake / total: {Sockets.Count} ");
 
         OnClientDisconnected?.Invoke(this, connection);
     }

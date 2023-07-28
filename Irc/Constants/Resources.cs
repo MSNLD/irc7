@@ -91,6 +91,12 @@ public static class Resources
     public static string IrcOpNickMask = @"[\x41-\xFF\-0-9]+$";
     public static int MaxFieldLen = 64;
 
+    #region "Webirc"
+
+    public static string webirc_option_secure = "secure";
+
+    #endregion
+
     public static long GetTime()
     {
         return DateTime.UtcNow.Ticks;
@@ -109,6 +115,34 @@ public static class Resources
         TimeZone = TimeZone.Substring(TimeZone.LastIndexOf(' ') + 1);
         return time.ToString("\"\"MMM d yyyy\" at \"HH:mm:ss ") + TimeZone;
     }
+
+    #region "Config"
+
+    public static string ConfigServerId = "Id";
+    public static string ConfigServerName = "Name";
+    public static string ConfigServerTitle = "Title";
+    public static string ConfigMotd = "Motd";
+    public static string ConfigSaslPackages = "SASL.Packages";
+    public static string ConfigPassportV4Secret = "Passport.V4.Secret";
+    public static string ConfigWebircUser = "WebIrc.User";
+    public static string ConfigWebircPass = "WebIrc.Password";
+    public static string ConfigWebircWhitelist = "WebIrc.Whitelisted.IP";
+    public static string ConfigMaxInputBytes = "MaxInputBytes";
+    public static string ConfigMaxOutputBytes = "MaxOutputBytes";
+    public static string ConfigPingInterval = "PingInterval";
+    public static string ConfigPingAttempts = "PingAttempts";
+    public static string ConfigMaxChannels = "MaxChannels";
+    public static string ConfigMaxConnections = "MaxConnections";
+    public static string ConfigMaxAuthenticatedConnections = "MaxAuthenticatedConnections";
+    public static string ConfigMaxAnonymousConnections = "MaxAnonymousConnections";
+    public static string ConfigMaxGuestConnections = "MaxGuestConnections";
+    public static string ConfigBasicAuthentication = "BasicAuthentication";
+    public static string ConfigAnonymousConnections = "AnonymousConnections";
+    public static string ConfigAdminInfo1 = "AdminInfo1";
+    public static string ConfigAdminInfo2 = "AdminInfo2";
+    public static string ConfigAdminInfo3 = "AdminInfo3";
+
+    #endregion
 
     #region Channel Categories
 
@@ -241,6 +275,7 @@ public static class Resources
     public static char UserModeOwner = 'q';
     public static char UserModeInvisible = 'i';
     public static char UserModeServerNotice = 's';
+    public static char UserModeSecure = 'S';
     public static char UserModeWallops = 'w';
 
     #endregion

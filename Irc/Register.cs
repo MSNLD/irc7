@@ -1,5 +1,6 @@
 ﻿using Irc.Commands;
 using Irc.Enumerations;
+using Irc.Interfaces;
 using Irc.Objects;
 using Irc.Objects.Server;
 
@@ -7,7 +8,7 @@ namespace Irc;
 
 public static class Register
 {
-    public static void TryRegister(ChatFrame chatFrame)
+    public static void TryRegister(IChatFrame chatFrame)
     {
         if (CanRegister(chatFrame))
         {
@@ -84,6 +85,7 @@ public static class Register
 
     public static bool BasicAuthentication(IServer server, IUser user)
     {
+        // TODO: Do basic auth
         if (!server.BasicAuthentication) return false;
 
         // Basic Auth would happen here
@@ -92,22 +94,9 @@ public static class Register
         if (!string.IsNullOrWhiteSpace(pass)) return true;
 
         return false;
-
-        // if (pass == "guide")
-        // {
-        //     chatFrame.User.PromoteToGuide();
-        // }
-        // else if (pass == "sysop")
-        // {
-        //     chatFrame.User.PromoteToSysop();
-        // }
-        // else if (pass == "admin")
-        // {
-        //     chatFrame.User.PromoteToAdministrator();
-        // }
     }
 
-    public static bool CanRegister(ChatFrame chatFrame)
+    public static bool CanRegister(IChatFrame chatFrame)
     {
         var server = chatFrame.Server;
         var user = chatFrame.User;
