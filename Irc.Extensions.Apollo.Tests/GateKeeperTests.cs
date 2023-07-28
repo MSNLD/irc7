@@ -32,7 +32,7 @@ public class GateKeeperTests
 
         token =
             $"{gateKeeperToken.Serialize<GateKeeperToken>().ToAsciiString()}{new Guid().ToByteArray().ToAsciiString()}{new Guid().ToByteArray().ToAsciiString()}";
-
+        gateKeeper.SetChallenge(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
         Assert.AreEqual(EnumSupportPackageSequence.SSP_FAILED, gateKeeper.AcceptSecurityContext(token, null));
     }
 
@@ -57,7 +57,8 @@ public class GateKeeperTests
         // Below contains magical answer guid to null byte challenge
         token =
             $"{gateKeeperToken.Serialize<GateKeeperToken>().ToAsciiString()}{Guid.Parse("e23a3251-b322-8b2b-a34c-c4d0be30c5dd").ToByteArray().ToAsciiString()}{new Guid().ToByteArray().ToAsciiString()}";
-
+        gateKeeper.SetChallenge(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
+        gateKeeper.CreateSecurityChallenge();
         Assert.AreEqual(EnumSupportPackageSequence.SSP_FAILED, gateKeeper.AcceptSecurityContext(token, null));
     }
 
@@ -82,7 +83,8 @@ public class GateKeeperTests
         // Below contains magical answer guid to null byte challenge
         token =
             $"{gateKeeperToken.Serialize<GateKeeperToken>().ToAsciiString()}{Guid.Parse("e23a3251-b322-8b2b-a34c-c4d0be30c5dd").ToByteArray().ToAsciiString()}{new Guid().ToByteArray().ToAsciiString()}";
-
+        gateKeeper.SetChallenge(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
+        gateKeeper.CreateSecurityChallenge();
         Assert.AreEqual(EnumSupportPackageSequence.SSP_OK, gateKeeper.AcceptSecurityContext(token, null));
     }
 
@@ -109,7 +111,8 @@ public class GateKeeperTests
         // Below contains magical answer guid to null byte challenge with ip
         token =
             $"{gateKeeperToken.Serialize<GateKeeperToken>().ToAsciiString()}{Guid.Parse("a8b9a59e-bd4d-411d-7728-4ec15d29282b").ToByteArray().ToAsciiString()}{new Guid().ToByteArray().ToAsciiString()}";
-
+        gateKeeper.SetChallenge(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
+        gateKeeper.CreateSecurityChallenge();
         Assert.AreEqual(EnumSupportPackageSequence.SSP_OK, gateKeeper.AcceptSecurityContext(token, ip));
     }
 }
