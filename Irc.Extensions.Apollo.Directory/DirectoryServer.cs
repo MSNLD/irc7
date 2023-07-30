@@ -44,5 +44,6 @@ public class DirectoryServer : ApolloServer
         AddCommand(new Ping());
         AddCommand(new Pong());
         AddCommand(new Version());
+        AddCommand(new WebIrc());
     }
 }

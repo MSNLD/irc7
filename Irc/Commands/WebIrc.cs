@@ -49,7 +49,7 @@ public class WebIrc : Command, ICommand
 
         var expectedUser = chatFrame.Server.GetDataStore().Get(Resources.ConfigWebircUser);
         var expectedPassword = chatFrame.Server.GetDataStore().Get(Resources.ConfigWebircPass);
-        if (expectedUser != gateway && expectedPassword != password)
+        if (expectedUser != gateway || expectedPassword != password)
         {
             Reject(chatFrame, remoteAddress);
             return;
