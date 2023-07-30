@@ -7,11 +7,12 @@ namespace Irc7d;
 
 public class SocketConnection : IConnection
 {
-    private readonly string _address;
     private readonly string _fullAddress;
-
-    private readonly BigInteger _id;
     private readonly Socket _socket;
+    private string _address;
+    private string _hostname;
+    private BigInteger _id;
+    private IPAddress _ipAddress;
     private string _received;
 
     public SocketConnection(Socket socket)
@@ -21,23 +22,11 @@ public class SocketConnection : IConnection
         _id = 0;
         if (_socket.RemoteEndPoint != null)
         {
-            var remoteAddressBytes = ((IPEndPoint)_socket.RemoteEndPoint).Address.GetAddressBytes();
-            _id = new BigInteger(remoteAddressBytes);
-
-            // _id = remoteAddressBytes.Length > 8
-            //     ? ((BigInteger) BitConverter.ToUInt64(remoteAddressBytes, 8) << 64) +
-            //       BitConverter.ToUInt64(remoteAddressBytes, 8)
-            //     : BitConverter.ToUInt32(remoteAddressBytes, 0);
-
             var remoteEndPoint = (IPEndPoint)_socket.RemoteEndPoint;
-            var ipAddress = remoteEndPoint.Address;
-
-            _address = _socket.RemoteEndPoint != null
-                ? ipAddress.ToString()
-                : string.Empty;
             _fullAddress = _socket.RemoteEndPoint != null
                 ? remoteEndPoint.ToString()
                 : string.Empty;
+            _assignIPAddress(remoteEndPoint.Address);
         }
     }
 
@@ -47,14 +36,19 @@ public class SocketConnection : IConnection
     public EventHandler<BigInteger> OnDisconnect { get; set; }
     public EventHandler<Exception> OnError { get; set; }
 
-    public string GetAddress()
+    public string GetIp()
     {
         return _address;
     }
 
-    public string GetFullAddress()
+    public string GetIpAndPort()
     {
         return _fullAddress;
+    }
+
+    public string GetHostname()
+    {
+        return _hostname;
     }
 
     public BigInteger GetId()
@@ -98,6 +92,32 @@ public class SocketConnection : IConnection
         recvAsync.Completed += (sender, args) => { ReceiveData(args); };
         // If Sync receive from connect then process data
         if (!_socket.ReceiveAsync(recvAsync)) ReceiveData(recvAsync);
+    }
+
+    public bool TryOverrideRemoteAddress(string ip, string hostname)
+    {
+        if (!string.IsNullOrWhiteSpace(hostname)) _hostname = hostname;
+
+        if (!string.IsNullOrWhiteSpace(ip))
+        {
+            if (!IPAddress.TryParse(ip, out var parsedAddress)) return false;
+            _assignIPAddress(parsedAddress);
+        }
+
+        return true;
+    }
+
+    private void _assignIPAddress(IPAddress address)
+    {
+        _ipAddress = address;
+        var remoteAddressBytes = _ipAddress.GetAddressBytes();
+        _id = new BigInteger(remoteAddressBytes);
+
+        var ipAddress = address;
+
+        _address = _socket.RemoteEndPoint != null
+            ? ipAddress.ToString()
+            : string.Empty;
     }
 
     private void Digest(Memory<byte> bytes)

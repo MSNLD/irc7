@@ -334,9 +334,9 @@ public static class Raw
         return $":{server} 319 {user} %s :";
     }
 
-    public static string IRCX_RPL_WHOISIP_320(IServer server, IUser user)
+    public static string IRCX_RPL_WHOISIP_320(IServer server, IUser user, IUser targetUser)
     {
-        return $":{server} 320 {user} %s :from IP %s";
+        return $":{server} 320 {user} {targetUser} :from IP {targetUser.GetConnection().GetIp()}";
     }
 
     public static string IRCX_RPL_MODE_321(IServer server, IUser user)
@@ -654,9 +654,9 @@ public static class Raw
         return $":{server} 629 {user} :You are now an IRC guide";
     }
 
-    public static string IRC2_RPL_WHOISSECURE_671(IServer server, IUser user)
+    public static string IRC2_RPL_WHOISSECURE_671(IServer server, IUser user, IUser targetUser)
     {
-        return $":{server} 671 {user} %s :is using a secure connection";
+        return $":{server} 671 {user} {targetUser} :is using a secure connection";
     }
 
     public static string IRCX_RPL_FINDS_NOSUCHCAT_701(IServer server, IUser user)

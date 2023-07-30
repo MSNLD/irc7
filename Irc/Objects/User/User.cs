@@ -24,6 +24,7 @@ public class User : ChatObject, IUser
     private readonly Queue<ModeOperation> _modeOperations = new();
     private bool _authenticated;
 
+    private long _commandSequence;
     private bool _guest;
     private EnumUserAccessLevel _level;
     private IProtocol _protocol;
@@ -56,7 +57,7 @@ public class User : ChatObject, IUser
             if (message.HasCommand) _dataRegulator.PushIncoming(message);
         };
 
-        Address.SetIP(connection.GetAddress());
+        Address.SetIP(connection.GetIp());
     }
 
     public override EnumUserAccessLevel Level => GetLevel();
@@ -343,7 +344,7 @@ public class User : ChatObject, IUser
             else
             {
                 GetDataRegulator().Purge();
-                Disconnect(Raw.IRCX_CLOSINGLINK_011_PINGTIMEOUT(Server, this, _connection.GetAddress()));
+                Disconnect(Raw.IRCX_CLOSINGLINK_011_PINGTIMEOUT(Server, this, _connection.GetIp()));
             }
         }
     }
@@ -375,6 +376,19 @@ public class User : ChatObject, IUser
     public Queue<ModeOperation> GetModeOperations()
     {
         return _modeOperations;
+    }
+
+    public IChatFrame GetNextFrame()
+    {
+        _commandSequence++;
+        var message = _dataRegulator.PopIncoming();
+        return new ChatFrame
+        {
+            SequenceId = _commandSequence,
+            Server = Server,
+            User = this,
+            Message = message
+        };
     }
 
     public virtual bool CanBeModifiedBy(ChatObject source)

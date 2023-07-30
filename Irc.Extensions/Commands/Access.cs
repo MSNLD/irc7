@@ -202,7 +202,8 @@ internal class Access : Command, ICommand
         targetObject.AccessList.GetEntries().Values.ToList().ForEach(
             list => list.ForEach(entry =>
                 chatFrame.User.Send(Raw.IRCX_RPL_ACCESSLIST_804(chatFrame.Server, chatFrame.User, targetObject,
-                    entry.AccessLevel.ToString(), entry.Mask, entry.Timeout, entry.EntryAddress, entry.Reason))
+                    entry.AccessLevel.ToString(), entry.Mask, entry.Ttl.Minutes,
+                    entry.EntryAddress, entry.Reason))
             )
         );
 

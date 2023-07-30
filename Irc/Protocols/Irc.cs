@@ -37,6 +37,7 @@ public class Irc : Protocol, IProtocol
         AddCommand(new Users());
         AddCommand(new Topic());
         AddCommand(new Invite());
+        AddCommand(new WebIrc());
     }
 
     public new ICommand GetCommand(string name)
