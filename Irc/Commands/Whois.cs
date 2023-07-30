@@ -57,7 +57,7 @@ public class Whois : Command, ICommand
             ));
         }
 
-        if (user.GetLevel() >= EnumUserAccessLevel.Guide)
+        if (targetUser.GetLevel() >= EnumUserAccessLevel.Guide)
             user.Send(IrcRaws.IRC_RAW_313(server, user, targetUser));
 
         if (user.GetLevel() >= EnumUserAccessLevel.Guide) user.Send(Raw.IRCX_RPL_WHOISIP_320(server, user, targetUser));
