@@ -94,7 +94,7 @@ public class SocketConnection : IConnection
         if (!_socket.ReceiveAsync(recvAsync)) ReceiveData(recvAsync);
     }
 
-    public bool TryOverrideRemoteAddress(string hostname, string ip)
+    public bool TryOverrideRemoteAddress(string ip, string hostname)
     {
         if (!string.IsNullOrWhiteSpace(hostname)) _hostname = hostname;
 
