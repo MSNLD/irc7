@@ -1,4 +1,6 @@
-﻿namespace Irc.Extensions.Apollo.Tests;
+﻿using NUnit.Framework.Legacy;
+
+namespace Irc.Extensions.Apollo.Tests;
 
 internal class GateKeeperPassportTests
 {
@@ -44,7 +46,7 @@ internal class GateKeeperPassportTests
 
     //    var token = $"{gateKeeperToken.Serialize<GateKeeperToken>().ToAsciiString()}";
 
-    //    Assert.AreEqual(EnumSupportPackageSequence.SSP_OK, gateKeeperPassport.InitializeSecurityContext(token, null));
+    //    ClassicAssert.AreEqual(EnumSupportPackageSequence.SSP_OK, gateKeeperPassport.InitializeSecurityContext(token, null));
 
     //    gateKeeperToken.Version = 3;
     //    gateKeeperToken.Sequence = (int) EnumSupportPackageSequence.SSP_EXT;
@@ -53,7 +55,7 @@ internal class GateKeeperPassportTests
     //    token =
     //        $"{gateKeeperToken.Serialize<GateKeeperToken>().ToAsciiString()}{Guid.Parse("a8b9a59e-bd4d-411d-7728-4ec15d29282b").ToByteArray().ToAsciiString()}{new Guid().ToByteArray().ToAsciiString()}";
 
-    //    Assert.AreEqual(EnumSupportPackageSequence.SSP_CREDENTIALS,
+    //    ClassicAssert.AreEqual(EnumSupportPackageSequence.SSP_CREDENTIALS,
     //        gateKeeperPassport.AcceptSecurityContext(token, ip));
 
     //    gateKeeperToken.Version = 3;
@@ -63,7 +65,7 @@ internal class GateKeeperPassportTests
     //    token =
     //        $"{gateKeeperToken.Serialize<GateKeeperToken>().ToAsciiString()}{passportCredentials.Ticket.Length:X8}{passportCredentials.Ticket}{passportCredentials.Profile.Length:X8}{passportCredentials.Profile}";
 
-    //    Assert.AreEqual(EnumSupportPackageSequence.SSP_CREDENTIALS,
+    //    ClassicAssert.AreEqual(EnumSupportPackageSequence.SSP_CREDENTIALS,
     //        gateKeeperPassport.AcceptSecurityContext(token, ip));
     //}
 }

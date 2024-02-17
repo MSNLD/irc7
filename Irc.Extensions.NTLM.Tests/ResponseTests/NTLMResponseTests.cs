@@ -1,6 +1,7 @@
 ﻿using System;
 using Irc.Helpers;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Irc.Extensions.NTLM.Tests;
 
@@ -21,7 +22,7 @@ public class NTLMResponseTests
         var ntlmAlgorithms = new NtlmResponses();
         var result = ntlmAlgorithms.NtlmResponse(password, challenge.ToAsciiString());
 
-        Assert.AreEqual(expectedResult, result);
+        ClassicAssert.AreEqual(expectedResult, result);
     }
 
     [Test]

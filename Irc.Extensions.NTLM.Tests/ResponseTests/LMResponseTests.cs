@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using Irc.Helpers;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Irc.Extensions.NTLM.Tests;
 
@@ -22,7 +23,7 @@ public class LMResponseTests
         var ntlmAlgorithms = new NtlmResponses();
         var result = ntlmAlgorithms.LmResponse(password, challenge.ToAsciiString());
 
-        Assert.AreEqual(expectedResult.ToAsciiString(), result);
+        ClassicAssert.AreEqual(expectedResult.ToAsciiString(), result);
     }
 
     [Test]
