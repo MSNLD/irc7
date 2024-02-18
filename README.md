@@ -21,7 +21,7 @@ Also our own data gathered during the time MSN Chat was operational, including e
 
 Current project state:
 
-IRC7 uses .NET Core 6.0 and is compiled in VS 2022
+IRC7 uses .NET 8.0 and is compiled in VS 2022
 
 Apologies as this is currently in early development so:
 - Codebase is rough

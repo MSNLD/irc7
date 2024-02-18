@@ -1,6 +1,7 @@
 ﻿using System;
 using Irc.Helpers;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Irc.Extensions.NTLM.Tests;
 
@@ -32,7 +33,7 @@ public class NTLMV2ResponseTests
         var ntlmAlgorithms = new NtlmResponses();
         var result = ntlmAlgorithms.NtlmV2Response(username, password, challenge.ToAsciiString(), blob.ToAsciiString());
 
-        Assert.AreEqual(expectedResult.ToAsciiString(), result);
+        ClassicAssert.AreEqual(expectedResult.ToAsciiString(), result);
     }
 
     //[Test, Ignore("Temporarily disabled")]
@@ -51,7 +52,7 @@ public class NTLMV2ResponseTests
         var result = ntlmAlgorithms.NtlmV2Response(username.ToUnicodeString(), password.ToUnicodeString(),
             serverChallenge, dataBlob);
 
-        Assert.AreEqual(expectedResult, result);
+        ClassicAssert.AreEqual(expectedResult, result);
     }
 
     //[Test, Ignore("Temporarily disabled")]
@@ -70,7 +71,7 @@ public class NTLMV2ResponseTests
         var result = ntlmAlgorithms.NtlmV2Response(username.ToUnicodeString(), password.ToUnicodeString(),
             serverChallenge, dataBlob);
 
-        Assert.AreEqual(expectedResult, result);
+        ClassicAssert.AreEqual(expectedResult, result);
     }
 
     [Test]

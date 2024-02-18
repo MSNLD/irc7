@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using Irc.Helpers;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Irc.Extensions.NTLM.Tests.MessageTests;
 
@@ -33,9 +34,9 @@ internal class NtlmType1MessageTests
         var ntlmMessage1 =
             new NtlmType1Message("NTLMSSP\0\u0001\0\0\0\a\u0082\b¢\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\n\0ðU\0\0\0\u000f");
 
-        Assert.AreEqual(NTLMShared.NTLMSignature, ntlmMessage1.Signature.ToAsciiString());
-        Assert.AreEqual(10, ntlmMessage1.ClientVersion.Major);
-        Assert.AreEqual(ntlmMessage1.EnumeratedFlags[NtlmFlag.NTLMSSP_NEGOTIATE_NTLM2], true);
+        ClassicAssert.AreEqual(NTLMShared.NTLMSignature, ntlmMessage1.Signature.ToAsciiString());
+        ClassicAssert.AreEqual(10, ntlmMessage1.ClientVersion.Major);
+        ClassicAssert.AreEqual(ntlmMessage1.EnumeratedFlags[NtlmFlag.NTLMSSP_NEGOTIATE_NTLM2], true);
     }
 
     [Test]

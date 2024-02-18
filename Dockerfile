@@ -1,6 +1,6 @@
 ARG listen_port=6667
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 WORKDIR /app
 RUN \
     git clone https://github.com/IRC7/IRC7.git && \
