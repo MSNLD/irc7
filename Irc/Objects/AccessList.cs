@@ -77,7 +77,7 @@ public class AccessList : IAccessList
         var accessList = Get(accessLevel);
         if (accessList == null) return null;
 
-        return accessList.FirstOrDefault(entry => Tools.MatchesMask(entry.Mask, mask));
+        return accessList.FirstOrDefault(entry => Tools.MatchesMask(mask, entry.Mask));
     }
 
     public Dictionary<EnumAccessLevel, List<AccessEntry>> GetEntries()

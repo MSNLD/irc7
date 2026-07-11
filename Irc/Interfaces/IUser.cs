@@ -62,4 +62,6 @@ public interface IUser
     ISaslHandler InitializeSspiHandler(bool passport);
     UserProfile? GetProfile();
     void AssignPassportProfile();
+    bool Grants(IUser targetUser);
+    bool Denys(IUser targetUser);
 }

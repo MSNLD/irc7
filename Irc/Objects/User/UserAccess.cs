@@ -9,8 +9,8 @@ public class UserAccess : AccessList
     {
         AccessEntries = new Dictionary<EnumAccessLevel, List<AccessEntry>>
         {
-            { EnumAccessLevel.VOICE, new List<AccessEntry>() },
-            { EnumAccessLevel.DENY, new List<AccessEntry>() }
+            { EnumAccessLevel.DENY, new List<AccessEntry>() },
+            { EnumAccessLevel.GRANT, new List<AccessEntry>() }
         };
     }
     

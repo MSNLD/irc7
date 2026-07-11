@@ -452,4 +452,22 @@ public class User : ChatObject, IUser
     {
         return source == this;
     }
+    
+    public bool Grants(IUser targetUser)
+    {
+        var grantList = Access.Get(EnumAccessLevel.GRANT);
+        if (grantList == null || grantList.Count == 0) return true;
+
+        return Access.Get(EnumAccessLevel.GRANT, targetUser.GetAddress().GetFullAddress()) != null ||
+               Access.Get(EnumAccessLevel.GRANT, targetUser.GetAddress().GetIpFullAddress()) != null;
+    }
+    
+    public bool Denys(IUser targetUser)
+    {
+        var denyList = Access.Get(EnumAccessLevel.DENY);
+        if (denyList == null || denyList.Count == 0) return false;
+
+        return Access.Get(EnumAccessLevel.DENY, targetUser.GetAddress().GetFullAddress()) != null ||
+               Access.Get(EnumAccessLevel.DENY, targetUser.GetAddress().GetIpFullAddress()) != null;
+    }
 }

@@ -68,18 +68,24 @@ public class Privmsg : Command, ICommand
                         Raws.IRCX_ERR_CANNOTSENDTOCHAN_404(chatFrame.Server, chatFrame.User, channel));
                     return;
                 }
-
+                
                 if (notice) ((Channel)chatObject).SendNotice(chatFrame.User, message);
                 else ((Channel)chatObject).SendMessage(chatFrame.User, message);
             }
             else if (chatObject is User)
             {
+                var targetUser = (User)chatObject;
+                // Check for DENY/GRANT (can only work on < Guide)
+                // If not granted or denied, then we do not send
+                if (!targetUser.Grants(chatFrame.User)) return;
+                if (targetUser.Denys(chatFrame.User)) return;
+                
                 if (notice)
-                    ((User)chatObject).Send(
+                    ((User)targetUser).Send(
                         Raws.RPL_NOTICE_USER(chatFrame.Server, chatFrame.User, chatObject, message)
                     );
                 else
-                    ((User)chatObject).Send(
+                    ((User)targetUser).Send(
                         Raws.RPL_PRIVMSG_USER(chatFrame.Server, chatFrame.User, chatObject, message)
                     );
             }
