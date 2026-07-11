@@ -455,6 +455,8 @@ public class User : ChatObject, IUser
     
     public bool Grants(IUser targetUser)
     {
+        if (targetUser.GetLevel() >= EnumUserAccessLevel.Guide) return true;
+        
         var grantList = Access.Get(EnumAccessLevel.GRANT);
         if (grantList == null || grantList.Count == 0) return true;
 
@@ -464,6 +466,8 @@ public class User : ChatObject, IUser
     
     public bool Denys(IUser targetUser)
     {
+        if (targetUser.GetLevel() >= EnumUserAccessLevel.Guide) return false;
+
         var denyList = Access.Get(EnumAccessLevel.DENY);
         if (denyList == null || denyList.Count == 0) return false;
 
