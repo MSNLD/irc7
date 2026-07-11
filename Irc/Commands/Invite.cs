@@ -98,6 +98,11 @@ internal class Invite : Command, ICommand
                 targetChannel));
             return;
         }
+        
+        // Check for DENY/GRANT (can only work on < Guide)
+        // If not granted or denied, then we do not send
+        if (!targetUser.Grants(chatFrame.User)) return;
+        if (targetUser.Denys(chatFrame.User)) return;
 
         targetUser.Send(Raws.RPL_INVITE(chatFrame.Server, chatFrame.User, targetUser, chatFrame.Server.RemoteIp,
             targetChannel));

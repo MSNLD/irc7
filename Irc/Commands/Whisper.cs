@@ -71,17 +71,23 @@ internal class Whisper : Command, ICommand
             user.Send(Raws.IRCX_ERR_NOSUCHNICK_401(server, user, targetNickname));
             return;
         }
+        
+        var targetUser = target.GetUser();
+        // Check for DENY/GRANT (can only work on < Guide)
+        // If not granted or denied, then we do not send
+        if (!targetUser.Grants(chatFrame.User)) return;
+        if (targetUser.Denys(chatFrame.User)) return;
 
         var message = chatFrame.ChatMessage.Parameters[2];
 
-        if (target.GetUser().GetProtocol().GetProtocolType() < EnumProtocolType.IRCX)
+        if (targetUser.GetProtocol().GetProtocolType() < EnumProtocolType.IRCX)
             // PRIVMSG
-            target.GetUser().Send(
-                Raws.RPL_PRIVMSG_USER(chatFrame.Server, chatFrame.User, (ChatObject)target.GetUser(), message)
+            targetUser.Send(
+                Raws.RPL_PRIVMSG_USER(chatFrame.Server, chatFrame.User, (ChatObject)targetUser, message)
             );
         else
-            target.GetUser().Send(
-                Raws.RPL_CHAN_WHISPER(chatFrame.Server, chatFrame.User, channel, (ChatObject)target.GetUser(), message)
+            targetUser.Send(
+                Raws.RPL_CHAN_WHISPER(chatFrame.Server, chatFrame.User, channel, (ChatObject)targetUser, message)
             );
     }
 }
