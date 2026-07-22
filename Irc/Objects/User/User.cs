@@ -134,8 +134,19 @@ public class User : ChatObject, IUser
                 stringBuilder.Append("\r\n");
             }
 
-            Log.Trace($"Sending[{_protocol.GetType().Name}/{Name}]: {stringBuilder}");
-            _connection?.Send(stringBuilder.ToString());
+            var outgoing = stringBuilder.ToString();
+
+            // Ensure we do not send messages exceeding the server maximum (exclude CRLF)
+            var maxAllowed = Server.MaxMessageLength - 2;
+
+            if (outgoing.Length > maxAllowed)
+            {
+                Log.Error($"Outgoing message length {outgoing.Length} exceeds Server.MaxMessageLength ({Server.MaxMessageLength}). Truncating to {maxAllowed} characters.");
+                outgoing = outgoing.Substring(0, maxAllowed);
+            }
+
+            Log.Trace($"Sending[{_protocol.GetType().Name}/{Name}]: {outgoing}");
+            _connection?.Send(outgoing);
         }
     }
 
